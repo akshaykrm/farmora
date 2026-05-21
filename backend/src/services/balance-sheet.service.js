@@ -535,6 +535,7 @@ const getBalanceSheet = async (filter, currentUser) => {
 
   const openingBalance = await getOpeningBalance(masterId)
 
+
   const purchasesData = await getPurchasesData(masterId, from_date, to_date)
   const salesData = await getSalesData(masterId, from_date, to_date)
   const purchaseReturnsData = await getPurchaseReturnsData(
@@ -628,7 +629,6 @@ const getBalanceSheet = async (filter, currentUser) => {
   const transactions = calculateRunningBalance(filteredTransactions, 0)
 
   const formattedTransactions = transactions
-    .sort((a, b) => new Date(b.date) - new Date(a.date))
     .map((t) => ({
       date: formatTransactionDate(t.date),
       purpose: t.purpose,
@@ -663,7 +663,7 @@ const getBalanceSheet = async (filter, currentUser) => {
       closing_balance: parseFloat(closingBalance.toFixed(2)),
     },
     breakdown,
-    transactions: formattedTransactions,
+    transactions: formattedTransactions.reverse() || [],
   }
 }
 
