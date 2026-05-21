@@ -90,7 +90,7 @@ const PurchaseBookTable = (props) => {
               <TableCell content={item.quantity} />
               <TableCell content={item.price || "-"} />
               <TableCell content={item.amount} />
-              <TableCell content={item.type || "-"} />
+              <TableCell className={`${item.type === "return" ? "text-red-700":"text-black"} capitalize`} content={item.type || "-"} />
               <TableCell content={item.balance || "-"} />
             </TableRow>
           );

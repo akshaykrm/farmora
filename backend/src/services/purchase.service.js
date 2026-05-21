@@ -118,7 +118,6 @@ const returnedRecords = await PurchaseReturnModel.findAll({
     }
   })
 
-
   const paidRecords  = await PurchaseBookModel.findAll({
       where:whereClause
     }
@@ -129,7 +128,7 @@ const returnedRecords = await PurchaseReturnModel.findAll({
       id: p.id,
       date: p.date,
       amount: p.total_amount,
-      type: 'paid',
+      type: 'return',
     }
   })
 
@@ -138,7 +137,7 @@ const returnedRecords = await PurchaseReturnModel.findAll({
       id: p.id,
       date: p.date,
       amount: p.amount,
-      type: 'paid',
+      type: p.type ? p.type:'paid',
     }
   })
 
