@@ -7,6 +7,7 @@ import {
 import VendorModel from '@models/vendor'
 import ItemModel from '@models/items.model'
 import PurchaseModel from '@models/purchase'
+import PurchaseReturnModel from '@models/purchase-return'
 import PurchaseBookModel from '@models/purchasebook'
 import userRoles from '@utils/user-roles'
 import { Op } from 'sequelize'
@@ -73,6 +74,10 @@ const getPurchaseBook = async (filter, currentUser) => {
     vendor_id: vendorId,
   }
 
+  const returnWhereClause = {
+    to_vendor: vendorId,
+  }
+
   if (start_date && end_date) {
     const start = dayjs(start_date).startOf('day').toDate()
     const end = dayjs(end_date).endOf('day').toDate()
@@ -80,11 +85,17 @@ const getPurchaseBook = async (filter, currentUser) => {
     whereClause.invoice_date = {
       [Op.between]: [start, end],
     }
+
+    returnWhereClause.invoice_date = {
+      [Op.between]: [start, end],
+    }
   }
   if (currentUser.user_type === userRoles.staff.type) {
     whereClause.master_id = currentUser.master_id
+    returnWhereClause.master_id = currentUser.master_id
   } else if (currentUser.user_type === userRoles.manager.type) {
     whereClause.master_id = currentUser.id
+    returnWhereClause.master_id = currentUser.id
   }
 
   const vendor = await vendorService.getById(vendorId, currentUser)
@@ -101,13 +112,28 @@ const getPurchaseBook = async (filter, currentUser) => {
     ],
   })
 
-  const paidRecords  = await PurchaseBookModel.findAll( {
+const returnedRecords = await PurchaseReturnModel.findAll({
+    where: {...returnWhereClause,
+      payment_type:"paid"
+    }
+  })
+
+
+  const paidRecords  = await PurchaseBookModel.findAll({
       where:whereClause
     }
   )
 
+  const returnList = returnedRecords.map((p) => {
+    return {
+      id: p.id,
+      date: p.date,
+      amount: p.total_amount,
+      type: 'paid',
+    }
+  })
 
-  const paidList = paidRecords.map((p) => {
+  const paidList = [ ...paidRecords ,...returnList].map((p) => {
     return {
       id: p.id,
       date: p.date,
@@ -135,7 +161,11 @@ const getPurchaseBook = async (filter, currentUser) => {
 
   let balance = parseFloat(vendor.opening_balance || '0')
   const purchasesWithBalance = sorted.map((item) => {
-    balance = parseFloat(item.amount) + parseFloat(balance)
+    if(item.type === "paid") {
+      balance = parseFloat(balance) - parseFloat(item.amount)
+    } else {
+    balance = parseFloat(balance)+ parseFloat(item.amount) 
+    }
     const newObj = {
       ...item,
       balance: balance,
@@ -153,7 +183,7 @@ const getPurchaseBook = async (filter, currentUser) => {
     items: purchasesWithBalance.reverse(),
     credit: totalCredit,
     paid: totalPaid,
-    balance: totalCredit - totalPaid,
+    balance: balance,
   }
 }
 
