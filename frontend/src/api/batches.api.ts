@@ -18,7 +18,6 @@ const batches = {
 		opts?: Opts,
 	): Promise<FetcherReturnType<ItemName[]>> => {
 		const params = { season_id: seasonId };
-		params.status = !opts?.status ? "active" : opts.status
 		const searchParms = new URLSearchParams(params);
 		const res = await fetcherV2<ItemName[]>("batches/names?" + searchParms);
 		return res;
