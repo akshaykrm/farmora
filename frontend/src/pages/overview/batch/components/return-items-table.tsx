@@ -27,7 +27,7 @@ const ReturnItem = (props: Props) => {
           ))}
         </TableRow>
         {returns.map((item, index) => {
-	  const returnTo = item.return_type  === "vendor"? item.vendor?.name : item.batch?.name 
+	  const returnTo = item.return_type  === "vendor"? item.vendor?.name : item.to_batch_data?.name 
           const purpose = `${item.category.type} return to ${returnTo}`;
           return (
             <TableRow key={index}>

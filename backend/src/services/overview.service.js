@@ -99,14 +99,16 @@ const getBatchOverview = async (filter, currentUser) => {
 			},
 			{
 				model: BatchModel,
-				as: 'batch',
+				as: 'to_batch_data',
 				required: false,
 				attributes: ['id', 'name'],
 			}
 		],
-		order: [['date', 'ASC']],
+		order: [['date', 'DESC']],
 	})
 
+
+  console.log(returns.map((r) => r.toJSON()))
 
 	const totalPurchasedFeeds =
 		calculateTotalFeeds(purchases) + calculateTotalFeeds(reassigned)
