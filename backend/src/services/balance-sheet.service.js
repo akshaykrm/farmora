@@ -277,13 +277,17 @@ const fetchPaidPurchases = async (masterId, startDate, endDate) => {
   for (let i = 0; i < purchases.length; i++) {
     const purchase = purchases[i]
     const vendorName = purchase.vendor ? purchase.vendor.name : 'Unknown'
-    transactions.push({
-      date: getTransactionDate(purchase, 'invoice_date'),
-      purpose: 'Purchase - ' + vendorName,
-      type: 'out',
-      amount: parseFloat(purchase.net_amount) || 0,
-    })
+    if(purchase.vendor.name!== "Internal") {
+      transactions.push({
+	date: getTransactionDate(purchase, 'invoice_date'),
+	purpose: 'Purchase - ' + vendorName,
+	type: 'out',
+	amount: parseFloat(purchase.net_amount) || 0,
+      })
+    }
   }
+
+
   return transactions
 }
 
