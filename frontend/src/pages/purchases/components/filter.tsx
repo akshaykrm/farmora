@@ -34,6 +34,7 @@ const FilterItems = (props: Props) => {
   const itemCategoryName = useGetItemCategoryNames();
   const batchNames = useGetBatchNames();
 
+
   const {
     setValue,
     watch,

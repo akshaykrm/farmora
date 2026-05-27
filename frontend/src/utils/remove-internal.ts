@@ -4,5 +4,6 @@ export const removeInternal = (dataList: ItemName[]) => {
 	if (!dataList) {
 		return []
 	}
-	return dataList.filter(({ type }) => (type !== "integration") && (type != "working"))
+  
+	return dataList.filter(({ name }) => (name.toLowerCase() !== "integration") && (name.toLowerCase() != "working"))
 }

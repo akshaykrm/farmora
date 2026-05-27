@@ -93,7 +93,7 @@ const ItemReturnTable = ({ onEdit }: Props) => {
                   <TableCell content={returnItem.rate_per_bag} />
                   <TableCell content={returnItem.total_amount} />
 
-                  <TableCell content={returnItem.category?.name || "-"} />
+                  <TableCell content={returnItem.category?.type || "-"} />
                   <TableCell
                     content={returnItem.from_batch_data?.name || "-"}
                   />

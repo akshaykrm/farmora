@@ -82,7 +82,10 @@ const ItemReturnForm = ({ methods, onSubmit }: Props) => {
 					</TextField>
 
 					<SelectList
-						options={removeInternal(itemCategoryName.data)}
+						options={removeInternal(itemCategoryName.data?.map((t) => {
+
+	      return {id: t.id, name:t.type}
+	    }))}
 						value={values.item_category_id}
 						onChange={(val) => {
 							(setValue as any)("item_category_id", val);
