@@ -197,7 +197,8 @@ const Layout = ({ children }: Props) => {
             top: 0,
             right: 0,
             left: { xs: 0, lg: `${DRAWER_WIDTH}px` },
-            zIndex: (theme) => theme.zIndex.drawer - 1,
+            zIndex: (theme) => {
+	    return theme.zIndex.drawer - 1},
           }}
         >
           <div className="px-6 h-full flex items-center justify-between">
