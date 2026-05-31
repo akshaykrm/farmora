@@ -223,8 +223,6 @@ const getSalesLedger = async (filter, currentUser) => {
     whereClause.master_id = currentUser.id
   }
 
-  logger.debug({ whereClause }, 'Fetching sales ledger')
-
   // Fetch buyer to get opening balance
   const buyer = await VendorModel.findOne({
     where: { id: buyer_id },
@@ -254,40 +252,25 @@ const getSalesLedger = async (filter, currentUser) => {
       'payment_type',
     ],
   })
-  let balance = parseFloat(buyer.opening_balance || '0')
-  const itemsWithBalance = sales.reverse().map((sale) => {
-    balance = parseFloat(sale.amount) + parseFloat(balance)
-    const newObj = {
-      created_date: sale.date,
-      bird_no: sale.bird_no,
-      weight: sale.weight ? parseFloat(sale.weight) : null,
-      price: sale.price ? parseFloat(sale.price) : null,
-      amount: parseFloat(sale.amount),
-      type: sale.payment_type,
-      balance: balance,
-    }
-    return newObj
-  })
 
-  // Calculate running balance
-  // const transactions = sales.map((sale) => {
-  //   const saleAmount = parseFloat(sale.amount)
-  //
-  //   // For credit sales, balance increases (buyer owes more)
-  //   // For cash sales, no change to balance (paid immediately)
-  //   const balanceChange = sale.payment_type === 'credit' ? saleAmount : 0
-  //   runningBalance += balanceChange
-  //
-  //   return {
-  //     created_date: sale.date,
-  //     bird_no: sale.bird_no,
-  //     weight: sale.weight ? parseFloat(sale.weight) : null,
-  //     price: sale.price ? parseFloat(sale.price) : null,
-  //     amount: saleAmount,
-  //     type: sale.payment_type,
-  //     balance: runningBalance,
-  //   }
-  // })
+  let balance = parseFloat(buyer.opening_balance || '0')
+
+  let items = []
+
+  for (const s of sales) {
+    if (s.payment_type === 'credit') {
+      balance = parseFloat(s.amount) + parseFloat(balance)
+    }
+    items.unshift({
+      created_date: s.date,
+      bird_no: s.bird_no,
+      weight: s.weight ? parseFloat(s.weight) : null,
+      price: s.price ? parseFloat(s.price) : null,
+      amount: parseFloat(s.amount),
+      type: s.payment_type,
+      balance: balance,
+    })
+  }
 
   return {
     buyer: {
@@ -295,7 +278,7 @@ const getSalesLedger = async (filter, currentUser) => {
       name: buyer.name,
     },
     opening_balance: parseFloat(buyer.opening_balance),
-    transactions: itemsWithBalance.reverse(),
+    transactions: items,
     closing_balance: balance,
   }
 }
