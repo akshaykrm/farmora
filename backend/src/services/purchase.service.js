@@ -57,7 +57,6 @@ const create = async (payload, currentUser) => {
   return newItem
 }
 
-
 const createPurchaseBook = async (payload, currentUser) => {
   if (currentUser.user_type === userRoles.staff.type) {
     payload.master_id = currentUser.master_id
@@ -103,7 +102,6 @@ const getPurchaseBook = async (filter, currentUser) => {
   const purchases = await PurchaseModel.findAll({
     where: {
       ...whereClause,
-      payment_type: 'credit',
     },
     order: [['invoice_date', 'DESC']],
     include: [
@@ -112,16 +110,13 @@ const getPurchaseBook = async (filter, currentUser) => {
     ],
   })
 
-const returnedRecords = await PurchaseReturnModel.findAll({
-    where: {...returnWhereClause,
-      payment_type:"paid"
-    }
+  const returnedRecords = await PurchaseReturnModel.findAll({
+    where: { ...returnWhereClause, payment_type: 'paid' },
   })
 
-  const paidRecords  = await PurchaseBookModel.findAll({
-      where:whereClause
-    }
-  )
+  const paidRecords = await PurchaseBookModel.findAll({
+    where: whereClause,
+  })
 
   const returnList = returnedRecords.map((p) => {
     return {
@@ -132,12 +127,12 @@ const returnedRecords = await PurchaseReturnModel.findAll({
     }
   })
 
-  const paidList = [ ...paidRecords ,...returnList].map((p) => {
+  const paidList = [...paidRecords, ...returnList].map((p) => {
     return {
       id: p.id,
       date: p.date,
       amount: p.amount,
-      type: p.type ? p.type:'paid',
+      type: p.type ? p.type : 'paid',
     }
   })
 
@@ -154,14 +149,13 @@ const returnedRecords = await PurchaseReturnModel.findAll({
 
   const transactions = [...paidList, ...creditList]
   const sorted = [...transactions].sort(
-  (a, b) => dayjs(a.date).valueOf() - dayjs(b.date).valueOf()
-);
-
+    (a, b) => dayjs(a.date).valueOf() - dayjs(b.date).valueOf()
+  )
 
   let balance = parseFloat(vendor.opening_balance || '0')
   const purchasesWithBalance = sorted.map((item) => {
-    if(item.type === "credit" ) {
-      balance = parseFloat(balance) + parseFloat(item.amount) 
+    if (item.type === 'credit') {
+      balance = parseFloat(balance) + parseFloat(item.amount)
     } else {
       balance = parseFloat(balance) - parseFloat(item.amount)
     }
