@@ -259,7 +259,7 @@ const getSalesLedger = async (filter, currentUser) => {
 
   for (const s of sales) {
     if (s.payment_type === 'credit') {
-      balance = parseFloat(balance) - parseFloat(s.amount)
+      balance = parseFloat(balance) + parseFloat(s.amount)
     }
     items.unshift({
       created_date: s.date,
