@@ -154,9 +154,10 @@ const getPurchaseBook = async (filter, currentUser) => {
 
   let balance = parseFloat(vendor.opening_balance || '0')
   const purchasesWithBalance = sorted.map((item) => {
+    console.log(item.type)
     if (item.type === 'credit') {
       balance = parseFloat(balance) + parseFloat(item.amount)
-    } else {
+    } else if (item.type === 'credit') {
       balance = parseFloat(balance) - parseFloat(item.amount)
     }
     const newObj = {
