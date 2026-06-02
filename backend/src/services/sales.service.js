@@ -260,6 +260,8 @@ const getSalesLedger = async (filter, currentUser) => {
   for (const s of sales) {
     if (s.payment_type === 'credit') {
       balance = parseFloat(balance) + parseFloat(s.amount)
+    } else if (s.payment_type === 'paid') {
+      balance = parseFloat(balance) - parseFloat(s.amount)
     }
     items.unshift({
       created_date: s.date,
@@ -284,8 +286,6 @@ const getSalesLedger = async (filter, currentUser) => {
 }
 
 const addSalesBookEntry = async (payload, currentUser) => {
-  logger.debug({ payload, currentUser }, 'Adding sales book entry: raw input')
-
   if (currentUser.user_type === userRoles.staff.type) {
     payload.master_id = currentUser.master_id
   } else {
@@ -293,11 +293,9 @@ const addSalesBookEntry = async (payload, currentUser) => {
   }
 
   // Set default payment_type to credit for ledger entries
-  payload.payment_type = 'credit'
+  payload.payment_type = 'paid'
 
-  logger.info({ entry: payload }, 'Creating sales book entry')
   const newEntry = await SalesModel.create(payload)
-  logger.info({ new_entry_id: newEntry.id }, 'Sales book entry created')
 
   return newEntry
 }

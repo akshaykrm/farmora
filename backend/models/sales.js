@@ -41,7 +41,7 @@ const SalesModel = sequelize.define(
       allowNull: true,
     },
     payment_type: {
-      type: Sequelize.ENUM('credit', 'cash'),
+      type: Sequelize.ENUM('credit', 'cash', 'paid'),
       defaultValue: 'cash',
       allowNull: false,
     },
