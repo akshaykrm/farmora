@@ -127,12 +127,12 @@ const getPurchaseBook = async (filter, currentUser) => {
     }
   })
 
-  const paidList = [...paidRecords, ...returnList].map((p) => {
+  const transformedPaidRecords = paidRecords.map((p) => {
     return {
       id: p.id,
       date: p.date,
       amount: p.amount,
-      type: p.type ? p.type : 'paid',
+      type: 'cached-out',
     }
   })
 
@@ -147,31 +147,43 @@ const getPurchaseBook = async (filter, currentUser) => {
     }
   })
 
-  const transactions = [...paidList, ...creditList]
+  const transactions = [...returnList, ...transformedPaidRecords, ...creditList]
   const sorted = [...transactions].sort(
     (a, b) => dayjs(a.date).valueOf() - dayjs(b.date).valueOf()
   )
 
   let balance = parseFloat(vendor.opening_balance || '0')
   const purchasesWithBalance = sorted.map((item) => {
-    console.log(item.type)
     if (item.type === 'credit') {
       balance = parseFloat(balance) + parseFloat(item.amount)
     } else if (item.type === 'return') {
       balance = parseFloat(balance) - parseFloat(item.amount)
+    } else if (item.type === 'cached-out') {
+      balance = parseFloat(balance) - parseFloat(item.amount)
     }
+
     const newObj = {
       ...item,
       balance: balance,
     }
     return newObj
   })
+
+  let temp = 0
+  creditList.forEach((c) => {
+    temp += parseFloat(c.amount)
+  })
+  console.log(temp)
   const totalCredit = creditList.reduce((acc, curr) => {
     return acc + parseFloat(curr.amount)
   }, 0)
-  const totalPaid = paidList.reduce((acc, curr) => {
-    return acc + parseFloat(curr.amount)
-  }, 0)
+
+  const totalPaid = [...transformedPaidRecords, ...returnList].reduce(
+    (acc, curr) => {
+      return acc + parseFloat(curr.amount)
+    },
+    0
+  )
 
   return {
     items: purchasesWithBalance.reverse(),
