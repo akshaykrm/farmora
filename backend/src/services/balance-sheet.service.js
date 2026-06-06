@@ -6,6 +6,7 @@ import GeneralExpenseModel from '@models/generalexpense'
 import ExpenseSalesModel from '@models/expensesales'
 import IntegrationBookModel from '@models/integationbook'
 import PurchaseReturnModel from '@models/purchase-return'
+import PurchaseBookModel from '@models/purchasebook'
 import userRoles from '@utils/user-roles'
 import { Op } from 'sequelize'
 import dayjs from 'dayjs'
@@ -123,6 +124,13 @@ const fetchIntegrationBooks = async (masterId, startDate, endDate) => {
   })
 }
 
+const fetchPurchaseBooks = async (masterId, startDate, endDate) => {
+  const dateFilter = buildDateFilter(startDate, endDate)
+  return PurchaseBookModel.findAll({
+    where: { master_id: masterId, ...dateFilter },
+  })
+}
+
 const fetchAllRecords = async (masterId, startDate, endDate) => {
   const [
     openingBalance,
@@ -133,6 +141,7 @@ const fetchAllRecords = async (masterId, startDate, endDate) => {
     generalExpenses,
     expenseSales,
     integrationBooks,
+    purchaseBooks,
   ] = await Promise.all([
     fetchVendorsOpeningBalance(masterId),
     fetchSales(masterId, startDate, endDate),
@@ -142,6 +151,7 @@ const fetchAllRecords = async (masterId, startDate, endDate) => {
     fetchGeneralExpenses(masterId, startDate, endDate),
     fetchExpenseSales(masterId, startDate, endDate),
     fetchIntegrationBooks(masterId, startDate, endDate),
+    fetchPurchaseBooks(masterId, startDate, endDate),
   ])
 
   return {
@@ -153,6 +163,7 @@ const fetchAllRecords = async (masterId, startDate, endDate) => {
     generalExpenses,
     expenseSales,
     integrationBooks,
+    purchaseBooks,
   }
 }
 
@@ -198,9 +209,7 @@ const purchaseToTransactions = (records) => {
 const purchaseReturnToTransactions = (records) => {
   const txns = []
   for (const r of records) {
-    const vendorName = r.to_vendor_data
-      ? r.to_vendor_data.name
-      : 'Unknown'
+    const vendorName = r.to_vendor_data ? r.to_vendor_data.name : 'Unknown'
     if (r.payment_type === 'paid') {
       txns.push({
         date: r.date,
@@ -283,6 +292,20 @@ const integrationBookToTransactions = (records) => {
   return txns
 }
 
+const purchaseBookToTransactions = (records) => {
+  const txns = []
+  for (const r of records) {
+    txns.push({
+      date: r.date,
+      purpose: 'Purchase Book Payment',
+      type: 'out',
+      amount: parseFloat(r.amount) || 0,
+      category: 'purchase_book',
+    })
+  }
+  return txns
+}
+
 // ---------------------------------------------------------------------------
 // PHASE 3 — MERGE & SORT: combine all category transaction arrays into one
 //            date-sorted list
@@ -352,12 +375,7 @@ const deriveSummary = (transactions, records, openingBalance) => {
     sumWhere(records.integrationBooks, 'amount', 'payment_type', 'credit') -
     sumWhere(records.purchaseReturns, 'total_amount', 'payment_type', 'credit')
 
-  const receivable = sumWhere(
-    records.sales,
-    'amount',
-    'payment_type',
-    'credit'
-  )
+  const receivable = sumWhere(records.sales, 'amount', 'payment_type', 'credit')
 
   const net = totalIn - totalOut
   const closingBalance = openingBalance + net
@@ -477,6 +495,10 @@ const buildBreakdown = (records) => {
       out: round(paidIntegration),
       liability: round(creditIntegration),
     },
+    purchase_books: {
+      in: 0,
+      out: round(sumField(records.purchaseBooks, 'amount')),
+    },
   }
 }
 
@@ -535,6 +557,7 @@ const getBalanceSheet = async (filter, currentUser) => {
   const expenseTxns = generalExpenseToTransactions(records.generalExpenses)
   const expenseSaleTxns = expenseSaleToTransactions(records.expenseSales)
   const integTxns = integrationBookToTransactions(records.integrationBooks)
+  const purchaseBookTxns = purchaseBookToTransactions(records.purchaseBooks)
 
   // -----------------------------------------------------------------------
   // PHASE 3 — Merge & sort by date
@@ -546,7 +569,8 @@ const getBalanceSheet = async (filter, currentUser) => {
     workingTxns,
     expenseTxns,
     expenseSaleTxns,
-    integTxns
+    integTxns,
+    purchaseBookTxns
   )
 
   // -----------------------------------------------------------------------
