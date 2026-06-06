@@ -101,8 +101,8 @@ const WorkingCostForm = ({ onSubmit, defaultValues, apiErrors }: Props) => {
             size="small"
             select
           >
-            <MenuItem value="income">Income</MenuItem>
-            <MenuItem value="expense">Expense</MenuItem>
+            <MenuItem value="income">Expense</MenuItem>
+            <MenuItem value="expense">Income</MenuItem>
           </RHFTextField>
         </div>
         <div className="flex justify-end mt-6">

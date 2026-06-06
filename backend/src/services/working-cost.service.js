@@ -45,11 +45,11 @@ const getAll = async (filter, currentUser) => {
     attributes: ['id', 'date', 'purpose', 'amount', 'payment_type'],
   })
 
-  const income = workingCostRecords.filter(
+  const expense = workingCostRecords.filter(
     (record) => record.payment_type === 'income'
   )
 
-  const expense = workingCostRecords.filter(
+  const income = workingCostRecords.filter(
     (record) => record.payment_type === 'expense'
   )
 
@@ -70,7 +70,7 @@ const getAll = async (filter, currentUser) => {
     }
   })
 
-  const parsedExpanse = expense.map((item) => {
+  const parsedIncome = income.map((item) => {
     return {
       id: item.id,
       date: item.date,
@@ -79,8 +79,8 @@ const getAll = async (filter, currentUser) => {
     }
   })
 
-  const combinedExpanse = [...parsedExpanse, ...parsedWorkingCost]
-  const sortedCombinedExpanse = combinedExpanse.sort((a, b) => {
+  const combinedIncome = [...parsedIncome, ...parsedWorkingCost]
+  const sortedCombinedIncome = combinedIncome.sort((a, b) => {
     const isBefore = dayjs(a.date).isBefore(b.date)
     if (isBefore) {
       return 1
@@ -89,23 +89,32 @@ const getAll = async (filter, currentUser) => {
     }
   })
 
-  const totalExpance = sortedCombinedExpanse.reduce((acc, curr) => {
+  const parsedExpense = expense.map((item) => {
+    return {
+      id: item.id,
+      date: item.date,
+      purpose: item.purpose,
+      amount: item.amount,
+    }
+  })
+
+  const totalIncome = sortedCombinedIncome.reduce((acc, curr) => {
     const parsedAmount = parseFloat(curr.amount)
     return parsedAmount + acc
   }, 0)
 
-  const totalIncome = income.reduce((acc, curr) => {
+  const totalExpense = parsedExpense.reduce((acc, curr) => {
     const parsedAmount = parseFloat(curr.amount)
     return parsedAmount + acc
   }, 0)
 
   return {
-    income,
-    expense: sortedCombinedExpanse,
+    income: sortedCombinedIncome,
+    expense: parsedExpense,
     totals: {
       income: totalIncome,
-      expanse: totalExpance,
-      balance: totalIncome - totalExpance,
+      expanse: totalExpense,
+      balance: totalIncome - totalExpense,
     },
   }
 }
