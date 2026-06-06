@@ -183,6 +183,7 @@ const saleToTransactions = (records) => {
         type: 'in',
         amount: parseFloat(r.amount) || 0,
         category: 'sale',
+        createdAt: r.createdAt,
       })
     }
   }
@@ -200,6 +201,7 @@ const purchaseToTransactions = (records) => {
         type: 'out',
         amount: parseFloat(r.net_amount) || 0,
         category: 'purchase',
+        createdAt: r.createdAt,
       })
     }
   }
@@ -217,6 +219,7 @@ const purchaseReturnToTransactions = (records) => {
         type: 'in',
         amount: parseFloat(r.total_amount) || 0,
         category: 'purchase_return',
+        createdAt: r.createdAt,
       })
       if (r.return_type === 'vendor') {
         txns.push({
@@ -225,6 +228,7 @@ const purchaseReturnToTransactions = (records) => {
           type: 'out',
           amount: parseFloat(r.total_amount) || 0,
           category: 'purchase_return',
+          createdAt: r.createdAt,
         })
       }
     }
@@ -242,6 +246,7 @@ const workingCostToTransactions = (records) => {
         type: r.payment_type === 'income' ? 'in' : 'out',
         amount: parseFloat(r.amount) || 0,
         category: 'working_cost',
+        createdAt: r.createdAt,
       })
     }
   }
@@ -257,6 +262,7 @@ const generalExpenseToTransactions = (records) => {
       type: 'out',
       amount: parseFloat(r.amount) || 0,
       category: 'general_expense',
+      createdAt: r.createdAt,
     })
   }
   return txns
@@ -271,6 +277,7 @@ const expenseSaleToTransactions = (records) => {
       type: 'in',
       amount: parseFloat(r.amount) || 0,
       category: 'expense_sale',
+      createdAt: r.createdAt,
     })
   }
   return txns
@@ -286,6 +293,7 @@ const integrationBookToTransactions = (records) => {
         type: 'out',
         amount: parseFloat(r.amount) || 0,
         category: 'integration_book',
+        createdAt: r.createdAt,
       })
     }
   }
@@ -301,6 +309,7 @@ const purchaseBookToTransactions = (records) => {
       type: 'out',
       amount: parseFloat(r.amount) || 0,
       category: 'purchase_book',
+      createdAt: r.createdAt,
     })
   }
   return txns
@@ -324,7 +333,7 @@ const mergeAndSort = (...arrays) => {
     if (dateA !== dateB) {
       return dateA - dateB
     }
-    return a.type === 'in' ? -1 : 1
+    return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
   })
   return combined
 }
