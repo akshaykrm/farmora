@@ -13,13 +13,13 @@ const EmployeesPage = () => {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-6">
         <PageTitle title="Employees" />
         <Button variant="contained" onClick={() => setOpenAdd(true)}>
           Add Employee
         </Button>
       </div>
-      <div className="mt-6">
+      <div>
         <EmployeesTable onEdit={setSelectedId} data={employeeList} />
       </div>
       <AddNewEmployee

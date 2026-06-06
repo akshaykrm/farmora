@@ -18,13 +18,13 @@ const FarmsPage = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-6">
         <PageTitle title="Farms" />
         <Button variant="contained" onClick={onOpen}>
           Add Farms
         </Button>
       </div>
-      <div className="mt-6">
+      <div>
         <FarmTable onEdit={(id) => setSelectedId(id)} farmList={farmList} />
       </div>
       <AddFarm isShow={isOpen} onClose={onClose} refetch={handleGetFarms} />

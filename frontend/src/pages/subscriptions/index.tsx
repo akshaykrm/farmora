@@ -14,14 +14,14 @@ const SubscriptionsPage = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-6">
         <PageTitle title="Subscriptions" />
         <Button variant="contained" onClick={onOpen}>
           Add Subscription
         </Button>
       </div>
 
-      <div className="mt-6">
+      <div>
         <SubscriptionTable onEdit={(id) => setSelectedId(id)} />
       </div>
       <AddSubscription isShow={isOpen} onClose={onClose} />

@@ -19,14 +19,14 @@ const PurchasePage = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-6">
         <PageTitle title="Purchase" />
         <Button variant="contained" onClick={onOpen}>
           Add Purchase
         </Button>
       </div>
 
-      <div className="mt-6">
+      <div>
         <ItemTable
           onEdit={(id) => setSelectedId(id)}
           data={purchaseList}

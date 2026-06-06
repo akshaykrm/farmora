@@ -16,13 +16,13 @@ const VendorPage = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-6">
         <PageTitle title="Vendor" />
         <Button variant="contained" onClick={onOpen}>
           Add Vendor
         </Button>
       </div>
-      <div className="mt-6">
+      <div>
         <VendorTable onEdit={(id) => setSelectedId(id)} data={vendorList} />
       </div>
       <AddVendor

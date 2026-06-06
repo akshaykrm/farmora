@@ -17,13 +17,13 @@ const ItemsPage = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-6">
         <PageTitle title="Items" />
         <Button variant="contained" onClick={onOpen}>
           Add Item
         </Button>
       </div>
-      <div className="mt-6">
+      <div>
         <ItemTable onEdit={(id) => setSelectedId(id)} data={itemsList} />
       </div>
       <AddItem

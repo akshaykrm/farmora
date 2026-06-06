@@ -17,13 +17,13 @@ const BatchPage = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-6">
         <PageTitle title="Batch" />
         <Button variant="contained" onClick={onOpen}>
           Add Batch
         </Button>
       </div>
-      <div className="mt-6">
+      <div>
         <BatchTable onEdit={(id) => setSelectedId(id)} data={batchList} />
       </div>
       <AddBatch

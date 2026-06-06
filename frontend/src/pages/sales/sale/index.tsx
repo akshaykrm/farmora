@@ -19,14 +19,14 @@ const SalesPage = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-6">
         <PageTitle title="Sales" />
         <Button variant="contained" onClick={onOpen}>
           Add Sale
         </Button>
       </div>
 
-      <div className="mt-6">
+      <div>
         <SalesTable onEdit={(id) => setSelectedId(id)} data={data} />
       </div>
       <AddSale

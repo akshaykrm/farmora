@@ -14,13 +14,13 @@ const SeasonsPage = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-6">
         <PageTitle title="Seasons" />
         <Button variant="contained" onClick={onOpen}>
           Add Season
         </Button>
       </div>
-      <div className="mt-6">
+      <div>
         <SeasonTable onEdit={(id) => setSelectedId(id)} />
       </div>
       <AddSeason isShow={isOpen} onClose={onClose} />
