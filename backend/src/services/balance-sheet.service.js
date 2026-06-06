@@ -128,6 +128,7 @@ const fetchPurchaseBooks = async (masterId, startDate, endDate) => {
   const dateFilter = buildDateFilter(startDate, endDate)
   return PurchaseBookModel.findAll({
     where: { master_id: masterId, ...dateFilter },
+    include: [{ model: VendorModel, as: 'vendor', attributes: ['name'] }],
   })
 }
 
@@ -197,7 +198,7 @@ const purchaseToTransactions = (records) => {
     if (r.payment_type === 'paid' && vendorName !== 'Internal') {
       txns.push({
         date: r.invoice_date,
-        purpose: 'Purchase - ' + vendorName,
+        purpose: 'Payment to ' + vendorName,
         type: 'out',
         amount: parseFloat(r.net_amount) || 0,
         category: 'purchase',
@@ -305,7 +306,7 @@ const purchaseBookToTransactions = (records) => {
   for (const r of records) {
     txns.push({
       date: r.date,
-      purpose: 'Purchase Book Payment',
+      purpose: `Payment to ${r.vendor?.name || 'Unknown'}`,
       type: 'out',
       amount: parseFloat(r.amount) || 0,
       category: 'purchase_book',

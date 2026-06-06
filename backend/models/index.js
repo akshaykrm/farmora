@@ -18,6 +18,7 @@ import WorkingCostModel from './workingcost.js'
 import SalesModel from './sales.js'
 import GeneralExpenseModel from './generalexpense.js'
 import ExpenseSalesModel from './expensesales.js'
+import PurchaseBookModel from './purchasebook.js'
 
 UserModel.hasMany(SubscriptionModel, {
   foreignKey: 'user_id',
@@ -198,6 +199,12 @@ PurchaseReturnModel.belongsTo(VendorModel, {
 PurchaseReturnModel.belongsTo(UserModel, {
   foreignKey: 'master_id',
   as: 'master',
+  targetKey: 'id',
+})
+
+PurchaseBookModel.belongsTo(VendorModel, {
+  foreignKey: 'vendor_id',
+  as: 'vendor',
   targetKey: 'id',
 })
 
