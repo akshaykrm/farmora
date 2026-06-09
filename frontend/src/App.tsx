@@ -35,6 +35,8 @@ import BalanceSheetPage from "@pages/balance-sheet";
 import EmployeesPage from "@pages/employees";
 import VendorPage from "@pages/vendors";
 import InvestorManagementPage from "@pages/investors/management";
+import InvestLedgerPage from "@pages/investors/ledger/invest";
+import ProfitLedgerPage from "@pages/investors/ledger/profit";
 
 const queryClient = new QueryClient();
 
@@ -45,7 +47,9 @@ const pageComponents: Record<string, React.ComponentType> = {
   "/configuration/seasons": SeasonsPage,
   "/configuration/farms": FarmsPage,
   "/configuration/vendors": VendorPage,
-  "/configuration/investors": InvestorManagementPage,
+  "/investors/management": InvestorManagementPage,
+  "/investors/ledger/invest": InvestLedgerPage,
+  "/investors/ledger/profit": ProfitLedgerPage,
   "/configuration/items": ItemsPage,
   "/expense/purchase": PurchasePage,
   "/expense/purchase-book": PurchaseBookPage,

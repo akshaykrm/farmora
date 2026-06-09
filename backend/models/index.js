@@ -20,6 +20,8 @@ import GeneralExpenseModel from './generalexpense.js'
 import ExpenseSalesModel from './expensesales.js'
 import PurchaseBookModel from './purchasebook.js'
 import InvestorManagementModel from './investorManagement.js'
+import InvestorTransactionTypeModel from './investorTransactionType.js'
+import InvestorTransactionModel from './investorTransaction.js'
 
 UserModel.hasMany(SubscriptionModel, {
   foreignKey: 'user_id',
@@ -251,6 +253,29 @@ SalesModel.belongsTo(UserModel, {
   targetKey: 'id',
 })
 
+InvestorTransactionModel.belongsTo(InvestorManagementModel, {
+  foreignKey: 'investor_id',
+  as: 'investor',
+  targetKey: 'id',
+})
+
+InvestorTransactionModel.belongsTo(InvestorTransactionTypeModel, {
+  foreignKey: 'transaction_type_id',
+  as: 'transaction_type',
+  targetKey: 'id',
+})
+
+InvestorTransactionModel.belongsTo(InvestorTransactionModel, {
+  foreignKey: 'reference_transaction_id',
+  as: 'reference_transaction',
+  targetKey: 'id',
+})
+
+InvestorManagementModel.hasMany(InvestorTransactionModel, {
+  foreignKey: 'investor_id',
+  as: 'transactions',
+})
+
 export {
   UserModel,
   FarmModel,
@@ -272,4 +297,6 @@ export {
   GeneralExpenseModel,
   ExpenseSalesModel,
   InvestorManagementModel,
+  InvestorTransactionTypeModel,
+  InvestorTransactionModel,
 }

@@ -37,6 +37,14 @@ export const paths: Paths = [
     ],
   },
   {
+    pathname: "Invest",
+    children: [
+      { pathname: "Management", link: "/investors/management" },
+      { pathname: "Investments", link: "/investors/ledger/invest" },
+      { pathname: "Profits", link: "/investors/ledger/profit" },
+    ],
+  },
+  {
     pathname: "Configuration",
     children: [
       { pathname: "Items", link: "/configuration/items" },
@@ -44,7 +52,6 @@ export const paths: Paths = [
       { pathname: "Seasons", link: "/configuration/seasons" },
       { pathname: "Batches", link: "/configuration/batches" },
       { pathname: "Vendors", link: "/configuration/vendors" },
-      { pathname: "Investors", link: "/configuration/investors" },
       { pathname: "Employees", link: "/configuration/employees" },
     ],
   },
