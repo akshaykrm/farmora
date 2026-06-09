@@ -1,0 +1,2 @@
+export const INVESTOR_DEFAULT_PAGE_LIMIT = 10
+export const INVESTOR_MAX_PAGE_LIMIT = 100

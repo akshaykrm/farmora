@@ -19,6 +19,7 @@ import SalesModel from './sales.js'
 import GeneralExpenseModel from './generalexpense.js'
 import ExpenseSalesModel from './expensesales.js'
 import PurchaseBookModel from './purchasebook.js'
+import InvestorManagementModel from './investorManagement.js'
 
 UserModel.hasMany(SubscriptionModel, {
   foreignKey: 'user_id',
@@ -270,4 +271,5 @@ export {
   SalesModel,
   GeneralExpenseModel,
   ExpenseSalesModel,
+  InvestorManagementModel,
 }

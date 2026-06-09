@@ -24,6 +24,7 @@ import overviewRouter from '@routes/overview.router'
 import dashboardRouter from '@routes/dashboard.router'
 import balanceSheetRouter from '@routes/balance-sheet.router'
 import invoiceConfigRouter from '@routes/invoice_config.router'
+import investorManagementRoutes from './src/investors/management/management.routes.js'
 
 import responseHandler from '@middlewares/response.middleware'
 import globalErrorHandler from '@middlewares/error.middleware'
@@ -59,6 +60,7 @@ app.use('/api/overview', overviewRouter)
 app.use('/api/dashboard', dashboardRouter)
 app.use('/api/balance-sheet', balanceSheetRouter)
 app.use('/api/invoice', invoiceConfigRouter)
+app.use('/api/investors', investorManagementRoutes)
 
 app.get('/', (_, res) => {
   res.json({ message: 'server is up and running', status: 'ok' })

@@ -44,6 +44,7 @@ export const paths: Paths = [
       { pathname: "Seasons", link: "/configuration/seasons" },
       { pathname: "Batches", link: "/configuration/batches" },
       { pathname: "Vendors", link: "/configuration/vendors" },
+      { pathname: "Investors", link: "/configuration/investors" },
       { pathname: "Employees", link: "/configuration/employees" },
     ],
   },
