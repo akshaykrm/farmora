@@ -10,6 +10,7 @@ export type TransactionType = {
 
 export type InvestorTransaction = {
   id: number
+  txn_id: string
   master_id: number
   investor_id: number
   transaction_type_id: number

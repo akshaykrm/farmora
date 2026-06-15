@@ -32,6 +32,9 @@ const InvestorTransactionModel = sequelize.define(
       type: Sequelize.TEXT,
       allowNull: true,
     },
+    txn_id: {
+      type: Sequelize.STRING(50),
+    },
   },
   {
     underscored: true,

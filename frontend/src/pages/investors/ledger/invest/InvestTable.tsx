@@ -10,6 +10,7 @@ import { useMemo } from "react";
 import type { InvestorTransactionListResponse } from "../types";
 
 const headers = [
+  "Txn ID",
   "Investor",
   "Type",
   "Amount",
@@ -47,6 +48,7 @@ const InvestTable = (props: Props) => {
         </TableRow>
         {data.data.map((transaction) => (
           <TableRow key={transaction.id}>
+            <TableCell content={transaction.txn_id ?? "-"} />
             <TableCell content={transaction.investor?.investor_name ?? "-"} />
             <TableCell
               content={
