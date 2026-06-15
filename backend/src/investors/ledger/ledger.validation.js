@@ -26,6 +26,14 @@ export const createInvestorTransactionSchema = Joi.object({
   remarks: Joi.string().allow(null, '').max(500).default(null),
 })
 
+export const getBalanceSummaryQuerySchema = Joi.object({
+  category: Joi.string().valid('CAPITAL', 'PROFIT').required().messages({
+    'any.required': 'Category is required',
+    'any.only': 'Category must be CAPITAL or PROFIT',
+  }),
+  investor_id: Joi.number().integer().allow(null, ''),
+})
+
 export const listInvestorTransactionsQuerySchema = Joi.object({
   page: Joi.number().integer().min(1).default(1),
   limit: Joi.number().integer().min(1).max(100).default(10),

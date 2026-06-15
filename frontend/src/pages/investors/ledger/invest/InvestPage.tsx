@@ -6,8 +6,10 @@ import InvestTable from './InvestTable'
 import InvestForm from './InvestForm'
 import InvestFilters from './InvestFilters'
 import ReversalDialog from '../ReversalDialog'
+import BalanceCard from '../BalanceCard'
 import useGetInvestorLedgerTransactions from '../hooks/useGetInvestorLedgerTransactions'
 import useCreateInvestorTransaction from '../hooks/useCreateInvestorTransaction'
+import useGetBalanceSummary from '../hooks/useGetBalanceSummary'
 import type {
   InvestorTransactionFormValues,
   LedgerFilterRequest,
@@ -29,6 +31,16 @@ const InvestPage = () => {
   const [reverseTransactionId, setReverseTransactionId] = useState<
     number | null
   >(null)
+  const [currentInvestorId, setCurrentInvestorId] = useState<string | undefined>()
+  const [filterStartDate, setFilterStartDate] = useState<string | undefined>()
+  const [filterEndDate, setFilterEndDate] = useState<string | undefined>()
+
+  const { balance, loading, refetch } = useGetBalanceSummary({
+    category: 'CAPITAL',
+    investorId: currentInvestorId,
+    startDate: filterStartDate,
+    endDate: filterEndDate,
+  })
 
   const onOpen = () => setOpenAdd(true)
   const onClose = () => setOpenAdd(false)
@@ -38,6 +50,7 @@ const InvestPage = () => {
       onClose()
       handleClose()
       handleFetchTransactions({ category: 'CAPITAL' })
+      refetch()
     },
   })
 
@@ -48,6 +61,9 @@ const InvestPage = () => {
   }
 
   const onFilter = (filter: LedgerFilterRequest) => {
+    setCurrentInvestorId(filter.investor_id || undefined)
+    setFilterStartDate(filter.start_date || undefined)
+    setFilterEndDate(filter.end_date || undefined)
     const params: Record<string, string> = { category: 'CAPITAL' }
     if (filter.investor_id) params.investor_id = filter.investor_id
     if (filter.transaction_type_id)
@@ -75,6 +91,16 @@ const InvestPage = () => {
         </Button>
       </div>
       <InvestFilters onFilter={onFilter} />
+      <div className="mt-4">
+        <BalanceCard
+          balance={balance}
+          loading={loading}
+          category="CAPITAL"
+          hasInvestorFilter={Boolean(currentInvestorId)}
+          filterStartDate={filterStartDate}
+          filterEndDate={filterEndDate}
+        />
+      </div>
       <div className="mt-4">
         <InvestTable
           onReverse={onReverse}

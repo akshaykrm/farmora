@@ -66,6 +66,16 @@ async function getProfitBalance(req, res) {
   res.success({ balance }, { message: 'Profit balance fetched successfully' })
 }
 
+async function getBalanceSummary(req, res) {
+  const filter = {}
+  if (req.query.category) filter.category = req.query.category
+  if (req.query.investor_id) filter.investor_id = req.query.investor_id
+  if (req.query.start_date) filter.start_date = req.query.start_date
+  if (req.query.end_date) filter.end_date = req.query.end_date
+  const balance = await LedgerService.getBalanceSummary(filter, req.user)
+  res.success({ balance }, { message: 'Balance summary fetched successfully' })
+}
+
 async function lookupInvestors(req, res) {
   const investors = await LedgerService.lookupInvestors(req.user)
   res.success(investors, { message: 'Investors fetched successfully' })
@@ -82,6 +92,7 @@ const LedgerController = {
   listTransactions: asyncHandler(listTransactions),
   getCapitalBalance: asyncHandler(getCapitalBalance),
   getProfitBalance: asyncHandler(getProfitBalance),
+  getBalanceSummary: asyncHandler(getBalanceSummary),
   lookupInvestors: asyncHandler(lookupInvestors),
   lookupTransactionTypes: asyncHandler(lookupTransactionTypes),
 }

@@ -324,6 +324,60 @@ async function lookupTransactionTypes() {
   return types
 }
 
+async function getBalanceSummary(filter, currentUser) {
+  const { category, investor_id, start_date, end_date } = filter
+
+  const inCode = category === TRANSACTION_CATEGORIES.CAPITAL
+    ? TRANSACTION_TYPE_CODES.CAPITAL_IN
+    : TRANSACTION_TYPE_CODES.PROFIT_CREDIT
+
+  const outCode = category === TRANSACTION_CATEGORIES.CAPITAL
+    ? TRANSACTION_TYPE_CODES.CAPITAL_OUT
+    : TRANSACTION_TYPE_CODES.PROFIT_WITHDRAW
+
+  const masterId = currentUser.user_type === userRoles.staff.type
+    ? currentUser.master_id
+    : currentUser.id
+
+  const result = await sequelize.query(
+    `
+    SELECT COALESCE(SUM(
+      CASE
+        WHEN ttc.code = :inCode THEN it.amount
+        WHEN ttc.code = :outCode THEN -it.amount
+        WHEN ttc.code = :reversalCode AND ref_ttc.code = :inCode THEN it.amount
+        WHEN ttc.code = :reversalCode AND ref_ttc.code = :outCode THEN -it.amount
+        ELSE 0
+      END
+    ), 0) AS balance
+    FROM investor_transactions it
+    JOIN investor_transaction_types ttc ON it.transaction_type_id = ttc.id
+    LEFT JOIN investor_transactions ref ON it.reference_transaction_id = ref.id
+    LEFT JOIN investor_transaction_types ref_ttc ON ref.transaction_type_id = ref_ttc.id
+    WHERE (ttc.category = :category OR (ttc.code = :reversalCode AND ref_ttc.category = :category))
+      AND (:investorId IS NULL OR it.investor_id = :investorId)
+      AND it.master_id = :masterId
+      AND (:startDate IS NULL OR it.transaction_date >= :startDate)
+      AND (:endDate IS NULL OR it.transaction_date <= :endDate)
+    `,
+    {
+      replacements: {
+        inCode,
+        outCode,
+        reversalCode: TRANSACTION_TYPE_CODES.REVERSAL,
+        category,
+        investorId: investor_id || null,
+        startDate: start_date || null,
+        endDate: end_date || null,
+        masterId,
+      },
+      type: sequelize.QueryTypes.SELECT,
+    }
+  )
+
+  return parseFloat(result[0]?.balance || 0)
+}
+
 const LedgerService = {
   createInvestorTransaction,
   getInvestorTransactionById,
@@ -333,6 +387,7 @@ const LedgerService = {
   getInvestorTransactionHistory,
   lookupInvestors,
   lookupTransactionTypes,
+  getBalanceSummary,
 }
 
 export default LedgerService

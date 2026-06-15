@@ -23,6 +23,12 @@ const investorLedgerApi = {
   lookupTransactionTypes: () =>
     fetcherV2<InvestorTransaction[]>('investors/ledger/lookup/transaction-types'),
 
+  getBalanceSummary: (params: Record<string, string>) =>
+    fetcherV2<{ balance: number }>('investors/ledger/summary', null, {
+      method: 'GET',
+      filter: params,
+    }),
+
   getCapitalBalance: (investorId: number) =>
     fetcherV2<{ balance: number }>(
       `investors/ledger/balances/capital?investor_id=${investorId}`

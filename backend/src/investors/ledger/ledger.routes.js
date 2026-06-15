@@ -42,6 +42,13 @@ router.get(
 )
 
 router.get(
+  '/summary',
+  isAuthenticated,
+  isManagerOrAdmin,
+  LedgerController.getBalanceSummary
+)
+
+router.get(
   '/',
   isAuthenticated,
   isManagerOrAdmin,
