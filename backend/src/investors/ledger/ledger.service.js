@@ -3,6 +3,7 @@ import { sequelize } from '@utils/db'
 import InvestorTransactionModel from '@models/investorTransaction'
 import InvestorTransactionTypeModel from '@models/investorTransactionType'
 import InvestorManagementModel from '@models/investorManagement'
+import SeasonModel from '@models/season'
 import userRoles from '@utils/user-roles'
 import { TRANSACTION_TYPE_CODES, TRANSACTION_CATEGORIES } from './ledger.constants'
 import {
@@ -15,7 +16,7 @@ import {
 } from './ledger.errors'
 
 async function createInvestorTransaction(payload, currentUser) {
-  const { investor_id, transaction_type_code, amount, transaction_date, reference_transaction_id, remarks } = payload
+  const { investor_id, transaction_type_code, amount, transaction_date, season_id, reference_transaction_id, remarks } = payload
 
   const typeRecord = await InvestorTransactionTypeModel.findOne({
     where: { code: transaction_type_code },
@@ -40,6 +41,7 @@ async function createInvestorTransaction(payload, currentUser) {
       transaction_type_id: typeRecord.id,
       amount: reversalAmount,
       transaction_date,
+      season_id,
       reference_transaction_id,
       remarks,
       master_id:
@@ -74,6 +76,7 @@ async function createInvestorTransaction(payload, currentUser) {
     transaction_type_id: typeRecord.id,
     amount,
     transaction_date,
+    season_id,
     reference_transaction_id: null,
     remarks,
     master_id:
@@ -108,6 +111,7 @@ async function getInvestorTransactionById(transactionId, currentUser) {
         as: 'reference_transaction',
         required: false,
       },
+      { model: SeasonModel, as: 'season', required: false },
     ],
   })
 
@@ -195,6 +199,7 @@ async function listInvestorTransactions(filter, currentUser) {
     include: [
       { model: InvestorManagementModel, as: 'investor', required: false },
       { model: InvestorTransactionTypeModel, as: 'transaction_type', required: false },
+      { model: SeasonModel, as: 'season', required: false },
     ],
   })
 

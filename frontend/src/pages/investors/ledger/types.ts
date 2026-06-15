@@ -17,6 +17,7 @@ export type InvestorTransaction = {
   amount: string
   transaction_date: string
   reference_transaction_id: number | null
+  season_id: number | null
   remarks: string | null
   has_reversal: boolean
   createdAt: string
@@ -26,6 +27,10 @@ export type InvestorTransaction = {
     investor_name: string
   }
   transaction_type?: TransactionType
+  season?: {
+    id: number
+    name: string
+  }
 }
 
 export type InvestorTransactionListResponse = ListResponse<InvestorTransaction>
@@ -36,6 +41,7 @@ export type InvestorTransactionFormValues = {
   amount: string
   transaction_date: string
   remarks: string
+  season_id?: number | null | ''
   reference_transaction_id?: number | null
 }
 

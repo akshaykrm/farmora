@@ -32,6 +32,10 @@ const InvestorTransactionModel = sequelize.define(
       type: Sequelize.TEXT,
       allowNull: true,
     },
+    season_id: {
+      type: Sequelize.INTEGER,
+      allowNull: true,
+    },
     txn_id: {
       type: Sequelize.STRING(50),
     },

@@ -271,6 +271,12 @@ InvestorTransactionModel.belongsTo(InvestorTransactionModel, {
   targetKey: 'id',
 })
 
+InvestorTransactionModel.belongsTo(SeasonModel, {
+  foreignKey: 'season_id',
+  as: 'season',
+  targetKey: 'id',
+})
+
 InvestorManagementModel.hasMany(InvestorTransactionModel, {
   foreignKey: 'investor_id',
   as: 'transactions',

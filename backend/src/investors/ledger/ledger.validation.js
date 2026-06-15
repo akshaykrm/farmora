@@ -22,6 +22,7 @@ export const createInvestorTransactionSchema = Joi.object({
     'any.required': 'Transaction date is required',
     'date.format': 'Transaction date must be a valid ISO date',
   }),
+  season_id: Joi.number().integer().allow(null).default(null),
   reference_transaction_id: Joi.number().integer().allow(null).default(null),
   remarks: Joi.string().allow(null, '').max(500).default(null),
 })

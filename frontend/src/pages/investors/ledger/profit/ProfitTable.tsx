@@ -13,6 +13,7 @@ const headers = [
   "Txn ID",
   "Investor",
   "Type",
+  "Season",
   "Amount",
   "Remarks",
   "Transaction Date",
@@ -62,6 +63,7 @@ const ProfitTable = (props: Props) => {
                 </span>
               }
             />
+            <TableCell content={transaction.season?.name ?? "-"} />
             <TableCell content={transaction.amount} />
             <TableCell content={transaction.remarks ?? "-"} />
             <TableCell

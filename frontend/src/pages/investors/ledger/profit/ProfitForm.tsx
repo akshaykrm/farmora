@@ -8,6 +8,7 @@ import type { ValidationError } from '@errors/api.error'
 import type { InvestorTransactionFormValues } from '../types'
 import useLookupInvestors from '../hooks/useLookupInvestors'
 import useLookupTransactionTypes from '../hooks/useLookupTransactionTypes'
+import useGetSeasonNameList from '@hooks/use-get-season-names'
 
 type Props = {
   onSubmit: (inputData: InvestorTransactionFormValues) => void
@@ -40,6 +41,8 @@ const ProfitForm = ({
     (t) => t.category === 'PROFIT'
   )
 
+  const seasons = useGetSeasonNameList()
+
   const isReversal = values.transaction_type_code === 'REVERSAL'
 
   useEffect(() => {
@@ -71,7 +74,11 @@ const ProfitForm = ({
             id: t.id,
             name: t.name,
           }))}
-          value={null}
+          value={
+            values.transaction_type_code
+              ? profitTypes.find((t) => t.code === values.transaction_type_code)?.id ?? null
+              : null
+          }
           onChange={(val) => {
             const selected = profitTypes.find((t) => t.id === val)
             setValue('transaction_type_code', selected ? selected.code : '')
@@ -81,6 +88,17 @@ const ProfitForm = ({
           name="transaction_type_code"
           error={Boolean(errors.transaction_type_code)}
           helperText={errors.transaction_type_code?.message}
+        />
+
+        <SelectList
+          options={seasons.data}
+          value={values.season_id ? Number(values.season_id) : null}
+          onChange={(val) => {
+            setValue('season_id', val ? val : '')
+            clearErrors('season_id')
+          }}
+          label="Season"
+          name="season_id"
         />
 
         <TextField

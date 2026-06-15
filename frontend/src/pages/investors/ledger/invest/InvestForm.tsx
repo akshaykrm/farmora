@@ -71,7 +71,11 @@ const InvestForm = ({
             id: t.id,
             name: t.name,
           }))}
-          value={null}
+          value={
+            values.transaction_type_code
+              ? capitalTypes.find((t) => t.code === values.transaction_type_code)?.id ?? null
+              : null
+          }
           onChange={(val) => {
             const selected = capitalTypes.find((t) => t.id === val)
             setValue('transaction_type_code', selected ? selected.code : '')
