@@ -80,7 +80,7 @@ const InvestTable = (props: Props) => {
             />
             <TableCell
               content={
-                transaction.transaction_type?.code !== "REVERSAL" ? (
+                transaction.transaction_type?.code !== "REVERSAL" && !transaction.has_reversal ? (
                   <Undo2
                     className="w-5 h-5 text-gray-600 hover:text-red-600 cursor-pointer"
                     onClick={() => {

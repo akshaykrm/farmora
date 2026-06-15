@@ -18,6 +18,7 @@ export type InvestorTransaction = {
   transaction_date: string
   reference_transaction_id: number | null
   remarks: string | null
+  has_reversal: boolean
   createdAt: string
   updatedAt: string
   investor?: {

@@ -37,7 +37,7 @@ const InvestForm = ({
   const types = useLookupTransactionTypes()
 
   const capitalTypes = types.data.filter(
-    (t) => t.category === 'CAPITAL' || t.code === 'REVERSAL'
+    (t) => t.category === 'CAPITAL'
   )
 
   const isReversal = values.transaction_type_code === 'REVERSAL'

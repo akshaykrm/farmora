@@ -178,6 +178,20 @@ async function listInvestorTransactions(filter, currentUser) {
     limit,
     offset,
     order: [['transaction_date', 'DESC'], ['id', 'DESC']],
+    attributes: {
+      include: [
+        [
+          literal(`EXISTS (
+            SELECT 1 FROM investor_transactions it2
+            WHERE it2.reference_transaction_id = investor_transactions.id
+            AND it2.transaction_type_id = (
+              SELECT id FROM investor_transaction_types WHERE code = 'REVERSAL'
+            )
+          )`),
+          'has_reversal',
+        ],
+      ],
+    },
     include: [
       { model: InvestorManagementModel, as: 'investor', required: false },
       { model: InvestorTransactionTypeModel, as: 'transaction_type', required: false },

@@ -37,7 +37,7 @@ const ProfitForm = ({
   const types = useLookupTransactionTypes()
 
   const profitTypes = types.data.filter(
-    (t) => t.category === 'PROFIT' || t.code === 'REVERSAL'
+    (t) => t.category === 'PROFIT'
   )
 
   const isReversal = values.transaction_type_code === 'REVERSAL'
