@@ -7,10 +7,36 @@ import ExpenseSalesModel from '@models/expensesales'
 import IntegrationBookModel from '@models/integationbook'
 import PurchaseReturnModel from '@models/purchase-return'
 import PurchaseBookModel from '@models/purchasebook'
+import InvestorTransactionModel from '@models/investorTransaction'
+import InvestorTransactionTypeModel from '@models/investorTransactionType'
+import InvestorManagementModel from '@models/investorManagement'
 import userRoles from '@utils/user-roles'
 import { Op } from 'sequelize'
 import dayjs from 'dayjs'
 import logger from '@utils/logger'
+
+// ---------------------------------------------------------------------------
+// Investor direction mapping — add new entries here to include them in the
+// balance sheet. Key = transaction type code, value = 'in' | 'out'.
+// Types not listed are excluded. Reversals automatically get the opposite
+// direction.
+// ---------------------------------------------------------------------------
+const INVESTOR_DIRECTION_MAP = {
+  CAPITAL_IN: 'in',
+  PROFIT_WITHDRAW: 'out',
+}
+
+const INVESTOR_PURPOSE_MAP = {
+  CAPITAL_IN: (t) =>
+    `Capital Investment - ${t.investor?.investor_name || 'Unknown'}`,
+  PROFIT_WITHDRAW: (t) =>
+    `Profit Withdrawal - ${t.investor?.investor_name || 'Unknown'}`,
+}
+
+const INVESTOR_CATEGORY_MAP = {
+  CAPITAL_IN: 'investor_capital',
+  PROFIT_WITHDRAW: 'investor_profit',
+}
 
 const getMasterId = (currentUser) => {
   if (currentUser.user_type === userRoles.staff.type) {
@@ -132,6 +158,64 @@ const fetchPurchaseBooks = async (masterId, startDate, endDate) => {
   })
 }
 
+const fetchInvestorTransactions = async (masterId, startDate, endDate) => {
+  const includedCodes = Object.keys(INVESTOR_DIRECTION_MAP)
+  const dateFilter = buildDateFilter(startDate, endDate, 'transaction_date')
+
+  const reversalType = await InvestorTransactionTypeModel.findOne({
+    where: { code: 'REVERSAL' },
+    attributes: ['id'],
+  })
+
+  const includedTypes = await InvestorTransactionTypeModel.findAll({
+    where: { code: { [Op.in]: includedCodes } },
+    attributes: ['id', 'code'],
+  })
+
+  const includedTypeIds = includedTypes.map((t) => t.id)
+
+  const where = {
+    master_id: masterId,
+    ...dateFilter,
+    [Op.or]: [
+      { transaction_type_id: { [Op.in]: includedTypeIds } },
+      {
+        transaction_type_id: reversalType.id,
+        reference_transaction_id: { [Op.ne]: null },
+      },
+    ],
+  }
+
+  return InvestorTransactionModel.findAll({
+    where,
+    include: [
+      {
+        model: InvestorManagementModel,
+        as: 'investor',
+        attributes: ['investor_name'],
+        required: false,
+      },
+      {
+        model: InvestorTransactionTypeModel,
+        as: 'transaction_type',
+        required: false,
+      },
+      {
+        model: InvestorTransactionModel,
+        as: 'reference_transaction',
+        required: false,
+        include: [
+          {
+            model: InvestorTransactionTypeModel,
+            as: 'transaction_type',
+            required: false,
+          },
+        ],
+      },
+    ],
+  })
+}
+
 const fetchAllRecords = async (masterId, startDate, endDate) => {
   const [
     openingBalance,
@@ -143,6 +227,7 @@ const fetchAllRecords = async (masterId, startDate, endDate) => {
     expenseSales,
     integrationBooks,
     purchaseBooks,
+    investorTransactions,
   ] = await Promise.all([
     fetchVendorsOpeningBalance(masterId),
     fetchSales(masterId, startDate, endDate),
@@ -153,6 +238,7 @@ const fetchAllRecords = async (masterId, startDate, endDate) => {
     fetchExpenseSales(masterId, startDate, endDate),
     fetchIntegrationBooks(masterId, startDate, endDate),
     fetchPurchaseBooks(masterId, startDate, endDate),
+    fetchInvestorTransactions(masterId, startDate, endDate),
   ])
 
   return {
@@ -165,6 +251,7 @@ const fetchAllRecords = async (masterId, startDate, endDate) => {
     expenseSales,
     integrationBooks,
     purchaseBooks,
+    investorTransactions,
   }
 }
 
@@ -310,6 +397,47 @@ const purchaseBookToTransactions = (records) => {
       type: 'out',
       amount: parseFloat(r.amount) || 0,
       category: 'purchase_book',
+      createdAt: r.createdAt,
+    })
+  }
+  return txns
+}
+
+const investorTransactionToTransactions = (records) => {
+  const txns = []
+  for (const r of records) {
+    const isReversal = r.transaction_type?.code === 'REVERSAL'
+    let typeCode
+
+    if (isReversal) {
+      const refCode = r.reference_transaction?.transaction_type?.code
+      if (!refCode || !INVESTOR_DIRECTION_MAP[refCode]) continue
+      typeCode = refCode
+    } else {
+      typeCode = r.transaction_type?.code
+      if (!typeCode || !INVESTOR_DIRECTION_MAP[typeCode]) continue
+    }
+
+    const baseDirection = INVESTOR_DIRECTION_MAP[typeCode]
+    const direction = isReversal
+      ? (baseDirection === 'in' ? 'out' : 'in')
+      : baseDirection
+
+    const purposeFn = INVESTOR_PURPOSE_MAP[typeCode]
+    const purpose = isReversal
+      ? `Reversal - ${purposeFn ? purposeFn(r) : typeCode}`
+      : purposeFn
+        ? purposeFn(r)
+        : typeCode
+
+    const category = INVESTOR_CATEGORY_MAP[typeCode] || 'investor'
+
+    txns.push({
+      date: r.transaction_date,
+      purpose,
+      type: direction,
+      amount: Math.abs(parseFloat(r.amount)) || 0,
+      category,
       createdAt: r.createdAt,
     })
   }
@@ -472,6 +600,30 @@ const buildBreakdown = (records) => {
     'credit'
   )
 
+  const investorCapitalIn = records.investorTransactions
+    .filter((r) => r.transaction_type?.code === 'CAPITAL_IN')
+    .reduce((sum, r) => sum + (parseFloat(r.amount) || 0), 0)
+
+  const investorCapitalOutReversals = records.investorTransactions
+    .filter(
+      (r) =>
+        r.transaction_type?.code === 'REVERSAL' &&
+        r.reference_transaction?.transaction_type?.code === 'CAPITAL_IN'
+    )
+    .reduce((sum, r) => sum + Math.abs(parseFloat(r.amount) || 0), 0)
+
+  const investorProfitWithdraw = records.investorTransactions
+    .filter((r) => r.transaction_type?.code === 'PROFIT_WITHDRAW')
+    .reduce((sum, r) => sum + (parseFloat(r.amount) || 0), 0)
+
+  const investorProfitInReversals = records.investorTransactions
+    .filter(
+      (r) =>
+        r.transaction_type?.code === 'REVERSAL' &&
+        r.reference_transaction?.transaction_type?.code === 'PROFIT_WITHDRAW'
+    )
+    .reduce((sum, r) => sum + Math.abs(parseFloat(r.amount) || 0), 0)
+
   return {
     purchases: {
       in: 0,
@@ -508,6 +660,14 @@ const buildBreakdown = (records) => {
     purchase_books: {
       in: 0,
       out: round(sumField(records.purchaseBooks, 'amount')),
+    },
+    investor_capital: {
+      in: round(investorCapitalIn),
+      out: round(investorCapitalOutReversals),
+    },
+    investor_profit: {
+      in: round(investorProfitInReversals),
+      out: round(investorProfitWithdraw),
     },
   }
 }
@@ -571,6 +731,9 @@ const getBalanceSheet = async (filter, currentUser) => {
   const expenseSaleTxns = expenseSaleToTransactions(records.expenseSales)
   const integTxns = integrationBookToTransactions(records.integrationBooks)
   const purchaseBookTxns = purchaseBookToTransactions(records.purchaseBooks)
+  const investorTxns = investorTransactionToTransactions(
+    records.investorTransactions
+  )
 
   // -----------------------------------------------------------------------
   // PHASE 3 — Merge & sort by date
@@ -583,7 +746,8 @@ const getBalanceSheet = async (filter, currentUser) => {
     expenseTxns,
     expenseSaleTxns,
     integTxns,
-    purchaseBookTxns
+    purchaseBookTxns,
+    investorTxns
   )
 
   // -----------------------------------------------------------------------

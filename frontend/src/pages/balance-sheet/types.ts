@@ -20,6 +20,8 @@ export type BalanceSheetBreakdownMap = {
   general_expenses: BalanceSheetBreakdown;
   expense_sales: BalanceSheetBreakdown;
   integration_books: BalanceSheetBreakdown;
+  investor_capital?: BalanceSheetBreakdown;
+  investor_profit?: BalanceSheetBreakdown;
 };
 
 export type BalanceSheetSummary = {

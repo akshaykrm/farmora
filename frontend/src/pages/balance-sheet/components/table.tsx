@@ -212,6 +212,16 @@ const BreakdownTable = ({ data }: { data: BalanceSheetResponse }) => {
       out: breakdown.integration_books.out,
       liability: breakdown.integration_books.liability,
     },
+    {
+      label: "Investor Capital",
+      in: breakdown.investor_capital?.in ?? 0,
+      out: breakdown.investor_capital?.out ?? 0,
+    },
+    {
+      label: "Investor Profit",
+      in: breakdown.investor_profit?.in ?? 0,
+      out: breakdown.investor_profit?.out ?? 0,
+    },
   ];
 
   return (
