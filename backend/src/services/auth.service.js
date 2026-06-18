@@ -1,3 +1,4 @@
+import bcryptjs from 'bcryptjs'
 import { SubsriptionInActiveError } from '@errors/subscription.errors'
 import {
   InvalidCredentialError,
@@ -168,9 +169,21 @@ const login = async (username, password) => {
   }
 }
 
+const resetPassword = async (username, newPassword) => {
+  const user = await UserModel.findOne({ where: { username } })
+
+  if (!user) {
+    throw new UserNotFoundError(username)
+  }
+
+  const hashedPassword = await bcryptjs.hash(newPassword, 10)
+  await user.update({ password: hashedPassword })
+}
+
 const authService = {
-  createManager: createManager,
-  login: login,
+  createManager,
+  login,
+  resetPassword,
 }
 
 export default authService

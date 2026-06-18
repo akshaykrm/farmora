@@ -19,3 +19,8 @@ export const updateNewStaffSchema = newStaffMemberSchema
     password: Joi.forbidden(),
   })
   .fork(['name', 'username'], (schema) => schema.optional())
+
+export const resetPasswordSchema = Joi.object({
+  username: Joi.string().min(3).max(100).required(),
+  new_password: Joi.string().min(3).max(100).required(),
+})
