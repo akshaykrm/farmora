@@ -71,6 +71,52 @@ async function createInvestorTransaction(payload, currentUser) {
     }
   }
 
+  if (transaction_type_code === TRANSACTION_TYPE_CODES.LOSS) {
+    const currentProfit = await getInvestorProfitBalance(investor_id)
+    const profitCovered = Math.min(amount, Math.max(0, currentProfit))
+    const capitalCovered = amount - profitCovered
+
+    let lossTransaction = null
+
+    if (profitCovered > 0) {
+      lossTransaction = await InvestorTransactionModel.create({
+        investor_id,
+        transaction_type_id: typeRecord.id,
+        amount: profitCovered,
+        transaction_date,
+        season_id,
+        reference_transaction_id: null,
+        remarks,
+        master_id:
+          currentUser.user_type === userRoles.staff.type
+            ? currentUser.master_id
+            : currentUser.id,
+      })
+    }
+
+    if (capitalCovered > 0) {
+      const capitalOutType = await InvestorTransactionTypeModel.findOne({
+        where: { code: TRANSACTION_TYPE_CODES.CAPITAL_OUT },
+      })
+
+      await InvestorTransactionModel.create({
+        investor_id,
+        transaction_type_id: capitalOutType.id,
+        amount: capitalCovered,
+        transaction_date,
+        season_id,
+        reference_transaction_id: lossTransaction ? lossTransaction.id : null,
+        remarks: remarks || 'Loss adjustment (excess over profit)',
+        master_id:
+          currentUser.user_type === userRoles.staff.type
+            ? currentUser.master_id
+            : currentUser.id,
+      })
+    }
+
+    return lossTransaction || { message: 'Loss fully covered by capital adjustment' }
+  }
+
   const transaction = await InvestorTransactionModel.create({
     investor_id,
     transaction_type_id: typeRecord.id,
@@ -252,8 +298,10 @@ async function getInvestorProfitBalance(investorId) {
       CASE
         WHEN ttc.code = :profitCreditCode THEN it.amount
         WHEN ttc.code = :profitWithdrawCode THEN -it.amount
+        WHEN ttc.code = :lossCode THEN -it.amount
         WHEN ttc.code = :reversalCode AND ref_ttc.code = :profitCreditCode THEN it.amount
         WHEN ttc.code = :reversalCode AND ref_ttc.code = :profitWithdrawCode THEN -it.amount
+        WHEN ttc.code = :reversalCode AND ref_ttc.code = :lossCode THEN -it.amount
         ELSE 0
       END
     ), 0) AS balance
@@ -269,6 +317,7 @@ async function getInvestorProfitBalance(investorId) {
         investorId,
         profitCreditCode: TRANSACTION_TYPE_CODES.PROFIT_CREDIT,
         profitWithdrawCode: TRANSACTION_TYPE_CODES.PROFIT_WITHDRAW,
+        lossCode: TRANSACTION_TYPE_CODES.LOSS,
         reversalCode: TRANSACTION_TYPE_CODES.REVERSAL,
         profitCategory: TRANSACTION_CATEGORIES.PROFIT,
       },
@@ -350,8 +399,10 @@ async function getBalanceSummary(filter, currentUser) {
       CASE
         WHEN ttc.code = :inCode THEN it.amount
         WHEN ttc.code = :outCode THEN -it.amount
+        WHEN ttc.code = :lossCode THEN -it.amount
         WHEN ttc.code = :reversalCode AND ref_ttc.code = :inCode THEN it.amount
         WHEN ttc.code = :reversalCode AND ref_ttc.code = :outCode THEN -it.amount
+        WHEN ttc.code = :reversalCode AND ref_ttc.code = :lossCode THEN -it.amount
         ELSE 0
       END
     ), 0) AS balance
@@ -369,6 +420,7 @@ async function getBalanceSummary(filter, currentUser) {
       replacements: {
         inCode,
         outCode,
+        lossCode: TRANSACTION_TYPE_CODES.LOSS,
         reversalCode: TRANSACTION_TYPE_CODES.REVERSAL,
         category,
         investorId: investor_id || null,
