@@ -71,6 +71,65 @@ async function createInvestorTransaction(payload, currentUser) {
     }
   }
 
+  if (transaction_type_code === TRANSACTION_TYPE_CODES.PROFIT_CREDIT) {
+    const erosion = await getCapitalErosionBalance(investor_id)
+
+    if (erosion > 0) {
+      const restorationAmount = Math.min(amount, erosion)
+      const remainingProfit = amount - restorationAmount
+
+      if (restorationAmount > 0) {
+        const capitalInType = await InvestorTransactionTypeModel.findOne({
+          where: { code: TRANSACTION_TYPE_CODES.CAPITAL_IN },
+        })
+
+        const lossType = await InvestorTransactionTypeModel.findOne({
+          where: { code: TRANSACTION_TYPE_CODES.LOSS },
+        })
+
+        const lossTxn = await InvestorTransactionModel.findOne({
+          where: { investor_id, transaction_type_id: lossType.id },
+          order: [['id', 'DESC']],
+        })
+
+        await InvestorTransactionModel.create({
+          investor_id,
+          transaction_type_id: capitalInType.id,
+          amount: restorationAmount,
+          transaction_date,
+          season_id,
+          reference_transaction_id: lossTxn ? lossTxn.id : null,
+          remarks: 'Capital restoration from profit allocation',
+          master_id:
+            currentUser.user_type === userRoles.staff.type
+              ? currentUser.master_id
+              : currentUser.id,
+        })
+      }
+
+      if (remainingProfit > 0) {
+        await InvestorTransactionModel.create({
+          investor_id,
+          transaction_type_id: typeRecord.id,
+          amount: remainingProfit,
+          transaction_date,
+          season_id,
+          reference_transaction_id: null,
+          remarks,
+          master_id:
+            currentUser.user_type === userRoles.staff.type
+              ? currentUser.master_id
+              : currentUser.id,
+        })
+      }
+
+      return {
+        capital_restored: restorationAmount,
+        profit_credited: remainingProfit,
+      }
+    }
+  }
+
   if (transaction_type_code === TRANSACTION_TYPE_CODES.LOSS) {
     const currentProfit = await getInvestorProfitBalance(investor_id)
     const profitCovered = Math.min(amount, Math.max(0, currentProfit))
@@ -328,6 +387,41 @@ async function getInvestorProfitBalance(investorId) {
   return parseFloat(result[0]?.balance || 0)
 }
 
+async function getCapitalErosionBalance(investorId) {
+  const lossType = await InvestorTransactionTypeModel.findOne({
+    where: { code: TRANSACTION_TYPE_CODES.LOSS },
+  })
+
+  if (!lossType) return 0
+
+  const result = await sequelize.query(
+    `
+    SELECT COALESCE(SUM(
+      CASE
+        WHEN ttc.code = 'CAPITAL_OUT' AND ref_ttc.code = 'LOSS' THEN it.amount
+        WHEN ttc.code = 'CAPITAL_IN' AND ref_ttc.code = 'LOSS' THEN -it.amount
+        ELSE 0
+      END
+    ), 0) AS net_erosion
+    FROM investor_transactions it
+    JOIN investor_transaction_types ttc ON it.transaction_type_id = ttc.id
+    LEFT JOIN investor_transactions ref ON it.reference_transaction_id = ref.id
+    LEFT JOIN investor_transaction_types ref_ttc ON ref.transaction_type_id = ref_ttc.id
+    WHERE it.investor_id = :investorId
+      AND (
+        (ttc.code = 'CAPITAL_OUT' AND ref_ttc.code = 'LOSS')
+        OR (ttc.code = 'CAPITAL_IN' AND ref_ttc.code = 'LOSS')
+      )
+    `,
+    {
+      replacements: { investorId },
+      type: sequelize.QueryTypes.SELECT,
+    }
+  )
+
+  return parseFloat(result[0]?.net_erosion || 0)
+}
+
 async function getInvestorTransactionHistory(investorId, filter = {}) {
   const { start_date, end_date } = filter
   const whereClause = { investor_id: investorId }
@@ -441,6 +535,7 @@ const LedgerService = {
   listInvestorTransactions,
   getInvestorCapitalBalance,
   getInvestorProfitBalance,
+  getCapitalErosionBalance,
   getInvestorTransactionHistory,
   lookupInvestors,
   lookupTransactionTypes,
