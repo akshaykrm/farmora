@@ -16,7 +16,12 @@ type Props = {
   onCancel?: () => void;
 };
 
-const WorkingCostForm = ({ onSubmit, defaultValues, apiErrors, onCancel }: Props) => {
+const WorkingCostForm = ({
+  onSubmit,
+  defaultValues,
+  apiErrors,
+  onCancel,
+}: Props) => {
   const methods = useForm<WorkingCostFormValues>({
     defaultValues: defaultValues,
   });
@@ -93,18 +98,6 @@ const WorkingCostForm = ({ onSubmit, defaultValues, apiErrors, onCancel }: Props
               },
             }}
           />
-
-          <RHFTextField
-            label="Payment Type"
-            name="payment_type"
-            control={control}
-            fullWidth
-            size="small"
-            select
-          >
-            <MenuItem value="income">Expense</MenuItem>
-            <MenuItem value="expense">Income</MenuItem>
-          </RHFTextField>
         </div>
         <div className="flex justify-end mt-6 gap-2">
           {onCancel && (
