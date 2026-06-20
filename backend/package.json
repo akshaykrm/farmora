@@ -15,7 +15,7 @@
     "db:seed": "sequelize-cli db:seed:all",
     "db:seed:undo": "sequelize-cli db:seed:undo",
     "db:seed:undo:all": "sequelize-cli db:seed:undo:all",
-    "seed:core": "sequelize-cli db:seed --seed 20250208124437-super-admin.js && sequelize-cli db:seed --seed 20251109062649-default-packages.js && sequelize-cli db:seed --seed 20251110165924-managers.js && sequelize-cli db:seed --seed 20251110170546-staff.js && sequelize-cli db:seed --seed 20251116065945-permission.js && sequelize-cli db:seed --seed 20251116073938-role.js && sequelize-cli db:seed --seed 20251214162201-role-permissions.js && sequelize-cli db:seed --seed 20251214162202-user-role-assignments.js && sequelize-cli db:seed --seed 20251110171725-subscription.js && sequelize-cli db:seed --seed 20260609000004-investor-transaction-types.js",
+    "seed:core": "sequelize-cli db:seed --seed 20250208124437-super-admin.js && sequelize-cli db:seed --seed 20251109062649-default-packages.js && sequelize-cli db:seed --seed 20251110165924-managers.js && sequelize-cli db:seed --seed 20251110170546-staff.js && sequelize-cli db:seed --seed 20251116065945-permission.js && sequelize-cli db:seed --seed 20251116073938-role.js && sequelize-cli db:seed --seed 20251214162201-role-permissions.js && sequelize-cli db:seed --seed 20251214162202-user-role-assignments.js && sequelize-cli db:seed --seed 20251110171725-subscription.js && sequelize-cli db:seed --seed 20260609000004-investor-transaction-types.js && sequelize-cli db:seed --seed 20260620000001-add-loss-transaction-type.js",
     "db:reset": "bun run db:migrate:undo:all && bun run db:migrate",
     "db:refresh": "bun run db:migrate:undo:all && bun run db:migrate && bun run db:seed"
   },

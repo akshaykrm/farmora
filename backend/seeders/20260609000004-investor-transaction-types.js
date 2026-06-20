@@ -30,13 +30,6 @@ export default {
         updated_at: new Date(),
       },
       {
-        code: 'LOSS',
-        name: 'Loss',
-        category: 'PROFIT',
-        created_at: new Date(),
-        updated_at: new Date(),
-      },
-      {
         code: 'REVERSAL',
         name: 'Reversal',
         category: 'SYSTEM',
