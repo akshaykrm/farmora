@@ -22,7 +22,12 @@ type Props = {
   onCancel?: () => void;
 };
 
-const PurchaseForm = ({ onSubmit, defaultValues, apiError, onCancel }: Props) => {
+const PurchaseForm = ({
+  onSubmit,
+  defaultValues,
+  apiError,
+  onCancel,
+}: Props) => {
   const methods = useForm({ defaultValues });
   const {
     handleSubmit,
@@ -281,7 +286,7 @@ const PurchaseForm = ({ onSubmit, defaultValues, apiError, onCancel }: Props) =>
             />
           </div>
 
-          <div className="min-w-0">
+          {/*          <div className="min-w-0">
             <RHFTextField
               label="Discount / Round Off"
               name="discount_price"
@@ -291,6 +296,7 @@ const PurchaseForm = ({ onSubmit, defaultValues, apiError, onCancel }: Props) =>
               size="small"
             />
           </div>
+	  */}
 
           <div className="min-w-0">
             <RHFTextField
@@ -303,6 +309,7 @@ const PurchaseForm = ({ onSubmit, defaultValues, apiError, onCancel }: Props) =>
             />
           </div>
 
+          {/*
           <div className="min-w-0">
             <RHFTextField
               label="Assign Quantity"
@@ -313,6 +320,7 @@ const PurchaseForm = ({ onSubmit, defaultValues, apiError, onCancel }: Props) =>
             />
           </div>
 
+	 */}
           <div className="min-w-0">
             <TextField
               select
