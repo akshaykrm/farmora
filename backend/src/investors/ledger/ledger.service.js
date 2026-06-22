@@ -28,7 +28,12 @@ async function createInvestorTransaction(payload, currentUser) {
     }
 
     const referenceTx = await InvestorTransactionModel.findByPk(
-      reference_transaction_id
+      reference_transaction_id,
+      {
+        include: [
+          { model: InvestorTransactionTypeModel, as: 'transaction_type' },
+        ],
+      }
     )
     if (!referenceTx) {
       throw new LedgerReversalReferenceNotFoundError(reference_transaction_id)
@@ -49,6 +54,69 @@ async function createInvestorTransaction(payload, currentUser) {
           ? currentUser.master_id
           : currentUser.id,
     })
+
+    const refTypeCode = referenceTx.transaction_type?.code
+
+    if (refTypeCode === TRANSACTION_TYPE_CODES.LOSS) {
+      const capitalOutType = await InvestorTransactionTypeModel.findOne({
+        where: { code: TRANSACTION_TYPE_CODES.CAPITAL_OUT },
+      })
+
+      const linkedCapitalOuts = await InvestorTransactionModel.findAll({
+        where: {
+          reference_transaction_id: referenceTx.id,
+          transaction_type_id: capitalOutType.id,
+        },
+      })
+
+      for (const linkedTx of linkedCapitalOuts) {
+        await InvestorTransactionModel.create({
+          investor_id,
+          transaction_type_id: typeRecord.id,
+          amount: -Math.abs(parseFloat(linkedTx.amount) || 0),
+          transaction_date,
+          season_id,
+          reference_transaction_id: linkedTx.id,
+          remarks: 'Reversal - Loss adjustment (capital portion)',
+          master_id:
+            currentUser.user_type === userRoles.staff.type
+              ? currentUser.master_id
+              : currentUser.id,
+        })
+      }
+    }
+
+    if (
+      refTypeCode === TRANSACTION_TYPE_CODES.CAPITAL_OUT &&
+      referenceTx.reference_transaction_id
+    ) {
+      const lossType = await InvestorTransactionTypeModel.findOne({
+        where: { code: TRANSACTION_TYPE_CODES.LOSS },
+      })
+
+      const parentLoss = await InvestorTransactionModel.findOne({
+        where: {
+          id: referenceTx.reference_transaction_id,
+          transaction_type_id: lossType.id,
+        },
+      })
+
+      if (parentLoss) {
+        await InvestorTransactionModel.create({
+          investor_id,
+          transaction_type_id: typeRecord.id,
+          amount: -Math.abs(parseFloat(parentLoss.amount) || 0),
+          transaction_date,
+          season_id,
+          reference_transaction_id: parentLoss.id,
+          remarks: 'Reversal - Loss',
+          master_id:
+            currentUser.user_type === userRoles.staff.type
+              ? currentUser.master_id
+              : currentUser.id,
+        })
+      }
+    }
 
     return transaction
   }
