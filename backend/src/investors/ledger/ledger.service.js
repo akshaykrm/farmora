@@ -57,19 +57,19 @@ async function createInvestorTransaction(payload, currentUser) {
 
     const refTypeCode = referenceTx.transaction_type?.code
 
-    if (refTypeCode === TRANSACTION_TYPE_CODES.LOSS) {
-      const capitalOutType = await InvestorTransactionTypeModel.findOne({
-        where: { code: TRANSACTION_TYPE_CODES.CAPITAL_OUT },
+    if (refTypeCode === TRANSACTION_TYPE_CODES.PROFIT_LOSS) {
+      const capitalLossType = await InvestorTransactionTypeModel.findOne({
+        where: { code: TRANSACTION_TYPE_CODES.CAPITAL_LOSS },
       })
 
-      const linkedCapitalOuts = await InvestorTransactionModel.findAll({
+      const linkedCapitalLosses = await InvestorTransactionModel.findAll({
         where: {
           reference_transaction_id: referenceTx.id,
-          transaction_type_id: capitalOutType.id,
+          transaction_type_id: capitalLossType.id,
         },
       })
 
-      for (const linkedTx of linkedCapitalOuts) {
+      for (const linkedTx of linkedCapitalLosses) {
         await InvestorTransactionModel.create({
           investor_id,
           transaction_type_id: typeRecord.id,
@@ -77,7 +77,7 @@ async function createInvestorTransaction(payload, currentUser) {
           transaction_date,
           season_id,
           reference_transaction_id: linkedTx.id,
-          remarks: 'Reversal - Loss adjustment (capital portion)',
+          remarks: 'Reversal - Loss exceeding profit (capital portion)',
           master_id:
             currentUser.user_type === userRoles.staff.type
               ? currentUser.master_id
@@ -87,17 +87,17 @@ async function createInvestorTransaction(payload, currentUser) {
     }
 
     if (
-      refTypeCode === TRANSACTION_TYPE_CODES.CAPITAL_OUT &&
+      refTypeCode === TRANSACTION_TYPE_CODES.CAPITAL_LOSS &&
       referenceTx.reference_transaction_id
     ) {
-      const lossType = await InvestorTransactionTypeModel.findOne({
-        where: { code: TRANSACTION_TYPE_CODES.LOSS },
+      const profitLossType = await InvestorTransactionTypeModel.findOne({
+        where: { code: TRANSACTION_TYPE_CODES.PROFIT_LOSS },
       })
 
       const parentLoss = await InvestorTransactionModel.findOne({
         where: {
           id: referenceTx.reference_transaction_id,
-          transaction_type_id: lossType.id,
+          transaction_type_id: profitLossType.id,
         },
       })
 
@@ -152,7 +152,7 @@ async function createInvestorTransaction(payload, currentUser) {
         })
 
         const lossType = await InvestorTransactionTypeModel.findOne({
-          where: { code: TRANSACTION_TYPE_CODES.LOSS },
+          where: { code: TRANSACTION_TYPE_CODES.PROFIT_LOSS },
         })
 
         const lossTxn = await InvestorTransactionModel.findOne({
@@ -198,7 +198,7 @@ async function createInvestorTransaction(payload, currentUser) {
     }
   }
 
-  if (transaction_type_code === TRANSACTION_TYPE_CODES.LOSS) {
+  if (transaction_type_code === TRANSACTION_TYPE_CODES.PROFIT_LOSS) {
     const currentProfit = await getInvestorProfitBalance(investor_id)
     const profitCovered = Math.min(amount, Math.max(0, currentProfit))
     const capitalCovered = amount - profitCovered
@@ -222,18 +222,18 @@ async function createInvestorTransaction(payload, currentUser) {
     }
 
     if (capitalCovered > 0) {
-      const capitalOutType = await InvestorTransactionTypeModel.findOne({
-        where: { code: TRANSACTION_TYPE_CODES.CAPITAL_OUT },
+      const capitalLossType = await InvestorTransactionTypeModel.findOne({
+        where: { code: TRANSACTION_TYPE_CODES.CAPITAL_LOSS },
       })
 
       await InvestorTransactionModel.create({
         investor_id,
-        transaction_type_id: capitalOutType.id,
+        transaction_type_id: capitalLossType.id,
         amount: capitalCovered,
         transaction_date,
         season_id,
         reference_transaction_id: lossTransaction ? lossTransaction.id : null,
-        remarks: remarks || 'Loss adjustment (excess over profit)',
+        remarks: remarks || 'Loss exceeding profit — capital erosion',
         master_id:
           currentUser.user_type === userRoles.staff.type
             ? currentUser.master_id
@@ -241,7 +241,7 @@ async function createInvestorTransaction(payload, currentUser) {
       })
     }
 
-    return lossTransaction || { message: 'Loss fully covered by capital adjustment' }
+    return lossTransaction || { message: 'Loss fully covered by capital erosion' }
   }
 
   const transaction = await InvestorTransactionModel.create({
@@ -391,8 +391,10 @@ async function getInvestorCapitalBalance(investorId) {
       CASE
         WHEN ttc.code = :capitalInCode THEN it.amount
         WHEN ttc.code = :capitalOutCode THEN -it.amount
+        WHEN ttc.code = :capitalLossCode THEN -it.amount
         WHEN ttc.code = :reversalCode AND ref_ttc.code = :capitalInCode THEN it.amount
         WHEN ttc.code = :reversalCode AND ref_ttc.code = :capitalOutCode THEN -it.amount
+        WHEN ttc.code = :reversalCode AND ref_ttc.code = :capitalLossCode THEN -it.amount
         ELSE 0
       END
     ), 0) AS balance
@@ -408,6 +410,7 @@ async function getInvestorCapitalBalance(investorId) {
         investorId,
         capitalInCode: TRANSACTION_TYPE_CODES.CAPITAL_IN,
         capitalOutCode: TRANSACTION_TYPE_CODES.CAPITAL_OUT,
+        capitalLossCode: TRANSACTION_TYPE_CODES.CAPITAL_LOSS,
         reversalCode: TRANSACTION_TYPE_CODES.REVERSAL,
         capitalCategory: TRANSACTION_CATEGORIES.CAPITAL,
       },
@@ -444,7 +447,7 @@ async function getInvestorProfitBalance(investorId) {
         investorId,
         profitCreditCode: TRANSACTION_TYPE_CODES.PROFIT_CREDIT,
         profitWithdrawCode: TRANSACTION_TYPE_CODES.PROFIT_WITHDRAW,
-        lossCode: TRANSACTION_TYPE_CODES.LOSS,
+        lossCode: TRANSACTION_TYPE_CODES.PROFIT_LOSS,
         reversalCode: TRANSACTION_TYPE_CODES.REVERSAL,
         profitCategory: TRANSACTION_CATEGORIES.PROFIT,
       },
@@ -457,7 +460,7 @@ async function getInvestorProfitBalance(investorId) {
 
 async function getCapitalErosionBalance(investorId) {
   const lossType = await InvestorTransactionTypeModel.findOne({
-    where: { code: TRANSACTION_TYPE_CODES.LOSS },
+    where: { code: TRANSACTION_TYPE_CODES.PROFIT_LOSS },
   })
 
   if (!lossType) return 0
@@ -466,8 +469,8 @@ async function getCapitalErosionBalance(investorId) {
     `
     SELECT COALESCE(SUM(
       CASE
-        WHEN ttc.code = 'CAPITAL_OUT' AND ref_ttc.code = 'LOSS' THEN it.amount
-        WHEN ttc.code = 'CAPITAL_IN' AND ref_ttc.code = 'LOSS' THEN -it.amount
+        WHEN ttc.code = 'CAPITAL_LOSS' AND ref_ttc.code = 'PROFIT_LOSS' THEN it.amount
+        WHEN ttc.code = 'CAPITAL_IN' AND ref_ttc.code = 'PROFIT_LOSS' THEN -it.amount
         ELSE 0
       END
     ), 0) AS net_erosion
@@ -477,8 +480,8 @@ async function getCapitalErosionBalance(investorId) {
     LEFT JOIN investor_transaction_types ref_ttc ON ref.transaction_type_id = ref_ttc.id
     WHERE it.investor_id = :investorId
       AND (
-        (ttc.code = 'CAPITAL_OUT' AND ref_ttc.code = 'LOSS')
-        OR (ttc.code = 'CAPITAL_IN' AND ref_ttc.code = 'LOSS')
+        (ttc.code = 'CAPITAL_LOSS' AND ref_ttc.code = 'PROFIT_LOSS')
+        OR (ttc.code = 'CAPITAL_IN' AND ref_ttc.code = 'PROFIT_LOSS')
       )
     `,
     {
@@ -551,6 +554,10 @@ async function getBalanceSummary(filter, currentUser) {
     ? TRANSACTION_TYPE_CODES.CAPITAL_OUT
     : TRANSACTION_TYPE_CODES.PROFIT_WITHDRAW
 
+  const lossCode = category === TRANSACTION_CATEGORIES.CAPITAL
+    ? TRANSACTION_TYPE_CODES.CAPITAL_LOSS
+    : TRANSACTION_TYPE_CODES.PROFIT_LOSS
+
   const masterId = currentUser.user_type === userRoles.staff.type
     ? currentUser.master_id
     : currentUser.id
@@ -582,7 +589,7 @@ async function getBalanceSummary(filter, currentUser) {
       replacements: {
         inCode,
         outCode,
-        lossCode: TRANSACTION_TYPE_CODES.LOSS,
+        lossCode,
         reversalCode: TRANSACTION_TYPE_CODES.REVERSAL,
         category,
         investorId: investor_id || null,
