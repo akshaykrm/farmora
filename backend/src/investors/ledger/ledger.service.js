@@ -57,7 +57,10 @@ async function createInvestorTransaction(payload, currentUser) {
     throw new LedgerNonReversalReferenceMustBeNullError()
   }
 
-  if (transaction_type_code === TRANSACTION_TYPE_CODES.CAPITAL_OUT) {
+  if (
+    transaction_type_code === TRANSACTION_TYPE_CODES.CAPITAL_OUT ||
+    transaction_type_code === TRANSACTION_TYPE_CODES.SETOFF
+  ) {
     const availableCapital = await getInvestorCapitalBalance(investor_id)
     if (availableCapital < amount) {
       throw new LedgerCapitalExceedsBalanceError()
@@ -157,6 +160,14 @@ async function listInvestorTransactions(filter, currentUser) {
       attributes: ['id'],
     })).map((t) => t.id)
 
+    const setoffType = await InvestorTransactionTypeModel.findOne({
+      where: { code: TRANSACTION_TYPE_CODES.SETOFF },
+    })
+
+    if (setoffType) {
+      categoryTypeIds.push(setoffType.id)
+    }
+
     const reversalType = await InvestorTransactionTypeModel.findOne({
       where: { code: TRANSACTION_TYPE_CODES.REVERSAL },
     })
@@ -218,8 +229,10 @@ async function getInvestorCapitalBalance(investorId) {
       CASE
         WHEN ttc.code = :capitalInCode THEN it.amount
         WHEN ttc.code = :capitalOutCode THEN -it.amount
+        WHEN ttc.code = :setoffCode THEN -it.amount
         WHEN ttc.code = :reversalCode AND ref_ttc.code = :capitalInCode THEN it.amount
         WHEN ttc.code = :reversalCode AND ref_ttc.code = :capitalOutCode THEN -it.amount
+        WHEN ttc.code = :reversalCode AND ref_ttc.code = :setoffCode THEN -it.amount
         ELSE 0
       END
     ), 0) AS balance
@@ -228,13 +241,14 @@ async function getInvestorCapitalBalance(investorId) {
     LEFT JOIN investor_transactions ref ON it.reference_transaction_id = ref.id
     LEFT JOIN investor_transaction_types ref_ttc ON ref.transaction_type_id = ref_ttc.id
     WHERE it.investor_id = :investorId
-      AND (ttc.category = :capitalCategory OR (ttc.code = :reversalCode AND ref_ttc.category = :capitalCategory))
+      AND (ttc.category = :capitalCategory OR ttc.code = :setoffCode OR (ttc.code = :reversalCode AND ref_ttc.category = :capitalCategory))
     `,
     {
       replacements: {
         investorId,
         capitalInCode: TRANSACTION_TYPE_CODES.CAPITAL_IN,
         capitalOutCode: TRANSACTION_TYPE_CODES.CAPITAL_OUT,
+        setoffCode: TRANSACTION_TYPE_CODES.SETOFF,
         reversalCode: TRANSACTION_TYPE_CODES.REVERSAL,
         capitalCategory: TRANSACTION_CATEGORIES.CAPITAL,
       },
@@ -252,8 +266,12 @@ async function getInvestorProfitBalance(investorId) {
       CASE
         WHEN ttc.code = :profitCreditCode THEN it.amount
         WHEN ttc.code = :profitWithdrawCode THEN -it.amount
+        WHEN ttc.code = :profitLossCode THEN -it.amount
+        WHEN ttc.code = :setoffCode THEN it.amount
         WHEN ttc.code = :reversalCode AND ref_ttc.code = :profitCreditCode THEN it.amount
         WHEN ttc.code = :reversalCode AND ref_ttc.code = :profitWithdrawCode THEN -it.amount
+        WHEN ttc.code = :reversalCode AND ref_ttc.code = :profitLossCode THEN -it.amount
+        WHEN ttc.code = :reversalCode AND ref_ttc.code = :setoffCode THEN it.amount
         ELSE 0
       END
     ), 0) AS balance
@@ -262,13 +280,15 @@ async function getInvestorProfitBalance(investorId) {
     LEFT JOIN investor_transactions ref ON it.reference_transaction_id = ref.id
     LEFT JOIN investor_transaction_types ref_ttc ON ref.transaction_type_id = ref_ttc.id
     WHERE it.investor_id = :investorId
-      AND (ttc.category = :profitCategory OR (ttc.code = :reversalCode AND ref_ttc.category = :profitCategory))
+      AND (ttc.category = :profitCategory OR ttc.code = :setoffCode OR (ttc.code = :reversalCode AND (ref_ttc.category = :profitCategory OR ref_ttc.code = :setoffCode)))
     `,
     {
       replacements: {
         investorId,
         profitCreditCode: TRANSACTION_TYPE_CODES.PROFIT_CREDIT,
         profitWithdrawCode: TRANSACTION_TYPE_CODES.PROFIT_WITHDRAW,
+        profitLossCode: TRANSACTION_TYPE_CODES.PROFIT_LOSS,
+        setoffCode: TRANSACTION_TYPE_CODES.SETOFF,
         reversalCode: TRANSACTION_TYPE_CODES.REVERSAL,
         profitCategory: TRANSACTION_CATEGORIES.PROFIT,
       },
@@ -350,8 +370,14 @@ async function getBalanceSummary(filter, currentUser) {
       CASE
         WHEN ttc.code = :inCode THEN it.amount
         WHEN ttc.code = :outCode THEN -it.amount
+        WHEN ttc.code = :profitLossCode THEN -it.amount
+        WHEN ttc.code = :setoffCode AND :category = 'CAPITAL' THEN -it.amount
+        WHEN ttc.code = :setoffCode AND :category = 'PROFIT' THEN it.amount
         WHEN ttc.code = :reversalCode AND ref_ttc.code = :inCode THEN it.amount
         WHEN ttc.code = :reversalCode AND ref_ttc.code = :outCode THEN -it.amount
+        WHEN ttc.code = :reversalCode AND ref_ttc.code = :profitLossCode THEN -it.amount
+        WHEN ttc.code = :reversalCode AND ref_ttc.code = :setoffCode AND :category = 'CAPITAL' THEN -it.amount
+        WHEN ttc.code = :reversalCode AND ref_ttc.code = :setoffCode AND :category = 'PROFIT' THEN it.amount
         ELSE 0
       END
     ), 0) AS balance
@@ -359,7 +385,7 @@ async function getBalanceSummary(filter, currentUser) {
     JOIN investor_transaction_types ttc ON it.transaction_type_id = ttc.id
     LEFT JOIN investor_transactions ref ON it.reference_transaction_id = ref.id
     LEFT JOIN investor_transaction_types ref_ttc ON ref.transaction_type_id = ref_ttc.id
-    WHERE (ttc.category = :category OR (ttc.code = :reversalCode AND ref_ttc.category = :category))
+    WHERE (ttc.category = :category OR ttc.code = :setoffCode OR (ttc.code = :reversalCode AND (ref_ttc.category = :category OR ref_ttc.code = :setoffCode)))
       AND (:investorId IS NULL OR it.investor_id = :investorId)
       AND it.master_id = :masterId
       AND (:startDate IS NULL OR it.transaction_date >= :startDate)
@@ -369,6 +395,8 @@ async function getBalanceSummary(filter, currentUser) {
       replacements: {
         inCode,
         outCode,
+        profitLossCode: TRANSACTION_TYPE_CODES.PROFIT_LOSS,
+        setoffCode: TRANSACTION_TYPE_CODES.SETOFF,
         reversalCode: TRANSACTION_TYPE_CODES.REVERSAL,
         category,
         investorId: investor_id || null,
