@@ -23,6 +23,7 @@ const headers = [
 const typeStyles: Record<string, string> = {
   CAPITAL_IN: "bg-green-100 text-green-800",
   CAPITAL_OUT: "bg-orange-100 text-orange-800",
+  SETOFF: "bg-amber-100 text-amber-800",
   REVERSAL: "bg-red-100 text-red-800",
 };
 

@@ -24,6 +24,8 @@ const headers = [
 const typeStyles: Record<string, string> = {
   PROFIT_CREDIT: "bg-blue-100 text-blue-800",
   PROFIT_WITHDRAW: "bg-purple-100 text-purple-800",
+  PROFIT_LOSS: "bg-pink-100 text-pink-800",
+  SETOFF: "bg-amber-100 text-amber-800",
   REVERSAL: "bg-red-100 text-red-800",
 };
 

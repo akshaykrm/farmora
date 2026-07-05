@@ -38,7 +38,7 @@ const ProfitForm = ({
   const types = useLookupTransactionTypes()
 
   const profitTypes = types.data.filter(
-    (t) => t.category === 'PROFIT'
+    (t) => t.category === 'PROFIT' || t.code === 'SETOFF'
   )
 
   const seasons = useGetSeasonNameList()
