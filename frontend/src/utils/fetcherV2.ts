@@ -30,6 +30,7 @@ const serailizeFilter = (filter: any) => {
 export type FetcherReturnStatus =
   | "success"
   | "validation_error"
+  | "failed"
   | "network_error";
 
 export type FetcherReturnType<T> = {
@@ -70,16 +71,18 @@ const fetcherV2 = async <T>(
       };
     }
 
-    const errorList: ErrorTest[] = json.error.error.map((err: any) => {
-      return { name: err.field, message: err.message };
-    });
-
-    return {
-      status: "validation_error",
-      error: errorList,
-    };
+    if (json.error.error) {
+      const errorList: ErrorTest[] = json.error.error.map((err: any) => {
+        return { name: err.field, message: err.message };
+      });
+      return {
+        status: "validation_error",
+        error: errorList,
+      };
+    }
+    return { status: "failed", data: json.error.message };
   } catch (error: any) {
-    console.log(error);
+    // console.log(error);
     return {
       status: "network_error",
     };
