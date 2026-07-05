@@ -23,22 +23,18 @@ import logger from '@utils/logger'
 // ---------------------------------------------------------------------------
 const INVESTOR_DIRECTION_MAP = {
   CAPITAL_IN: 'in',
-  CAPITAL_OUT: 'out',
   PROFIT_WITHDRAW: 'out',
 }
 
 const INVESTOR_PURPOSE_MAP = {
   CAPITAL_IN: (t) =>
     `Capital Investment - ${t.investor?.investor_name || 'Unknown'}`,
-  CAPITAL_OUT: (t) =>
-    `Capital Withdrawal - ${t.investor?.investor_name || 'Unknown'}`,
   PROFIT_WITHDRAW: (t) =>
     `Profit Withdrawal - ${t.investor?.investor_name || 'Unknown'}`,
 }
 
 const INVESTOR_CATEGORY_MAP = {
   CAPITAL_IN: 'investor_capital',
-  CAPITAL_OUT: 'investor_capital',
   PROFIT_WITHDRAW: 'investor_profit',
 }
 
@@ -616,18 +612,6 @@ const buildBreakdown = (records) => {
     )
     .reduce((sum, r) => sum + Math.abs(parseFloat(r.amount) || 0), 0)
 
-  const investorCapitalOut = records.investorTransactions
-    .filter((r) => r.transaction_type?.code === 'CAPITAL_OUT')
-    .reduce((sum, r) => sum + (parseFloat(r.amount) || 0), 0)
-
-  const investorCapitalOutReversalsIn = records.investorTransactions
-    .filter(
-      (r) =>
-        r.transaction_type?.code === 'REVERSAL' &&
-        r.reference_transaction?.transaction_type?.code === 'CAPITAL_OUT'
-    )
-    .reduce((sum, r) => sum + Math.abs(parseFloat(r.amount) || 0), 0)
-
   const investorProfitWithdraw = records.investorTransactions
     .filter((r) => r.transaction_type?.code === 'PROFIT_WITHDRAW')
     .reduce((sum, r) => sum + (parseFloat(r.amount) || 0), 0)
@@ -678,8 +662,8 @@ const buildBreakdown = (records) => {
       out: round(sumField(records.purchaseBooks, 'amount')),
     },
     investor_capital: {
-      in: round(investorCapitalIn + investorCapitalOutReversalsIn),
-      out: round(investorCapitalOutReversals + investorCapitalOut),
+      in: round(investorCapitalIn),
+      out: round(investorCapitalOutReversals),
     },
     investor_profit: {
       in: round(investorProfitInReversals),
