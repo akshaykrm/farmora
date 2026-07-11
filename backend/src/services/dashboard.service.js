@@ -18,7 +18,6 @@ import logger from '@utils/logger'
 const getManagerDashboard = async (currentUser) => {
   logger.debug({ actor_id: currentUser.id }, 'Fetching manager dashboard data')
 
-  // Build base where clause for user access control
   const userWhereClause = {}
   if (currentUser.user_type === userRoles.staff.type) {
     userWhereClause.master_id = currentUser.master_id
@@ -26,102 +25,44 @@ const getManagerDashboard = async (currentUser) => {
     userWhereClause.master_id = currentUser.id
   }
 
-  // Get date range for last 30 days
   const now = new Date()
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
 
-  // Fetch all required data in parallel
   const [
-    farms,
-    batches,
-    seasons,
-    recentSales,
-    recentPurchases,
+    activeBatchCount,
     allSales,
     allPurchases,
     generalExpenses,
     generalSales,
     workingCosts,
   ] = await Promise.all([
-    // Farms
-    FarmModel.findAll({
-      where: { ...userWhereClause },
-      attributes: ['id', 'name', 'place', 'capacity', 'status'],
-      order: [['id', 'DESC']],
-      limit: 10,
+    BatchModel.count({
+      where: { ...userWhereClause, status: 'active' },
     }),
-    // Batches with season and farm
-    BatchModel.findAll({
-      where: { ...userWhereClause },
-      include: [
-        { model: SeasonModel, as: 'season', attributes: ['id', 'name'] },
-        { model: FarmModel, as: 'farm', attributes: ['id', 'name'] },
-      ],
-      order: [['id', 'DESC']],
-      limit: 10,
-    }),
-    // Seasons
-    SeasonModel.findAll({
-      where: { ...userWhereClause },
-      attributes: ['id', 'name', 'from_date', 'to_date', 'status'],
-      order: [['id', 'DESC']],
-      limit: 10,
-    }),
-    // Recent sales (last 10)
     SalesModel.findAll({
       where: {
         ...userWhereClause,
-        season_id: { [Op.ne]: null },
-        batch_id: { [Op.ne]: null },
       },
-      include: [
-        { model: VendorModel, as: 'buyer', attributes: ['id', 'name'] },
-        { model: BatchModel, as: 'batch', attributes: ['id', 'name'] },
-      ],
-      order: [['date', 'DESC']],
-      limit: 10,
+      attributes: ['id', 'amount', 'date'],
     }),
-    // Recent purchases (last 10)
     PurchaseModel.findAll({
       where: { ...userWhereClause },
-      include: [
-        { model: VendorModel, as: 'vendor', attributes: ['id', 'name'] },
-      ],
-      order: [['invoice_date', 'DESC']],
-      limit: 10,
+      attributes: ['id', 'net_amount', 'invoice_date'],
     }),
-    // All sales for metrics
-    SalesModel.findAll({
-      where: {
-        ...userWhereClause,
-        season_id: { [Op.ne]: null },
-        batch_id: { [Op.ne]: null },
-      },
-      attributes: ['id', 'amount', 'payment_type', 'date'],
-    }),
-    // All purchases for metrics
-    PurchaseModel.findAll({
-      where: { ...userWhereClause },
-      attributes: ['id', 'net_amount', 'payment_type', 'invoice_date'],
-    }),
-    // General expenses
     GeneralExpenseModel.findAll({
       where: { ...userWhereClause, status: 'active' },
-      attributes: ['id', 'amount', 'date', 'purpose'],
+      attributes: ['id', 'amount'],
     }),
-    // General sales (expense sales)
     ExpenseSalesModel.findAll({
       where: { ...userWhereClause, status: 'active' },
-      attributes: ['id', 'amount', 'date', 'purpose'],
+      attributes: ['id', 'amount'],
     }),
-    // Working costs
     WorkingCostModel.findAll({
       where: { ...userWhereClause, status: 'active' },
-      attributes: ['id', 'amount', 'date', 'purpose'],
+      attributes: ['id', 'amount'],
     }),
   ])
 
-  // Calculate metrics
   const totalRevenue = allSales.reduce(
     (sum, s) => sum + (parseFloat(s.amount) || 0),
     0
@@ -150,8 +91,8 @@ const getManagerDashboard = async (currentUser) => {
   const totalExpenses =
     totalPurchaseExpenses + totalGeneralExpenses + totalWorkingCosts
   const netProfit = totalRevenue + totalGeneralSalesAmount - totalExpenses
+  const balanceInHand = totalRevenue + totalGeneralSalesAmount - totalExpenses
 
-  // Calculate 30-day metrics for balance section
   const last30DaySales = allSales.filter(
     (s) => new Date(s.date) >= thirtyDaysAgo
   )
@@ -169,153 +110,11 @@ const getManagerDashboard = async (currentUser) => {
     0
   )
 
-  const balanceInHand = totalRevenue + totalGeneralSalesAmount - totalExpenses
-
-  // Count active batches
-  const activeBatches = batches.filter((b) => b.status === 'active').length
-
-  // Format farms
-  const farmsData = farms.map((farm) => ({
-    id: farm.id,
-    name: farm.name,
-    place: farm.place || '',
-    capacity: farm.capacity || '',
-    status: farm.status || 'active',
-  }))
-
-  // Format batches with profit calculation
-  const batchIds = batches.map((b) => b.id)
-
-  // Get sales and purchases per batch for profit calculation
-  const batchSalesMap = {}
-  const batchPurchasesMap = {}
-
-  allSales.forEach((sale) => {
-    if (!batchSalesMap[sale.batch_id]) {
-      batchSalesMap[sale.batch_id] = 0
-    }
-    batchSalesMap[sale.batch_id] += parseFloat(sale.amount) || 0
-  })
-
-  allPurchases.forEach((purchase) => {
-    if (!batchPurchasesMap[purchase.batch_id]) {
-      batchPurchasesMap[purchase.batch_id] = 0
-    }
-    batchPurchasesMap[purchase.batch_id] += parseFloat(purchase.net_amount) || 0
-  })
-
-  const batchesData = batches.map((batch) => {
-    const batchSales = batchSalesMap[batch.id] || 0
-    const batchExpenses = batchPurchasesMap[batch.id] || 0
-    const profit = batchSales - batchExpenses
-
-    return {
-      id: batch.id,
-      name: batch.name,
-      season_name: batch.season?.name || '',
-      farm_name: batch.farm?.name || '',
-      status: batch.status || 'active',
-      profit: parseFloat(profit.toFixed(2)),
-    }
-  })
-
-  // Format seasons with revenue/expense calculation
-  const seasonIds = seasons.map((s) => s.id)
-  const seasonRevenueMap = {}
-  const seasonExpenseMap = {}
-
-  allSales.forEach((sale) => {
-    if (!seasonRevenueMap[sale.season_id]) {
-      seasonRevenueMap[sale.season_id] = 0
-    }
-    seasonRevenueMap[sale.season_id] += parseFloat(sale.amount) || 0
-  })
-
-  // Map purchases to seasons through batches
-  batches.forEach((batch) => {
-    if (batch.season_id) {
-      const batchExpense = batchPurchasesMap[batch.id] || 0
-      if (!seasonExpenseMap[batch.season_id]) {
-        seasonExpenseMap[batch.season_id] = 0
-      }
-      seasonExpenseMap[batch.season_id] += batchExpense
-    }
-  })
-
-  const seasonsData = seasons.map((season) => {
-    const revenue = seasonRevenueMap[season.id] || 0
-    const expense = seasonExpenseMap[season.id] || 0
-    const margin = revenue > 0 ? ((revenue - expense) / revenue) * 100 : 0
-
-    return {
-      id: season.id,
-      name: season.name,
-      from_date: season.from_date,
-      to_date: season.to_date || '',
-      status: season.status,
-      revenue: parseFloat(revenue.toFixed(2)),
-      expense: parseFloat(expense.toFixed(2)),
-      margin: parseFloat(margin.toFixed(1)),
-    }
-  })
-
-  // Format sales
-  const salesData = recentSales.map((sale) => ({
-    id: sale.id,
-    date: sale.date,
-    buyer_name: sale.buyer?.name || 'N/A',
-    batch_name: sale.batch?.name || 'N/A',
-    weight: sale.weight ? parseFloat(sale.weight) : 0,
-    amount: parseFloat(sale.amount) || 0,
-  }))
-
-  // Format purchases
-  const purchasesData = recentPurchases.map((purchase) => ({
-    id: purchase.id,
-    invoice_date: purchase.invoice_date,
-    name: purchase.name || '',
-    vendor_name: purchase.vendor?.name || 'N/A',
-    quantity: purchase.quantity || 0,
-    net_amount: parseFloat(purchase.net_amount) || 0,
-    payment_type: purchase.payment_type === 'paid' ? 'paid' : 'credit',
-  }))
-
-  // Build transactions from sales and purchases
-  const transactions = []
-
-  // Add sales as credits
-  recentSales.slice(0, 5).forEach((sale) => {
-    transactions.push({
-      id: sale.id,
-      date: sale.date,
-      description: `Sale - ${sale.buyer?.name || 'N/A'}`,
-      category: 'Revenue',
-      type: 'credit',
-      amount: parseFloat(sale.amount) || 0,
-    })
-  })
-
-  // Add purchases as debits
-  recentPurchases.slice(0, 5).forEach((purchase) => {
-    transactions.push({
-      id: purchase.id + 10000, // Offset to avoid ID collision
-      date: purchase.invoice_date,
-      description: `Purchase - ${purchase.vendor?.name || 'N/A'}`,
-      category: 'Inventory',
-      type: 'debit',
-      amount: parseFloat(purchase.net_amount) || 0,
-    })
-  })
-
-  // Sort transactions by date descending
-  transactions.sort((a, b) => new Date(b.date) - new Date(a.date))
-
-  // Build metrics array
   const metrics = [
     {
       label: 'Total Revenue',
       value: parseFloat(totalRevenue.toFixed(2)),
-      trend: 0, // TODO: Calculate actual trend
+      trend: 0,
       color: 'blue',
     },
     {
@@ -332,7 +131,7 @@ const getManagerDashboard = async (currentUser) => {
     },
     {
       label: 'Active Batches',
-      value: activeBatches,
+      value: activeBatchCount,
       trend: 0,
       color: 'rose',
     },
@@ -341,23 +140,15 @@ const getManagerDashboard = async (currentUser) => {
   logger.info(
     {
       actor_id: currentUser.id,
-      farms_count: farmsData.length,
-      batches_count: batchesData.length,
-      seasons_count: seasonsData.length,
-      sales_count: salesData.length,
-      purchases_count: purchasesData.length,
+      active_batches: activeBatchCount,
+      total_revenue: totalRevenue,
+      total_expenses: totalExpenses,
     },
     'Manager dashboard data fetched'
   )
 
   return {
     metrics,
-    farms: farmsData,
-    batches: batchesData,
-    seasons: seasonsData,
-    sales: salesData,
-    purchases: purchasesData,
-    transactions: transactions.slice(0, 10),
     balanceInHand: parseFloat(balanceInHand.toFixed(2)),
     totalCredited: parseFloat(totalCredited.toFixed(2)),
     totalDebited: parseFloat(totalDebited.toFixed(2)),
