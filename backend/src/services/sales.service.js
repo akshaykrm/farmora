@@ -7,6 +7,24 @@ import userRoles from '@utils/user-roles'
 import { Op } from 'sequelize'
 import logger from '@utils/logger'
 
+export async function getAllSalesWithBatchClosed(where) {
+  const retunredItems = await SalesModel.findAll({
+    where,
+    include: [
+      {
+        model: BatchModel,
+        as: 'batch',
+        where: {
+          closed_on: {
+            [Op.not]: null,
+          },
+        },
+      },
+    ],
+  })
+  return retunredItems
+}
+
 const create = async (payload, currentUser) => {
   logger.debug({ payload, currentUser }, 'Creating sale: raw input')
 

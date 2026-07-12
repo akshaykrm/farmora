@@ -12,7 +12,9 @@ import userRoles from '@utils/user-roles'
 import { Op } from 'sequelize'
 import logger from '@utils/logger'
 import { getAllPurchaseWithBatchActive } from '@services/purchase.service'
+import { getAllClosedBatches } from '@services/batch.service'
 import { getAllReturnsWithBatchActive } from '@services/purchase-return.service'
+import overviewService from '@services/overview.service'
 
 function calculateTotalStockValue(purchaseItems, returnedItems) {
   let expenseTotal = 0
@@ -29,6 +31,24 @@ function calculateTotalStockValue(purchaseItems, returnedItems) {
   return expenseTotal - returnedTotal
 }
 
+async function getAverageProfitFromClosedBatches(
+  closedBatchNames,
+  currentUser
+) {
+  let totalProfit = 0
+  let totalWeight = 0
+  for (const b of closedBatchNames) {
+    const { overviewCalculations: res } =
+      await overviewService.getBatchOverview({ batch_id: b.id }, currentUser)
+
+    totalProfit +=
+      parseFloat(res.total_sale_amount) - parseFloat(res.total_expense)
+    totalWeight += parseFloat(res.total_sale_weight)
+  }
+
+  return totalProfit / totalWeight
+}
+
 const getManagerDashboard = async (currentUser) => {
   logger.debug({ actor_id: currentUser.id }, 'Fetching manager dashboard data')
 
@@ -41,12 +61,21 @@ const getManagerDashboard = async (currentUser) => {
 
   const now = new Date()
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+
+  // Total Stock Value
   const activePurchase = await getAllPurchaseWithBatchActive(userWhereClause)
   const activeReturns = await getAllReturnsWithBatchActive(userWhereClause)
 
   const totalStockValue = calculateTotalStockValue(
     activePurchase,
     activeReturns
+  )
+
+  // Average Profit
+  const closedBatches = await getAllClosedBatches(userWhereClause)
+  const avarageProfit = await getAverageProfitFromClosedBatches(
+    closedBatches,
+    currentUser
   )
 
   const [
@@ -139,8 +168,8 @@ const getManagerDashboard = async (currentUser) => {
       color: 'blue',
     },
     {
-      label: 'Total Expenses',
-      value: parseFloat((-totalExpenses).toFixed(2)),
+      label: 'Average Profit',
+      value: parseFloat(avarageProfit),
       trend: 0,
       color: 'amber',
     },

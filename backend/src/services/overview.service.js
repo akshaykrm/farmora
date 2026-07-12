@@ -156,7 +156,10 @@ const getBatchOverview = async (filter, currentUser) => {
         : null,
     },
     expenses: [
-      ...purchases.map((p) => ({ ...p.get({ plain: true }), date: p.invoice_date })),
+      ...purchases.map((p) => ({
+        ...p.get({ plain: true }),
+        date: p.invoice_date,
+      })),
       ...reassigned,
     ],
     sales,
