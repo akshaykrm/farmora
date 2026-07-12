@@ -1,9 +1,6 @@
-import FarmModel from '@models/farm'
 import BatchModel from '@models/batch'
-import SeasonModel from '@models/season'
 import SalesModel from '@models/sales'
 import PurchaseModel from '@models/purchase'
-import VendorModel from '@models/vendor'
 import GeneralExpenseModel from '@models/generalexpense'
 import ExpenseSalesModel from '@models/expensesales'
 import WorkingCostModel from '@models/workingcost'
@@ -12,8 +9,25 @@ import SubscriptionModel from '@models/subscription'
 import PackageModel from '@models/package'
 import ItemModel from '@models/items.model'
 import userRoles from '@utils/user-roles'
-import { Op, fn, col, literal } from 'sequelize'
+import { Op } from 'sequelize'
 import logger from '@utils/logger'
+import { getAllPurchaseWithBatchActive } from '@services/purchase.service'
+import { getAllReturnsWithBatchActive } from '@services/purchase-return.service'
+
+function calculateTotalStockValue(purchaseItems, returnedItems) {
+  let expenseTotal = 0
+  let returnedTotal = 0
+
+  for (const item of purchaseItems) {
+    expenseTotal += parseFloat(item.net_amount)
+  }
+
+  for (const item of returnedItems) {
+    returnedTotal += parseFloat(item.total_amount)
+  }
+
+  return expenseTotal - returnedTotal
+}
 
 const getManagerDashboard = async (currentUser) => {
   logger.debug({ actor_id: currentUser.id }, 'Fetching manager dashboard data')
@@ -27,6 +41,13 @@ const getManagerDashboard = async (currentUser) => {
 
   const now = new Date()
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+  const activePurchase = await getAllPurchaseWithBatchActive(userWhereClause)
+  const activeReturns = await getAllReturnsWithBatchActive(userWhereClause)
+
+  const totalStockValue = calculateTotalStockValue(
+    activePurchase,
+    activeReturns
+  )
 
   const [
     activeBatchCount,
@@ -112,8 +133,8 @@ const getManagerDashboard = async (currentUser) => {
 
   const metrics = [
     {
-      label: 'Total Revenue',
-      value: parseFloat(totalRevenue.toFixed(2)),
+      label: 'Total Stock Values',
+      value: parseFloat(totalStockValue.toFixed(2)),
       trend: 0,
       color: 'blue',
     },

@@ -7,7 +7,24 @@ import { Op } from 'sequelize'
 import logger from '@utils/logger'
 import itemService from '@services/items.service'
 
-const create = async (payload, currentUser) => {
+export async function getAllReturnsWithBatchActive(where) {
+  const retunredItems = await PurchaseReturnModel.findAll({
+    where,
+    include: [
+      {
+        model: BatchModel,
+        as: 'batch',
+        where: {
+          closed_on: {
+            [Op.is]: null,
+          },
+        },
+      },
+    ],
+  })
+  return retunredItems
+}
+async function create(payload, currentUser) {
   logger.debug({ payload, currentUser }, 'Creating item return: raw input')
 
   if (currentUser.user_type === userRoles.staff.type) {

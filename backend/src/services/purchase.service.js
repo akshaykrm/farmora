@@ -18,11 +18,26 @@ import SeasonModel from '@models/season'
 import dayjs from 'dayjs'
 import batchService from '@services/batch.service'
 import vendorService from './vendor.service'
-import farmService from './farm.service'
 import FarmModel from '@models/farm'
 import IntegrationBookModel from '@models/integationbook'
-import { transport } from 'pino'
 
+export async function getAllPurchaseWithBatchActive(where) {
+  const purchases = await PurchaseModel.findAll({
+    where,
+    include: [
+      {
+        model: BatchModel,
+        as: 'batch',
+        where: {
+          closed_on: {
+            [Op.is]: null,
+          },
+        },
+      },
+    ],
+  })
+  return purchases
+}
 const create = async (payload, currentUser) => {
   const { quantity, assign_quantity } = payload
   if (assign_quantity) {
