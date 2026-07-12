@@ -170,6 +170,7 @@ const getBatchOverview = async (filter, currentUser) => {
       total_returned_feeds: totalReturnedFeeds,
       total_returned_amount: totalReturnAmount,
       total_sale_weight: totalSaleWeight,
+      total_consumed_feed: netFeedWeight,
       total_sale_birds: totalSaleBirds,
       total_sale_amount: totalSaleAmount,
       avg_weight: avgWeight,

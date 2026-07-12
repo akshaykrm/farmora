@@ -37,6 +37,8 @@ async function getAverageProfitFromClosedBatches(
 ) {
   let totalProfit = 0
   let totalWeight = 0
+  let totalConsumedFeed = 0
+
   for (const b of closedBatchNames) {
     const { overviewCalculations: res } =
       await overviewService.getBatchOverview({ batch_id: b.id }, currentUser)
@@ -44,9 +46,13 @@ async function getAverageProfitFromClosedBatches(
     totalProfit +=
       parseFloat(res.total_sale_amount) - parseFloat(res.total_expense)
     totalWeight += parseFloat(res.total_sale_weight)
+    totalConsumedFeed = parseFloat(res.total_consumed_feed)
   }
 
-  return totalProfit / totalWeight
+  return {
+    averageProfit: totalProfit / totalWeight,
+    averageFCR: totalConsumedFeed / totalWeight,
+  }
 }
 
 const getManagerDashboard = async (currentUser) => {
@@ -73,7 +79,7 @@ const getManagerDashboard = async (currentUser) => {
 
   // Average Profit
   const closedBatches = await getAllClosedBatches(userWhereClause)
-  const avarageProfit = await getAverageProfitFromClosedBatches(
+  const closedBatchCalculations = await getAverageProfitFromClosedBatches(
     closedBatches,
     currentUser
   )
@@ -169,13 +175,13 @@ const getManagerDashboard = async (currentUser) => {
     },
     {
       label: 'Average Profit',
-      value: parseFloat(avarageProfit),
+      value: parseFloat(closedBatchCalculations.averageProfit),
       trend: 0,
       color: 'amber',
     },
     {
-      label: 'Net Profit',
-      value: parseFloat(netProfit.toFixed(2)),
+      label: 'Avarage FCR',
+      value: parseFloat(closedBatchCalculations.averageFCR.toFixed(2)),
       trend: 0,
       color: 'emerald',
     },
