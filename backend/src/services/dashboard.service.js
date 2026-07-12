@@ -20,15 +20,27 @@ function calculateTotalStockValue(purchaseItems, returnedItems) {
   let expenseTotal = 0
   let returnedTotal = 0
 
-  for (const item of purchaseItems) {
-    expenseTotal += parseFloat(item.net_amount)
+  let totalPurchasedChicks = 0
+  let totalReturnedChicks = 0
+
+  for (const p of purchaseItems) {
+    if (p.category.type === 'chick') {
+      totalPurchasedChicks += p.quantity
+    }
+    expenseTotal += parseFloat(p.net_amount)
   }
 
-  for (const item of returnedItems) {
-    returnedTotal += parseFloat(item.total_amount)
+  for (const p of returnedItems) {
+    if (p.category.type === 'chick') {
+      totalReturnedChicks += p.quantity
+    }
+    returnedTotal += parseFloat(p.total_amount)
   }
 
-  return expenseTotal - returnedTotal
+  return {
+    stock: expenseTotal - returnedTotal,
+    chicks: totalPurchasedChicks - totalReturnedChicks,
+  }
 }
 
 async function getAverageProfitFromClosedBatches(
@@ -72,14 +84,11 @@ const getManagerDashboard = async (currentUser) => {
   const activePurchase = await getAllPurchaseWithBatchActive(userWhereClause)
   const activeReturns = await getAllReturnsWithBatchActive(userWhereClause)
 
-  const totalStockValue = calculateTotalStockValue(
-    activePurchase,
-    activeReturns
-  )
+  const activeTotals = calculateTotalStockValue(activePurchase, activeReturns)
 
-  // Average Profit
+  // Average Profit & avarage fcr
   const closedBatches = await getAllClosedBatches(userWhereClause)
-  const closedBatchCalculations = await getAverageProfitFromClosedBatches(
+  const closedTotals = await getAverageProfitFromClosedBatches(
     closedBatches,
     currentUser
   )
@@ -169,25 +178,25 @@ const getManagerDashboard = async (currentUser) => {
   const metrics = [
     {
       label: 'Total Stock Values',
-      value: parseFloat(totalStockValue.toFixed(2)),
+      value: parseFloat(activeTotals.stock.toFixed(2)),
       trend: 0,
       color: 'blue',
     },
     {
       label: 'Average Profit',
-      value: parseFloat(closedBatchCalculations.averageProfit),
+      value: parseFloat(closedTotals.averageProfit.toFixed(2)),
       trend: 0,
       color: 'amber',
     },
     {
       label: 'Avarage FCR',
-      value: parseFloat(closedBatchCalculations.averageFCR.toFixed(2)),
+      value: parseFloat(closedTotals.averageFCR.toFixed(2)),
       trend: 0,
       color: 'emerald',
     },
     {
       label: 'Active Batches',
-      value: activeBatchCount,
+      value: activeTotals.chicks,
       trend: 0,
       color: 'rose',
     },

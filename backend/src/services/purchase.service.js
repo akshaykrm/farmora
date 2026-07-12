@@ -26,6 +26,10 @@ export async function getAllPurchaseWithBatchActive(where) {
     where,
     include: [
       {
+        model: ItemModel,
+        as: 'category',
+      },
+      {
         model: BatchModel,
         as: 'batch',
         where: {
