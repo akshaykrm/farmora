@@ -181,24 +181,28 @@ const getManagerDashboard = async (currentUser) => {
       value: parseFloat(activeTotals.stock.toFixed(2)),
       trend: 0,
       color: 'blue',
+      unit: '₹',
     },
     {
       label: 'Average Profit',
       value: parseFloat(closedTotals.averageProfit.toFixed(2)),
       trend: 0,
       color: 'amber',
+      unit: '₹/kg',
     },
     {
       label: 'Avarage FCR',
       value: parseFloat(closedTotals.averageFCR.toFixed(2)),
       trend: 0,
       color: 'emerald',
+      unit: '',
     },
     {
       label: 'Active Batches',
       value: activeTotals.chicks,
       trend: 0,
       color: 'rose',
+      unit: 'birds',
     },
   ]
 

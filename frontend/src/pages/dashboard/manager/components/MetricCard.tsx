@@ -7,9 +7,31 @@ const colorMap: Record<string, string> = {
   rose: "text-rose-600 bg-rose-50 border-rose-100",
 };
 
-const MetricCard = ({ label, value, trend, color }: MetricData) => {
+function formatMetricValue(val: number, unit?: string) {
+  const isMoney = unit?.startsWith("₹");
+  const prefix = isMoney ? "₹" : "";
+  const suffix = isMoney ? unit!.slice(1) : unit ? ` ${unit}` : "";
+  const absVal = Math.abs(val);
+
+  const formatted =
+    unit === "birds"
+      ? absVal.toLocaleString(undefined, { maximumFractionDigits: 0 })
+      : absVal.toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+
+  return { prefix, formatted, suffix };
+}
+
+const MetricCard = ({ label, value, trend, color, unit }: MetricData) => {
   const isPositive = trend >= 0;
   const accentColor = colorMap[color] || colorMap.blue;
+  const { prefix, formatted, suffix } = formatMetricValue(value, unit);
+  const prev = formatMetricValue(
+    value * (1 - trend / 100),
+    unit
+  );
 
   return (
     <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
@@ -56,19 +78,18 @@ const MetricCard = ({ label, value, trend, color }: MetricData) => {
       <div>
         <p className="text-sm font-medium text-slate-500 mb-1">{label}</p>
         <h3 className="text-2xl font-bold text-slate-800 tracking-tight">
-          {value < 0 ? "-" : ""}₹
-          {Math.abs(value).toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}
+          {value < 0 ? "-" : ""}
+          {prefix}
+          {formatted}
+          {suffix}
         </h3>
       </div>
       <div className="mt-4 pt-4 border-t border-slate-50">
         <div className="flex items-center text-xs text-slate-400">
-          <span className="font-semibold text-slate-500 mr-2">Prev:</span>₹
-          {(Math.abs(value) * (1 - trend / 100)).toLocaleString(undefined, {
-            maximumFractionDigits: 0,
-          })}
+          <span className="font-semibold text-slate-500 mr-2">Prev:</span>
+          {prev.prefix}
+          {prev.formatted}
+          {prev.suffix}
         </div>
       </div>
     </div>
