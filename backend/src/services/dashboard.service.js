@@ -61,7 +61,7 @@ async function getAverageProfitFromClosedBatches(
     totalProfit +=
       parseFloat(res.total_sale_amount) - parseFloat(res.total_expense)
     totalWeight += parseFloat(res.total_sale_weight)
-    totalConsumedFeed = parseFloat(res.total_consumed_feed)
+    totalConsumedFeed += parseFloat(res.total_consumed_feed)
   }
 
   return {
