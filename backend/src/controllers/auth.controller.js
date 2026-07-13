@@ -22,9 +22,16 @@ const login = async (req, res) => {
 
   res.success(responseObject, { message: 'user authenticated' })
 }
+const resetPassword = async (req, res) => {
+  const { username, new_password } = req.body
+  await authService.resetPassword(username, new_password)
+  res.success(null, { message: 'Password reset successfully' })
+}
+
 const authController = {
   createManager: asyncHandler(createManager),
   login: asyncHandler(login),
+  resetPassword: asyncHandler(resetPassword),
 }
 
 export default authController

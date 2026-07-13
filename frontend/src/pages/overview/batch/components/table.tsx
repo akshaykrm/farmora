@@ -71,6 +71,10 @@ const BatchOverviewTable = () => {
                 <FinancialSummaryTable
                   totalSaleAmount={overviewCalculations.total_sale_amount}
                   totalExpense={overviewCalculations.total_expense}
+                  totalReturnAmount={overviewCalculations.total_returned_amount}
+                  totalPurchaseAmount={
+                    overviewCalculations.total_purchase_amount
+                  }
                 />
               </div>
               <div className="mt-6">

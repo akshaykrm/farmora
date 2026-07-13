@@ -46,13 +46,12 @@ const getAll = async (filter, currentUser) => {
   })
 
   const expense = workingCostRecords.filter(
-    (record) => record.payment_type === 'income'
-  )
-
-  const income = workingCostRecords.filter(
     (record) => record.payment_type === 'expense'
   )
 
+  const income = workingCostRecords.filter(
+    (record) => record.payment_type === 'income'
+  )
 
   const item = await itemService.getWorkingItem(currentUser)
   if (item) {

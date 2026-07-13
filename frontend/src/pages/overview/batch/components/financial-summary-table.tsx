@@ -3,10 +3,17 @@ import { roundNumber } from "@utils/number";
 type Props = {
   totalExpense: number;
   totalSaleAmount: number;
+  totalReturnAmount: number;
+  totalPurchaseAmount: number;
 };
 
 const FinancialSummaryTable = (props: Props) => {
-  const { totalExpense, totalSaleAmount } = props;
+  const {
+    totalExpense,
+    totalSaleAmount,
+    totalReturnAmount,
+    totalPurchaseAmount,
+  } = props;
 
   const profit = totalSaleAmount - totalExpense;
   return (
@@ -14,6 +21,18 @@ const FinancialSummaryTable = (props: Props) => {
       <h3 className="text-lg font-semibold mb-3">Financial Summary</h3>
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
         <div className="grid grid-cols-1 gap-3">
+          <div className="flex justify-between items-center border-b pb-2">
+            <span className="text-gray-600">Purchase Total:</span>
+            <span className="font-semibold text-lg">
+              ₹{roundNumber(totalPurchaseAmount)}
+            </span>
+          </div>
+          <div className="flex justify-between items-center border-b pb-2">
+            <span className="text-gray-600">Return Total:</span>
+            <span className="font-semibold text-lg">
+              ₹{roundNumber(totalReturnAmount)}
+            </span>
+          </div>
           <div className="flex justify-between items-center border-b pb-2">
             <span className="text-gray-600">Total Expense:</span>
             <span className="font-semibold text-lg text-red-600">
