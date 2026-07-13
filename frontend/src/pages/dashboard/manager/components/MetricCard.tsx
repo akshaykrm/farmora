@@ -7,30 +7,29 @@ const colorMap: Record<string, string> = {
   rose: "text-rose-600 bg-rose-50 border-rose-100",
 };
 
-function formatMetricValue(val: number, unit?: string) {
+function formatMetricValue(val: number, unit?: string, decimals?: number) {
   const isMoney = unit?.startsWith("₹");
   const prefix = isMoney ? "₹" : "";
   const suffix = isMoney ? unit!.slice(1) : unit ? ` ${unit}` : "";
   const absVal = Math.abs(val);
+  const d = decimals ?? 2;
 
-  const formatted =
-    unit === "birds"
-      ? absVal.toLocaleString(undefined, { maximumFractionDigits: 0 })
-      : absVal.toLocaleString(undefined, {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        });
+  const formatted = absVal.toLocaleString(undefined, {
+    minimumFractionDigits: d,
+    maximumFractionDigits: d,
+  });
 
   return { prefix, formatted, suffix };
 }
 
-const MetricCard = ({ label, value, trend, color, unit }: MetricData) => {
+const MetricCard = ({ label, value, trend, color, unit, subtitle, decimals }: MetricData) => {
   const isPositive = trend >= 0;
   const accentColor = colorMap[color] || colorMap.blue;
-  const { prefix, formatted, suffix } = formatMetricValue(value, unit);
+  const { prefix, formatted, suffix } = formatMetricValue(value, unit, decimals);
   const prev = formatMetricValue(
     value * (1 - trend / 100),
-    unit
+    unit,
+    decimals
   );
 
   return (
@@ -82,6 +81,12 @@ const MetricCard = ({ label, value, trend, color, unit }: MetricData) => {
           {prefix}
           {formatted}
           {suffix}
+          {subtitle && (
+            <span className="text-sm font-normal text-slate-400">
+              {" "}
+              / {subtitle}
+            </span>
+          )}
         </h3>
       </div>
       <div className="mt-4 pt-4 border-t border-slate-50">

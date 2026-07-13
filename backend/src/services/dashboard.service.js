@@ -88,6 +88,7 @@ const getManagerDashboard = async (currentUser) => {
 
   // Average Profit & avarage fcr
   const closedBatches = await getAllClosedBatches(userWhereClause)
+  const activeBatches = await getAllClosedBatches(userWhereClause)
   const closedTotals = await getAverageProfitFromClosedBatches(
     closedBatches,
     currentUser
@@ -178,31 +179,36 @@ const getManagerDashboard = async (currentUser) => {
   const metrics = [
     {
       label: 'Total Stock Values',
-      value: parseFloat(activeTotals.stock.toFixed(2)),
+      value: activeTotals.stock,
       trend: 0,
       color: 'blue',
       unit: '₹',
+      decimals: 2,
     },
     {
       label: 'Average Profit',
-      value: parseFloat(closedTotals.averageProfit.toFixed(2)),
+      value: closedTotals.averageProfit,
       trend: 0,
       color: 'amber',
       unit: '₹/kg',
+      decimals: 2,
     },
     {
       label: 'Avarage FCR',
-      value: parseFloat(closedTotals.averageFCR.toFixed(2)),
+      value: closedTotals.averageFCR,
       trend: 0,
       color: 'emerald',
       unit: '',
+      decimals: 2,
     },
     {
       label: 'Active Batches',
-      value: activeTotals.chicks,
+      value: activeBatches?.length || 0,
       trend: 0,
       color: 'rose',
-      unit: 'birds',
+      unit: 'Batches',
+      decimals: 0,
+      subtitle: `${activeTotals.chicks} Chicks`,
     },
   ]
 

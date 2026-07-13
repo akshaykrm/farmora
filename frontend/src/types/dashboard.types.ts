@@ -4,6 +4,8 @@ export interface MetricData {
   trend: number;
   color: "blue" | "amber" | "emerald" | "rose";
   unit?: string;
+  subtitle?: string;
+  decimals?: number;
 }
 
 export interface ManagerDashboardData {

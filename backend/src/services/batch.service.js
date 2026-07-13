@@ -80,6 +80,18 @@ export async function getAllClosedBatches(filter) {
   return batchRecords
 }
 
+export async function getAllOpenBatches(filter) {
+  const batchRecords = await BatchModel.findAll({
+    where: {
+      ...filter,
+      closed_on: {
+        [Op.is]: null,
+      },
+    },
+  })
+  return batchRecords
+}
+
 const getById = async (batchId, currentUser, opts = {}) => {
   const { include = [], where } = opts
   let filter = { id: batchId }
