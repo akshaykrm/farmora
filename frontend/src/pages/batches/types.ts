@@ -1,8 +1,8 @@
-import type { FarmName } from "@app-types/farms.types";
 import type { NameResponse } from "@app-types/gen.types";
 import type { ListResponse } from "@app-types/response.types";
 import type { SeasonName } from "@app-types/season.types";
 import type { ValidationError } from "@errors/api.error";
+import type { FarmName } from "@pages/farms/types";
 
 export type Batch = {
   id: number;
@@ -13,6 +13,11 @@ export type Batch = {
 };
 
 export type BatchName = NameResponse;
+
+export type BatchNameFilter = {
+  status?: "active" | "closed" | null | undefined;
+  season_id?: number | string | null | undefined;
+};
 
 export type BatchListResponse = ListResponse<Batch>;
 

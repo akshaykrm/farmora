@@ -30,7 +30,7 @@ type Props = {
 
 const SaleFilter = ({ handleFetch }: Props) => {
   const seasonList = useGetSeasonNameList();
-  const batchList = useGetBatchNameList();
+  const batchList = useGetBatchNameList({ status: "active" });
 
   const methods = useForm<SaleFilterType>({
     defaultValues: defaultValues,

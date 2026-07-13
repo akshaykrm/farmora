@@ -1,13 +1,13 @@
 import { TextField, MenuItem, Button } from "@mui/material";
 import usetGetVendorNames from "@hooks/vendor/use-get-vendor-names";
 import useGetItemCategoryNames from "@hooks/item-category/use-get-item-category-names";
-import useGetBatchNames from "@hooks/batch/use-get-batch-names";
 import SelectList from "@components/select-list";
 import type { ItemReturnFilterRequest } from "@app-types/item-return.types";
 import { useForm } from "react-hook-form";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import { removeInternal } from "@utils/remove-internal";
+import useGetBatchNameList from "@hooks/use-get-batch-names";
 
 type Props = {
   onFilter: (filterData: ItemReturnFilterRequest) => Promise<void>;
@@ -27,7 +27,7 @@ const defaultValues: ItemReturnFilterRequest = {
 const FilterItemReturns = (props: Props) => {
   const vendorNames = usetGetVendorNames();
   const itemCategoryName = useGetItemCategoryNames();
-  const batchNames = useGetBatchNames();
+  const batchNames = useGetBatchNameList({ status: "active" });
 
   const methods = useForm<ItemReturnFilterRequest>({
     defaultValues,

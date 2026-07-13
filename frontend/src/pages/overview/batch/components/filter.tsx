@@ -6,6 +6,7 @@ import batches from "@api/batches.api";
 import type { BatchName } from "@app-types/batch.types";
 import { useEffect, useState } from "react";
 import useGetSeasonNameList from "@hooks/use-get-season-names";
+import useGetBatchNameList from "@hooks/use-get-batch-names";
 
 type Props = {
   onFilter: (v: BatchOverviewFilterRequest) => Promise<void>;
@@ -19,9 +20,6 @@ const defaultValues: BatchOverviewFilterRequest = {
 const FilterBatchOverview = ({ onFilter }: Props) => {
   const methods = useForm<BatchOverviewFilterRequest>({ defaultValues });
 
-  const seasonsList = useGetSeasonNameList();
-
-  const [batchList, setBatchList] = useState<BatchName[]>([]);
   const {
     formState: { errors },
     watch,
@@ -29,7 +27,12 @@ const FilterBatchOverview = ({ onFilter }: Props) => {
     handleSubmit,
     getValues,
   } = methods;
+
   const [seasonId, batchId] = watch(["season_id", "batch_id"]);
+  const seasonsList = useGetSeasonNameList();
+  const batchList = useGetBatchNameList({
+    season_id: seasonId,
+  });
 
   useEffect(() => {
     document.addEventListener("batchOverview:batch-closed", () => {
@@ -37,26 +40,6 @@ const FilterBatchOverview = ({ onFilter }: Props) => {
       onFilter(values);
     });
   }, []);
-
-  useEffect(() => {
-    const handleGetBatchBySeasonId = async (seasonId: number) => {
-      const res = await batches.getBySeasonId(seasonId);
-
-      if (res.status === "success") {
-        if (res.data) {
-          setBatchList(res.data);
-          return;
-        }
-      }
-      setBatchList([]);
-    };
-
-    if (seasonId) {
-      handleGetBatchBySeasonId(seasonId);
-    } else {
-      setBatchList([]);
-    }
-  }, [seasonId]);
 
   const handleFilter = handleSubmit(
     async (inputData: BatchOverviewFilterRequest) => {
@@ -83,7 +66,7 @@ const FilterBatchOverview = ({ onFilter }: Props) => {
         />
 
         <SelectList
-          options={batchList}
+          options={batchList.data}
           value={batchId}
           onChange={(val) => {
             setValue("batch_id", val ? val : "");

@@ -23,7 +23,7 @@ const ItemReturnForm = ({ methods, onSubmit, onCancel }: Props) => {
     formState: { errors },
   } = methods;
 
-  const batchNames = useGetBatchNameList();
+  const batchNames = useGetBatchNameList({ status: "active" });
   const itemCategoryName = useGetItemCategoryName();
   const itemVendorName = useGetSellerNameList();
   const values = watch();

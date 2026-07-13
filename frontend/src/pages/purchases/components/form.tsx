@@ -1,5 +1,3 @@
-import batches from "@api/batches.api";
-import type { BatchName } from "@app-types/batch.types";
 import SelectList from "@components/select-list";
 import useGetSeasonNameList from "@hooks/use-get-season-names";
 import useGetSellerNameList from "@hooks/use-get-vendor-name-list";
@@ -14,6 +12,7 @@ import useGetItemsByVendorId from "@pages/items/hooks/use-get-items-by-vendor-id
 import purchase from "../api";
 import { itemTypes } from "@pages/items";
 import { RHFTextField } from "@components/form/input";
+import useGetBatchNameList from "@hooks/use-get-batch-names";
 
 type Props = {
   defaultValues: DefaultValues<PurchaseFormValues>;
@@ -51,7 +50,11 @@ const PurchaseForm = ({
   const { handleGetItemsByVendorID, itemList } = useGetItemsByVendorId();
 
   const seasonNames = useGetSeasonNameList();
-  const batchList = useGetBAtchBySeasonId(values.season_id);
+  //TODO: make this get by season id
+  const batchList = useGetBatchNameList({
+    status: "active",
+    season_id: values.season_id,
+  });
 
   const selectedItem = useMemo(() => {
     if (itemList && selectedCategoryId) {
@@ -222,8 +225,8 @@ const PurchaseForm = ({
 
           <div className="min-w-0">
             <SelectList
-              options={batchList}
-              disabled={batchList.length === 0}
+              options={batchList.data}
+              disabled={!values.season_id}
               value={values.batch_id}
               onChange={(val) => {
                 clearErrors("batch_id");
@@ -363,31 +366,6 @@ const PurchaseForm = ({
       </form>
     </>
   );
-};
-
-const useGetBAtchBySeasonId = (seasonId: number | null | undefined) => {
-  const [batchList, setBatchList] = useState<BatchName[]>([]);
-  useEffect(() => {
-    const handleGetBatchBySeasonId = async (seasonId: number) => {
-      const res = await batches.getBySeasonId(seasonId);
-
-      if (res.status === "success") {
-        if (res.data) {
-          setBatchList(res.data);
-          return;
-        }
-      }
-      setBatchList([]);
-    };
-
-    if (seasonId) {
-      handleGetBatchBySeasonId(seasonId);
-    } else {
-      setBatchList([]);
-    }
-  }, [seasonId]);
-
-  return batchList;
 };
 
 export default PurchaseForm;

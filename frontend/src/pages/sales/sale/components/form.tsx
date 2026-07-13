@@ -1,5 +1,5 @@
 import SelectList from "@components/select-list";
-import useGetBatchNames from "@hooks/batch/use-get-batch-names";
+import useGetBatchNameList from "@hooks/use-get-batch-names";
 import useGetSeasonNames from "@hooks/use-get-season-names";
 import { TextField, Button, MenuItem } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
@@ -23,8 +23,12 @@ const SaleForm = ({ methods, onSubmit, onCancel }: Props) => {
     clearErrors,
   } = methods;
 
+  const values = methods.watch();
+
   const seasonNames = useGetSeasonNames();
-  const batchNames = useGetBatchNames();
+  const batchNames = useGetBatchNameList({
+    status: "active",
+  });
 
   // Fetch all vendors and filter buyers
   const vendorsList = useQuery<{ data: Vendor[] }>({
@@ -38,8 +42,6 @@ const SaleForm = ({ methods, onSubmit, onCancel }: Props) => {
       .filter((v) => v.vendor_type === "customer")
       .map((v) => ({ id: v.id, name: v.name }));
   }, [vendorsList.data]);
-
-  const values = methods.watch();
 
   const [averageWeight, setAverageWeight] = useState<number>(0.0);
   useEffect(() => {

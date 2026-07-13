@@ -3,25 +3,16 @@ import type {
   EditBatchPayload,
   NewBatchRequest,
 } from "@app-types/batch.types";
-import type { ItemName } from "@pages/items/types";
+import type { BatchNameFilter } from "@pages/batches/types";
 import fetcher from "@utils/fetcher";
-import fetcherV2, { type FetcherReturnType } from "@utils/fetcherV2";
 
-type Opts = {
-  status: "active" | "inactive";
-};
 const batches = {
   fetchAll: () => fetcher("batches"),
-  getNames: () => fetcher("batches/names"),
-  getBySeasonId: async (
-    seasonId: number,
-    opts?: Opts,
-  ): Promise<FetcherReturnType<ItemName[]>> => {
-    const params = { season_id: seasonId };
-    const searchParms = new URLSearchParams(params);
-    const res = await fetcherV2<ItemName[]>("batches/names?" + searchParms);
-    return res;
-  },
+  getNames: (filter?: BatchNameFilter) =>
+    fetcher("batches/names", null, {
+      method: "GET",
+      filter,
+    }),
   fetchById: (id: number) => fetcher(`batches/${id}`),
   create: async (payload: NewBatchRequest) =>
     await fetcher("batches", JSON.stringify(payload), { method: "POST" }),
