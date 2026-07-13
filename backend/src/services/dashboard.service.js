@@ -12,7 +12,10 @@ import userRoles from '@utils/user-roles'
 import { Op } from 'sequelize'
 import logger from '@utils/logger'
 import { getAllPurchaseWithBatchActive } from '@services/purchase.service'
-import { getAllClosedBatches } from '@services/batch.service'
+import {
+  getAllClosedBatches,
+  getAllActiveBatches,
+} from '@services/batch.service'
 import { getAllReturnsWithBatchActive } from '@services/purchase-return.service'
 import overviewService from '@services/overview.service'
 
@@ -88,7 +91,16 @@ const getManagerDashboard = async (currentUser) => {
 
   // Average Profit & avarage fcr
   const closedBatches = await getAllClosedBatches(userWhereClause)
-  const activeBatches = await getAllClosedBatches(userWhereClause)
+  const activeBatches = await getAllActiveBatches(userWhereClause)
+
+  let totalExpence = 0
+  for (const b of activeBatches) {
+    const { overviewCalculations: res } =
+      await overviewService.getBatchOverview({ batch_id: b.id }, currentUser)
+
+    totalExpence += res.total_expense
+  }
+
   const closedTotals = await getAverageProfitFromClosedBatches(
     closedBatches,
     currentUser
@@ -179,7 +191,7 @@ const getManagerDashboard = async (currentUser) => {
   const metrics = [
     {
       label: 'Total Stock Values',
-      value: activeTotals.stock,
+      value: totalExpence,
       trend: 0,
       color: 'blue',
       unit: '₹',

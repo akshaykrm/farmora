@@ -80,7 +80,7 @@ export async function getAllClosedBatches(filter) {
   return batchRecords
 }
 
-export async function getAllOpenBatches(filter) {
+export async function getAllActiveBatches(filter) {
   const batchRecords = await BatchModel.findAll({
     where: {
       ...filter,
