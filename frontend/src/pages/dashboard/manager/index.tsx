@@ -69,7 +69,7 @@ const ManagerDashboard = () => {
                   d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
                 />
               </svg>
-              Balance in Hand
+              Cash Balance
             </p>
             <h2 className="text-4xl md:text-5xl font-black tracking-tighter">
               ₹{data.balanceInHand.toLocaleString()}
@@ -79,7 +79,7 @@ const ManagerDashboard = () => {
           <div className="relative z-10 flex flex-col sm:flex-row gap-4 w-full md:w-auto">
             <div className="bg-white/10 px-5 py-4 rounded-xl backdrop-blur-md border border-white/10 min-w-[180px]">
               <p className="text-[10px] text-green-200 uppercase font-bold mb-1">
-                Total Credited (30d)
+                Customer Balance
               </p>
               <p className="text-xl font-bold text-emerald-300">
                 +₹{data.totalCredited.toLocaleString()}
@@ -87,7 +87,7 @@ const ManagerDashboard = () => {
             </div>
             <div className="bg-white/10 px-5 py-4 rounded-xl backdrop-blur-md border border-white/10 min-w-[180px]">
               <p className="text-[10px] text-green-200 uppercase font-bold mb-1">
-                Total Debited (30d)
+                Supplier Balance
               </p>
               <p className="text-xl font-bold text-rose-300">
                 -₹{data.totalDebited.toLocaleString()}
