@@ -147,8 +147,12 @@ const updateById = async (batchId, payload, currentUser) => {
   await batchRecord.update(payload)
 }
 
-const close = async (batchId, currentUser) => {
-  await updateById(batchId, { closed_on: dayjs().toDate() }, currentUser)
+const close = async (batchId, currentUser, closingStatement = null) => {
+  await updateById(
+    batchId,
+    { closed_on: dayjs().toDate(), closing_statement: closingStatement },
+    currentUser
+  )
 }
 
 const deleteById = async (batchId, currentUser) => {

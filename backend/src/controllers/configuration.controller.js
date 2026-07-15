@@ -72,7 +72,8 @@ const updateBatch = async (req, res) => {
 
 const close = async (req, res) => {
   const { batch_id } = req.params
-  await batchService.close(batch_id, req.user)
+  const { closing_statement } = req.body
+  await batchService.close(batch_id, req.user, closing_statement)
   res.success(null, { message: 'Batch closed successfully' })
 }
 

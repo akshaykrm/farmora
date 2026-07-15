@@ -80,9 +80,6 @@ const getManagerDashboard = async (currentUser) => {
     userWhereClause.master_id = currentUser.id
   }
 
-  const now = new Date()
-  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
-
   // Total Stock Value
   const activePurchase = await getAllPurchaseWithBatchActive(userWhereClause)
   const activeReturns = await getAllReturnsWithBatchActive(userWhereClause)
@@ -106,40 +103,34 @@ const getManagerDashboard = async (currentUser) => {
     currentUser
   )
 
-  const [
-    activeBatchCount,
-    allSales,
-    allPurchases,
-    generalExpenses,
-    generalSales,
-    workingCosts,
-  ] = await Promise.all([
-    BatchModel.count({
-      where: { ...userWhereClause, status: 'active' },
-    }),
-    SalesModel.findAll({
-      where: {
-        ...userWhereClause,
-      },
-      attributes: ['id', 'amount', 'date'],
-    }),
-    PurchaseModel.findAll({
-      where: { ...userWhereClause },
-      attributes: ['id', 'net_amount', 'invoice_date'],
-    }),
-    GeneralExpenseModel.findAll({
-      where: { ...userWhereClause, status: 'active' },
-      attributes: ['id', 'amount'],
-    }),
-    ExpenseSalesModel.findAll({
-      where: { ...userWhereClause, status: 'active' },
-      attributes: ['id', 'amount'],
-    }),
-    WorkingCostModel.findAll({
-      where: { ...userWhereClause, status: 'active' },
-      attributes: ['id', 'amount'],
-    }),
-  ])
+  const [allSales, allPurchases, generalExpenses, generalSales, workingCosts] =
+    await Promise.all([
+      BatchModel.count({
+        where: { ...userWhereClause, status: 'active' },
+      }),
+      SalesModel.findAll({
+        where: {
+          ...userWhereClause,
+        },
+        attributes: ['id', 'amount', 'date'],
+      }),
+      PurchaseModel.findAll({
+        where: { ...userWhereClause },
+        attributes: ['id', 'net_amount', 'invoice_date'],
+      }),
+      GeneralExpenseModel.findAll({
+        where: { ...userWhereClause, status: 'active' },
+        attributes: ['id', 'amount'],
+      }),
+      ExpenseSalesModel.findAll({
+        where: { ...userWhereClause, status: 'active' },
+        attributes: ['id', 'amount'],
+      }),
+      WorkingCostModel.findAll({
+        where: { ...userWhereClause, status: 'active' },
+        attributes: ['id', 'amount'],
+      }),
+    ])
 
   const totalRevenue = allSales.reduce(
     (sum, s) => sum + (parseFloat(s.amount) || 0),
@@ -168,25 +159,7 @@ const getManagerDashboard = async (currentUser) => {
 
   const totalExpenses =
     totalPurchaseExpenses + totalGeneralExpenses + totalWorkingCosts
-  const netProfit = totalRevenue + totalGeneralSalesAmount - totalExpenses
   const balanceInHand = totalRevenue + totalGeneralSalesAmount - totalExpenses
-
-  const last30DaySales = allSales.filter(
-    (s) => new Date(s.date) >= thirtyDaysAgo
-  )
-  const last30DayPurchases = allPurchases.filter(
-    (p) => new Date(p.invoice_date) >= thirtyDaysAgo
-  )
-
-  const totalCredited = last30DaySales.reduce(
-    (sum, s) => sum + (parseFloat(s.amount) || 0),
-    0
-  )
-
-  const totalDebited = last30DayPurchases.reduce(
-    (sum, p) => sum + (parseFloat(p.net_amount) || 0),
-    0
-  )
 
   const metrics = [
     {
@@ -224,21 +197,11 @@ const getManagerDashboard = async (currentUser) => {
     },
   ]
 
-  logger.info(
-    {
-      actor_id: currentUser.id,
-      active_batches: activeBatchCount,
-      total_revenue: totalRevenue,
-      total_expenses: totalExpenses,
-    },
-    'Manager dashboard data fetched'
-  )
-
   return {
     metrics,
     balanceInHand: parseFloat(balanceInHand.toFixed(2)),
-    totalCredited: parseFloat(totalCredited.toFixed(2)),
-    totalDebited: parseFloat(totalDebited.toFixed(2)),
+    totalCredited: 0,
+    totalDebited: 0,
   }
 }
 

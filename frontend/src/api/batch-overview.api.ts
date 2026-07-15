@@ -15,11 +15,12 @@ const batchOverview = {
     return fetcherV2<BatchOverviewResponse>("overview/batch", null, opts);
   },
 
-  closeBatch: async (batchId: number) => {
+  closeBatch: async (batchId: number, closingStatement?: string) => {
     return await fetcherV2(
       `batches/${batchId}/close`,
       JSON.stringify({
         status: "close",
+        closing_statement: closingStatement || null,
       }),
       { method: "PUT" },
     );

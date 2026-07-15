@@ -47,6 +47,7 @@ export type BatchOverviewBatch = {
   name: string;
   status: "active" | "inactive" | "closed";
   closed_on: string;
+  closing_statement: string | null;
   season: {
     id: number;
     name: string;

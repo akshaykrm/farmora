@@ -42,6 +42,7 @@ export async function getAllPurchaseWithBatchActive(where) {
   })
   return purchases
 }
+
 const create = async (payload, currentUser) => {
   const { quantity, assign_quantity } = payload
   if (assign_quantity) {

@@ -25,6 +25,10 @@ const BatchModel = sequelize.define(
       allowNull: true,
       field: 'closed_on',
     },
+    closing_statement: {
+      type: Sequelize.TEXT,
+      allowNull: true,
+    },
     status: {
       type: Sequelize.ENUM('active', 'inactive'),
       defaultValue: 'active',

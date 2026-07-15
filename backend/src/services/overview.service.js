@@ -151,6 +151,7 @@ const getBatchOverview = async (filter, currentUser) => {
       name: batch.name,
       status: batch.status,
       closed_on: batch.closed_on,
+      closing_statement: batch.closing_statement,
       season: batch.season
         ? { id: batch.season.id, name: batch.season.name }
         : null,
