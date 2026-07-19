@@ -73,7 +73,7 @@ export const FarmsListing = ({ data }: { data: Farm[] }) => (
       </table>
     </div>
     {data.length === 0 && (
-      <div className="p-4 text-center text-slate-400">No farms found</div>
+      <div className="p-4 pt-8 text-center text-slate-400 flex items-start justify-center flex-1">No farms found</div>
     )}
   </div>
 );
@@ -127,7 +127,7 @@ export const BatchesListing = ({ data }: { data: Batch[] }) => (
       </table>
     </div>
     {data.length === 0 && (
-      <div className="p-4 text-center text-slate-400">No batches found</div>
+      <div className="p-4 pt-8 text-center text-slate-400 flex items-start justify-center flex-1">No batches found</div>
     )}
   </div>
 );
@@ -182,7 +182,7 @@ export const SeasonsListing = ({ data }: { data: Season[] }) => (
       </table>
     </div>
     {data.length === 0 && (
-      <div className="p-4 text-center text-slate-400">No seasons found</div>
+      <div className="p-4 pt-8 text-center text-slate-400 flex items-start justify-center flex-1">No seasons found</div>
     )}
   </div>
 );
@@ -237,7 +237,7 @@ export const SalesListing = ({ data }: { data: RecentSale[] }) => (
       </table>
     </div>
     {data.length === 0 && (
-      <div className="p-4 text-center text-slate-400">No sales found</div>
+      <div className="p-4 pt-8 text-center text-slate-400 flex items-start justify-center flex-1">No sales found</div>
     )}
   </div>
 );
@@ -288,7 +288,7 @@ export const PurchasesListing = ({ data }: { data: RecentPurchase[] }) => (
       </table>
     </div>
     {data.length === 0 && (
-      <div className="p-4 text-center text-slate-400">No purchases found</div>
+      <div className="p-4 pt-8 text-center text-slate-400 flex items-start justify-center flex-1">No purchases found</div>
     )}
   </div>
 );
@@ -372,7 +372,7 @@ export const TransactionsListing = ({ data }: { data: Transaction[] }) => (
       </table>
     </div>
     {data.length === 0 && (
-      <div className="p-4 text-center text-slate-400">
+      <div className="p-4 pt-8 text-center text-slate-400 flex items-start justify-center flex-1">
         No transactions found
       </div>
     )}
