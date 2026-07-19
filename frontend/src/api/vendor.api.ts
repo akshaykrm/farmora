@@ -3,11 +3,16 @@ import type {
   EditVendorPayload,
   EditVendorRequest,
 } from "@app-types/vendor.types";
+import type { VendorNamesFilter } from "@pages/vendors/types";
 import fetcher from "@utils/fetcher";
 
 const vendors = {
   fetchAll: () => fetcher("vendors"),
-  getNames: () => fetcher("vendors/names"),
+  getNames: (filter?: VendorNamesFilter) =>
+    fetcher("vendors/names", null, {
+      method: "GET",
+      filter: filter,
+    }),
   fetchById: (id: number) => fetcher(`vendors/${id}`),
   create: async (payload: NewVendorRequest) =>
     await fetcher("vendors", JSON.stringify(payload), { method: "POST" }),

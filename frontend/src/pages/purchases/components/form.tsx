@@ -1,10 +1,10 @@
 import SelectList from "@components/select-list";
 import useGetSeasonNameList from "@hooks/use-get-season-names";
-import useGetSellerNameList from "@hooks/use-get-vendor-name-list";
+import useGetVendorNames from "@hooks/use-get-vendor-name-list";
 import { TextField, Button, MenuItem } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useForm, type DefaultValues } from "react-hook-form";
 import type { PurchaseFormValues } from "../types";
 import type { ValidationError } from "@errors/api.error";
@@ -43,9 +43,8 @@ const PurchaseForm = ({
     methods.reset(defaultValues);
   }, [defaultValues]);
 
-  const sellerList = useGetSellerNameList();
+  const sellerList = useGetVendorNames({ type: "supplier" });
   const values = methods.watch();
-
   const selectedCategoryId = watch("category_id") as number;
   const { handleGetItemsByVendorID, itemList } = useGetItemsByVendorId();
 

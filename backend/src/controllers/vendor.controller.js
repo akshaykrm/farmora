@@ -10,7 +10,14 @@ const create = async (req, res) => {
 }
 
 const getNames = async (req, res) => {
-  const records = await vendorService.getNames(req.user)
+  const { type } = req.query
+
+  const filter = {}
+  if (type) {
+    filter.vendor_type = type
+  }
+
+  const records = await vendorService.getNames(filter, req.user)
   res.success(records, { message: 'vendor names' })
 }
 

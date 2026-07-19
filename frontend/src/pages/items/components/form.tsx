@@ -1,5 +1,5 @@
 import SelectList from "@components/select-list";
-import useGetSellerNameList from "@hooks/use-get-vendor-name-list";
+import useGetVendorNames from "@hooks/use-get-vendor-name-list";
 import { Stack, Button, MenuItem } from "@mui/material";
 import { useForm, type DefaultValues } from "react-hook-form";
 import type { ItemFormValues } from "../types";
@@ -33,7 +33,7 @@ const ItemForm = ({ onSubmit, defaultValues, apiError, onCancel }: Props) => {
   useEffect(() => {
     reset(defaultValues);
   }, [defaultValues]);
-  const sellerList = useGetSellerNameList();
+  const sellerList = useGetVendorNames({ type: "supplier" });
   const vendorID = watch("vendor_id");
 
   useEffect(() => {

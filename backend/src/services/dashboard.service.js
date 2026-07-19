@@ -112,7 +112,6 @@ const getManagerDashboard = async (currentUser) => {
     allSales,
     allPurchases,
     generalExpenses,
-    generalSales,
     workingCosts,
   ] = await Promise.all([
     BatchModel.count({
@@ -162,14 +161,8 @@ const getManagerDashboard = async (currentUser) => {
     0
   )
 
-  const totalGeneralSalesAmount = generalSales.reduce(
-    (sum, s) => sum + (parseFloat(s.amount) || 0),
-    0
-  )
-
   const totalExpenses =
     totalPurchaseExpenses + totalGeneralExpenses + totalWorkingCosts
-  const balanceInHand = totalRevenue + totalGeneralSalesAmount - totalExpenses
 
   const last30DaySales = allSales.filter(
     (s) => new Date(s.date) >= thirtyDaysAgo
@@ -241,6 +234,8 @@ const getManagerDashboard = async (currentUser) => {
     totalDebited: parseFloat(totalDebited.toFixed(2)),
   }
 }
+
+async function getSellerBalance(currentUser) {}
 
 async function getBalanceInHand(currentUser) {
   const cashBalance = await balanceSheetService.getBalanceSheet({}, currentUser)

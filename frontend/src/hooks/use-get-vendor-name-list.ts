@@ -1,15 +1,16 @@
 import vendors from "@api/vendor.api";
 import type { VendorName } from "@app-types/vendor.types";
+import type { VendorNamesFilter } from "@pages/vendors/types";
 import { useState, useEffect } from "react";
 
-const useGetSellerNameList = () => {
+const useGetVendorNames = (filter?: VendorNamesFilter) => {
   const [state, setState] = useState<VendorName[]>([]);
 
   useEffect(() => {
     vendors
-      .getNames()
+      .getNames(filter)
       .then((data: VendorName[]) => {
-        setState(data.filter(({ vendor_type }) => vendor_type === "supplier"));
+        setState(data);
       })
       .catch((err) => {
         console.log(err);
@@ -20,4 +21,4 @@ const useGetSellerNameList = () => {
   return { data: state };
 };
 
-export default useGetSellerNameList;
+export default useGetVendorNames;

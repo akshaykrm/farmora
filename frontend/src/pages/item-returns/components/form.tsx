@@ -1,7 +1,7 @@
 import SelectList from "@components/select-list";
 import useGetItemCategoryName from "@hooks/item-category/use-get-item-category-names";
 import useGetBatchNameList from "@hooks/use-get-batch-names";
-import useGetSellerNameList from "@hooks/use-get-vendor-name-list";
+import useGetVendorNames from "@hooks/use-get-vendor-name-list";
 import { TextField, MenuItem, Button } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import { removeInternal } from "@utils/remove-internal";
@@ -25,7 +25,7 @@ const ItemReturnForm = ({ methods, onSubmit, onCancel }: Props) => {
 
   const batchNames = useGetBatchNameList({ status: "active" });
   const itemCategoryName = useGetItemCategoryName();
-  const itemVendorName = useGetSellerNameList();
+  const itemVendorName = useGetVendorNames({ type: "supplier" });
   const values = watch();
 
   console.log(
