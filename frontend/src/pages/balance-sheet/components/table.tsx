@@ -30,7 +30,7 @@ const BalanceSheetTable = ({ data, isLoading }: Props) => {
           otherwise={
             <DataNotFound
               title="No data found"
-              description="Apply filters to view balance sheet"
+              description="Apply filters to view cash flow"
             />
           }
         />

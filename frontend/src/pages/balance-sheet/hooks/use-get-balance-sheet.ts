@@ -21,7 +21,7 @@ const useGetBalanceSheet = () => {
     if (status === "success" && data) {
       setBalanceSheetData(data);
     } else {
-      setError(fetchError?.message || "Failed to fetch balance sheet");
+      setError(fetchError?.message || "Failed to fetch cash flow");
     }
 
     setIsLoading(false);
