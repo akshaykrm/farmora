@@ -3,10 +3,9 @@ import type {
   Farm,
   Batch,
   Season,
-  Sale,
-  Purchase,
   Transaction,
 } from "../types";
+import type { RecentPurchase, RecentSale } from "@app-types/dashboard.types";
 import dayjs from "dayjs";
 
 const TableHeader = ({ children }: { children: ReactNode }) => (
@@ -188,15 +187,19 @@ export const SeasonsListing = ({ data }: { data: Season[] }) => (
   </div>
 );
 
-export const SalesListing = ({ data }: { data: Sale[] }) => (
+export const SalesListing = ({ data }: { data: RecentSale[] }) => (
   <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead className="bg-slate-50/30">
           <tr>
+            <TableHeader>Date</TableHeader>
+            <TableHeader>Batch</TableHeader>
             <TableHeader>Buyer</TableHeader>
-            <TableHeader>Batch / Weight</TableHeader>
-            <TableHeader>Total</TableHeader>
+            <TableHeader>Weight (kg)</TableHeader>
+            <TableHeader>Birds</TableHeader>
+            <TableHeader>Payment</TableHeader>
+            <TableHeader>Amount</TableHeader>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100">
@@ -205,17 +208,28 @@ export const SalesListing = ({ data }: { data: Sale[] }) => (
               key={sale.id}
               className="hover:bg-slate-50/50 transition-colors"
             >
-              <td className="px-6 py-4 font-bold text-slate-800 leading-tight">
-                {sale.buyer_name}
-                <div className="text-[10px] text-slate-400 font-normal">
-                  {dayjs(sale.date).format("DD MMM YYYY")}
-                </div>
-              </td>
               <td className="px-6 py-4 text-slate-500 text-xs">
-                {sale.batch_name} ({sale.weight} kg)
+                {dayjs(sale.date).format("DD MMM YYYY")}
               </td>
-              <td className="px-6 py-4 font-bold text-emerald-600">
-                ₹{sale.amount.toLocaleString()}
+              <td className="px-6 py-4 font-bold text-slate-800 text-xs">
+                {sale.batch}
+              </td>
+              <td className="px-6 py-4 text-slate-600 font-medium text-xs">
+                {sale.buyer}
+              </td>
+              <td className="px-6 py-4 text-slate-600 text-xs">
+                {parseFloat(sale.weight).toLocaleString()}
+              </td>
+              <td className="px-6 py-4 text-slate-600 text-xs">
+                {sale.birds?.toLocaleString() ?? "-"}
+              </td>
+              <td className="px-6 py-4">
+                <Badge variant={sale.payment_type === "paid" ? "green" : "amber"}>
+                  {sale.payment_type}
+                </Badge>
+              </td>
+              <td className="px-6 py-4 font-bold text-slate-800">
+                ₹{parseFloat(sale.amount).toLocaleString()}
               </td>
             </tr>
           ))}
@@ -228,15 +242,18 @@ export const SalesListing = ({ data }: { data: Sale[] }) => (
   </div>
 );
 
-export const PurchasesListing = ({ data }: { data: Purchase[] }) => (
+export const PurchasesListing = ({ data }: { data: RecentPurchase[] }) => (
   <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead className="bg-slate-50/30">
           <tr>
-            <TableHeader>Item / Vendor</TableHeader>
+            <TableHeader>Invoice #</TableHeader>
+            <TableHeader>Date</TableHeader>
+            <TableHeader>Type</TableHeader>
+            <TableHeader>Quantity</TableHeader>
+            <TableHeader>Supplier</TableHeader>
             <TableHeader>Amount</TableHeader>
-            <TableHeader>Status</TableHeader>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100">
@@ -245,24 +262,25 @@ export const PurchasesListing = ({ data }: { data: Purchase[] }) => (
               key={purchase.id}
               className="hover:bg-slate-50/50 transition-colors"
             >
-              <td className="px-6 py-4">
-                <p className="font-bold text-slate-800 leading-tight">
-                  {purchase.name}
-                </p>
-                <p className="text-[10px] text-slate-400 uppercase tracking-tighter">
-                  {purchase.vendor_name} •{" "}
-                  {dayjs(purchase.invoice_date).format("DD MMM YYYY")}
-                </p>
+              <td className="px-6 py-4 text-slate-500 text-xs font-medium">
+                {purchase.invoice_number}
               </td>
-              <td className="px-6 py-4 font-bold text-rose-600">
-                ₹{purchase.net_amount.toLocaleString()}
+              <td className="px-6 py-4 text-slate-500 text-xs">
+                {dayjs(purchase.invoice_date).format("DD MMM YYYY")}
               </td>
               <td className="px-6 py-4">
-                <Badge
-                  variant={purchase.payment_type === "paid" ? "green" : "amber"}
-                >
-                  {purchase.payment_type}
+                <Badge variant={purchase.type === "paid" ? "green" : "amber"}>
+                  {purchase.type}
                 </Badge>
+              </td>
+              <td className="px-6 py-4 text-slate-600 font-medium text-xs">
+                {purchase.quantity}
+              </td>
+              <td className="px-6 py-4 font-bold text-slate-800">
+                {purchase.supplier_name}
+              </td>
+              <td className="px-6 py-4 font-bold text-slate-800">
+                ₹{parseFloat(purchase.amount).toLocaleString()}
               </td>
             </tr>
           ))}

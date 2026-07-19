@@ -159,11 +159,45 @@ const getManagerDashboard = async (currentUser) => {
     }
   }
 
+  const recentPurchases = await purchaseService.getAll(
+    { limit: 10 },
+    currentUser
+  )
+
+  const parsedPurchases = recentPurchases.data.map((r) => {
+    return {
+      id: r.id,
+      invoice_number: r.invoice_number,
+      invoice_date: r.invoice_date,
+      amount: r.net_amount,
+      supplier_name: r.vendor.name,
+      quantity: r.quantity,
+      type: r.category.type,
+    }
+  })
+
+  const recentSales = await salesService.getAll({ limit: 10 }, currentUser)
+
+  const parsedSales = recentSales.data.map((r) => {
+    return {
+      id: r.id,
+      date: r.date,
+      batch: r.batch?.name || '-',
+      buyer: r.buyer?.name || '-',
+      weight: r.weight,
+      birds: r.bird_no,
+      amount: r.amount,
+      payment_type: r.payment_type,
+    }
+  })
+
   return {
     metrics,
     balanceInHand: await getBalanceInHand(currentUser),
     customerBalance: customerBalance,
     supplierBalance: supplierBalance,
+    recentPurchases: parsedPurchases,
+    recentSales: parsedSales,
   }
 }
 

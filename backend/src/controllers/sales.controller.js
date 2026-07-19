@@ -15,9 +15,14 @@ const create = async (req, res) => {
 }
 
 const getAll = async (req, res) => {
-  const filter = {
-    page: parseInt(req.query.page) || 1,
-    limit: parseInt(req.query.limit) || 10,
+  const filter = {}
+
+  if (req.query.page) {
+    filter.page = parseInt(req.query.page)
+  }
+
+  if (req.query.limit) {
+    filter.limit = parseInt(req.query.limit)
   }
 
   if (req.query.master_id) {
@@ -45,6 +50,7 @@ const getAll = async (req, res) => {
     filter.end_date = req.query.end_date
   }
 
+  console.log(filter)
   const saleRecords = await salesService.getAll(filter, req.user)
   res.success(saleRecords, {
     message: 'Sales fetched successfully',

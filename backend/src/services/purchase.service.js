@@ -282,9 +282,8 @@ const assignItemToBatch = async (payload, currentUser, opts = {}) => {
   return record
 }
 
-const getAll = async (payload, currentUser) => {
+async function getAll(payload, currentUser) {
   const { page, limit, ...filter } = payload
-  const offset = (page - 1) * limit
 
   if (filter.name) {
     filter.name = { [Op.iLike]: `%${filter.name}%` }
@@ -310,6 +309,7 @@ const getAll = async (payload, currentUser) => {
 
   const rows = await PurchaseModel.findAll({
     where: filter,
+    limit: limit,
     order: [['id', 'DESC']],
     attributes: {
       exclude: ['category_id', 'vendor_id'],

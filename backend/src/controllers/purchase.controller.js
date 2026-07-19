@@ -84,9 +84,14 @@ const assingItemToBatch = async (req, res) => {
 }
 
 const getAll = async (req, res) => {
-  const filter = {
-    page: parseInt(req.query.page) || 1,
-    limit: parseInt(req.query.limit) || 10,
+  const filter = {}
+
+  if (req.query.page) {
+    filter.page = parseInt(req.query.page)
+  }
+
+  if (req.query.limit) {
+    filter.limit = parseInt(req.query.limit)
   }
 
   if (req.query.master_id) {
@@ -113,6 +118,7 @@ const getAll = async (req, res) => {
   if (req.query.start_date) {
     filter.start_date = req.query.start_date
   }
+
   if (req.query.end_date) {
     filter.end_date = req.query.end_date
   }
@@ -151,7 +157,7 @@ const deleteById = async (req, res) => {
 
 const purchaseController = {
   create: asyncHandler(create),
-  createPurchaseBookEntry:asyncHandler(createPurchaseBookEntry),
+  createPurchaseBookEntry: asyncHandler(createPurchaseBookEntry),
   getAll: asyncHandler(getAll),
   getById: asyncHandler(getById),
   updateById: asyncHandler(updateById),

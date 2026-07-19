@@ -8,6 +8,27 @@ export interface MetricData {
   decimals?: number;
 }
 
+export interface RecentPurchase {
+  id: number;
+  invoice_number: string;
+  invoice_date: string;
+  amount: string;
+  supplier_name: string;
+  type: string;
+  quantity: number;
+}
+
+export interface RecentSale {
+  id: number;
+  date: string;
+  batch: string;
+  buyer: string;
+  weight: string;
+  birds: number;
+  amount: string;
+  payment_type: string;
+}
+
 export interface ManagerDashboardData {
   metrics: MetricData[];
   balanceInHand: number;
@@ -15,6 +36,8 @@ export interface ManagerDashboardData {
   supplierBalance: number;
   totalCredited: number;
   totalDebited: number;
+  recentPurchases: RecentPurchase[];
+  recentSales: RecentSale[];
 }
 
 // Admin Dashboard Types
