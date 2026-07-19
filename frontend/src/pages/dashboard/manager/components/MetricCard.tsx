@@ -33,8 +33,8 @@ const MetricCard = ({ label, value, trend, color, unit, subtitle, decimals }: Me
   );
 
   return (
-    <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-      <div className="flex justify-between items-start mb-4">
+    <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+      <div className="flex justify-between items-start mb-3">
         <div className={`p-2.5 rounded-xl border ${accentColor}`}>
           <svg
             className="w-6 h-6"
@@ -89,7 +89,7 @@ const MetricCard = ({ label, value, trend, color, unit, subtitle, decimals }: Me
           )}
         </h3>
       </div>
-      <div className="mt-4 pt-4 border-t border-slate-50">
+      <div className="mt-3 pt-3 border-t border-slate-50">
         <div className="flex items-center text-xs text-slate-400">
           <span className="font-semibold text-slate-500 mr-2">Prev:</span>
           {prev.prefix}

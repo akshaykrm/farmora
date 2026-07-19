@@ -16,8 +16,6 @@ const ManagerDashboard = () => {
     queryFn: dashboardApi.fetchManagerDashboard,
   });
 
-  console.log(data);
-
   if (isLoading) {
     return (
       <Box className="flex items-center justify-center h-96">
@@ -35,9 +33,9 @@ const ManagerDashboard = () => {
   }
 
   return (
-    <div className="py-4 px-3 w-full space-y-12">
+    <div className="h-full flex flex-col py-4 px-3 w-full gap-6 overflow-hidden">
       {/* Welcome Header */}
-      <div className="mb-4">
+      <div className="mb-2 shrink-0">
         <h1 className="text-3xl font-bold text-slate-800 mb-1">
           Hi, {user?.name} 👋
         </h1>
@@ -47,8 +45,8 @@ const ManagerDashboard = () => {
       </div>
 
       {/* KEY PERFORMANCE INDICATORS */}
-      <section className="animate-in fade-in duration-700">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <section className="animate-in fade-in duration-700 shrink-0">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {data.metrics.map((metric, idx) => (
             <MetricCard key={idx} {...metric} />
           ))}
@@ -56,8 +54,8 @@ const ManagerDashboard = () => {
       </section>
 
       {/* BALANCE SECTION */}
-      <section className="w-full">
-        <div className="bg-gradient-to-br from-green-700 to-green-800 p-6 md:p-8 rounded-2xl text-white shadow-lg relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
+      <section className="w-full shrink-0">
+        <div className="bg-gradient-to-br from-green-700 to-green-800 p-5 md:p-6 rounded-2xl text-white shadow-lg relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -mr-12 -mt-12 blur-2xl"></div>
           <div className="relative z-10">
             <p className="text-green-100 text-xs font-bold uppercase tracking-widest mb-1 flex items-center gap-2">
@@ -103,9 +101,9 @@ const ManagerDashboard = () => {
       </section>
 
       {/* RECENT PURCHASES & SALES */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 flex-1 min-h-0 overflow-hidden">
         {data.recentPurchases?.length > 0 && (
-          <section className="animate-in fade-in duration-700">
+          <section className="animate-in fade-in duration-700 flex flex-col min-h-0 overflow-hidden">
             <SectionHeader
               title="Recent Purchases"
               icon={
@@ -129,7 +127,7 @@ const ManagerDashboard = () => {
         )}
 
         {data.recentSales?.length > 0 && (
-          <section className="animate-in fade-in duration-700">
+          <section className="animate-in fade-in duration-700 flex flex-col min-h-0 overflow-hidden">
             <SectionHeader
               title="Recent Sales"
               icon={
