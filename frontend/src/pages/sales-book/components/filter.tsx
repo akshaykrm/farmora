@@ -5,10 +5,7 @@ import { useForm } from "react-hook-form";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import FilterWrapper from "@components/filter-wrapper";
-import type { Vendor } from "@pages/vendors/types";
-import vendors from "@api/vendor.api";
-import { useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
+import useGetVendorNames from "@hooks/use-get-vendor-name-list";
 
 type Props = {
   onFilter: (filter: SalesBookFilterRequest) => void;
@@ -34,17 +31,7 @@ const FilterSalesBook = ({ onFilter }: Props) => {
 
   const values = watch();
 
-  const vendorsList = useQuery<{ data: Vendor[] }>({
-    queryKey: ["vendors:all"],
-    queryFn: vendors.fetchAll,
-  });
-
-  const buyersList = useMemo(() => {
-    if (!vendorsList.data?.data) return [];
-    return vendorsList.data.data
-      .filter((v) => v.vendor_type === "customer")
-      .map((v) => ({ id: v.id, name: v.name }));
-  }, [vendorsList.data]);
+  const buyersList = useGetVendorNames({ type: "customer" });
 
   const handleFilter = handleSubmit(
     async (inputData: SalesBookFilterRequest) => {
@@ -57,7 +44,7 @@ const FilterSalesBook = ({ onFilter }: Props) => {
       <FilterWrapper>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <SelectList
-            options={buyersList}
+            options={buyersList.data}
             value={values.buyer_id}
             onChange={(val) => {
               setValue("buyer_id", val ? val : "");
