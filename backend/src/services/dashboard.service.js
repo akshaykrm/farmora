@@ -19,6 +19,8 @@ import {
 import { getAllReturnsWithBatchActive } from '@services/purchase-return.service'
 import overviewService from '@services/overview.service'
 import balanceSheetService from '@services/balance-sheet.service'
+import vendorService from '@services/vendor.service'
+import salesService from '@services/sales.service'
 
 function calculateTotalStockValue(purchaseItems, returnedItems) {
   let expenseTotal = 0
@@ -81,9 +83,6 @@ const getManagerDashboard = async (currentUser) => {
     userWhereClause.master_id = currentUser.id
   }
 
-  const now = new Date()
-  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
-
   // Total Stock Value
   const activePurchase = await getAllPurchaseWithBatchActive(userWhereClause)
   const activeReturns = await getAllReturnsWithBatchActive(userWhereClause)
@@ -105,80 +104,6 @@ const getManagerDashboard = async (currentUser) => {
   const closedTotals = await getAverageProfitFromClosedBatches(
     closedBatches,
     currentUser
-  )
-
-  const [
-    activeBatchCount,
-    allSales,
-    allPurchases,
-    generalExpenses,
-    workingCosts,
-  ] = await Promise.all([
-    BatchModel.count({
-      where: { ...userWhereClause, status: 'active' },
-    }),
-    SalesModel.findAll({
-      where: {
-        ...userWhereClause,
-      },
-      attributes: ['id', 'amount', 'date'],
-    }),
-    PurchaseModel.findAll({
-      where: { ...userWhereClause },
-      attributes: ['id', 'net_amount', 'invoice_date'],
-    }),
-    GeneralExpenseModel.findAll({
-      where: { ...userWhereClause, status: 'active' },
-      attributes: ['id', 'amount'],
-    }),
-    ExpenseSalesModel.findAll({
-      where: { ...userWhereClause, status: 'active' },
-      attributes: ['id', 'amount'],
-    }),
-    WorkingCostModel.findAll({
-      where: { ...userWhereClause, status: 'active' },
-      attributes: ['id', 'amount'],
-    }),
-  ])
-
-  const totalRevenue = allSales.reduce(
-    (sum, s) => sum + (parseFloat(s.amount) || 0),
-    0
-  )
-
-  const totalPurchaseExpenses = allPurchases.reduce(
-    (sum, p) => sum + (parseFloat(p.net_amount) || 0),
-    0
-  )
-
-  const totalGeneralExpenses = generalExpenses.reduce(
-    (sum, e) => sum + (parseFloat(e.amount) || 0),
-    0
-  )
-
-  const totalWorkingCosts = workingCosts.reduce(
-    (sum, w) => sum + (parseFloat(w.amount) || 0),
-    0
-  )
-
-  const totalExpenses =
-    totalPurchaseExpenses + totalGeneralExpenses + totalWorkingCosts
-
-  const last30DaySales = allSales.filter(
-    (s) => new Date(s.date) >= thirtyDaysAgo
-  )
-  const last30DayPurchases = allPurchases.filter(
-    (p) => new Date(p.invoice_date) >= thirtyDaysAgo
-  )
-
-  const totalCredited = last30DaySales.reduce(
-    (sum, s) => sum + (parseFloat(s.amount) || 0),
-    0
-  )
-
-  const totalDebited = last30DayPurchases.reduce(
-    (sum, p) => sum + (parseFloat(p.net_amount) || 0),
-    0
   )
 
   const metrics = [
@@ -217,32 +142,47 @@ const getManagerDashboard = async (currentUser) => {
     },
   ]
 
-  logger.info(
-    {
-      actor_id: currentUser.id,
-      active_batches: activeBatchCount,
-      total_revenue: totalRevenue,
-      total_expenses: totalExpenses,
-    },
-    'Manager dashboard data fetched'
-  )
+  const vendors = await vendorService.getNames({}, currentUser)
+  let supplierBalance = 0
+  let customerBalance = 0
+
+  for (const v of vendors) {
+    if (v.vendor_type === 'supplier') {
+    } else {
+      customerBalance += await getCustomerBalance(v, currentUser)
+    }
+  }
 
   return {
     metrics,
     balanceInHand: await getBalanceInHand(currentUser),
-    totalCredited: parseFloat(totalCredited.toFixed(2)),
-    totalDebited: parseFloat(totalDebited.toFixed(2)),
+    customerBalance: customerBalance,
+    supplierBalance: supplierBalance,
   }
 }
 
-async function getSellerBalance(currentUser) {}
+async function getSupplierBalance(supplier, currentUser) {
+  const res = await salesService.getSalesLedger(
+    { buyer_id: supplier.id },
+    currentUser
+  )
+  return res.closing_balance
+}
+
+async function getCustomerBalance(customer, currentUser) {
+  const res = await salesService.getSalesLedger(
+    { buyer_id: customer.id },
+    currentUser
+  )
+  return res.closing_balance
+}
 
 async function getBalanceInHand(currentUser) {
   const cashBalance = await balanceSheetService.getBalanceSheet({}, currentUser)
   const { total_in, total_out } = cashBalance.summary
 
   const balanceInHand = total_in - total_out
-  return balanceInHand.toFixed(2)
+  return balanceInHand
 }
 
 const getAdminDashboard = async (currentUser) => {

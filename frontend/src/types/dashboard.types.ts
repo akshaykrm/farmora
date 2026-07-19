@@ -11,6 +11,8 @@ export interface MetricData {
 export interface ManagerDashboardData {
   metrics: MetricData[];
   balanceInHand: number;
+  customerBalance: number;
+  supplierBalance: number;
   totalCredited: number;
   totalDebited: number;
 }

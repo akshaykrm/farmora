@@ -3,5 +3,5 @@ export function formatCurrency(amount: number) {
     style: "currency",
     currency: "INR",
     minimumFractionDigits: 2,
-  }).format(amount);
+  }).format(amount || 0);
 }

@@ -14,6 +14,8 @@ const ManagerDashboard = () => {
     queryFn: dashboardApi.fetchManagerDashboard,
   });
 
+  console.log(data);
+
   if (isLoading) {
     return (
       <Box className="flex items-center justify-center h-96">
@@ -83,7 +85,7 @@ const ManagerDashboard = () => {
                 Customer Balance
               </p>
               <p className="text-xl font-bold text-emerald-300">
-                +₹{data.totalCredited.toLocaleString()}
+                {formatCurrency(data.customerBalance)}
               </p>
             </div>
             <div className="bg-white/10 px-5 py-4 rounded-xl backdrop-blur-md border border-white/10 min-w-[180px]">
@@ -91,7 +93,7 @@ const ManagerDashboard = () => {
                 Supplier Balance
               </p>
               <p className="text-xl font-bold text-rose-300">
-                -₹{data.totalDebited.toLocaleString()}
+                {formatCurrency(data.supplierBalance)}
               </p>
             </div>
           </div>

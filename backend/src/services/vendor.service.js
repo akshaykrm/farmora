@@ -31,7 +31,6 @@ const getNames = async (filter, currentUser) => {
     attributes: ['id', 'name', 'vendor_type'],
     limit: 50,
   })
-  console.log(records)
   return records
 }
 
