@@ -4,6 +4,7 @@ import MetricCard from "./components/MetricCard";
 import dashboardApi from "@api/dashboard.api";
 import type { ManagerDashboardData } from "@app-types/dashboard.types";
 import { CircularProgress, Box } from "@mui/material";
+import { formatCurrency } from "@utils/currency";
 
 const ManagerDashboard = () => {
   const { user } = useAuth();
@@ -72,7 +73,7 @@ const ManagerDashboard = () => {
               Cash Balance
             </p>
             <h2 className="text-4xl md:text-5xl font-black tracking-tighter">
-              ₹{data.balanceInHand.toLocaleString()}
+              {formatCurrency(data.balanceInHand)}
             </h2>
           </div>
 

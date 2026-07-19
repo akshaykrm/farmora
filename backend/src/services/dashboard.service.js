@@ -18,6 +18,7 @@ import {
 } from '@services/batch.service'
 import { getAllReturnsWithBatchActive } from '@services/purchase-return.service'
 import overviewService from '@services/overview.service'
+import balanceSheetService from '@services/balance-sheet.service'
 
 function calculateTotalStockValue(purchaseItems, returnedItems) {
   let expenseTotal = 0
@@ -235,10 +236,18 @@ const getManagerDashboard = async (currentUser) => {
 
   return {
     metrics,
-    balanceInHand: parseFloat(balanceInHand.toFixed(2)),
+    balanceInHand: await getBalanceInHand(currentUser),
     totalCredited: parseFloat(totalCredited.toFixed(2)),
     totalDebited: parseFloat(totalDebited.toFixed(2)),
   }
+}
+
+async function getBalanceInHand(currentUser) {
+  const cashBalance = await balanceSheetService.getBalanceSheet({}, currentUser)
+  const { total_in, total_out } = cashBalance.summary
+
+  const balanceInHand = total_in - total_out
+  return balanceInHand.toFixed(2)
 }
 
 const getAdminDashboard = async (currentUser) => {

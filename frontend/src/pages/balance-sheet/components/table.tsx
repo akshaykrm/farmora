@@ -7,18 +7,11 @@ import Ternary from "@components/ternary";
 import type { BalanceSheetResponse, Transaction } from "../types";
 import dayjs from "dayjs";
 import { Card } from "@mui/material";
+import { formatCurrency } from "@utils/currency";
 
 type Props = {
   data: BalanceSheetResponse | null;
   isLoading: boolean;
-};
-
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    minimumFractionDigits: 2,
-  }).format(amount);
 };
 
 const formatDate = (date: string) => {
@@ -271,19 +264,13 @@ const BreakdownTable = ({ data }: { data: BalanceSheetResponse }) => {
   );
 };
 
-const getBalance = (inA: number, outA: number) => {
-  const t = inA - outA;
-  return t.toFixed(2);
-};
-
 const AllTables = ({ data }: { data: BalanceSheetResponse }) => {
   const { transactions, summary } = data;
 
   const { total_in, total_out } = summary;
 
-  const balance = getBalance(total_in, total_out);
+  const balance = total_in - total_out;
 
-  console.log(balance);
   return (
     <div>
       <div className="grid grid-cols-1 gap-3 md:grid-cols-3 mb-4">
