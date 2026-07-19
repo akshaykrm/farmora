@@ -193,7 +193,6 @@ const getPurchaseBook = async (filter, currentUser) => {
   creditList.forEach((c) => {
     temp += parseFloat(c.amount)
   })
-  console.log(temp)
   const totalCredit = creditList.reduce((acc, curr) => {
     return acc + parseFloat(curr.amount)
   }, 0)

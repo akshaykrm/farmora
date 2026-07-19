@@ -1,6 +1,5 @@
 import { FarmNotFoundError } from '@errors/farm.errors'
 import FarmModel from '@models/farm'
-import UserModel from '@models/user'
 import userRoles from '@utils/user-roles'
 import { Op } from 'sequelize'
 

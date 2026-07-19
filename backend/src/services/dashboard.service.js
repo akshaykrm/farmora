@@ -1,9 +1,6 @@
 import BatchModel from '@models/batch'
 import SalesModel from '@models/sales'
 import PurchaseModel from '@models/purchase'
-import GeneralExpenseModel from '@models/generalexpense'
-import ExpenseSalesModel from '@models/expensesales'
-import WorkingCostModel from '@models/workingcost'
 import UserModel from '@models/user'
 import SubscriptionModel from '@models/subscription'
 import PackageModel from '@models/package'
@@ -21,6 +18,11 @@ import overviewService from '@services/overview.service'
 import balanceSheetService from '@services/balance-sheet.service'
 import vendorService from '@services/vendor.service'
 import salesService from '@services/sales.service'
+import purchaseService from '@services/purchase.service'
+import farmService from '@services/farm.service'
+import seasonService from '@services/season.service'
+import integrationBookService from '@services/itegration-book.service'
+import workingCostService from '@services/working-cost.service'
 
 function calculateTotalStockValue(purchaseItems, returnedItems) {
   let expenseTotal = 0
@@ -142,12 +144,16 @@ const getManagerDashboard = async (currentUser) => {
     },
   ]
 
-  const vendors = await vendorService.getNames({}, currentUser)
   let supplierBalance = 0
   let customerBalance = 0
 
+  supplierBalance += await getIntegrationBalance(currentUser)
+  supplierBalance += await getWorkingBalance(currentUser)
+
+  const vendors = await vendorService.getNames({}, currentUser)
   for (const v of vendors) {
     if (v.vendor_type === 'supplier') {
+      supplierBalance += await getSupplierBalance(v, currentUser)
     } else {
       customerBalance += await getCustomerBalance(v, currentUser)
     }
@@ -161,12 +167,40 @@ const getManagerDashboard = async (currentUser) => {
   }
 }
 
+async function getWorkingBalance(currentUser) {
+  let balance = 0
+  const seasonNames = await seasonService.getNames(currentUser, {})
+  for (const s of seasonNames) {
+    const res = await workingCostService.getAll(
+      { season_id: s.id },
+      currentUser
+    )
+    balance += res.totals.balance
+  }
+
+  return balance
+}
+
+async function getIntegrationBalance(currentUser) {
+  let balance = 0
+  const farmNames = await farmService.getNames(currentUser)
+  for (const f of farmNames) {
+    const res = await integrationBookService.getAll(
+      { farm_id: f.id },
+      currentUser
+    )
+    balance += res.totals.balance
+  }
+
+  return balance
+}
+
 async function getSupplierBalance(supplier, currentUser) {
-  const res = await salesService.getSalesLedger(
-    { buyer_id: supplier.id },
+  const res = await purchaseService.getPurchaseBook(
+    { vendorId: supplier.id },
     currentUser
   )
-  return res.closing_balance
+  return res.balance
 }
 
 async function getCustomerBalance(customer, currentUser) {
@@ -192,59 +226,53 @@ const getAdminDashboard = async (currentUser) => {
   const currentYear = now.getFullYear()
 
   // Fetch all data in parallel for admin (across all managers)
-  const [
-    allManagers,
-    allSubscriptions,
-    allBatches,
-    allSales,
-    allPurchases,
-    allItems,
-  ] = await Promise.all([
-    // All managers
-    UserModel.findAll({
-      where: { user_type: userRoles.manager.type },
-      attributes: ['id', 'name', 'username', 'status', 'created_at'],
-      order: [['id', 'DESC']],
-    }),
-    // All subscriptions
-    SubscriptionModel.findAll({
-      include: [
-        { model: UserModel, as: 'user', attributes: ['id', 'name'] },
-        {
-          model: PackageModel,
-          as: 'package',
-          attributes: ['id', 'name', 'price'],
+  const [allManagers, allBatches, allSales, allPurchases, allItems] =
+    await Promise.all([
+      // All managers
+      UserModel.findAll({
+        where: { user_type: userRoles.manager.type },
+        attributes: ['id', 'name', 'username', 'status', 'created_at'],
+        order: [['id', 'DESC']],
+      }),
+      // All subscriptions
+      SubscriptionModel.findAll({
+        include: [
+          { model: UserModel, as: 'user', attributes: ['id', 'name'] },
+          {
+            model: PackageModel,
+            as: 'package',
+            attributes: ['id', 'name', 'price'],
+          },
+        ],
+        order: [['id', 'DESC']],
+      }),
+      // All batches
+      BatchModel.findAll({
+        attributes: ['id', 'name', 'status', 'master_id', 'created_at'],
+      }),
+      // All sales
+      SalesModel.findAll({
+        where: {
+          season_id: { [Op.ne]: null },
+          batch_id: { [Op.ne]: null },
         },
-      ],
-      order: [['id', 'DESC']],
-    }),
-    // All batches
-    BatchModel.findAll({
-      attributes: ['id', 'name', 'status', 'master_id', 'created_at'],
-    }),
-    // All sales
-    SalesModel.findAll({
-      where: {
-        season_id: { [Op.ne]: null },
-        batch_id: { [Op.ne]: null },
-      },
-      attributes: ['id', 'amount', 'date', 'master_id'],
-    }),
-    // All purchases
-    PurchaseModel.findAll({
-      attributes: [
-        'id',
-        'net_amount',
-        'invoice_date',
-        'master_id',
-        'category_id',
-      ],
-    }),
-    // All items
-    ItemModel.findAll({
-      attributes: ['id', 'name', 'type'],
-    }),
-  ])
+        attributes: ['id', 'amount', 'date', 'master_id'],
+      }),
+      // All purchases
+      PurchaseModel.findAll({
+        attributes: [
+          'id',
+          'net_amount',
+          'invoice_date',
+          'master_id',
+          'category_id',
+        ],
+      }),
+      // All items
+      ItemModel.findAll({
+        attributes: ['id', 'name', 'type'],
+      }),
+    ])
 
   // Calculate stats
   const totalRevenue = allSales.reduce(
