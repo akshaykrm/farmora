@@ -33,7 +33,7 @@ const ManagerDashboard = () => {
   }
 
   return (
-    <div className="h-full flex flex-col py-4 px-3 w-full gap-6 overflow-hidden">
+    <div className="h-full flex flex-col w-full gap-4 overflow-hidden">
       {/* Welcome Header */}
       <div className="mb-2 shrink-0">
         <h1 className="text-3xl font-bold text-slate-800 mb-1">
