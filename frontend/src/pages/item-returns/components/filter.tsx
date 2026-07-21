@@ -1,5 +1,5 @@
 import { TextField, MenuItem, Button } from "@mui/material";
-import usetGetVendorNames from "@hooks/vendor/use-get-vendor-names";
+import useGetVendorNames from "@hooks/use-get-vendor-name-list";
 import useGetItemCategoryNames from "@hooks/item-category/use-get-item-category-names";
 import SelectList from "@components/select-list";
 import type { ItemReturnFilterRequest } from "@app-types/item-return.types";
@@ -25,7 +25,7 @@ const defaultValues: ItemReturnFilterRequest = {
 };
 
 const FilterItemReturns = (props: Props) => {
-  const vendorNames = usetGetVendorNames();
+  const vendorNames = useGetVendorNames({ type: "supplier" });
   const itemCategoryName = useGetItemCategoryNames();
   const batchNames = useGetBatchNameList({ status: "active" });
 

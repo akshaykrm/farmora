@@ -4,10 +4,8 @@ import useGetSeasonNames from "@hooks/use-get-season-names";
 import { TextField, Button, MenuItem } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
-import { useQuery } from "@tanstack/react-query";
-import vendors from "@api/vendor.api";
-import type { Vendor } from "@app-types/vendor.types";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import useGetVendorNames from "@hooks/use-get-vendor-name-list";
 
 type Props = {
   methods: any;
@@ -30,18 +28,7 @@ const SaleForm = ({ methods, onSubmit, onCancel }: Props) => {
     status: "active",
   });
 
-  // Fetch all vendors and filter buyers
-  const vendorsList = useQuery<{ data: Vendor[] }>({
-    queryKey: ["vendors:all"],
-    queryFn: vendors.fetchAll,
-  });
-
-  const buyersList = useMemo(() => {
-    if (!vendorsList.data?.data) return [];
-    return vendorsList.data.data
-      .filter((v) => v.vendor_type === "customer")
-      .map((v) => ({ id: v.id, name: v.name }));
-  }, [vendorsList.data]);
+  const buyersList = useGetVendorNames({ type: "customer" });
 
   const [averageWeight, setAverageWeight] = useState<number>(0.0);
   useEffect(() => {
@@ -109,7 +96,7 @@ const SaleForm = ({ methods, onSubmit, onCancel }: Props) => {
           />
 
           <SelectList
-            options={buyersList}
+            options={buyersList.data}
             value={values.buyer_id}
             onChange={(val) => {
               setValue("buyer_id", val);

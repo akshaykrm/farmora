@@ -28,7 +28,7 @@ export const paths: Paths = [
       { pathname: "General Sales", link: "/general/general-sales" },
     ],
   },
-  { pathname: "Balance Sheet", link: "/balance-sheet" },
+  { pathname: "Cash Flow", link: "/cash-flow" },
   {
     pathname: "Overview",
     children: [

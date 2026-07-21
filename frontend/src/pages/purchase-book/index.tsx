@@ -8,7 +8,7 @@ import PageTitle from "@components/PageTitle";
 import { Button } from "@mui/material";
 import PurchaseBookTable from "./components/table";
 import { useState } from "react";
-import useGetSellerNameList from "@hooks/use-get-vendor-name-list";
+import useGetVendorNames from "@hooks/use-get-vendor-name-list";
 import { RHFTextField } from "@components/form/input";
 import fetcherV2, { type FetcherReturnType } from "@utils/fetcherV2";
 
@@ -19,7 +19,7 @@ type NewPaymentFormValues = {
 };
 
 const PurchaseBookPage = () => {
-  const sellerList = useGetSellerNameList();
+  const sellerList = useGetVendorNames({ type: "supplier" });
 
   const methods = useForm<NewPaymentFormValues>({
     defaultValues: {

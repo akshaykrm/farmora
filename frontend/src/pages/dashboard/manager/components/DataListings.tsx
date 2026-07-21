@@ -3,14 +3,13 @@ import type {
   Farm,
   Batch,
   Season,
-  Sale,
-  Purchase,
   Transaction,
 } from "../types";
+import type { RecentPurchase, RecentSale } from "@app-types/dashboard.types";
 import dayjs from "dayjs";
 
 const TableHeader = ({ children }: { children: ReactNode }) => (
-  <th className="px-6 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-50">
+  <th className="px-4 py-2.5 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-50">
     {children}
   </th>
 );
@@ -39,7 +38,7 @@ const Badge = ({
 };
 
 export const FarmsListing = ({ data }: { data: Farm[] }) => (
-  <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+  <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead className="bg-slate-50/30">
@@ -56,14 +55,14 @@ export const FarmsListing = ({ data }: { data: Farm[] }) => (
               key={farm.id}
               className="hover:bg-slate-50/50 transition-colors"
             >
-              <td className="px-6 py-4 font-bold text-slate-800">
+              <td className="px-4 py-2.5 font-bold text-slate-800">
                 {farm.name}
               </td>
-              <td className="px-6 py-4 text-slate-500">{farm.place || "-"}</td>
-              <td className="px-6 py-4 text-slate-600 font-medium">
+              <td className="px-4 py-2.5 text-slate-500">{farm.place || "-"}</td>
+              <td className="px-4 py-2.5 text-slate-600 font-medium">
                 {farm.capacity || "-"}
               </td>
-              <td className="px-6 py-4">
+              <td className="px-4 py-2.5">
                 <Badge variant={farm.status === "active" ? "green" : "slate"}>
                   {farm.status}
                 </Badge>
@@ -74,13 +73,13 @@ export const FarmsListing = ({ data }: { data: Farm[] }) => (
       </table>
     </div>
     {data.length === 0 && (
-      <div className="p-8 text-center text-slate-400">No farms found</div>
+      <div className="p-4 pt-8 text-center text-slate-400 flex items-start justify-center flex-1">No farms found</div>
     )}
   </div>
 );
 
 export const BatchesListing = ({ data }: { data: Batch[] }) => (
-  <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden h-full flex flex-col">
+  <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden h-full flex flex-col">
     <div className="p-4 border-b border-slate-50 flex justify-between items-center">
       <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
         Recent Batches
@@ -102,14 +101,14 @@ export const BatchesListing = ({ data }: { data: Batch[] }) => (
               key={batch.id}
               className="hover:bg-slate-50/50 transition-colors"
             >
-              <td className="px-6 py-4 font-bold text-slate-800">
+              <td className="px-4 py-2.5 font-bold text-slate-800">
                 {batch.name}
               </td>
-              <td className="px-6 py-4 text-slate-500 text-xs">
+              <td className="px-4 py-2.5 text-slate-500 text-xs">
                 {batch.season_name} / {batch.farm_name}
               </td>
               <td
-                className={`px-6 py-4 font-bold text-xs ${
+                className={`px-4 py-2.5 font-bold text-xs ${
                   (batch.profit || 0) >= 0
                     ? "text-emerald-600"
                     : "text-rose-600"
@@ -117,7 +116,7 @@ export const BatchesListing = ({ data }: { data: Batch[] }) => (
               >
                 ₹{(batch.profit || 0).toLocaleString()}
               </td>
-              <td className="px-6 py-4">
+              <td className="px-4 py-2.5">
                 <Badge variant={batch.status === "active" ? "blue" : "slate"}>
                   {batch.status}
                 </Badge>
@@ -128,13 +127,13 @@ export const BatchesListing = ({ data }: { data: Batch[] }) => (
       </table>
     </div>
     {data.length === 0 && (
-      <div className="p-8 text-center text-slate-400">No batches found</div>
+      <div className="p-4 pt-8 text-center text-slate-400 flex items-start justify-center flex-1">No batches found</div>
     )}
   </div>
 );
 
 export const SeasonsListing = ({ data }: { data: Season[] }) => (
-  <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden h-full flex flex-col">
+  <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden h-full flex flex-col">
     <div className="p-4 border-b border-slate-50 flex justify-between items-center">
       <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
         Seasonal Data
@@ -155,16 +154,16 @@ export const SeasonsListing = ({ data }: { data: Season[] }) => (
               key={season.id}
               className="hover:bg-slate-50/50 transition-colors"
             >
-              <td className="px-6 py-4 font-bold text-slate-800">
+              <td className="px-4 py-2.5 font-bold text-slate-800">
                 {season.name}
               </td>
-              <td className="px-6 py-4 text-slate-500 text-xs">
+              <td className="px-4 py-2.5 text-slate-500 text-xs">
                 {dayjs(season.from_date).format("MMM YYYY")} -{" "}
                 {season.to_date
                   ? dayjs(season.to_date).format("MMM YYYY")
                   : "Present"}
               </td>
-              <td className="px-6 py-4">
+              <td className="px-4 py-2.5">
                 <div className="flex items-center gap-2">
                   <div className="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                     <div
@@ -183,20 +182,24 @@ export const SeasonsListing = ({ data }: { data: Season[] }) => (
       </table>
     </div>
     {data.length === 0 && (
-      <div className="p-8 text-center text-slate-400">No seasons found</div>
+      <div className="p-4 pt-8 text-center text-slate-400 flex items-start justify-center flex-1">No seasons found</div>
     )}
   </div>
 );
 
-export const SalesListing = ({ data }: { data: Sale[] }) => (
-  <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-    <div className="overflow-x-auto">
+export const SalesListing = ({ data }: { data: RecentSale[] }) => (
+  <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex-1 flex flex-col min-h-0">
+    <div className="overflow-y-auto flex-1 min-h-0">
       <table className="w-full text-sm">
         <thead className="bg-slate-50/30">
           <tr>
+            <TableHeader>Date</TableHeader>
+            <TableHeader>Batch</TableHeader>
             <TableHeader>Buyer</TableHeader>
-            <TableHeader>Batch / Weight</TableHeader>
-            <TableHeader>Total</TableHeader>
+            <TableHeader>Weight (kg)</TableHeader>
+            <TableHeader>Birds</TableHeader>
+            <TableHeader>Payment</TableHeader>
+            <TableHeader>Amount</TableHeader>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100">
@@ -205,17 +208,28 @@ export const SalesListing = ({ data }: { data: Sale[] }) => (
               key={sale.id}
               className="hover:bg-slate-50/50 transition-colors"
             >
-              <td className="px-6 py-4 font-bold text-slate-800 leading-tight">
-                {sale.buyer_name}
-                <div className="text-[10px] text-slate-400 font-normal">
-                  {dayjs(sale.date).format("DD MMM YYYY")}
-                </div>
+              <td className="px-4 py-2.5 text-slate-500 text-xs">
+                {dayjs(sale.date).format("DD MMM YYYY")}
               </td>
-              <td className="px-6 py-4 text-slate-500 text-xs">
-                {sale.batch_name} ({sale.weight} kg)
+              <td className="px-4 py-2.5 font-bold text-slate-800 text-xs">
+                {sale.batch}
               </td>
-              <td className="px-6 py-4 font-bold text-emerald-600">
-                ₹{sale.amount.toLocaleString()}
+              <td className="px-4 py-2.5 text-slate-600 font-medium text-xs">
+                {sale.buyer}
+              </td>
+              <td className="px-4 py-2.5 text-slate-600 text-xs">
+                {parseFloat(sale.weight).toLocaleString()}
+              </td>
+              <td className="px-4 py-2.5 text-slate-600 text-xs">
+                {sale.birds?.toLocaleString() ?? "-"}
+              </td>
+              <td className="px-4 py-2.5">
+                <Badge variant={sale.payment_type === "paid" ? "green" : "amber"}>
+                  {sale.payment_type}
+                </Badge>
+              </td>
+              <td className="px-4 py-2.5 font-bold text-slate-800">
+                ₹{parseFloat(sale.amount).toLocaleString()}
               </td>
             </tr>
           ))}
@@ -223,20 +237,23 @@ export const SalesListing = ({ data }: { data: Sale[] }) => (
       </table>
     </div>
     {data.length === 0 && (
-      <div className="p-8 text-center text-slate-400">No sales found</div>
+      <div className="p-4 pt-8 text-center text-slate-400 flex items-start justify-center flex-1">No sales found</div>
     )}
   </div>
 );
 
-export const PurchasesListing = ({ data }: { data: Purchase[] }) => (
-  <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-    <div className="overflow-x-auto">
+export const PurchasesListing = ({ data }: { data: RecentPurchase[] }) => (
+  <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex-1 flex flex-col min-h-0">
+    <div className="overflow-y-auto flex-1 min-h-0">
       <table className="w-full text-sm">
         <thead className="bg-slate-50/30">
           <tr>
-            <TableHeader>Item / Vendor</TableHeader>
+            <TableHeader>Invoice #</TableHeader>
+            <TableHeader>Date</TableHeader>
+            <TableHeader>Type</TableHeader>
+            <TableHeader>Quantity</TableHeader>
+            <TableHeader>Supplier</TableHeader>
             <TableHeader>Amount</TableHeader>
-            <TableHeader>Status</TableHeader>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100">
@@ -245,24 +262,25 @@ export const PurchasesListing = ({ data }: { data: Purchase[] }) => (
               key={purchase.id}
               className="hover:bg-slate-50/50 transition-colors"
             >
-              <td className="px-6 py-4">
-                <p className="font-bold text-slate-800 leading-tight">
-                  {purchase.name}
-                </p>
-                <p className="text-[10px] text-slate-400 uppercase tracking-tighter">
-                  {purchase.vendor_name} •{" "}
-                  {dayjs(purchase.invoice_date).format("DD MMM YYYY")}
-                </p>
+              <td className="px-4 py-2.5 text-slate-500 text-xs font-medium">
+                {purchase.invoice_number}
               </td>
-              <td className="px-6 py-4 font-bold text-rose-600">
-                ₹{purchase.net_amount.toLocaleString()}
+              <td className="px-4 py-2.5 text-slate-500 text-xs">
+                {dayjs(purchase.invoice_date).format("DD MMM YYYY")}
               </td>
-              <td className="px-6 py-4">
-                <Badge
-                  variant={purchase.payment_type === "paid" ? "green" : "amber"}
-                >
-                  {purchase.payment_type}
+              <td className="px-4 py-2.5">
+                <Badge variant={purchase.type === "paid" ? "green" : "amber"}>
+                  {purchase.type}
                 </Badge>
+              </td>
+              <td className="px-4 py-2.5 text-slate-600 font-medium text-xs">
+                {purchase.quantity}
+              </td>
+              <td className="px-4 py-2.5 font-bold text-slate-800">
+                {purchase.supplier_name}
+              </td>
+              <td className="px-4 py-2.5 font-bold text-slate-800">
+                ₹{parseFloat(purchase.amount).toLocaleString()}
               </td>
             </tr>
           ))}
@@ -270,13 +288,13 @@ export const PurchasesListing = ({ data }: { data: Purchase[] }) => (
       </table>
     </div>
     {data.length === 0 && (
-      <div className="p-8 text-center text-slate-400">No purchases found</div>
+      <div className="p-4 pt-8 text-center text-slate-400 flex items-start justify-center flex-1">No purchases found</div>
     )}
   </div>
 );
 
 export const TransactionsListing = ({ data }: { data: Transaction[] }) => (
-  <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+  <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead className="bg-slate-50/30">
@@ -289,7 +307,7 @@ export const TransactionsListing = ({ data }: { data: Transaction[] }) => (
         <tbody className="divide-y divide-slate-100">
           {data.map((tx) => (
             <tr key={tx.id} className="hover:bg-slate-50/50 transition-colors">
-              <td className="px-6 py-4">
+              <td className="px-4 py-2.5">
                 <div className="flex items-center gap-3">
                   <div
                     className={`p-2 rounded-lg ${
@@ -336,13 +354,13 @@ export const TransactionsListing = ({ data }: { data: Transaction[] }) => (
                   </div>
                 </div>
               </td>
-              <td className="px-6 py-4">
+              <td className="px-4 py-2.5">
                 <Badge variant={tx.type === "credit" ? "green" : "red"}>
                   {tx.type}
                 </Badge>
               </td>
               <td
-                className={`px-6 py-4 font-bold text-base ${
+                className={`px-4 py-2.5 font-bold text-base ${
                   tx.type === "credit" ? "text-emerald-600" : "text-rose-600"
                 }`}
               >
@@ -354,7 +372,7 @@ export const TransactionsListing = ({ data }: { data: Transaction[] }) => (
       </table>
     </div>
     {data.length === 0 && (
-      <div className="p-8 text-center text-slate-400">
+      <div className="p-4 pt-8 text-center text-slate-400 flex items-start justify-center flex-1">
         No transactions found
       </div>
     )}

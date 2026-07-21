@@ -1,5 +1,5 @@
 import { Button, Card } from "@mui/material";
-import usetGetVendorNames from "@hooks/vendor/use-get-vendor-names";
+import useGetVendorNames from "@hooks/use-get-vendor-name-list";
 import SelectList from "@components/select-list";
 import type { PurchaseBookFilterRequest } from "@app-types/purchase-book.types";
 import { useForm } from "react-hook-form";
@@ -12,7 +12,7 @@ type Props = {
 };
 
 const FilterPurchaseBook = (props: Props) => {
-  const vendorNames = usetGetVendorNames();
+  const vendorNames = useGetVendorNames({ type: "supplier" });
   const methods = useForm<PurchaseBookFilterRequest>({
     defaultValues: {
       vendor_id: null,

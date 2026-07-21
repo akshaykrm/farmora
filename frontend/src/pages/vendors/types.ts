@@ -4,6 +4,7 @@ import type { ValidationError } from "@errors/api.error";
 
 export type VendorType = "supplier" | "customer";
 
+export type VendorNamesFilter = { type: "supplier" | "customer" };
 export type Vendor = {
   id: number;
   name: string;

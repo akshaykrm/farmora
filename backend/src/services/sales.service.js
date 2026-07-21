@@ -59,7 +59,6 @@ const create = async (payload, currentUser) => {
 
 const getAll = async (payload, currentUser) => {
   const { page, limit, ...filter } = payload
-  const offset = (page - 1) * limit
 
   logger.debug(
     { payload, actor_id: currentUser.id },
@@ -112,7 +111,6 @@ const getAll = async (payload, currentUser) => {
   const { count, rows } = await SalesModel.findAndCountAll({
     where: filter,
     limit,
-    offset,
     order: [['id', 'DESC']],
     attributes: {
       exclude: ['season_id', 'batch_id', 'buyer_id'],

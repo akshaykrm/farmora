@@ -62,7 +62,7 @@ const pageComponents: Record<string, React.ComponentType> = {
   "/general/general-sales": GeneralSalesPage,
   "/overview/season": SeasonOverviewPage,
   "/overview/batch": BatchOverviewPage,
-  "/balance-sheet": BalanceSheetPage,
+  "/cash-flow": BalanceSheetPage,
   "/packages": PackagesPage,
   "/subscriptions": SubscriptionsPage,
 };

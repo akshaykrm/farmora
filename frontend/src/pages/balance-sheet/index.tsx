@@ -14,7 +14,7 @@ const BalanceSheetPage = () => {
   return (
     <>
       <div className="flex items-center justify-between mb-6">
-        <PageTitle title="Balance Sheet" />
+        <PageTitle title="Cash Flow" />
       </div>
       <BalanceSheetFilter onFilter={handleFilter} />
       <BalanceSheetTable data={balanceSheetData} isLoading={isLoading} />

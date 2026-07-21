@@ -4,10 +4,7 @@ import { TextField, Button } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
 import dayjs from "dayjs";
-import { useQuery } from "@tanstack/react-query";
-import vendors from "@api/vendor.api";
-import type { Vendor } from "@app-types/vendor.types";
-import { useMemo } from "react";
+import useGetVendorNames from "@hooks/use-get-vendor-name-list";
 
 type AddMethod = UseFormReturn<NewSalesBookEntryRequest, any, FieldValues>;
 
@@ -18,17 +15,7 @@ type Props = {
 };
 
 const SalesBookForm = ({ methods, onSubmit, onCancel }: Props) => {
-  const vendorsList = useQuery<{ data: Vendor[] }>({
-    queryKey: ["vendors:all"],
-    queryFn: vendors.fetchAll,
-  });
-
-  const buyersList = useMemo(() => {
-    if (!vendorsList.data?.data) return [];
-    return vendorsList.data.data
-      .filter((v) => v.vendor_type === "customer")
-      .map((v) => ({ id: v.id, name: v.name }));
-  }, [vendorsList.data]);
+  const buyersList = useGetVendorNames({ type: "customer" });
 
   const {
     watch,
@@ -62,7 +49,7 @@ const SalesBookForm = ({ methods, onSubmit, onCancel }: Props) => {
           />
 
           <SelectList
-            options={buyersList}
+            options={buyersList.data}
             value={values.buyer_id}
             onChange={(val) => {
               (setValue as any)("buyer_id", val);
