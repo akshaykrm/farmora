@@ -5,18 +5,18 @@ import ItemTable from "./components/table";
 import EditItem from "./components/edit";
 import { Box, Button, Pagination } from "@mui/material";
 import useGetPurchases from "./hooks/use-get-purchases";
-import usePaginate from "@hooks/use-paginate";
 import FilterItems from "./components/filter";
+import usePurchaseFilter from "./hooks/use-purchase-filter";
 
 function PurchasePage() {
   const [isOpen, setOpenAdd] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
-  const { updateQueryParams, filter } = usePaginate();
+  const { updateQueryParams, filter } = usePurchaseFilter();
 
   const onOpen = () => setOpenAdd(true);
   const onClose = () => setOpenAdd(false);
 
-  const purchaseList = useGetPurchases(filter);
+  const purchases = useGetPurchases(filter);
 
   const filterButtonRef = useRef(null);
 
@@ -36,10 +36,23 @@ function PurchasePage() {
             onFilter={(filter) => updateQueryParams(filter)}
           />
         </div>
-        <ItemTable onEdit={(id) => setSelectedId(id)} data={purchaseList} />
+        <ItemTable
+          onEdit={(id) => setSelectedId(id)}
+          data={purchases.records}
+        />
       </div>
       <Box className="flex justify-end mt-6">
-        <Pagination count={10} size="small" defaultPage={1} />
+        <Pagination
+          count={purchases.totalPages}
+          size="small"
+          defaultPage={1}
+          onChange={(_, page) => {
+            updateQueryParams({
+              page,
+            });
+          }}
+          page={filter.page}
+        />
       </Box>
       <AddPurchase
         isShow={isOpen}

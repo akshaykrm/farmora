@@ -13,7 +13,7 @@ import { type Ref } from "react";
 type Props = {
   onFilter: (inputData: PurchaseFilter) => void;
   filterButtonRef: Ref<HTMLButtonElement>;
-  defaultFilter: Record<string, string | number>;
+  defaultFilter: Record<string, string | number | null>;
 };
 
 const FilterItems = (props: Props) => {

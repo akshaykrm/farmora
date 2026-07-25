@@ -10,6 +10,7 @@ import PurchaseModel from '@models/purchase'
 import PurchaseReturnModel from '@models/purchase-return'
 import PurchaseBookModel from '@models/purchasebook'
 import userRoles from '@utils/user-roles'
+import { calculateOffSet } from '@utils/pagination'
 import { Op } from 'sequelize'
 import purchaseBatchAssignmentService from '@services/purchase-batch-assignment'
 import PurchaseBatchAssignmentModel from '@models/purchasebatchassignment'
@@ -307,8 +308,12 @@ async function getAll(payload, currentUser) {
     }
   }
 
-  const { rows, count } = await PurchaseModel.findAndCountAll({
+  const offset = calculateOffSet(page, limit)
+
+  const opts = {
     where: filter,
+    offset: offset,
+    limit: limit,
     order: [['id', 'DESC']],
     attributes: {
       exclude: ['category_id', 'vendor_id'],
@@ -333,13 +338,13 @@ async function getAll(payload, currentUser) {
         attributes: { exclude: ['item_id', 'createdAt', 'updatedAt'] },
       },
     ],
-  })
+  }
+  const { rows, count } = await PurchaseModel.findAndCountAll(opts)
 
+  const totalPages = Math.ceil(count / limit)
   return {
     data: rows,
-    count,
-    page,
-    limit,
+    totalPages: totalPages,
   }
 }
 
