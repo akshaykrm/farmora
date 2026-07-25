@@ -3,17 +3,20 @@ import { useRef, useState } from "react";
 import AddPurchase from "./components/add";
 import ItemTable from "./components/table";
 import EditItem from "./components/edit";
-import { Button } from "@mui/material";
+import { Box, Button, Pagination } from "@mui/material";
 import useGetPurchases from "./hooks/use-get-purchases";
+import usePaginate from "@hooks/use-paginate";
+import FilterItems from "./components/filter";
 
-const PurchasePage = () => {
+function PurchasePage() {
   const [isOpen, setOpenAdd] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const { updateQueryParams, filter } = usePaginate();
 
   const onOpen = () => setOpenAdd(true);
   const onClose = () => setOpenAdd(false);
 
-  const { handleFetchAllPurchases, purchaseList } = useGetPurchases();
+  const purchaseList = useGetPurchases(filter);
 
   const filterButtonRef = useRef(null);
 
@@ -25,15 +28,18 @@ const PurchasePage = () => {
           Add Purchase
         </Button>
       </div>
-
       <div>
-        <ItemTable
-          onEdit={(id) => setSelectedId(id)}
-          data={purchaseList}
-          handleFetchAllPurchases={handleFetchAllPurchases}
-          filterButtonRef={filterButtonRef}
-        />
+        <div className="mb-5">
+          <FilterItems
+            filterButtonRef={filterButtonRef}
+            onFilter={(filter) => updateQueryParams(filter)}
+          />
+        </div>
+        <ItemTable onEdit={(id) => setSelectedId(id)} data={purchaseList} />
       </div>
+      <Box className="flex justify-end mt-6">
+        <Pagination count={10} size="small" defaultPage={1} />
+      </Box>
       <AddPurchase
         isShow={isOpen}
         onClose={onClose}
@@ -46,6 +52,6 @@ const PurchasePage = () => {
       />
     </>
   );
-};
+}
 
 export default PurchasePage;

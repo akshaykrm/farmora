@@ -1,36 +1,44 @@
 import { useEffect, useState } from "react";
-import type { ListResponse } from "@app-types/response.types";
-import type { Purchase, PurchaseFilterRequest } from "../types";
+import type { Purchase } from "../types";
 import purchase from "../api";
 
-const useGetPurchases = () => {
-  const [purchaseList, setPurchaseList] = useState<ListResponse<Purchase>>({
-    data: [],
-    limit: 0,
-    page: 0,
-    total: 0,
-  });
+function useGetPurchases(filter?: Record<string, string | number>) {
+  const [purchaseList, setPurchaseList] = useState<Purchase[]>([]);
 
-  const handleFetchAllPurchases = async (filter?: PurchaseFilterRequest) => {
+  const handleFetchAllPurchases = async (
+    filter?: Record<string, string | number>,
+  ) => {
     const res = await purchase.fetchAll(filter);
     if (res.status === "success") {
       if (res.data) {
-        setPurchaseList(res.data);
+        setPurchaseList(res.data.data);
       }
     }
   };
 
+  const {
+    page,
+    limit,
+    vendor_id,
+    category_id,
+    batch_id,
+    start_date,
+    end_date,
+  } = filter || {};
+
   useEffect(() => {
     handleFetchAllPurchases({
-      batch_id: "",
-      category_id: "",
-      vendor_id: "",
-      start_date: "",
-      end_date: "",
+      page,
+      limit,
+      vendor_id,
+      category_id,
+      batch_id,
+      start_date,
+      end_date,
     });
-  }, []);
+  }, [page, limit, vendor_id, category_id, batch_id, start_date, end_date]);
 
-  return { purchaseList, handleFetchAllPurchases };
-};
+  return purchaseList;
+}
 
 export default useGetPurchases;

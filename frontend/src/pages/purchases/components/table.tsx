@@ -3,14 +3,12 @@ import TableCell from "@components/TableCell";
 import TableHeaderCell from "@components/TableHeaderCell";
 import TableRow from "@components/TableRow";
 import { EditIcon } from "lucide-react";
-import FilterItems from "./filter";
 import { useMemo, type Ref } from "react";
 import DataNotFound from "@components/data-not-found";
 import Ternary from "@components/ternary";
 import dayjs from "dayjs";
 import Card from "@mui/material/Card";
-import type { ListResponse } from "@app-types/response.types";
-import type { Purchase, PurchaseFilterRequest } from "../types";
+import type { Purchase, PurchaseFilter } from "../types";
 
 const headers = [
   "Supplier Name",
@@ -25,84 +23,65 @@ const headers = [
 
 type Props = {
   onEdit: (selectedId: number) => void;
-  data: ListResponse<Purchase>;
-  handleFetchAllPurchases: (filter: PurchaseFilterRequest) => Promise<void>;
-  filterButtonRef: Ref<HTMLButtonElement>;
+  data: Purchase[];
 };
 
-const ItemTable = ({
-  onEdit,
-  data,
-  handleFetchAllPurchases,
-  filterButtonRef,
-}: Props) => {
+const ItemTable = ({ onEdit, data }: Props) => {
   const isEmpty = useMemo(() => {
-    return data.data.length === 0;
-  }, [data.data]);
+    return data.length === 0;
+  }, [data]);
 
   return (
     <>
-      <div className="mb-5">
-        <FilterItems
-          filterButtonRef={filterButtonRef}
-          onFilter={async (filter) => {
-            await handleFetchAllPurchases(filter);
-          }}
+      <Card>
+        <Table>
+          <TableRow>
+            {headers.map((header) => (
+              <TableHeaderCell key={header} content={header} />
+            ))}
+          </TableRow>
+          {data.map((item) => {
+            return (
+              <TableRow key={item.id}>
+                <TableCell content={item.vendor?.name} />
+                <TableCell
+                  content={
+                    <span className="capitalize">{item.category.type}</span>
+                  }
+                />
+
+                <TableCell content={item.quantity || "-"} />
+                <TableCell content={item.price_per_unit || "-"} />
+                <TableCell content={item.total_price} />
+                <TableCell content={item.invoice_number} />
+                <TableCell
+                  content={dayjs(item.invoice_date).format("DD-MM-YYYY")}
+                />
+                <TableCell
+                  content={
+                    <EditIcon
+                      className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer"
+                      onClick={() => {
+                        onEdit(item.id);
+                      }}
+                    />
+                  }
+                />
+              </TableRow>
+            );
+          })}
+        </Table>
+
+        <Ternary
+          when={isEmpty}
+          then={
+            <DataNotFound
+              title="No purchases found"
+              description="Try adjusting your filters or create a new purchase"
+            />
+          }
         />
-      </div>
-
-      <>
-        <Card>
-          <Table>
-            <TableRow>
-              {headers.map((header) => (
-                <TableHeaderCell key={header} content={header} />
-              ))}
-            </TableRow>
-            {data.data.map((item) => {
-              console.log(item);
-              return (
-                <TableRow key={item.id}>
-                  <TableCell content={item.vendor?.name} />
-                  <TableCell
-                    content={
-                      <span className="capitalize">{item.category.type}</span>
-                    }
-                  />
-
-                  <TableCell content={item.quantity || "-"} />
-                  <TableCell content={item.price_per_unit || "-"} />
-                  <TableCell content={item.total_price} />
-                  <TableCell content={item.invoice_number} />
-                  <TableCell
-                    content={dayjs(item.invoice_date).format("DD-MM-YYYY")}
-                  />
-                  <TableCell
-                    content={
-                      <EditIcon
-                        className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer"
-                        onClick={() => {
-                          onEdit(item.id);
-                        }}
-                      />
-                    }
-                  />
-                </TableRow>
-              );
-            })}
-          </Table>
-
-          <Ternary
-            when={isEmpty}
-            then={
-              <DataNotFound
-                title="No purchases found"
-                description="Try adjusting your filters or create a new purchase"
-              />
-            }
-          />
-        </Card>
-      </>
+      </Card>
     </>
   );
 };

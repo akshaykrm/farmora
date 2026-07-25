@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "scripts": {
+    "dev": "bun --workspaces --parallel dev"
+  },  
+  "workspaces": [
+    "backend",
+    "frontend"
+  ]
+}

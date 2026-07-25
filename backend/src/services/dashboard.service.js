@@ -76,128 +76,136 @@ async function getAverageProfitFromClosedBatches(
 }
 
 const getManagerDashboard = async (currentUser) => {
-  logger.debug({ actor_id: currentUser.id }, 'Fetching manager dashboard data')
+  try {
+    logger.debug(
+      { actor_id: currentUser.id },
+      'Fetching manager dashboard data'
+    )
 
-  const userWhereClause = {}
-  if (currentUser.user_type === userRoles.staff.type) {
-    userWhereClause.master_id = currentUser.master_id
-  } else if (currentUser.user_type === userRoles.manager.type) {
-    userWhereClause.master_id = currentUser.id
-  }
-
-  // Total Stock Value
-  const activePurchase = await getAllPurchaseWithBatchActive(userWhereClause)
-  const activeReturns = await getAllReturnsWithBatchActive(userWhereClause)
-
-  const activeTotals = calculateTotalStockValue(activePurchase, activeReturns)
-
-  // Average Profit & avarage fcr
-  const closedBatches = await getAllClosedBatches(userWhereClause)
-  const activeBatches = await getAllActiveBatches(userWhereClause)
-
-  let totalExpence = 0
-  for (const b of activeBatches) {
-    const { overviewCalculations: res } =
-      await overviewService.getBatchOverview({ batch_id: b.id }, currentUser)
-
-    totalExpence += res.total_expense
-  }
-
-  const closedTotals = await getAverageProfitFromClosedBatches(
-    closedBatches,
-    currentUser
-  )
-
-  const metrics = [
-    {
-      label: 'Total Stock Values',
-      value: totalExpence,
-      trend: 0,
-      color: 'blue',
-      unit: '₹',
-      decimals: 2,
-    },
-    {
-      label: 'Average Profit',
-      value: closedTotals.averageProfit,
-      trend: 0,
-      color: 'amber',
-      unit: '₹/kg',
-      decimals: 2,
-    },
-    {
-      label: 'Avarage FCR',
-      value: closedTotals.averageFCR,
-      trend: 0,
-      color: 'emerald',
-      unit: '',
-      decimals: 2,
-    },
-    {
-      label: 'Active Batches',
-      value: activeBatches?.length || 0,
-      trend: 0,
-      color: 'rose',
-      unit: 'Batches',
-      decimals: 0,
-      subtitle: `${activeTotals.chicks} Chicks`,
-    },
-  ]
-
-  let supplierBalance = 0
-  let customerBalance = 0
-
-  supplierBalance += await getIntegrationBalance(currentUser)
-  supplierBalance += await getWorkingBalance(currentUser)
-
-  const vendors = await vendorService.getNames({}, currentUser)
-  for (const v of vendors) {
-    if (v.vendor_type === 'supplier') {
-      supplierBalance += await getSupplierBalance(v, currentUser)
-    } else {
-      customerBalance += await getCustomerBalance(v, currentUser)
+    const userWhereClause = {}
+    if (currentUser.user_type === userRoles.staff.type) {
+      userWhereClause.master_id = currentUser.master_id
+    } else if (currentUser.user_type === userRoles.manager.type) {
+      userWhereClause.master_id = currentUser.id
     }
-  }
 
-  const recentPurchases = await purchaseService.getAll(
-    { limit: 10 },
-    currentUser
-  )
+    // Total Stock Value
+    const activePurchase = await getAllPurchaseWithBatchActive(userWhereClause)
+    const activeReturns = await getAllReturnsWithBatchActive(userWhereClause)
 
-  const parsedPurchases = recentPurchases.data.map((r) => {
+    const activeTotals = calculateTotalStockValue(activePurchase, activeReturns)
+
+    // Average Profit & avarage fcr
+    const closedBatches = await getAllClosedBatches(userWhereClause)
+    const activeBatches = await getAllActiveBatches(userWhereClause)
+
+    let totalExpence = 0
+    for (const b of activeBatches) {
+      const { overviewCalculations: res } =
+        await overviewService.getBatchOverview({ batch_id: b.id }, currentUser)
+
+      totalExpence += res.total_expense
+    }
+
+    const closedTotals = await getAverageProfitFromClosedBatches(
+      closedBatches,
+      currentUser
+    )
+
+    const metrics = [
+      {
+        label: 'Total Stock Values',
+        value: totalExpence,
+        trend: 0,
+        color: 'blue',
+        unit: '₹',
+        decimals: 2,
+      },
+      {
+        label: 'Average Profit',
+        value: closedTotals.averageProfit,
+        trend: 0,
+        color: 'amber',
+        unit: '₹/kg',
+        decimals: 2,
+      },
+      {
+        label: 'Avarage FCR',
+        value: closedTotals.averageFCR,
+        trend: 0,
+        color: 'emerald',
+        unit: '',
+        decimals: 2,
+      },
+      {
+        label: 'Active Batches',
+        value: activeBatches?.length || 0,
+        trend: 0,
+        color: 'rose',
+        unit: 'Batches',
+        decimals: 0,
+        subtitle: `${activeTotals.chicks} Chicks`,
+      },
+    ]
+
+    let supplierBalance = 0
+    let customerBalance = 0
+
+    supplierBalance += await getIntegrationBalance(currentUser)
+    supplierBalance += await getWorkingBalance(currentUser)
+
+    const vendors = await vendorService.getNames({}, currentUser)
+    for (const v of vendors) {
+      if (v.vendor_type === 'supplier') {
+        supplierBalance += await getSupplierBalance(v, currentUser)
+      } else {
+        customerBalance += await getCustomerBalance(v, currentUser)
+      }
+    }
+
+    const recentPurchases = await purchaseService.getAll(
+      { limit: 10 },
+      currentUser
+    )
+
+    const parsedPurchases = recentPurchases.data.map((r) => {
+      return {
+        id: r.id,
+        invoice_number: r.invoice_number,
+        invoice_date: r.invoice_date,
+        amount: r.net_amount,
+        supplier_name: r.vendor.name,
+        quantity: r.quantity,
+        type: r.category.type,
+      }
+    })
+
+    const recentSales = await salesService.getAll({ limit: 10 }, currentUser)
+
+    const parsedSales = recentSales.data.map((r) => {
+      return {
+        id: r.id,
+        date: r.date,
+        batch: r.batch?.name || '-',
+        buyer: r.buyer?.name || '-',
+        weight: r.weight,
+        birds: r.bird_no,
+        amount: r.amount,
+        payment_type: r.payment_type,
+      }
+    })
+
     return {
-      id: r.id,
-      invoice_number: r.invoice_number,
-      invoice_date: r.invoice_date,
-      amount: r.net_amount,
-      supplier_name: r.vendor.name,
-      quantity: r.quantity,
-      type: r.category.type,
+      metrics,
+      balanceInHand: await getBalanceInHand(currentUser),
+      customerBalance: customerBalance,
+      supplierBalance: supplierBalance,
+      recentPurchases: parsedPurchases,
+      recentSales: parsedSales,
     }
-  })
-
-  const recentSales = await salesService.getAll({ limit: 10 }, currentUser)
-
-  const parsedSales = recentSales.data.map((r) => {
-    return {
-      id: r.id,
-      date: r.date,
-      batch: r.batch?.name || '-',
-      buyer: r.buyer?.name || '-',
-      weight: r.weight,
-      birds: r.bird_no,
-      amount: r.amount,
-      payment_type: r.payment_type,
-    }
-  })
-
-  return {
-    metrics,
-    balanceInHand: await getBalanceInHand(currentUser),
-    customerBalance: customerBalance,
-    supplierBalance: supplierBalance,
-    recentPurchases: parsedPurchases,
-    recentSales: parsedSales,
+  } catch (err) {
+    console.log(err)
+    return {}
   }
 }
 

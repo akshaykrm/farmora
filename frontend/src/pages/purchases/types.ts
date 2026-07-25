@@ -42,11 +42,21 @@ export type NewPurchaseRequest = {
 };
 
 export type PurchaseFilterRequest = {
-  vendor_id: number | "";
-  category_id: number | "";
-  batch_id: number | "";
-  start_date: string;
-  end_date: string;
+  page: number;
+  limit: number;
+  vendor_id?: number | "";
+  category_id?: number | "";
+  batch_id?: number | "";
+  start_date?: string;
+  end_date?: string;
+};
+
+export type PurchaseFilter = {
+  vendor_id?: number | "";
+  category_id?: number | "";
+  batch_id?: number | "";
+  start_date?: string;
+  end_date?: string;
 };
 
 export type EditPurchaseRequest = Partial<NewPurchaseRequest> & {

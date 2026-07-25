@@ -7,15 +7,15 @@ import { useForm } from "react-hook-form";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import FilterWrapper from "@components/filter-wrapper";
-import type { PurchaseFilterRequest } from "../types";
+import type { PurchaseFilter } from "../types";
 import type { Ref } from "react";
 
 type Props = {
-  onFilter: (inputData: PurchaseFilterRequest) => Promise<void>;
+  onFilter: (inputData: PurchaseFilter) => void;
   filterButtonRef: Ref<HTMLButtonElement>;
 };
 
-const defaultValues: PurchaseFilterRequest = {
+const defaultValues: PurchaseFilter = {
   vendor_id: "",
   category_id: "",
   batch_id: "",
@@ -26,7 +26,7 @@ const defaultValues: PurchaseFilterRequest = {
 const FilterItems = (props: Props) => {
   const { onFilter, filterButtonRef } = props;
 
-  const methods = useForm<PurchaseFilterRequest>({
+  const methods = useForm<PurchaseFilter>({
     defaultValues,
   });
 

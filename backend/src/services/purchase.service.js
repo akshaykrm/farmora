@@ -307,9 +307,8 @@ async function getAll(payload, currentUser) {
     }
   }
 
-  const rows = await PurchaseModel.findAll({
+  const { rows, count } = await PurchaseModel.findAndCountAll({
     where: filter,
-    limit: limit,
     order: [['id', 'DESC']],
     attributes: {
       exclude: ['category_id', 'vendor_id'],
@@ -338,6 +337,9 @@ async function getAll(payload, currentUser) {
 
   return {
     data: rows,
+    count,
+    page,
+    limit,
   }
 }
 

@@ -1,7 +1,6 @@
-import type { Purchase } from "@app-types/item.types";
 import type { ListResponse } from "@app-types/response.types";
 import fetcherV2, { type FetcherReturnType } from "@utils/fetcherV2";
-import type { PurchaseFormValues } from "./types";
+import type { Purchase, PurchaseFormValues } from "./types";
 
 const purchase = {
   fetchAll: (filter?: {}) => {

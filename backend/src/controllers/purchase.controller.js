@@ -86,20 +86,17 @@ const assingItemToBatch = async (req, res) => {
 const getAll = async (req, res) => {
   const filter = {}
 
-  if (req.query.page) {
-    filter.page = parseInt(req.query.page)
-  }
-
-  if (req.query.limit) {
-    filter.limit = parseInt(req.query.limit)
-  }
+  filter.page = parseInt(req.query.page) || 1
+  filter.limit = parseInt(req.query.limit) || 10
 
   if (req.query.master_id) {
     filter.master_id = req.query.master_id
   }
+
   if (req.query.status) {
     filter.status = req.query.status
   }
+
   if (req.query.name) {
     filter.name = req.query.name
   }
