@@ -16,7 +16,7 @@ function PurchasePage() {
   const onOpen = () => setOpenAdd(true);
   const onClose = () => setOpenAdd(false);
 
-  const purchases = useGetPurchases(filter);
+  const { purchases, refetch } = useGetPurchases(filter);
 
   const filterButtonRef = useRef(null);
 
@@ -32,7 +32,6 @@ function PurchasePage() {
         <div className="mb-5">
           <FilterItems
             defaultFilter={filter}
-            filterButtonRef={filterButtonRef}
             onFilter={(filter) => updateQueryParams(filter)}
           />
         </div>
@@ -57,12 +56,15 @@ function PurchasePage() {
       <AddPurchase
         isShow={isOpen}
         onClose={onClose}
-        filterButtonRef={filterButtonRef}
+        refetch={(filter) => {
+          updateQueryParams(filter);
+        }}
       />
       <EditItem
         selectedId={selectedId}
         onClose={() => setSelectedId(null)}
-        filterButtonRef={filterButtonRef}
+
+        refetch={refetch}
       />
     </>
   );

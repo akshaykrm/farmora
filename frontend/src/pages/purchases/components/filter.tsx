@@ -8,16 +8,14 @@ import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import FilterWrapper from "@components/filter-wrapper";
 import type { PurchaseFilter } from "../types";
-import { type Ref } from "react";
 
 type Props = {
   onFilter: (inputData: PurchaseFilter) => void;
-  filterButtonRef: Ref<HTMLButtonElement>;
   defaultFilter: Record<string, string | number | null>;
 };
 
 const FilterItems = (props: Props) => {
-  const { onFilter, filterButtonRef, defaultFilter } = props;
+  const { onFilter, defaultFilter } = props;
 
   const methods = useForm<PurchaseFilter>({
     defaultValues: defaultFilter,
@@ -117,11 +115,7 @@ const FilterItems = (props: Props) => {
         </div>
 
         <div className="flex justify-end">
-          <Button
-            variant="contained"
-            onClick={handleFilter}
-            ref={filterButtonRef}
-          >
+          <Button variant="contained" onClick={handleFilter}>
             Apply Filters
           </Button>
         </div>

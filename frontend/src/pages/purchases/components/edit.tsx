@@ -3,15 +3,14 @@ import PurchaseForm from "./form";
 import useGetPurchaseById from "../hooks/use-get-purchase-by-id";
 import Ternary from "@components/ternary";
 import useEditPurchase from "../hooks/use-edit-purchase";
-import type { Ref } from "react";
 
 type Props = {
   selectedId: number | null;
   onClose: () => void;
-  filterButtonRef: Ref<HTMLButtonElement>;
+  refetch: (override?: Record<string, string | number | null>) => void;
 };
 
-const EditItem = ({ selectedId, onClose, filterButtonRef }: Props) => {
+const EditItem = ({ selectedId, onClose, refetch }: Props) => {
   const isShow = selectedId !== null;
 
   const { dataLoaded, selectedData } = useGetPurchaseById(selectedId);
@@ -19,11 +18,7 @@ const EditItem = ({ selectedId, onClose, filterButtonRef }: Props) => {
   const { clearError, errors, onSubmit } = useEditPurchase(selectedId, {
     onSuccess: () => {
       handleClose();
-      if (filterButtonRef) {
-        if (typeof filterButtonRef !== "function") {
-          filterButtonRef.current?.click();
-        }
-      }
+      refetch();
     },
   });
 

@@ -3,7 +3,6 @@ import PurchaseForm from "./form";
 import dayjs from "dayjs";
 import type { PurchaseFormValues } from "../types";
 import useAddPurchase from "../hooks/use-add-purchase";
-import type { Ref } from "react";
 
 const defaultValues: PurchaseFormValues = {
   total_price: "",
@@ -24,18 +23,14 @@ const defaultValues: PurchaseFormValues = {
 type Props = {
   isShow: boolean;
   onClose: () => void;
-  filterButtonRef: Ref<HTMLButtonElement>;
+  refetch: (override: Record<string, string | number | null>) => void;
 };
 
-const AddPurchase = ({ isShow, onClose, filterButtonRef }: Props) => {
+const AddPurchase = ({ isShow, onClose, refetch }: Props) => {
   const { errors, clearError, onSubmit } = useAddPurchase({
     onSuccess: () => {
       handleClose();
-      if (filterButtonRef) {
-        if (typeof filterButtonRef !== "function") {
-          filterButtonRef.current?.click();
-        }
-      }
+      refetch({ page: 1 });
     },
   });
 
@@ -51,12 +46,12 @@ const AddPurchase = ({ isShow, onClose, filterButtonRef }: Props) => {
       onClose={handleClose}
     >
       <DialogContent>
-          <PurchaseForm
-            onSubmit={onSubmit}
-            defaultValues={defaultValues}
-            apiError={errors}
-            onCancel={handleClose}
-          />
+        <PurchaseForm
+          onSubmit={onSubmit}
+          defaultValues={defaultValues}
+          apiError={errors}
+          onCancel={handleClose}
+        />
       </DialogContent>
     </Dialog>
   );
