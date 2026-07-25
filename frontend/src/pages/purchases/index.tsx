@@ -18,8 +18,6 @@ function PurchasePage() {
 
   const { purchases, refetch } = useGetPurchases(filter);
 
-  const filterButtonRef = useRef(null);
-
   return (
     <>
       <div className="flex items-center justify-between mb-6">

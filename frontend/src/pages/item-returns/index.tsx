@@ -8,6 +8,8 @@ import useItemReturnFilter from "./hooks/use-purchase-return-filter";
 import useGetItemReturns from "./hooks/use-item-returs";
 import FilterItemReturns from "./components/filter";
 
+// TODO: Implement similar pagination to rest of the tables
+// Pagination is now simple and easy to implement use the queryParms hooks to get the data use refetch to get data or over ride data
 const ItemReturnPage = () => {
   const [isOpen, setOpenAdd] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
