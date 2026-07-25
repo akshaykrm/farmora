@@ -1,14 +1,9 @@
-import itemReturn from "@api/item-return.api";
-import type {
-  ItemReturn,
-  ItemReturnFilterRequest,
-} from "@app-types/item-return.types";
+import type { ItemReturn, ItemReturnFilterRequest } from "../types";
 import Table from "@components/Table";
 import TableCell from "@components/TableCell";
 import TableHeaderCell from "@components/TableHeaderCell";
 import TableRow from "@components/TableRow";
 import { EditIcon } from "lucide-react";
-import FilterItemReturns from "./filter";
 import { useState, useEffect, useMemo } from "react";
 import DataNotFound from "@components/data-not-found";
 import DataLoading from "@components/data-loading";
@@ -31,43 +26,14 @@ const headers = [
 
 type Props = {
   onEdit: (selectedId: number) => void;
+  data: ItemReturn[];
 };
 
-const ItemReturnTable = ({ onEdit }: Props) => {
-  const [itemReturnList, setItemreturnList] = useState<
-    ListResponse<ItemReturn>
-  >({
-    data: [],
-    limit: 0,
-    page: 0,
-    total: 0,
-  });
-
-  const handleFetchAll = async (filter?: ItemReturnFilterRequest) => {
-    const res = await itemReturn.fetchAll(filter);
-    if (res.status === "success") {
-      if (res.data) {
-        setItemreturnList(res.data);
-      }
-    }
-  };
-
-  useEffect(() => {
-    handleFetchAll();
-  }, []);
-
-  const isEmpty = useMemo(
-    () => itemReturnList.data?.length === 0,
-    [itemReturnList.data],
-  );
+const ItemReturnTable = ({ onEdit, data }: Props) => {
+  const isEmpty = data?.length === 0;
 
   return (
     <>
-      <FilterItemReturns
-        onFilter={async (filter) => {
-          handleFetchAll(filter);
-        }}
-      />
       <Ternary
         when={false}
         then={<DataLoading />}
@@ -79,7 +45,7 @@ const ItemReturnTable = ({ onEdit }: Props) => {
                   <TableHeaderCell key={header} content={header} />
                 ))}
               </TableRow>
-              {itemReturnList.data.map((returnItem) => (
+              {data.map((returnItem) => (
                 <TableRow key={returnItem.id}>
                   <TableCell
                     content={returnItem.return_type}

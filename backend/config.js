@@ -10,6 +10,8 @@ const CONFIG = {
   port: process.env.PORT || 3000,
   logLevel: process.env.LOG_LEVEL || 'info',
   jwt_secret: process.env.JWT_SECRET,
+  default_page: 1,
+  default_limit: 10,
 }
 
 export default CONFIG

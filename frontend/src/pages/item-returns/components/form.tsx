@@ -4,7 +4,10 @@ import useGetBatchNameList from "@hooks/use-get-batch-names";
 import useGetVendorNames from "@hooks/use-get-vendor-name-list";
 import { TextField, MenuItem, Button } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
-import { removeInternal } from "@utils/remove-internal";
+import {
+  removeInternal,
+  swapNameWithTypeAndRemoveType,
+} from "@utils/remove-internal";
 import dayjs from "dayjs";
 import { useEffect } from "react";
 
@@ -87,10 +90,8 @@ const ItemReturnForm = ({ methods, onSubmit, onCancel }: Props) => {
           </TextField>
 
           <SelectList
-            options={removeInternal(
-              itemCategoryName.data?.map((t) => {
-                return { id: t.id, name: t.type };
-              }),
+            options={swapNameWithTypeAndRemoveType(
+              removeInternal(itemCategoryName.data),
             )}
             value={values.item_category_id}
             onChange={(val) => {

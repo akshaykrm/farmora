@@ -6,22 +6,15 @@ import type { ItemReturnFilterRequest } from "@app-types/item-return.types";
 import { useForm } from "react-hook-form";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
-import { removeInternal } from "@utils/remove-internal";
+import {
+  removeInternal,
+  swapNameWithTypeAndRemoveType,
+} from "@utils/remove-internal";
 import useGetBatchNameList from "@hooks/use-get-batch-names";
 
 type Props = {
-  onFilter: (filterData: ItemReturnFilterRequest) => Promise<void>;
-};
-
-const defaultValues: ItemReturnFilterRequest = {
-  return_type: "",
-  item_category_id: "",
-  from_batch: "",
-  to_batch: "",
-  to_vendor: "",
-  status: "",
-  start_date: "",
-  end_date: "",
+  onFilter: (filterData: ItemReturnFilterRequest) => void;
+  defaultFilter: Record<string, string | number | null>;
 };
 
 const FilterItemReturns = (props: Props) => {
@@ -30,11 +23,10 @@ const FilterItemReturns = (props: Props) => {
   const batchNames = useGetBatchNameList({ status: "active" });
 
   const methods = useForm<ItemReturnFilterRequest>({
-    defaultValues,
+    defaultValues: props.defaultFilter,
   });
 
   const {
-    register,
     formState: { errors },
     handleSubmit,
     watch,
@@ -52,23 +44,26 @@ const FilterItemReturns = (props: Props) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
           <TextField
             label="Return Type"
-            {...register("return_type")}
+            name="return_type"
+            onChange={(e) => {
+              const val = e.target.value;
+              setValue("return_type", val ? val : "");
+            }}
+            value={values.return_type || "all"}
             select
             error={Boolean(errors.return_type)}
             helperText={errors.return_type?.message}
             fullWidth
             size="small"
           >
-            <MenuItem value="">All</MenuItem>
+            <MenuItem value="all">All</MenuItem>
             <MenuItem value="vendor">Vendor</MenuItem>
             <MenuItem value="batch">Batch</MenuItem>
           </TextField>
 
           <SelectList
-            options={removeInternal(
-              itemCategoryName.data?.map((t) => {
-                return { id: t.id, name: t.type };
-              }),
+            options={swapNameWithTypeAndRemoveType(
+              removeInternal(itemCategoryName.data),
             )}
             value={values.item_category_id}
             onChange={(val) => {
@@ -86,6 +81,7 @@ const FilterItemReturns = (props: Props) => {
             onChange={(val) => {
               setValue("from_batch", val ? val : "");
             }}
+
             label="From Batch"
             name="from_batch"
             error={Boolean(errors.from_batch)}
@@ -115,21 +111,6 @@ const FilterItemReturns = (props: Props) => {
             error={Boolean(errors.to_vendor)}
             helperText={errors.to_vendor?.message}
           />
-
-          <TextField
-            label="Status"
-            {...register("status")}
-            select
-            error={Boolean(errors.status)}
-            helperText={errors.status?.message}
-            fullWidth
-            size="small"
-          >
-            <MenuItem value="">All</MenuItem>
-            <MenuItem value="pending">Pending</MenuItem>
-            <MenuItem value="completed">Completed</MenuItem>
-            <MenuItem value="cancelled">Cancelled</MenuItem>
-          </TextField>
 
           <DatePicker
             label="Start Date"

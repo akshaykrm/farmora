@@ -1,5 +1,6 @@
 import purchaseService from '@services/purchase.service'
 import asyncHandler from '@utils/async-handler'
+import CONFIG from '../../config/config.js'
 
 const create = async (req, res) => {
   const payload = req.body
@@ -84,10 +85,10 @@ const assingItemToBatch = async (req, res) => {
 }
 
 const getAll = async (req, res) => {
-  const filter = {}
-
-  filter.page = parseInt(req.query.page) || 1
-  filter.limit = parseInt(req.query.limit) || 10
+  const filter = {
+    page: parseInt(req.query.page) || CONFIG.default_page,
+    limit: parseInt(req.query.limit) || CONFIG.default_limit,
+  }
 
   if (req.query.master_id) {
     filter.master_id = req.query.master_id

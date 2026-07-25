@@ -6,6 +6,7 @@ import userRoles from '@utils/user-roles'
 import { Op } from 'sequelize'
 import logger from '@utils/logger'
 import itemService from '@services/items.service'
+import { calculateOffSet } from '@utils/pagination'
 
 export async function getAllReturnsWithBatchActive(where) {
   const retunredItems = await PurchaseReturnModel.findAll({
@@ -73,18 +74,16 @@ async function create(payload, currentUser) {
 }
 
 const getAll = async (payload, currentUser) => {
-  const { page, limit, ...filter } = payload
-  const offset = (page - 1) * limit
-
-  logger.debug(
-    { payload, actor_id: currentUser.id },
-    'Fetching item returns: raw query payload'
-  )
+  const { page, limit, return_type, status, ...filter } = payload
 
   if (currentUser.user_type === userRoles.staff.type) {
     filter.master_id = currentUser.master_id
   } else if (currentUser.user_type === userRoles.manager.type) {
     filter.master_id = currentUser.id
+  }
+
+  if (return_type !== 'all') {
+    filter.return_type = return_type
   }
 
   if (filter.start_date || filter.end_date) {
@@ -98,15 +97,7 @@ const getAll = async (payload, currentUser) => {
       delete filter.end_date
     }
   }
-
-  logger.debug(
-    {
-      filter,
-      page,
-      limit,
-    },
-    'Fetching item returns: processed query payload'
-  )
+  const offset = calculateOffSet(page, limit)
 
   const { count, rows } = await PurchaseReturnModel.findAndCountAll({
     where: filter,
@@ -139,16 +130,10 @@ const getAll = async (payload, currentUser) => {
     ],
   })
 
-  logger.info(
-    { actor_id: currentUser.id, page, limit, count, filter },
-    'Item returns fetched'
-  )
-
+  const totalPages = Math.ceil(count / limit)
   return {
-    page,
-    limit,
-    total: count,
     data: rows,
+    totalPages: totalPages,
   }
 }
 
