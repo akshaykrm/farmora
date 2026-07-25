@@ -10,6 +10,7 @@ import type { EditPurchaseRequest } from "@app-types/item.types";
 type Props = {
   selectedId: number | null;
   onClose: () => void;
+  refetch: (override?: Record<string, string | number | null>) => void;
 };
 
 const defaultValues: EditItemReturnRequest = {
@@ -27,7 +28,7 @@ const defaultValues: EditItemReturnRequest = {
   status: "completed",
 };
 
-const EditItemReturn = ({ selectedId, onClose }: Props) => {
+const EditItemReturn = ({ selectedId, onClose, refetch }: Props) => {
   const isShow = selectedId !== null;
 
   const methods = useForm<EditItemReturnRequest>({
@@ -72,6 +73,7 @@ const EditItemReturn = ({ selectedId, onClose }: Props) => {
     const res = await itemReturn.updateById(inputData.id, inputData);
     if (res.status === "success") {
       onClose();
+      refetch();
       return;
     }
     if (res.status === "validation_error") {
@@ -84,7 +86,11 @@ const EditItemReturn = ({ selectedId, onClose }: Props) => {
   return (
     <Dialog isOpen={isShow} headerTitle="Edit Return" onClose={onClose}>
       <DialogContent>
-        <ItemReturnForm methods={methods} onSubmit={onSubmit} onCancel={onClose} />
+        <ItemReturnForm
+          methods={methods}
+          onSubmit={onSubmit}
+          onCancel={onClose}
+        />
       </DialogContent>
     </Dialog>
   );

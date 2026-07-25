@@ -31,12 +31,6 @@ const ItemReturnForm = ({ methods, onSubmit, onCancel }: Props) => {
   const itemVendorName = useGetVendorNames({ type: "supplier" });
   const values = watch();
 
-  console.log(
-    itemCategoryName.data.filter(
-      ({ type }) => type !== "integration" && type != "working",
-    ),
-  );
-
   const returnType = values.return_type;
 
   const [qty, ratePerBag] = watch(["quantity", "rate_per_bag"]);

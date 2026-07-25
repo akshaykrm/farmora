@@ -12,7 +12,7 @@ const ItemReturnPage = () => {
   const [isOpen, setOpenAdd] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const { updateQueryParams, filter } = useItemReturnFilter();
-  const itemReturns = useGetItemReturns(filter);
+  const { itemReturns, refetch } = useGetItemReturns(filter);
 
   const onOpen = () => setOpenAdd(true);
   const onClose = () => setOpenAdd(false);
@@ -51,8 +51,15 @@ const ItemReturnPage = () => {
           page={filter.page}
         />
       </Box>
-      <AddItemReturn isShow={isOpen} onClose={onClose} />
+      <AddItemReturn
+        isShow={isOpen}
+        onClose={onClose}
+        refetch={(filter) => {
+          updateQueryParams(filter);
+        }}
+      />
       <EditItemReturn
+        refetch={refetch}
         selectedId={selectedId}
         onClose={() => setSelectedId(null)}
       />
