@@ -31,6 +31,7 @@ function PurchasePage() {
       <div>
         <div className="mb-5">
           <FilterItems
+            defaultFilter={filter}
             filterButtonRef={filterButtonRef}
             onFilter={(filter) => updateQueryParams(filter)}
           />

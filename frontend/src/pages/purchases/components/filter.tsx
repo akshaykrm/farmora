@@ -8,26 +8,19 @@ import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import FilterWrapper from "@components/filter-wrapper";
 import type { PurchaseFilter } from "../types";
-import type { Ref } from "react";
+import { type Ref } from "react";
 
 type Props = {
   onFilter: (inputData: PurchaseFilter) => void;
   filterButtonRef: Ref<HTMLButtonElement>;
-};
-
-const defaultValues: PurchaseFilter = {
-  vendor_id: "",
-  category_id: "",
-  batch_id: "",
-  start_date: "",
-  end_date: "",
+  defaultFilter: Record<string, string | number>;
 };
 
 const FilterItems = (props: Props) => {
-  const { onFilter, filterButtonRef } = props;
+  const { onFilter, filterButtonRef, defaultFilter } = props;
 
   const methods = useForm<PurchaseFilter>({
-    defaultValues,
+    defaultValues: defaultFilter,
   });
 
   const vendorNames = useGetVendorNames({ type: "supplier" });
