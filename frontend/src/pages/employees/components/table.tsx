@@ -3,22 +3,19 @@ import TableCell from "@components/TableCell";
 import TableHeaderCell from "@components/TableHeaderCell";
 import TableRow from "@components/TableRow";
 import { EditIcon } from "lucide-react";
-import { useMemo } from "react";
 import DataNotFound from "@components/data-not-found";
 import Ternary from "@components/ternary";
-import type { EmployeesListResponse } from "../types";
+import type { Employee } from "../types";
 
 const headers = ["ID", "Name", "Username", "User Type", "Reset Flag", "Edit"];
 
 type Props = {
   onEdit: (selectedId: number) => void;
-  data: EmployeesListResponse;
+  employees: Employee[];
 };
 
-const EmployeesTable = ({ onEdit, data }: Props) => {
-  const isEmpty = useMemo(() => {
-    return data.data.length === 0;
-  }, [data.data]);
+const EmployeesTable = ({ onEdit, employees }: Props) => {
+  const isEmpty = employees.length === 0;
 
   return (
     <>
@@ -28,7 +25,7 @@ const EmployeesTable = ({ onEdit, data }: Props) => {
             <TableHeaderCell key={header} content={header} />
           ))}
         </TableRow>
-        {data.data.map((employee, i) => (
+        {employees.map((employee, i) => (
           <TableRow key={employee.id}>
             <TableCell content={i + 1} />
             <TableCell content={employee.name} />

@@ -3,13 +3,16 @@ import PageTitle from "@components/PageTitle";
 import AddNewEmployee from "./components/add-new-employee";
 import EditEmployee from "./components/edit-employee";
 import EmployeesTable from "./components/table";
-import { Button } from "@mui/material";
+import { Box, Button, Pagination } from "@mui/material";
 import useGetEmployees from "./hooks/use-get-employees";
+import useEmployeeFilter from "./hooks/use-employee-filter";
 
 const EmployeesPage = () => {
   const [isDialogOpen, setOpenAdd] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
-  const { employeeList, handleFetchAllEmployees } = useGetEmployees();
+  const { filter, updateQueryParams } = useEmployeeFilter();
+
+  const { employees, refetch } = useGetEmployees(filter);
 
   return (
     <div>
@@ -20,15 +23,28 @@ const EmployeesPage = () => {
         </Button>
       </div>
       <div>
-        <EmployeesTable onEdit={setSelectedId} data={employeeList} />
+        <EmployeesTable onEdit={setSelectedId} employees={employees.records} />
       </div>
+      <Box className="flex justify-end mt-6">
+        <Pagination
+          count={employees.totalPages}
+          size="small"
+          defaultPage={1}
+          onChange={(_, page) => {
+            updateQueryParams({ page });
+          }}
+          page={filter.page}
+        />
+      </Box>
       <AddNewEmployee
         isShow={isDialogOpen}
         onClose={() => setOpenAdd(false)}
-        refetch={handleFetchAllEmployees}
+        refetch={() => {
+          updateQueryParams({ page: 1 });
+        }}
       />
       <EditEmployee
-        refetch={handleFetchAllEmployees}
+        refetch={() => refetch()}
         selectedId={selectedId}
         onClose={() => setSelectedId(null)}
       />

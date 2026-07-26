@@ -1,28 +1,35 @@
-import { useEffect, useState } from "react";
-import type { EmployeesListResponse } from "../types";
+import { useCallback, useEffect, useState } from "react";
+import type { Employee } from "../types";
 import employee from "../api";
+import { overrideFilters, type Filter } from "@utils/filters";
 
-const useGetEmployees = () => {
-  const [employeeList, setEmployeeList] = useState<EmployeesListResponse>({
-    data: [],
-    limit: 0,
-    page: 0,
-    total: 0,
-  });
+const useGetEmployees = (filter?: Filter) => {
+  const [employees, setEmployees] = useState<{
+    records: Employee[];
+    totalPages: number;
+  }>({ records: [], totalPages: 0 });
 
-  const handleFetchAllEmployees = async () => {
-    const res = await employee.fetchAll();
-    if (res.status === "success") {
-      if (res.data) {
-        setEmployeeList(res.data);
+  const { page, limit } = filter || {};
+
+  const handleFetchAllEmployees = useCallback(
+    async (override?: Filter) => {
+      const opts = overrideFilters(filter, override);
+      const res = await employee.fetchAll(opts);
+      if (res.status === "success") {
+        if (res.data) {
+          const { data, totalPages } = res.data;
+          setEmployees({ records: data, totalPages });
+        }
       }
-    }
-  };
+    },
+    [page, limit],
+  );
+
   useEffect(() => {
     handleFetchAllEmployees();
-  }, []);
+  }, [handleFetchAllEmployees]);
 
-  return { employeeList, handleFetchAllEmployees };
+  return { employees, refetch: handleFetchAllEmployees };
 };
 
 export default useGetEmployees;

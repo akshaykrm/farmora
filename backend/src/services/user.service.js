@@ -5,6 +5,7 @@ import { sequelize } from '@utils/db'
 import { Op } from 'sequelize'
 import userRoles from '@utils/user-roles'
 import UserRoleAssignment from '@models/userroleassignment'
+import { calculateOffSet } from '@utils/pagination'
 
 const createStaff = async (payload, currentUser) => {
   const existsingUser = await getUserByUsername(payload.username)
@@ -98,7 +99,7 @@ const deleteById = async (userId, currentUser) => {
 
 const getAll = async (payload = {}, currentUser) => {
   const { limit, page, ...filter } = payload
-  const offset = (page - 1) * limit
+  const offset = calculateOffSet(page, limit)
 
   if (currentUser.user_type === userRoles.manager.type) {
     filter.parent_id = currentUser.id
@@ -122,10 +123,9 @@ const getAll = async (payload = {}, currentUser) => {
     },
   })
 
+  const totalPages = Math.ceil(count / limit)
   return {
-    page,
-    limit,
-    total: count,
+    totalPages,
     data: rows,
   }
 }
