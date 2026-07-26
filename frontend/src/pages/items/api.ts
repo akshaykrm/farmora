@@ -3,7 +3,14 @@ import fetcher from "@utils/fetcher";
 import fetcherV2, { type FetcherReturnType } from "@utils/fetcherV2";
 
 const items = {
-  fetchAll: () => fetcherV2<ItemListResponse>("items/categories"),
+  fetchAll: (filter?: Record<string, string | number | null>) => {
+    const opts = {
+      method: "GET" as const,
+      filter: filter,
+    };
+
+    return fetcherV2<ItemListResponse>("items/categories", null, opts);
+  },
   getNames: () => fetcher("items/categories/names"),
 
   getByVendorId: async (

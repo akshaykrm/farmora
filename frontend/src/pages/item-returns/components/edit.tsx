@@ -10,7 +10,7 @@ import type { EditPurchaseRequest } from "@app-types/item.types";
 type Props = {
   selectedId: number | null;
   onClose: () => void;
-  refetch: (override?: Record<string, string | number | null>) => void;
+  refetch: () => void;
 };
 
 const defaultValues: EditItemReturnRequest = {

@@ -3,22 +3,19 @@ import TableCell from "@components/TableCell";
 import TableHeaderCell from "@components/TableHeaderCell";
 import TableRow from "@components/TableRow";
 import { EditIcon } from "lucide-react";
-import { useMemo } from "react";
 import DataNotFound from "@components/data-not-found";
 import Ternary from "@components/ternary";
-import type { ItemListResponse } from "../types";
+import type { Item } from "../types";
 
 const headers = ["ID", "Name", "Base Price", "Type", "Vendor", "Action"];
 
 type Props = {
   onEdit: (selectedId: number) => void;
-  data: ItemListResponse;
+  data: Item[];
 };
 
 const ItemTable = ({ onEdit, data }: Props) => {
-  const isEmpty = useMemo(() => {
-    return data.data.length === 0;
-  }, [data.data]);
+  const isEmpty = data.length === 0;
 
   return (
     <>
@@ -28,7 +25,7 @@ const ItemTable = ({ onEdit, data }: Props) => {
             <TableHeaderCell key={header} content={header} />
           ))}
         </TableRow>
-        {data.data.map((itemCategory, i) => (
+        {data.map((itemCategory, i) => (
           <TableRow key={itemCategory.id}>
             <TableCell content={i + 1} />
             <TableCell content={itemCategory.name} />

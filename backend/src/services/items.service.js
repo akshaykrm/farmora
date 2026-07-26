@@ -3,6 +3,7 @@ import VendorModel from '@models/vendor'
 import ItemModel from '@models/items.model'
 import userRoles from '@utils/user-roles'
 import { Op } from 'sequelize'
+import { calculateOffSet } from '@utils/pagination'
 
 const create = async (payload, currentUser) => {
   payload.status = 'active'
@@ -52,7 +53,7 @@ const getItemsByVendorId = async (vendorID, currentUser) => {
 
 const getAll = async (payload, currentUser) => {
   const { limit, page, ...filter } = payload
-  const offset = (page - 1) * limit
+  const offset = calculateOffSet(page, limit)
 
   if (filter.name) {
     filter.name = { [Op.iLike]: `%${filter.name}%` }
@@ -72,10 +73,9 @@ const getAll = async (payload, currentUser) => {
     include: [{ model: VendorModel, as: 'vendor', required: true }],
   })
 
+  const totalPages = Math.ceil(count / limit)
   return {
-    page,
-    limit,
-    total: count,
+    totalPages: totalPages,
     data: rows,
   }
 }

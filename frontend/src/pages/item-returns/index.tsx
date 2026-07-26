@@ -56,8 +56,8 @@ const ItemReturnPage = () => {
       <AddItemReturn
         isShow={isOpen}
         onClose={onClose}
-        refetch={(filter) => {
-          updateQueryParams(filter);
+        refetch={() => {
+          updateQueryParams({ page: 1 });
         }}
       />
       <EditItemReturn

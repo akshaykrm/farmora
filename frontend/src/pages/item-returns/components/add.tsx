@@ -21,7 +21,7 @@ const defaultValues: NewItemReturnRequest = {
 type Props = {
   isShow: boolean;
   onClose: () => void;
-  refetch: (override: Record<string, string | number | null>) => void;
+  refetch: () => void;
 };
 
 const AddItemReturn = ({ isShow, onClose, refetch }: Props) => {
@@ -36,7 +36,7 @@ const AddItemReturn = ({ isShow, onClose, refetch }: Props) => {
     const res = await itemReturn.create(inputData);
     if (res.status === "success") {
       handleClose();
-      refetch({ page: 1 });
+      refetch();
       return;
     }
     if (res.status === "validation_error") {

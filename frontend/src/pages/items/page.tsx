@@ -3,18 +3,39 @@ import { useState } from "react";
 import AddItem from "./components/add";
 import ItemTable from "./components/table";
 import EditItem from "./components/edit";
-import { Button } from "@mui/material";
+import { Box, Button, Pagination } from "@mui/material";
 import useGetItems from "./hooks/use-get-items";
+import useQueryParameters from "@hooks/use-query-parameters";
+import { DEFAULT_FIRST_PAGE, DEFAULT_PAGE_LIMIT } from "@config";
+
+function useItemFilter() {
+  const { queryParms, updateQueryParams } = useQueryParameters();
+
+  const page = queryParms.page ? parseInt(queryParms.page) : DEFAULT_FIRST_PAGE;
+  const limit = queryParms.limit
+    ? parseInt(queryParms.limit)
+    : DEFAULT_PAGE_LIMIT;
+
+  return {
+    filter: {
+      page,
+      limit,
+    },
+    updateQueryParams,
+  };
+}
 
 const ItemsPage = () => {
   const [isOpen, setOpenAdd] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
+  const { filter, updateQueryParams } = useItemFilter();
+
   const onOpen = () => setOpenAdd(true);
   const onClose = () => setOpenAdd(false);
 
-  const { itemsList, handleFetchAllItems } = useGetItems();
-
+  const { items, refetch } = useGetItems(filter);
+  console.log(items);
   return (
     <>
       <div className="flex items-center justify-between mb-6">
@@ -24,15 +45,30 @@ const ItemsPage = () => {
         </Button>
       </div>
       <div>
-        <ItemTable onEdit={(id) => setSelectedId(id)} data={itemsList} />
+        <ItemTable onEdit={(id) => setSelectedId(id)} data={items.records} />
       </div>
+      <Box className="flex justify-end mt-6">
+        <Pagination
+          count={items.totalPages}
+          size="small"
+          defaultPage={1}
+          onChange={(_, page) => {
+            updateQueryParams({
+              page,
+            });
+          }}
+          page={filter.page}
+        />
+      </Box>
       <AddItem
         isShow={isOpen}
         onClose={onClose}
-        refetch={handleFetchAllItems}
+        refetch={() => {
+          updateQueryParams({ page: 1 });
+        }}
       />
       <EditItem
-        refetch={handleFetchAllItems}
+        refetch={refetch}
         selectedId={selectedId}
         onClose={() => setSelectedId(null)}
       />
