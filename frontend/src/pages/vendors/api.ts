@@ -5,9 +5,16 @@ import type {
   VendorName,
   VendorsListResponse,
 } from "./types";
+import type { Filter } from "@utils/filters";
 
 const vendors = {
-  fetchAll: () => fetcherV2<VendorsListResponse>("vendors"),
+  fetchAll: (filter?: Filter) => {
+    const opts = {
+      method: "GET" as const,
+      filter: filter,
+    };
+    return fetcherV2<VendorsListResponse>("vendors", null, opts);
+  },
   fetchById: (id: number) => fetcherV2<VendorDetail>(`vendors/${id}`),
   fetchNames: () => fetcherV2<VendorName[]>("vendors/names"),
   create: (payload: VendorFormValues) =>

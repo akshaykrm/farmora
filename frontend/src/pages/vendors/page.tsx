@@ -3,11 +3,13 @@ import { useState } from "react";
 import AddVendor from "./components/add";
 import VendorTable from "./components/table";
 import EditVendor from "./components/edit";
-import { Button } from "@mui/material";
+import { Box, Button, Pagination } from "@mui/material";
 import useGetVendors from "./hooks/use-get-vendors";
+import useVendorFilter from "./hooks/use-vendor-filter";
 
 const VendorPage = () => {
-  const { handleFetchAllVendors, vendorList } = useGetVendors();
+  const { filter, updateQueryParams } = useVendorFilter();
+  const { vendorsList, refetch } = useGetVendors(filter);
   const [isOpen, setOpenAdd] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
@@ -23,17 +25,30 @@ const VendorPage = () => {
         </Button>
       </div>
       <div>
-        <VendorTable onEdit={(id) => setSelectedId(id)} data={vendorList} />
+        <VendorTable onEdit={(id) => setSelectedId(id)} vendors={vendorsList.records} />
       </div>
+      <Box className="flex justify-end mt-6">
+        <Pagination
+          count={vendorsList.totalPages}
+          size="small"
+          defaultPage={1}
+          onChange={(_, page) => {
+            updateQueryParams({ page });
+          }}
+          page={filter.page}
+        />
+      </Box>
       <AddVendor
         isShow={isOpen}
         onClose={onClose}
-        refetch={handleFetchAllVendors}
+        refetch={() => {
+          updateQueryParams({ page: 1 });
+        }}
       />
       <EditVendor
         selectedId={selectedId}
         onClose={() => setSelectedId(null)}
-        refetch={handleFetchAllVendors}
+        refetch={() => refetch()}
       />
     </>
   );

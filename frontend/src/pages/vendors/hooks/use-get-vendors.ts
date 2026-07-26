@@ -1,28 +1,35 @@
+import { useCallback, useEffect, useState } from "react";
 import vendors from "../api";
-import type { VendorsListResponse } from "../types";
-import { useEffect, useState } from "react";
+import type { Vendor } from "../types";
+import { overrideFilters, type Filter } from "@utils/filters";
 
-const useGetVendors = () => {
-  const [vendorList, setVendorList] = useState<VendorsListResponse>({
-    data: [],
-    limit: 0,
-    page: 0,
-    total: 0,
-  });
+const useGetVendors = (filter?: Filter) => {
+  const [vendorsList, setVendorsList] = useState<{
+    records: Vendor[];
+    totalPages: number;
+  }>({ records: [], totalPages: 0 });
 
-  const handleFetchAllVendors = async () => {
-    const res = await vendors.fetchAll();
-    if (res.status === "success") {
-      if (res.data) {
-        setVendorList(res.data);
+  const { page, limit } = filter || {};
+
+  const handleFetchAllVendors = useCallback(
+    async (override?: Filter) => {
+      const opts = overrideFilters(filter, override);
+      const res = await vendors.fetchAll(opts);
+      if (res.status === "success") {
+        if (res.data) {
+          const { data, totalPages } = res.data;
+          setVendorsList({ records: data, totalPages });
+        }
       }
-    }
-  };
+    },
+    [page, limit],
+  );
+
   useEffect(() => {
     handleFetchAllVendors();
-  }, []);
+  }, [handleFetchAllVendors]);
 
-  return { vendorList, handleFetchAllVendors };
+  return { vendorsList, refetch: handleFetchAllVendors };
 };
 
 export default useGetVendors;

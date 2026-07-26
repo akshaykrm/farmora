@@ -2,6 +2,7 @@ import { VendorNotFoundError } from '@errors/vendor.errors'
 import VendorModel from '@models/vendor'
 import userRoles from '@utils/user-roles'
 import { Op } from 'sequelize'
+import { calculateOffSet } from '@utils/pagination'
 
 const create = async (payload, currentUser) => {
   payload.master_id = currentUser.id
@@ -36,7 +37,7 @@ const getNames = async (filter, currentUser) => {
 
 const getAll = async (payload, currentUser) => {
   const { page, limit, ...filter } = payload
-  const offset = (page - 1) * limit
+  const offset = calculateOffSet(page, limit)
 
   if (filter.name) {
     filter.name = { [Op.iLike]: `%${filter.name}%` }
@@ -53,10 +54,9 @@ const getAll = async (payload, currentUser) => {
     order: [['id', 'DESC']],
   })
 
+  const totalPages = Math.ceil(count / limit)
   return {
-    page,
-    limit,
-    total: count,
+    totalPages,
     data: rows,
   }
 }

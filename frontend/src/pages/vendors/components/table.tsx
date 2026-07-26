@@ -5,8 +5,7 @@ import TableRow from "@components/TableRow";
 import DataNotFound from "@components/data-not-found";
 import Ternary from "@components/ternary";
 import { EditIcon } from "lucide-react";
-import { useMemo } from "react";
-import type { VendorsListResponse } from "../types";
+import type { Vendor } from "../types";
 
 const headers = [
   "ID",
@@ -20,15 +19,11 @@ const headers = [
 
 type Props = {
   onEdit: (selectedId: number) => void;
-  data: VendorsListResponse;
+  vendors: Vendor[];
 };
 
-const VendorTable = (props: Props) => {
-  const { onEdit, data } = props;
-
-  const isEmpty = useMemo(() => {
-    return data.data.length === 0;
-  }, [data.data]);
+const VendorTable = ({ onEdit, vendors }: Props) => {
+  const isEmpty = vendors.length === 0;
 
   return (
     <>
@@ -38,7 +33,7 @@ const VendorTable = (props: Props) => {
             <TableHeaderCell key={header} content={header} />
           ))}
         </TableRow>
-        {data.data.map((vendor, i) => (
+        {vendors.map((vendor, i) => (
           <TableRow key={vendor.id}>
             <TableCell content={i + 1} />
             <TableCell content={vendor.name} />
