@@ -7,7 +7,7 @@ import useBalanceSheetFilter from "./hooks/use-balance-sheet-filter";
 const BalanceSheetPage = () => {
   const { balanceSheetData, isLoading, fetchBalanceSheet } =
     useGetBalanceSheet();
-  const { page, updateQueryParams } = useBalanceSheetFilter();
+  const { page, updateQueryParams, limit } = useBalanceSheetFilter();
 
   const handleFilter = (filter: { from_date?: string; to_date?: string }) => {
     updateQueryParams({ page: 1 });
@@ -24,6 +24,7 @@ const BalanceSheetPage = () => {
         data={balanceSheetData}
         isLoading={isLoading}
         page={page}
+        limit={limit}
         onPageChange={(p) => updateQueryParams({ page: p })}
       />
     </>

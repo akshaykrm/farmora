@@ -5,9 +5,13 @@ function useBalanceSheetFilter() {
   const { queryParms, updateQueryParams } = useQueryParameters();
 
   const page = queryParms.page ? parseInt(queryParms.page) : DEFAULT_FIRST_PAGE;
+  const limit = queryParms.limit
+    ? parseInt(queryParms.limit)
+    : DEFAULT_PAGE_LIMIT;
 
   return {
     page,
+    limit,
     updateQueryParams,
   };
 }

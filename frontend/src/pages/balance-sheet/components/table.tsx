@@ -8,12 +8,12 @@ import type { BalanceSheetResponse, Transaction } from "../types";
 import dayjs from "dayjs";
 import { Box, Card, Pagination } from "@mui/material";
 import { formatCurrency } from "@utils/currency";
-import { DEFAULT_PAGE_LIMIT } from "@config";
 
 type Props = {
   data: BalanceSheetResponse | null;
   isLoading: boolean;
   page: number;
+  limit: number;
   onPageChange: (page: number) => void;
 };
 
@@ -21,7 +21,8 @@ const formatDate = (date: string) => {
   return dayjs(date).format("DD-MM-YYYY");
 };
 
-const BalanceSheetTable = ({ data, isLoading, page, onPageChange }: Props) => {
+function BalanceSheetTable(props: Props) {
+  const { data, isLoading, page, limit, onPageChange } = props;
   return (
     <Ternary
       when={isLoading}
@@ -29,7 +30,14 @@ const BalanceSheetTable = ({ data, isLoading, page, onPageChange }: Props) => {
       otherwise={
         <Ternary
           when={data !== null}
-          then={<AllTables data={data!} page={page} onPageChange={onPageChange} />}
+          then={
+            <AllTables
+              data={data!}
+              page={page}
+              onPageChange={onPageChange}
+              limit={limit}
+            />
+          }
           otherwise={
             <DataNotFound
               title="No data found"
@@ -40,7 +48,7 @@ const BalanceSheetTable = ({ data, isLoading, page, onPageChange }: Props) => {
       }
     />
   );
-};
+}
 
 const TransactionsTable = ({
   transactions,
@@ -79,31 +87,31 @@ const TransactionsTable = ({
                 </td>
               </tr>
               {transactions.map((t, index) => (
-              <TableRow key={index}>
-                <TableCell content={formatDate(t.date)} />
-                <TableCell content={t.purpose} />
-                <TableCell
-                  content={
-                    <span
-                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        t.type === "in"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
-                    >
-                      {t.type === "in" ? "IN" : "OUT"}
-                    </span>
-                  }
-                />
-                <TableCell
-                  content={formatCurrency(t.amount)}
-                  className="text-right"
-                />
-                <TableCell
-                  content={formatCurrency(t.balance)}
-                  className="text-right font-medium"
-                />
-              </TableRow>
+                <TableRow key={index}>
+                  <TableCell content={formatDate(t.date)} />
+                  <TableCell content={t.purpose} />
+                  <TableCell
+                    content={
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          t.type === "in"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {t.type === "in" ? "IN" : "OUT"}
+                      </span>
+                    }
+                  />
+                  <TableCell
+                    content={formatCurrency(t.amount)}
+                    className="text-right"
+                  />
+                  <TableCell
+                    content={formatCurrency(t.balance)}
+                    className="text-right font-medium"
+                  />
+                </TableRow>
               ))}
             </>
           )}
@@ -279,18 +287,28 @@ const BreakdownTable = ({ data }: { data: BalanceSheetResponse }) => {
   );
 };
 
-const AllTables = ({ data, page, onPageChange }: { data: BalanceSheetResponse; page: number; onPageChange: (page: number) => void }) => {
+const AllTables = ({
+  data,
+  limit,
+  page,
+  onPageChange,
+}: {
+  data: BalanceSheetResponse;
+  page: number;
+  limit: number;
+  onPageChange: (page: number) => void;
+}) => {
   const { transactions, summary } = data;
 
   const { total_in, total_out } = summary;
 
   const balance = total_in - total_out;
 
-  const totalPages = Math.ceil(transactions.length / DEFAULT_PAGE_LIMIT);
-  const startIndex = (page - 1) * DEFAULT_PAGE_LIMIT;
+  const totalPages = Math.ceil(transactions.length / limit);
+  const startIndex = (page - 1) * limit;
   const paginatedTransactions = transactions.slice(
     startIndex,
-    startIndex + DEFAULT_PAGE_LIMIT,
+    startIndex + limit,
   );
 
   const pageStartBalance =
