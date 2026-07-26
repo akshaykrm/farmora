@@ -2,12 +2,15 @@ import PageTitle from "@components/PageTitle";
 import BalanceSheetFilter from "./components/filter";
 import BalanceSheetTable from "./components/table";
 import useGetBalanceSheet from "./hooks/use-get-balance-sheet";
+import useBalanceSheetFilter from "./hooks/use-balance-sheet-filter";
 
 const BalanceSheetPage = () => {
   const { balanceSheetData, isLoading, fetchBalanceSheet } =
     useGetBalanceSheet();
+  const { page, updateQueryParams } = useBalanceSheetFilter();
 
   const handleFilter = (filter: { from_date?: string; to_date?: string }) => {
+    updateQueryParams({ page: 1 });
     fetchBalanceSheet(filter);
   };
 
@@ -17,7 +20,12 @@ const BalanceSheetPage = () => {
         <PageTitle title="Cash Flow" />
       </div>
       <BalanceSheetFilter onFilter={handleFilter} />
-      <BalanceSheetTable data={balanceSheetData} isLoading={isLoading} />
+      <BalanceSheetTable
+        data={balanceSheetData}
+        isLoading={isLoading}
+        page={page}
+        onPageChange={(p) => updateQueryParams({ page: p })}
+      />
     </>
   );
 };

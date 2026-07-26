@@ -6,19 +6,22 @@ import DataNotFound from "@components/data-not-found";
 import Ternary from "@components/ternary";
 import type { BalanceSheetResponse, Transaction } from "../types";
 import dayjs from "dayjs";
-import { Card } from "@mui/material";
+import { Box, Card, Pagination } from "@mui/material";
 import { formatCurrency } from "@utils/currency";
+import { DEFAULT_PAGE_LIMIT } from "@config";
 
 type Props = {
   data: BalanceSheetResponse | null;
   isLoading: boolean;
+  page: number;
+  onPageChange: (page: number) => void;
 };
 
 const formatDate = (date: string) => {
   return dayjs(date).format("DD-MM-YYYY");
 };
 
-const BalanceSheetTable = ({ data, isLoading }: Props) => {
+const BalanceSheetTable = ({ data, isLoading, page, onPageChange }: Props) => {
   return (
     <Ternary
       when={isLoading}
@@ -26,7 +29,7 @@ const BalanceSheetTable = ({ data, isLoading }: Props) => {
       otherwise={
         <Ternary
           when={data !== null}
-          then={<AllTables data={data!} />}
+          then={<AllTables data={data!} page={page} onPageChange={onPageChange} />}
           otherwise={
             <DataNotFound
               title="No data found"
@@ -41,8 +44,10 @@ const BalanceSheetTable = ({ data, isLoading }: Props) => {
 
 const TransactionsTable = ({
   transactions,
+  pageStartBalance,
 }: {
   transactions: Transaction[];
+  pageStartBalance: number;
 }) => {
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
@@ -64,7 +69,16 @@ const TransactionsTable = ({
               </td>
             </tr>
           ) : (
-            transactions.map((t, index) => (
+            <>
+              <tr className="bg-gray-50">
+                <td colSpan={4} className="px-4 py-2 text-sm text-gray-500">
+                  Balance at start of page
+                </td>
+                <td className="px-4 py-2 text-sm text-right font-medium text-gray-700">
+                  {formatCurrency(pageStartBalance)}
+                </td>
+              </tr>
+              {transactions.map((t, index) => (
               <TableRow key={index}>
                 <TableCell content={formatDate(t.date)} />
                 <TableCell content={t.purpose} />
@@ -90,7 +104,8 @@ const TransactionsTable = ({
                   className="text-right font-medium"
                 />
               </TableRow>
-            ))
+              ))}
+            </>
           )}
         </tbody>
       </table>
@@ -264,12 +279,24 @@ const BreakdownTable = ({ data }: { data: BalanceSheetResponse }) => {
   );
 };
 
-const AllTables = ({ data }: { data: BalanceSheetResponse }) => {
+const AllTables = ({ data, page, onPageChange }: { data: BalanceSheetResponse; page: number; onPageChange: (page: number) => void }) => {
   const { transactions, summary } = data;
 
   const { total_in, total_out } = summary;
 
   const balance = total_in - total_out;
+
+  const totalPages = Math.ceil(transactions.length / DEFAULT_PAGE_LIMIT);
+  const startIndex = (page - 1) * DEFAULT_PAGE_LIMIT;
+  const paginatedTransactions = transactions.slice(
+    startIndex,
+    startIndex + DEFAULT_PAGE_LIMIT,
+  );
+
+  const pageStartBalance =
+    startIndex === 0
+      ? data.opening_balance
+      : transactions[startIndex - 1].balance;
 
   return (
     <div>
@@ -313,7 +340,20 @@ const AllTables = ({ data }: { data: BalanceSheetResponse }) => {
           </div>
         </Card>
       </div>
-      <TransactionsTable transactions={transactions} />
+      <TransactionsTable
+        transactions={paginatedTransactions}
+        pageStartBalance={pageStartBalance}
+      />
+      {totalPages > 1 && (
+        <Box className="flex justify-end mt-4">
+          <Pagination
+            count={totalPages}
+            size="small"
+            page={page}
+            onChange={(_, p) => onPageChange(p)}
+          />
+        </Box>
+      )}
     </div>
   );
 };
