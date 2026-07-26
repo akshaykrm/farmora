@@ -2,6 +2,7 @@ import { FarmNotFoundError } from '@errors/farm.errors'
 import FarmModel from '@models/farm'
 import userRoles from '@utils/user-roles'
 import { Op } from 'sequelize'
+import { calculateOffSet } from '@utils/pagination'
 
 const create = async (payload, currentUser) => {
   payload.master_id = currentUser.id
@@ -27,7 +28,7 @@ const getNames = async (currentUser) => {
 
 const getAll = async (payload = {}, currentUser) => {
   const { page, limit, ...filter } = payload
-  // const offset = (page - 1) * limit
+  const offset = calculateOffSet(page, limit)
 
   if (filter.name) {
     filter.name = { [Op.iLike]: `%${filter.name}%` }
@@ -37,15 +38,16 @@ const getAll = async (payload = {}, currentUser) => {
     filter.master_id = currentUser.id
   }
 
-  const rows = await FarmModel.findAll({
+  const { rows, count } = await FarmModel.findAndCountAll({
     where: filter,
+    limit,
+    offset,
     order: [['id', 'DESC']],
   })
 
+  const totalPages = Math.ceil(count / limit)
   return {
-    page,
-    limit,
-    total: 0,
+    totalPages: totalPages,
     data: rows,
   }
 }

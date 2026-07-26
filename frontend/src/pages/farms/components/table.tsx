@@ -3,22 +3,19 @@ import TableCell from "@components/TableCell";
 import TableHeaderCell from "@components/TableHeaderCell";
 import TableRow from "@components/TableRow";
 import { EditIcon } from "lucide-react";
-import { useMemo } from "react";
 import DataNotFound from "@components/data-not-found";
 import Ternary from "@components/ternary";
-import type { FarmsListResponse } from "../types";
+import type { Farm } from "../types";
 
 const headers = ["ID", "Name", "Place", "Capacity", "Edit"];
 
 type Props = {
-  farmList: FarmsListResponse;
+  farms: Farm[];
   onEdit: (selectedId: number) => void;
 };
 
-const FarmTable = ({ onEdit, farmList }: Props) => {
-  const isEmpty = useMemo(() => {
-    return farmList.data.length === 0;
-  }, [farmList.data]);
+const FarmTable = ({ onEdit, farms }: Props) => {
+  const isEmpty = farms.length === 0;
 
   return (
     <>
@@ -28,7 +25,7 @@ const FarmTable = ({ onEdit, farmList }: Props) => {
             <TableHeaderCell key={header} content={header} />
           ))}
         </TableRow>
-        {farmList.data.map((farm, i) => (
+        {farms.map((farm, i) => (
           <TableRow key={farm.id}>
             <TableCell content={i + 1} />
             <TableCell content={farm.name} />

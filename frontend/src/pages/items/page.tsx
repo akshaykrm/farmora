@@ -5,25 +5,7 @@ import ItemTable from "./components/table";
 import EditItem from "./components/edit";
 import { Box, Button, Pagination } from "@mui/material";
 import useGetItems from "./hooks/use-get-items";
-import useQueryParameters from "@hooks/use-query-parameters";
-import { DEFAULT_FIRST_PAGE, DEFAULT_PAGE_LIMIT } from "@config";
-
-function useItemFilter() {
-  const { queryParms, updateQueryParams } = useQueryParameters();
-
-  const page = queryParms.page ? parseInt(queryParms.page) : DEFAULT_FIRST_PAGE;
-  const limit = queryParms.limit
-    ? parseInt(queryParms.limit)
-    : DEFAULT_PAGE_LIMIT;
-
-  return {
-    filter: {
-      page,
-      limit,
-    },
-    updateQueryParams,
-  };
-}
+import useItemFilter from "./hooks/use-item-filter";
 
 const ItemsPage = () => {
   const [isOpen, setOpenAdd] = useState(false);
@@ -35,7 +17,7 @@ const ItemsPage = () => {
   const onClose = () => setOpenAdd(false);
 
   const { items, refetch } = useGetItems(filter);
-  console.log(items);
+
   return (
     <>
       <div className="flex items-center justify-between mb-6">
