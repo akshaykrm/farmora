@@ -1,9 +1,10 @@
 import type { ListResponse } from "@app-types/response.types";
 import fetcherV2, { type FetcherReturnType } from "@utils/fetcherV2";
 import type { Purchase, PurchaseFormValues } from "./types";
+import type { Filter } from "@utils/filters";
 
 const purchase = {
-  fetchAll: (filter?: {}) => {
+  fetchAll: (filter?: Filter) => {
     const opts = {
       method: "GET" as const,
       filter: filter,

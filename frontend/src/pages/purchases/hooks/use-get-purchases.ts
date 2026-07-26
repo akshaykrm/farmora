@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import type { Purchase } from "../types";
 import purchase from "../api";
+import { overrideFilters, type Filter } from "@utils/filters";
 
-function useGetPurchases(filter?: Record<string, string | number | null>) {
+function useGetPurchases(filter?: Filter) {
   const [purchases, setPurchases] = useState<{
     records: Purchase[];
     totalPages: number;
@@ -22,13 +23,8 @@ function useGetPurchases(filter?: Record<string, string | number | null>) {
   } = filter || {};
 
   const handleFetchAllPurchases = useCallback(
-    async (override?: Record<string, string | number | null>) => {
-      const opts = filter || {};
-      if (override) {
-        for (const k in override) {
-          opts[k] = override[k];
-        }
-      }
+    async (override?: Filter) => {
+      const opts = overrideFilters(filter, override);
 
       const res = await purchase.fetchAll(opts);
       if (res.status === "success") {
