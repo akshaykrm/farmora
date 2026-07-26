@@ -1,14 +1,15 @@
 import fetcherV2 from "@utils/fetcherV2";
-import type { SeasonFormValues } from "./types";
+import type { SeasonListResponse, SeasonFormValues } from "./types";
 import fetcher from "@utils/fetcher";
-
-type Filter = {
-  status: "active" | "inactive";
-};
+import type { Filter } from "@utils/filters";
 
 const seasons = {
-  fetchAll: () => {
-    return fetcher("seasons");
+  fetchAll: (filter?: Filter) => {
+    const opts = {
+      method: "GET" as const,
+      filter: filter,
+    };
+    return fetcherV2<SeasonListResponse>("seasons", null, opts);
   },
   getNames: () => {
     return fetcher("seasons/names");

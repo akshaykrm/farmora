@@ -1,28 +1,35 @@
-import { useEffect, useState } from "react";
-import type { SeasonListResponse } from "../types";
+import { useCallback, useEffect, useState } from "react";
+import type { Season } from "../types";
 import seasons from "../api";
+import { overrideFilters, type Filter } from "@utils/filters";
 
-const useGetSeasons = () => {
-  const [seasonsList, setSeasonsList] = useState<SeasonListResponse>({
-    data: [],
-    limit: 0,
-    page: 0,
-    total: 0,
-  });
+const useGetSeasons = (filter?: Filter) => {
+  const [seasonsList, setSeasonsList] = useState<{
+    records: Season[];
+    totalPages: number;
+  }>({ records: [], totalPages: 0 });
 
-  const handleFetchAllSeasons = async () => {
-    const res = await seasons.fetchAll();
-    if (res.status === "success") {
-      if (res.data) {
-        setSeasonsList(res.data);
+  const { page, limit } = filter || {};
+
+  const handleFetchAllSeasons = useCallback(
+    async (override?: Filter) => {
+      const opts = overrideFilters(filter, override);
+      const res = await seasons.fetchAll(opts);
+      if (res.status === "success") {
+        if (res.data) {
+          const { data, totalPages } = res.data;
+          setSeasonsList({ records: data, totalPages });
+        }
       }
-    }
-  };
+    },
+    [page, limit],
+  );
+
   useEffect(() => {
     handleFetchAllSeasons();
-  }, []);
+  }, [handleFetchAllSeasons]);
 
-  return { seasonsList, handleFetchAllSeasons };
+  return { seasonsList, refetch: handleFetchAllSeasons };
 };
 
 export default useGetSeasons;

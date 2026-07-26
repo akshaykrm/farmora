@@ -3,6 +3,7 @@ import SeasonModel from '@models/season'
 import userRoles from '@utils/user-roles'
 import dayjs from 'dayjs'
 import { Op } from 'sequelize'
+import { calculateOffSet } from '@utils/pagination'
 
 const create = async (payload, currentUser) => {
   const startDate = dayjs(payload.startDate).toDate()
@@ -31,7 +32,7 @@ const getNames = async (currentUser, filter) => {
 
 const getAll = async (payload = {}, currentUser) => {
   const { page, limit, ...filter } = payload
-  const offset = (page - 1) * limit
+  const offset = calculateOffSet(page, limit)
 
   if (filter.name) {
     filter.name = { [Op.iLike]: `%${filter.name}%` }
@@ -48,10 +49,9 @@ const getAll = async (payload = {}, currentUser) => {
     order: [['id', 'DESC']],
   })
 
+  const totalPages = Math.ceil(count / limit)
   return {
-    page,
-    limit,
-    total: count,
+    totalPages,
     data: rows,
   }
 }

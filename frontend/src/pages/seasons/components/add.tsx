@@ -15,13 +15,14 @@ const defaultValues: SeasonFormValues = {
 type Props = {
   isShow: boolean;
   onClose: () => void;
+  refetch: () => void;
 };
 
-const AddSeason = ({ isShow, onClose }: Props) => {
+const AddSeason = ({ isShow, onClose, refetch }: Props) => {
   const { onSubmit, clearError, errors } = useAddSeason({
     onSuccess: () => {
       handleClose();
-      // refetch();
+      refetch();
     },
   });
 
