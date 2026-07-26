@@ -6,6 +6,7 @@ import userRoles from '@utils/user-roles'
 import UserModel from '@models/user'
 import FarmModel from '@models/farm'
 import SeasonModel from '@models/season'
+import { calculateOffSet } from '@utils/pagination'
 
 const create = async (payload, currentUser) => {
   payload.name = payload.name.trim()
@@ -35,7 +36,7 @@ const getNames = async (currentUser, filter) => {
 
 const getAll = async (payload, currentUser) => {
   const { page, limit, ...filter } = payload
-  const offset = (page - 1) * limit
+  const offset = calculateOffSet(page, limit)
 
   if (filter.name) {
     filter.name = { [Op.iLike]: `%${filter.name}%` }
@@ -56,10 +57,9 @@ const getAll = async (payload, currentUser) => {
       ],
     })
 
+    const totalPages = Math.ceil(count / limit)
     return {
-      page,
-      limit,
-      total: count,
+      totalPages,
       data: rows,
     }
   } catch (error) {

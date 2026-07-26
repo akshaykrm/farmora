@@ -2,9 +2,10 @@ import type { BatchListResponse, BatchFormValues } from "./types";
 import type { ItemName } from "@pages/items/types";
 import fetcher from "@utils/fetcher";
 import fetcherV2, { type FetcherReturnType } from "@utils/fetcherV2";
+import type { Filter } from "@utils/filters";
 
 const batches = {
-  fetchAll: (filter?: {}) => {
+  fetchAll: (filter?: Filter) => {
     const opts = {
       method: "GET" as const,
       filter: filter,

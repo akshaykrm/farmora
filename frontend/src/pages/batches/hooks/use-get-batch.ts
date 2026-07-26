@@ -1,28 +1,35 @@
-import { useEffect, useState } from "react";
-import type { BatchListResponse } from "../types";
+import { useCallback, useEffect, useState } from "react";
+import type { Batch } from "../types";
 import batch from "../api";
+import { overrideFilters, type Filter } from "@utils/filters";
 
-const useGetBatches = () => {
-  const [batchList, setBatchesList] = useState<BatchListResponse>({
-    data: [],
-    limit: 0,
-    page: 0,
-    total: 0,
-  });
+const useGetBatches = (filter?: Filter) => {
+  const [batches, setBatches] = useState<{
+    records: Batch[];
+    totalPages: number;
+  }>({ records: [], totalPages: 0 });
 
-  const handleFetchAllBatches = async () => {
-    const res = await batch.fetchAll();
-    if (res.status === "success") {
-      if (res.data) {
-        setBatchesList(res.data);
+  const { page, limit } = filter || {};
+
+  const handleFetchAllBatches = useCallback(
+    async (override?: Filter) => {
+      const opts = overrideFilters(filter, override);
+      const res = await batch.fetchAll(opts);
+      if (res.status === "success") {
+        if (res.data) {
+          const { data, totalPages } = res.data;
+          setBatches({ records: data, totalPages });
+        }
       }
-    }
-  };
+    },
+    [page, limit],
+  );
+
   useEffect(() => {
     handleFetchAllBatches();
-  }, []);
+  }, [handleFetchAllBatches]);
 
-  return { batchList, handleFetchAllBatches };
+  return { batches, refetch: handleFetchAllBatches };
 };
 
 export default useGetBatches;

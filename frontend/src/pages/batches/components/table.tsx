@@ -3,22 +3,19 @@ import TableCell from "@components/TableCell";
 import TableHeaderCell from "@components/TableHeaderCell";
 import TableRow from "@components/TableRow";
 import { EditIcon } from "lucide-react";
-import { useMemo } from "react";
 import DataNotFound from "@components/data-not-found";
 import Ternary from "@components/ternary";
-import type { BatchListResponse } from "../types";
+import type { Batch } from "../types";
 
 const headers = ["ID", "Name", "Status", "Farm Name", "Season Name", "Action"];
 
 type Props = {
   onEdit: (selectedId: number) => void;
-  data: BatchListResponse;
+  batches: Batch[];
 };
 
-const BatchTable = ({ onEdit, data }: Props) => {
-  const isEmpty = useMemo(() => {
-    return data.data.length === 0;
-  }, [data.data]);
+const BatchTable = ({ onEdit, batches }: Props) => {
+  const isEmpty = batches.length === 0;
 
   return (
     <>
@@ -28,7 +25,7 @@ const BatchTable = ({ onEdit, data }: Props) => {
             <TableHeaderCell key={header} content={header} />
           ))}
         </TableRow>
-        {data.data.map((season, i) => (
+        {batches.map((season, i) => (
           <TableRow key={season.id}>
             <TableCell content={i + 1} />
             <TableCell content={season.name} />
