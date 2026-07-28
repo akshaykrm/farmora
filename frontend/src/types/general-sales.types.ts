@@ -1,10 +1,9 @@
-import type { ListResponse } from "./response.types";
 import type { Season } from "./season.types";
 
 export type GeneralSalesRecord = {
   id: number;
-  season_id: number;
-  master_id: number;
+  season_id: number | null;
+  master_id: number | null;
   purpose: string;
   date: string;
   amount: number;
@@ -31,6 +30,14 @@ export type GeneralSalesListResponse = {
 
 export type NewGeneralSalesRequest = {
   season_id: number | null;
+  purpose: string;
+  amount: number | string;
+  narration?: string | null;
+};
+
+export type GeneralSalesFormValues = {
+  season_id: number | null;
+  date: string | null;
   purpose: string;
   amount: number | string;
   narration?: string | null;

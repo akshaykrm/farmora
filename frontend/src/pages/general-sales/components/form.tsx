@@ -1,36 +1,45 @@
-import type {
-  NewGeneralSalesRequest,
-  EditGeneralSalesRequest,
-} from "@app-types/general-sales.types";
+import type { GeneralSalesFormValues } from "@app-types/general-sales.types";
 import SelectList from "@components/select-list";
 import useGetSeasonNames from "@hooks/use-get-season-names";
 import { TextField, Button } from "@mui/material";
-import type { FieldValues, UseFormReturn } from "react-hook-form";
+import { useForm, type DefaultValues } from "react-hook-form";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
-
-type EditMethod = UseFormReturn<EditGeneralSalesRequest, any, FieldValues>;
-type AddMethod = UseFormReturn<NewGeneralSalesRequest, any, FieldValues>;
+import type { ValidationError } from "@errors/api.error";
+import { useEffect } from "react";
 
 type Props = {
-  methods: EditMethod | AddMethod;
+  defaultValues: DefaultValues<GeneralSalesFormValues>;
   onSubmit: (payload: any) => void;
+  apiError: ValidationError[];
   onCancel?: () => void;
 };
 
-const GeneralSalesForm = ({ methods, onSubmit, onCancel }: Props) => {
-  const seasonNames = useGetSeasonNames({ status: "active" });
+const GeneralSalesForm = (props: Props) => {
+  const { onSubmit, onCancel, defaultValues, apiError } = props;
+  const seasonNames = useGetSeasonNames();
+
+  const methods = useForm({ defaultValues });
 
   const {
     watch,
     setValue,
     handleSubmit,
     register,
+    setError,
     formState: { errors },
     clearErrors,
   } = methods;
 
   const values = watch();
+
+  useEffect(() => {
+    if (apiError.length > 0) {
+      apiError.forEach(({ name, message }) => {
+        setError(name, { message });
+      });
+    }
+  }, [apiError]);
 
   return (
     <>

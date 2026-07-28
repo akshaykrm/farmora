@@ -1,9 +1,8 @@
 import { Dialog, DialogContent } from "@components/dialog";
 import GeneralSalesForm from "./form";
-import useEditForm from "@hooks/use-edit-form";
-import useGetById from "@hooks/use-get-by-id";
-import generalSales from "@api/general-sales.api";
-import type { EditGeneralSalesRequest } from "@app-types/general-sales.types";
+import Ternary from "@components/ternary";
+import useGetGeneralSalesById from "../hooks/use-get-general-sales-by-id";
+import useEditGeneralSale from "../hooks/use-edit-general-sales";
 
 type Props = {
   selectedId: number | null;
@@ -11,37 +10,22 @@ type Props = {
   refetch: () => void;
 };
 
-const defaultValues: EditGeneralSalesRequest = {
-  id: 0,
-  season_id: null,
-  purpose: "",
-  amount: "",
-  narration: "",
-};
-
-const EditGeneralSales = ({ selectedId, onClose, refetch }: Props) => {
+function EditGeneralSales({ selectedId, onClose, refetch }: Props) {
   const isShow = selectedId !== null;
+
+  const { dataLoaded, selectedData } = useGetGeneralSalesById(selectedId);
+  const { errors, clearError, onSubmit } = useEditGeneralSale(
+    selectedId,
+    () => {
+      onClose();
+      refetch();
+    },
+  );
 
   const handleClose = () => {
     onClose();
-    methods.reset();
+    clearError();
   };
-
-  const query = useGetById<EditGeneralSalesRequest>(selectedId, {
-    defaultValues,
-    queryKey: "general-sales:get-by-id",
-    queryFn: generalSales.fetchById,
-  });
-
-  const { methods, onSubmit } = useEditForm<EditGeneralSalesRequest>({
-    defaultValues: query.data as EditGeneralSalesRequest,
-    mutationKey: "general-sales:edit",
-    mutationFn: generalSales.updateById,
-    onSuccess: () => {
-      handleClose();
-      refetch();
-    },
-  });
 
   return (
     <Dialog
@@ -50,10 +34,20 @@ const EditGeneralSales = ({ selectedId, onClose, refetch }: Props) => {
       onClose={handleClose}
     >
       <DialogContent>
-        <GeneralSalesForm methods={methods} onSubmit={onSubmit} onCancel={handleClose} />
+        <Ternary
+          when={dataLoaded}
+          then={
+            <GeneralSalesForm
+              onSubmit={onSubmit}
+              onCancel={handleClose}
+              apiError={errors}
+              defaultValues={selectedData}
+            />
+          }
+        />
       </DialogContent>
     </Dialog>
   );
-};
+}
 
 export default EditGeneralSales;

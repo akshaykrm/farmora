@@ -1,9 +1,7 @@
 import type {
   GeneralSalesListResponse,
-  NewGeneralSalesRequest,
-  EditGeneralSalesRequest,
-  EditGeneralSalesPayload,
   GeneralSalesRecord,
+  GeneralSalesFormValues,
 } from "@app-types/general-sales.types";
 import fetcher from "@utils/fetcher";
 import fetcherV2 from "@utils/fetcherV2";
@@ -17,18 +15,14 @@ const generalSales = {
     };
     return fetcherV2<GeneralSalesListResponse>("general-sales", null, opts);
   },
-  fetchById: (id: number): Promise<GeneralSalesRecord> =>
-    fetcher(`general-sales/${id}`),
-  create: async (payload: NewGeneralSalesRequest) =>
-    await fetcher("general-sales", JSON.stringify(payload), { method: "POST" }),
-  updateById: async (id: number, updateData: EditGeneralSalesRequest) => {
-    const payload: EditGeneralSalesPayload = {
-      season_id: updateData.season_id,
-      purpose: updateData.purpose,
-      amount: updateData.amount,
-      narration: updateData.narration,
-    };
-    return await fetcher(`general-sales/${id}`, JSON.stringify(payload), {
+  fetchById: async (id: number) =>
+    fetcherV2<GeneralSalesRecord>(`general-sales/${id}`),
+  create: async (payload: GeneralSalesFormValues) =>
+    await fetcherV2("general-sales", JSON.stringify(payload), {
+      method: "POST",
+    }),
+  updateById: async (id: number, updateData: GeneralSalesFormValues) => {
+    return await fetcherV2(`general-sales/${id}`, JSON.stringify(updateData), {
       method: "PUT",
     });
   },

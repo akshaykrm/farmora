@@ -1,14 +1,14 @@
 import { Dialog, DialogContent } from "@components/dialog";
-import useAddForm from "@hooks/use-add-form";
-import generalSales from "@api/general-sales.api";
-import type { NewGeneralSalesRequest } from "@app-types/general-sales.types";
+import type { GeneralSalesFormValues } from "@app-types/general-sales.types";
 import GeneralSalesForm from "./form";
+import useAddGeneralSales from "../hooks/use-add-general-sales";
 
-const defaultValues: NewGeneralSalesRequest = {
+const defaultValues: GeneralSalesFormValues = {
   season_id: null,
   purpose: "",
   amount: "",
   narration: "",
+  date: "",
 };
 
 type Props = {
@@ -18,20 +18,15 @@ type Props = {
 };
 
 const AddGeneralSales = ({ isShow, onClose, refetch }: Props) => {
+  const { clearError, errors, onSubmit } = useAddGeneralSales(() => {
+    refetch();
+    onClose();
+  });
+
   const handleClose = () => {
     onClose();
-    methods.reset();
+    clearError();
   };
-
-  const { methods, onSubmit } = useAddForm<NewGeneralSalesRequest>({
-    defaultValues,
-    mutationFn: generalSales.create,
-    mutationKey: "general-sales:add",
-    onSuccess: () => {
-      handleClose();
-      refetch();
-    },
-  });
 
   return (
     <Dialog
@@ -41,9 +36,10 @@ const AddGeneralSales = ({ isShow, onClose, refetch }: Props) => {
     >
       <DialogContent>
         <GeneralSalesForm
-          methods={methods}
           onSubmit={onSubmit}
           onCancel={handleClose}
+          apiError={errors}
+          defaultValues={defaultValues}
         />
       </DialogContent>
     </Dialog>
