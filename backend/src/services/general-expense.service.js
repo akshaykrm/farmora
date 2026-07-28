@@ -3,6 +3,7 @@ import SeasonModel from '@models/season'
 import userRoles from '@utils/user-roles'
 import dayjs from 'dayjs'
 import { Op } from 'sequelize'
+import { calculateOffSet } from '@utils/pagination'
 
 const create = async (payload, currentUser) => {
   if (currentUser.user_type === userRoles.staff.type) {
@@ -16,8 +17,9 @@ const create = async (payload, currentUser) => {
 }
 
 const getAll = async (filter, currentUser) => {
-  const { season_id, start_date, end_date, purpose } = filter
+  const { limit, page, season_id, start_date, end_date, purpose } = filter
   const whereClause = {}
+  const offset = calculateOffSet(page, limit)
 
   if (season_id) {
     whereClause.season_id = season_id
@@ -44,13 +46,28 @@ const getAll = async (filter, currentUser) => {
     whereClause.master_id = currentUser.id
   }
 
-  const generalExpenses = await GeneralExpenseModel.findAll({
-    where: whereClause,
-    order: [['date', 'DESC']],
-    include: [{ model: SeasonModel, as: 'season', required: false }],
-  })
+  const [paginatedData, totalAmount] = await Promise.all([
+    GeneralExpenseModel.findAndCountAll({
+      where: whereClause,
+      limit,
+      offset,
+      order: [['date', 'DESC']],
+      include: [{ model: SeasonModel, as: 'season', required: false }],
+    }),
 
-  return generalExpenses
+    GeneralExpenseModel.sum('amount', {
+      where: whereClause,
+    }),
+  ])
+
+  const { count, rows } = paginatedData
+
+  const totalPages = Math.ceil(count / limit)
+  return {
+    totalPages: totalPages,
+    totalAmount,
+    data: rows,
+  }
 }
 
 const getById = async (id, currentUser) => {

@@ -21,7 +21,12 @@ export type GeneralExpenseFilterRequest = {
   end_date: string;
 };
 
-export type GeneralExpenseListResponse = GeneralExpenseRecord[];
+export type GeneralExpenseListResponse = {
+  data: GeneralExpenseRecord[];
+  totalPages: number;
+  limit: number;
+  totalAmount: number;
+};
 
 export type GeneralExpanceFormValues = {
   season_id: number | "";

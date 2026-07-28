@@ -5,10 +5,11 @@ import { useForm } from "react-hook-form";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import { RHFTextField } from "@components/form/input";
+import type { Filter } from "@utils/filters";
 
 type Props = {
-  onFilter: (filter: Record<string, string | number | null>) => void;
-  defaultFilter: Record<string, string | number>;
+  onFilter: (filter: Filter) => void;
+  defaultFilter: Filter;
 };
 
 const FilterGeneralExpense = ({ onFilter, defaultFilter }: Props) => {

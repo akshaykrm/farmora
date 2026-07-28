@@ -1,14 +1,14 @@
 import type {
   GeneralExpenseListResponse,
   GeneralExpenseRecord,
-  GeneralExpenseFilterRequest,
   GeneralExpanceFormValues,
 } from "@app-types/general-expense.types";
 import fetcher from "@utils/fetcher";
 import fetcherV2 from "@utils/fetcherV2";
+import type { Filter } from "@utils/filters";
 
 const generalExpense = {
-  fetchAll: (filter: GeneralExpenseFilterRequest) => {
+  fetchAll: (filter: Filter) => {
     const opts = {
       method: "GET" as const,
       filter: filter,

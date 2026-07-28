@@ -2,38 +2,19 @@ import PageTitle from "@components/PageTitle";
 import GeneralExpenseTable from "./components/table";
 import AddGeneralExpense from "./components/add";
 import EditGeneralExpense from "./components/edit";
-import { Button } from "@mui/material";
-import { useCallback, useEffect, useState } from "react";
+import { Box, Button, Pagination } from "@mui/material";
+import { useState } from "react";
 import FilterGeneralExpense from "./components/filter";
-import generalExpense from "@api/general-expense.api";
-import type { GeneralExpenseRecord } from "@app-types/general-expense.types";
 import useGeneralExpenseFilter from "./hooks/use-general-expense-filter";
+import useGetGeneralExpense from "./hooks/use-get-general-expense";
+import { formatCurrency } from "@utils/currency";
 
 const GeneralExpensePage = () => {
   const { filter, updateQueryParams } = useGeneralExpenseFilter();
   const [isOpen, setOpenAdd] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [data, setData] = useState<GeneralExpenseRecord[]>([]);
 
-  const fetchData = useCallback(async () => {
-    if (!filter.season_id) {
-      setData([]);
-      return;
-    }
-    const res = await generalExpense.fetchAll({
-      season_id: filter.season_id,
-      start_date: filter.start_date || "",
-      end_date: filter.end_date || "",
-      purpose: filter.purpose || "",
-    });
-    if (res.status === "success" && res.data) {
-      setData(res.data);
-    }
-  }, [filter.season_id, filter.start_date, filter.end_date, filter.purpose]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  const { generalExpenses, refetch } = useGetGeneralExpense(filter);
 
   const onOpen = () => setOpenAdd(true);
   const onClose = () => setOpenAdd(false);
@@ -46,19 +27,30 @@ const GeneralExpensePage = () => {
           Add General Expense
         </Button>
       </div>
+
       <FilterGeneralExpense
         defaultFilter={filter}
         onFilter={(f) => {
-          updateQueryParams({ ...f, page: 1 });
+          updateQueryParams(f);
         }}
       />
+
+      <TotalAmount totalAmount={generalExpenses.totalAmount} />
+
       <GeneralExpenseTable
         onEdit={(id) => setSelectedId(id)}
-        data={data}
-        page={filter.page}
-        limit={filter.limit}
-        onPageChange={(p) => updateQueryParams({ page: p })}
+        data={generalExpenses.records}
       />
+
+      <Box className="flex justify-end mt-4">
+        <Pagination
+          count={generalExpenses.totalPages}
+          size="small"
+          page={filter.page}
+          onChange={(_, p) => updateQueryParams({ page: p })}
+        />
+      </Box>
+
       <AddGeneralExpense
         isShow={isOpen}
         onClose={onClose}
@@ -66,6 +58,7 @@ const GeneralExpensePage = () => {
           updateQueryParams({ page: 1 });
         }}
       />
+
       <EditGeneralExpense
         selectedId={selectedId}
         onClose={() => setSelectedId(null)}
@@ -74,5 +67,15 @@ const GeneralExpensePage = () => {
     </>
   );
 };
+
+function TotalAmount({ totalAmount }: { totalAmount: number }) {
+  return (
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+      <h5 className="text-md font-semibold text-gray-800">
+        Total Amount: {formatCurrency(totalAmount)}
+      </h5>
+    </div>
+  );
+}
 
 export default GeneralExpensePage;

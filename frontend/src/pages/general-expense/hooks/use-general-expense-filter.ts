@@ -12,11 +12,14 @@ function useGeneralExpenseFilter() {
     ? parseInt(queryParms.season_id)
     : null;
 
+  const purpose = queryParms.purpose ? parseInt(queryParms.purpose) : "";
+
   return {
     filter: {
       ...queryParms,
       page,
       limit,
+      purpose,
       season_id,
     },
     updateQueryParams,
