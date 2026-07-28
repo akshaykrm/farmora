@@ -1,24 +1,19 @@
 import { Button } from "@mui/material";
 import useGetSeasonNames from "@hooks/use-get-season-names";
 import SelectList from "@components/select-list";
-import type { GeneralSalesFilterRequest } from "@app-types/general-sales.types";
 import { useForm } from "react-hook-form";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import { RHFTextField } from "@components/form/input";
 
 type Props = {
-  onFilter: (filter: GeneralSalesFilterRequest) => Promise<void>;
+  onFilter: (filter: Record<string, string | number | null>) => void;
+  defaultFilter: Record<string, string | number | null>;
 };
 
-const FilterGeneralSales = (props: Props) => {
-  const methods = useForm<GeneralSalesFilterRequest>({
-    defaultValues: {
-      season_id: null,
-      start_date: "",
-      purpose: "",
-      end_date: "",
-    },
+const FilterGeneralSales = ({ onFilter, defaultFilter }: Props) => {
+  const methods = useForm({
+    defaultValues: defaultFilter,
   });
   const seasonNames = useGetSeasonNames();
 
@@ -29,6 +24,10 @@ const FilterGeneralSales = (props: Props) => {
     control,
   } = methods;
   const values = watch();
+
+  const handleApplyFilter = () => {
+    onFilter(methods.getValues());
+  };
 
   return (
     <div className="w-full bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
@@ -91,7 +90,7 @@ const FilterGeneralSales = (props: Props) => {
       <div className="flex justify-end">
         <Button
           variant="contained"
-          onClick={async () => await props.onFilter(values)}
+          onClick={handleApplyFilter}
           disabled={!values.season_id}
         >
           Apply Filters

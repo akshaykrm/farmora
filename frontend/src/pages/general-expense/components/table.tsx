@@ -1,37 +1,35 @@
-import type { GeneralExpenseListResponse } from "@app-types/general-expense.types";
+import type { GeneralExpenseRecord } from "@app-types/general-expense.types";
 import Table from "@components/Table";
 import TableCell from "@components/TableCell";
 import TableHeaderCell from "@components/TableHeaderCell";
 import TableRow from "@components/TableRow";
-import { useMemo } from "react";
 import DataNotFound from "@components/data-not-found";
 import dayjs from "dayjs";
 import { EditIcon } from "lucide-react";
 import { roundNumber } from "@utils/number";
+import { Box, Pagination } from "@mui/material";
 
 const headers = ["Date", "Season", "Purpose", "Amount", "Action"];
 
 type Props = {
   onEdit: (selectedId: number) => void;
-  data: GeneralExpenseListResponse;
+  data: GeneralExpenseRecord[];
+  page: number;
+  limit: number;
+  onPageChange: (page: number) => void;
 };
 
-const GeneralExpenseTable = ({ onEdit, data }: Props) => {
-  const isEmpty = useMemo(() => {
-    return data?.length === 0;
-  }, [data]);
+const GeneralExpenseTable = ({ onEdit, data, page, limit, onPageChange }: Props) => {
+  const isEmpty = data.length === 0;
 
-  const calculateTotal = (items: any[]) => {
-    if (!items || items.length === 0) return 0;
+  const totalAmount = data.reduce(
+    (acc, item) => acc + (parseFloat(item.amount.toString()) || 0),
+    0,
+  );
 
-    const total = items.reduce((acc, item) => {
-      return parseFloat(acc) + (parseFloat(item.amount.toString()) || 0);
-    }, 0);
-
-    return total;
-  };
-
-  const totalAmount = calculateTotal(data || []);
+  const totalPages = Math.ceil(data.length / limit);
+  const startIndex = (page - 1) * limit;
+  const paginatedData = data.slice(startIndex, startIndex + limit);
 
   return (
     <div className="w-full">
@@ -41,7 +39,7 @@ const GeneralExpenseTable = ({ onEdit, data }: Props) => {
             <TableHeaderCell key={header} content={header} />
           ))}
         </TableRow>
-        {data?.map((item) => (
+        {paginatedData.map((item) => (
           <TableRow key={item.id}>
             <TableCell content={dayjs(item.date).format("DD-MM-YYYY")} />
             <TableCell
@@ -74,6 +72,16 @@ const GeneralExpenseTable = ({ onEdit, data }: Props) => {
             Total Amount: ₹{roundNumber(totalAmount)}
           </h5>
         </div>
+      )}
+      {totalPages > 1 && (
+        <Box className="flex justify-end mt-4">
+          <Pagination
+            count={totalPages}
+            size="small"
+            page={page}
+            onChange={(_, p) => onPageChange(p)}
+          />
+        </Box>
       )}
     </div>
   );

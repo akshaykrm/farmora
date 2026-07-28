@@ -3,26 +3,19 @@ import { useState } from "react";
 import AddInvestor from "./components/AddInvestor";
 import InvestorManagementTable from "./components/InvestorManagementTable";
 import EditInvestor from "./components/EditInvestor";
-import { Button } from "@mui/material";
-import useGetInvestors from "./hooks/useGetInvestors";
+import { Box, Button, Pagination } from "@mui/material";
+import useGetInvestors from "./hooks/use-get-investors";
+import useInvestorFilter from "./hooks/use-investor-filter";
 import InvestorManagementFilter from "./components/InvestorManagementFilter";
-import type { InvestorFilterRequest } from "./types";
 
 const InvestorManagementPage = () => {
-  const { handleFetchAllInvestors, investorList } = useGetInvestors();
+  const { filter, updateQueryParams } = useInvestorFilter();
+  const { investors, refetch } = useGetInvestors(filter);
   const [isOpen, setOpenAdd] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
   const onOpen = () => setOpenAdd(true);
   const onClose = () => setOpenAdd(false);
-
-  const onFilter = (filter: InvestorFilterRequest) => {
-    const params: Record<string, string> = {};
-    if (filter.search) params.search = filter.search;
-    if (filter.start_date) params.start_date = filter.start_date;
-    if (filter.end_date) params.end_date = filter.end_date;
-    handleFetchAllInvestors(params);
-  };
 
   return (
     <>
@@ -32,22 +25,38 @@ const InvestorManagementPage = () => {
           Add Investor
         </Button>
       </div>
-      <InvestorManagementFilter onFilter={onFilter} />
+      <InvestorManagementFilter
+        defaultFilter={filter}
+        onFilter={(f) => updateQueryParams(f)}
+      />
       <div className="mt-4">
         <InvestorManagementTable
           onEdit={(id) => setSelectedId(id)}
-          data={investorList}
+          investors={investors.records}
         />
       </div>
+      <Box className="flex justify-end mt-6">
+        <Pagination
+          count={investors.totalPages}
+          size="small"
+          defaultPage={1}
+          onChange={(_, page) => {
+            updateQueryParams({ page });
+          }}
+          page={filter.page}
+        />
+      </Box>
       <AddInvestor
         isShow={isOpen}
         onClose={onClose}
-        refetch={() => handleFetchAllInvestors()}
+        refetch={() => {
+          updateQueryParams({ page: 1 });
+        }}
       />
       <EditInvestor
         selectedId={selectedId}
         onClose={() => setSelectedId(null)}
-        refetch={() => handleFetchAllInvestors()}
+        refetch={() => refetch()}
       />
     </>
   );

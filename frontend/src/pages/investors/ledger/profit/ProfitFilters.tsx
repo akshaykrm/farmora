@@ -6,21 +6,14 @@ import FilterWrapper from '@components/filter-wrapper'
 import SelectList from '@components/select-list'
 import useLookupInvestors from '../hooks/useLookupInvestors'
 import useLookupTransactionTypes from '../hooks/useLookupTransactionTypes'
-import type { LedgerFilterRequest } from '../types'
 
 type Props = {
-  onFilter: (filter: LedgerFilterRequest) => void
+  onFilter: (filter: Record<string, string | number | null>) => void
+  defaultFilter: Record<string, string | number>
 }
 
-const defaultValues: LedgerFilterRequest = {
-  investor_id: '',
-  transaction_type_id: '',
-  start_date: '',
-  end_date: '',
-}
-
-const ProfitFilters = ({ onFilter }: Props) => {
-  const methods = useForm<LedgerFilterRequest>({ defaultValues })
+const ProfitFilters = ({ onFilter, defaultFilter }: Props) => {
+  const methods = useForm({ defaultFilter })
   const { setValue, watch, handleSubmit } = methods
   const values = watch()
   const investors = useLookupInvestors()

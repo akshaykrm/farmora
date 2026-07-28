@@ -1,19 +1,17 @@
 import PageTitle from '@components/PageTitle'
 import { useState } from 'react'
-import { Button } from '@mui/material'
+import { Box, Button, Pagination } from '@mui/material'
 import { Dialog, DialogContent } from '@components/dialog'
 import ProfitTable from './ProfitTable'
 import ProfitForm from './ProfitForm'
 import ProfitFilters from './ProfitFilters'
 import ReversalDialog from '../ReversalDialog'
 import BalanceCard from '../BalanceCard'
-import useGetInvestorLedgerTransactions from '../hooks/useGetInvestorLedgerTransactions'
+import useGetInvestorLedgerTransactions from '../hooks/use-get-investor-ledger-transactions'
 import useCreateInvestorTransaction from '../hooks/useCreateInvestorTransaction'
 import useGetBalanceSummary from '../hooks/useGetBalanceSummary'
-import type {
-  InvestorTransactionFormValues,
-  LedgerFilterRequest,
-} from '../types'
+import useLedgerFilter from '../hooks/use-ledger-filter'
+import type { InvestorTransactionFormValues } from '../types'
 
 const defaultFormValues: InvestorTransactionFormValues = {
   investor_id: '',
@@ -24,22 +22,20 @@ const defaultFormValues: InvestorTransactionFormValues = {
 }
 
 const ProfitPage = () => {
-  const { transactionList, handleFetchTransactions } =
-    useGetInvestorLedgerTransactions({ category: 'PROFIT' })
+  const { filter, updateQueryParams } = useLedgerFilter()
+  const { transactions } =
+    useGetInvestorLedgerTransactions({ ...filter, category: 'PROFIT' })
   const [isOpen, setOpenAdd] = useState(false)
   const [isReversalOpen, setReversalOpen] = useState(false)
   const [reverseTransactionId, setReverseTransactionId] = useState<
     number | null
   >(null)
-  const [currentInvestorId, setCurrentInvestorId] = useState<string | undefined>()
-  const [filterStartDate, setFilterStartDate] = useState<string | undefined>()
-  const [filterEndDate, setFilterEndDate] = useState<string | undefined>()
 
-  const { balance, loading, refetch } = useGetBalanceSummary({
+  const { balance, loading, refetch: refetchBalance } = useGetBalanceSummary({
     category: 'PROFIT',
-    investorId: currentInvestorId,
-    startDate: filterStartDate,
-    endDate: filterEndDate,
+    investorId: filter.investor_id || undefined,
+    startDate: filter.start_date || undefined,
+    endDate: filter.end_date || undefined,
   })
 
   const onOpen = () => setOpenAdd(true)
@@ -49,8 +45,8 @@ const ProfitPage = () => {
     onSuccess: () => {
       onClose()
       handleClose()
-      handleFetchTransactions({ category: 'PROFIT' })
-      refetch()
+      updateQueryParams({ page: 1 })
+      refetchBalance()
     },
   })
 
@@ -58,19 +54,6 @@ const ProfitPage = () => {
     setReversalOpen(false)
     setReverseTransactionId(null)
     clearError()
-  }
-
-  const onFilter = (filter: LedgerFilterRequest) => {
-    setCurrentInvestorId(filter.investor_id || undefined)
-    setFilterStartDate(filter.start_date || undefined)
-    setFilterEndDate(filter.end_date || undefined)
-    const params: Record<string, string> = { category: 'PROFIT' }
-    if (filter.investor_id) params.investor_id = filter.investor_id
-    if (filter.transaction_type_id)
-      params.transaction_type_id = filter.transaction_type_id
-    if (filter.start_date) params.start_date = filter.start_date
-    if (filter.end_date) params.end_date = filter.end_date
-    handleFetchTransactions(params)
   }
 
   const onReverse = (transactionId: number) => {
@@ -90,23 +73,34 @@ const ProfitPage = () => {
           Add Profit
         </Button>
       </div>
-      <ProfitFilters onFilter={onFilter} />
+      <ProfitFilters defaultFilter={filter} onFilter={(f) => updateQueryParams(f)} />
       <div className="mt-4">
         <BalanceCard
           balance={balance}
           loading={loading}
           category="PROFIT"
-          hasInvestorFilter={Boolean(currentInvestorId)}
-          filterStartDate={filterStartDate}
-          filterEndDate={filterEndDate}
+          hasInvestorFilter={Boolean(filter.investor_id)}
+          filterStartDate={filter.start_date}
+          filterEndDate={filter.end_date}
         />
       </div>
       <div className="mt-4">
         <ProfitTable
           onReverse={onReverse}
-          data={transactionList}
+          transactions={transactions.records}
         />
       </div>
+      <Box className="flex justify-end mt-6">
+        <Pagination
+          count={transactions.totalPages}
+          size="small"
+          defaultPage={1}
+          onChange={(_, page) => {
+            updateQueryParams({ page });
+          }}
+          page={filter.page}
+        />
+      </Box>
       <Dialog
         isOpen={isOpen}
         headerTitle="Add Profit"

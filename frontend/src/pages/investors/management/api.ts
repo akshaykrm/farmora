@@ -1,12 +1,15 @@
 import fetcherV2 from '@utils/fetcherV2'
-import type { InvestorDetail, InvestorFormValues, InvestorListResponse } from './types'
+import type { InvestorDetail, InvestorFormValues, Investor } from './types'
+import type { Filter } from '@utils/filters'
 
 const investorsApi = {
-  fetchAll: (filter?: Record<string, string>) =>
-    fetcherV2<InvestorListResponse>('investors', null, {
-      method: 'GET',
-      filter,
-    }),
+  fetchAll: (filter?: Filter) => {
+    const opts = {
+      method: 'GET' as const,
+      filter: filter,
+    }
+    return fetcherV2<{ data: Investor[]; totalPages: number }>('investors', null, opts)
+  },
 
   fetchById: (id: number) =>
     fetcherV2<InvestorDetail>(`investors/${id}`),

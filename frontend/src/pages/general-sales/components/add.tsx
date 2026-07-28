@@ -14,9 +14,10 @@ const defaultValues: NewGeneralSalesRequest = {
 type Props = {
   isShow: boolean;
   onClose: () => void;
+  refetch: () => void;
 };
 
-const AddGeneralSales = ({ isShow, onClose }: Props) => {
+const AddGeneralSales = ({ isShow, onClose, refetch }: Props) => {
   const handleClose = () => {
     onClose();
     methods.reset();
@@ -28,6 +29,7 @@ const AddGeneralSales = ({ isShow, onClose }: Props) => {
     mutationKey: "general-sales:add",
     onSuccess: () => {
       handleClose();
+      refetch();
     },
   });
 
@@ -38,7 +40,11 @@ const AddGeneralSales = ({ isShow, onClose }: Props) => {
       onClose={handleClose}
     >
       <DialogContent>
-        <GeneralSalesForm methods={methods} onSubmit={onSubmit} onCancel={handleClose} />
+        <GeneralSalesForm
+          methods={methods}
+          onSubmit={onSubmit}
+          onCancel={handleClose}
+        />
       </DialogContent>
     </Dialog>
   );

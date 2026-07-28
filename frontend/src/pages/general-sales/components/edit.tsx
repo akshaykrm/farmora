@@ -8,6 +8,7 @@ import type { EditGeneralSalesRequest } from "@app-types/general-sales.types";
 type Props = {
   selectedId: number | null;
   onClose: () => void;
+  refetch: () => void;
 };
 
 const defaultValues: EditGeneralSalesRequest = {
@@ -18,7 +19,7 @@ const defaultValues: EditGeneralSalesRequest = {
   narration: "",
 };
 
-const EditGeneralSales = ({ selectedId, onClose }: Props) => {
+const EditGeneralSales = ({ selectedId, onClose, refetch }: Props) => {
   const isShow = selectedId !== null;
 
   const handleClose = () => {
@@ -38,6 +39,7 @@ const EditGeneralSales = ({ selectedId, onClose }: Props) => {
     mutationFn: generalSales.updateById,
     onSuccess: () => {
       handleClose();
+      refetch();
     },
   });
 

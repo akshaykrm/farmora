@@ -4,13 +4,13 @@ import type {
   EditGeneralSalesRequest,
   EditGeneralSalesPayload,
   GeneralSalesRecord,
-  GeneralSalesFilterRequest,
 } from "@app-types/general-sales.types";
 import fetcher from "@utils/fetcher";
 import fetcherV2 from "@utils/fetcherV2";
+import type { Filter } from "@utils/filters";
 
 const generalSales = {
-  fetchAll: (filter: GeneralSalesFilterRequest) => {
+  fetchAll: (filter: Filter) => {
     const opts = {
       method: "GET" as const,
       filter: filter,

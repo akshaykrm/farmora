@@ -1,13 +1,16 @@
 import fetcherV2 from '@utils/fetcherV2'
 import type { InvestorTransaction, InvestorTransactionFormValues, InvestorTransactionListResponse } from './types'
 import type { NameResponse } from '@app-types/gen.types'
+import type { Filter } from '@utils/filters'
 
 const investorLedgerApi = {
-  listTransactions: (filter?: Record<string, string>) =>
-    fetcherV2<InvestorTransactionListResponse>('investors/ledger', null, {
-      method: 'GET',
-      filter,
-    }),
+  listTransactions: (filter?: Filter) => {
+    const opts = {
+      method: 'GET' as const,
+      filter: filter,
+    }
+    return fetcherV2<InvestorTransactionListResponse>('investors/ledger', null, opts)
+  },
 
   getTransactionById: (id: number) =>
     fetcherV2<InvestorTransaction>(`investors/ledger/${id}`),

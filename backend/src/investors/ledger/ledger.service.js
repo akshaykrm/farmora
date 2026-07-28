@@ -214,10 +214,9 @@ async function listInvestorTransactions(filter, currentUser) {
     ],
   })
 
+  const totalPages = Math.ceil(count / limit)
   return {
-    page,
-    limit,
-    total: count,
+    totalPages,
     data: rows,
   }
 }

@@ -53,10 +53,9 @@ async function getAllInvestors(payload, currentUser) {
     order: [['id', 'DESC']],
   })
 
+  const totalPages = Math.ceil(count / limit)
   return {
-    page,
-    limit,
-    total: count,
+    totalPages,
     data: rows,
   }
 }

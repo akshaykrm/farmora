@@ -1,4 +1,3 @@
-import type { ListResponse } from '@app-types/response.types'
 import type { ValidationError } from '@errors/api.error'
 
 export type TransactionType = {
@@ -33,8 +32,6 @@ export type InvestorTransaction = {
   }
 }
 
-export type InvestorTransactionListResponse = ListResponse<InvestorTransaction>
-
 export type InvestorTransactionFormValues = {
   investor_id: number | ''
   transaction_type_code: string
@@ -43,16 +40,6 @@ export type InvestorTransactionFormValues = {
   remarks: string
   season_id?: number | null | ''
   reference_transaction_id?: number | null
-}
-
-export type LedgerFilterRequest = {
-  investor_id?: string
-  transaction_type_id?: string
-  start_date?: string
-  end_date?: string
-  page?: string
-  limit?: string
-  category?: string
 }
 
 export type UseCreateInvestorTransaction = (opts: {

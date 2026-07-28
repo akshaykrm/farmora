@@ -1,3 +1,4 @@
+import type { ListResponse } from "./response.types";
 import type { Season } from "./season.types";
 
 export type GeneralSalesRecord = {
@@ -21,7 +22,12 @@ export type GeneralSalesFilterRequest = {
   end_date: string;
 };
 
-export type GeneralSalesListResponse = GeneralSalesRecord[];
+export type GeneralSalesListResponse = {
+  data: GeneralSalesRecord[];
+  totalPages: number;
+  limit: number;
+  totalAmount: number;
+};
 
 export type NewGeneralSalesRequest = {
   season_id: number | null;

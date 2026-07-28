@@ -3,21 +3,14 @@ import { useForm } from 'react-hook-form'
 import { DatePicker } from '@mui/x-date-pickers'
 import dayjs from 'dayjs'
 import FilterWrapper from '@components/filter-wrapper'
-import type { InvestorFilterRequest } from '../types'
-
 type Props = {
-  onFilter: (filter: InvestorFilterRequest) => void
+  onFilter: (filter: Record<string, string | number | null>) => void
+  defaultFilter: Record<string, string | number>
 }
 
-const defaultValues: InvestorFilterRequest = {
-  search: '',
-  start_date: '',
-  end_date: '',
-}
-
-const InvestorManagementFilter = ({ onFilter }: Props) => {
-  const methods = useForm<InvestorFilterRequest>({
-    defaultValues,
+const InvestorManagementFilter = ({ onFilter, defaultFilter }: Props) => {
+  const methods = useForm({
+    defaultValues: defaultFilter,
   })
 
   const { register, setValue, watch, handleSubmit } = methods

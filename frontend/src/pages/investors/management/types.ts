@@ -1,4 +1,3 @@
-import type { ListResponse } from '@app-types/response.types'
 import type { ValidationError } from '@errors/api.error'
 
 export type Investor = {
@@ -21,8 +20,6 @@ export type InvestorFormValues = {
   is_active: boolean
 }
 
-export type InvestorListResponse = ListResponse<Investor>
-
 type UseInvestorReturn = {
   onSubmit: (inputData: InvestorFormValues) => void
   errors: ValidationError[]
@@ -31,12 +28,6 @@ type UseInvestorReturn = {
 
 type Opts = {
   onSuccess: () => void
-}
-
-export type InvestorFilterRequest = {
-  search: string
-  start_date: string
-  end_date: string
 }
 
 export type UseAddInvestor = (opts: Opts) => UseInvestorReturn

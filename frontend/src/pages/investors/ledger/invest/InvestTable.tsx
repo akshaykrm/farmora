@@ -6,8 +6,7 @@ import TableRow from "@components/TableRow";
 import DataNotFound from "@components/data-not-found";
 import Ternary from "@components/ternary";
 import { Undo2 } from "lucide-react";
-import { useMemo } from "react";
-import type { InvestorTransactionListResponse } from "../types";
+import type { InvestorTransaction } from "../types";
 
 const headers = [
   "Txn ID",
@@ -29,15 +28,11 @@ const typeStyles: Record<string, string> = {
 
 type Props = {
   onReverse: (transactionId: number) => void;
-  data: InvestorTransactionListResponse;
+  transactions: InvestorTransaction[];
 };
 
-const InvestTable = (props: Props) => {
-  const { onReverse, data } = props;
-
-  const isEmpty = useMemo(() => {
-    return data.data.length === 0;
-  }, [data.data]);
+const InvestTable = ({ onReverse, transactions }: Props) => {
+  const isEmpty = transactions.length === 0;
 
   return (
     <>
@@ -47,7 +42,7 @@ const InvestTable = (props: Props) => {
             <TableHeaderCell key={header} content={header} />
           ))}
         </TableRow>
-        {data.data.map((transaction) => (
+        {transactions.map((transaction) => (
           <TableRow key={transaction.id}>
             <TableCell content={transaction.txn_id ?? "-"} />
             <TableCell content={transaction.investor?.investor_name ?? "-"} />

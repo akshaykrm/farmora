@@ -1,48 +1,33 @@
 import { Button } from "@mui/material";
 import useGetSeasonNames from "@hooks/use-get-season-names";
 import SelectList from "@components/select-list";
-import type { GeneralExpenseFilterRequest } from "@app-types/general-expense.types";
 import { useForm } from "react-hook-form";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
-import { useEffect } from "react";
 import { RHFTextField } from "@components/form/input";
 
 type Props = {
-  onFilter: (inpuData: GeneralExpenseFilterRequest) => Promise<void>;
+  onFilter: (filter: Record<string, string | number | null>) => void;
+  defaultFilter: Record<string, string | number>;
 };
 
-const FilterGeneralExpense = (props: Props) => {
-  const methods = useForm<GeneralExpenseFilterRequest>({
-    defaultValues: {
-      season_id: null,
-      start_date: "",
-      purpose: "",
-      end_date: "",
-    },
+const FilterGeneralExpense = ({ onFilter, defaultFilter }: Props) => {
+  const methods = useForm({
+    defaultValues: defaultFilter,
   });
   const {
     formState: { errors },
     watch,
     setValue,
-    getValues,
-    handleSubmit,
     control,
   } = methods;
 
   const seasonNames = useGetSeasonNames();
   const values = watch();
 
-  const handleFilter = handleSubmit(async (inputData) => {
-    props.onFilter(inputData);
-  });
-
-  useEffect(() => {
-    document.addEventListener("general_expense:refetch", () => {
-      const filter = getValues();
-      props.onFilter(filter);
-    });
-  }, []);
+  const handleApplyFilter = () => {
+    onFilter(methods.getValues());
+  };
 
   return (
     <div className="w-full bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
@@ -104,7 +89,7 @@ const FilterGeneralExpense = (props: Props) => {
       <div className="flex justify-end">
         <Button
           variant="contained"
-          onClick={handleFilter}
+          onClick={handleApplyFilter}
           disabled={!values.season_id}
         >
           Apply Filters

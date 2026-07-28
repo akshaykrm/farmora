@@ -16,9 +16,10 @@ const defaultValues: GeneralExpanceFormValues = {
 type Props = {
   isShow: boolean;
   onClose: () => void;
+  refetch: () => void;
 };
 
-const AddGeneralExpense = ({ isShow, onClose }: Props) => {
+const AddGeneralExpense = ({ isShow, onClose, refetch }: Props) => {
   const [errors, setErrors] = useState<ValidationError[]>([]);
 
   const clearErrors = () => {
@@ -35,8 +36,7 @@ const AddGeneralExpense = ({ isShow, onClose }: Props) => {
     if (res.status === "success") {
       if (res.data) {
         handleClose();
-        const customEvent = new CustomEvent("general_expense:refetch");
-        document.dispatchEvent(customEvent);
+        refetch();
       }
     } else if (res.status === "validation_error") {
       setErrors(res.error);

@@ -8,6 +8,7 @@ import type { ValidationError } from "@errors/api.error";
 type Props = {
   selectedId: number | null;
   onClose: () => void;
+  refetch: () => void;
 };
 
 const defaultValues: GeneralExpanceFormValues = {
@@ -18,7 +19,7 @@ const defaultValues: GeneralExpanceFormValues = {
   narration: "",
 };
 
-const EditGeneralExpense = ({ selectedId, onClose }: Props) => {
+const EditGeneralExpense = ({ selectedId, onClose, refetch }: Props) => {
   const isShow = selectedId !== null;
   const [errors, setErrors] = useState<ValidationError[]>([]);
   const clearErrors = () => {
@@ -63,10 +64,8 @@ const EditGeneralExpense = ({ selectedId, onClose }: Props) => {
       const res = await generalExpense.updateById(selectedId, inputData);
       if (res.status === "success") {
         handleClose();
-        const customEvent = new CustomEvent("general_expense:refetch");
-        document.dispatchEvent(customEvent);
+        refetch();
       } else if (res.status === "validation_error") {
-        setErrors(res.error);
         setErrors(res.error);
       }
     },

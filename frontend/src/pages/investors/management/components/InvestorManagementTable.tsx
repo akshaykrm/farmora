@@ -6,8 +6,7 @@ import TableRow from "@components/TableRow";
 import DataNotFound from "@components/data-not-found";
 import Ternary from "@components/ternary";
 import { EditIcon } from "lucide-react";
-import { useMemo } from "react";
-import type { InvestorListResponse } from "../types";
+import type { Investor } from "../types";
 
 const headers = [
   "ID",
@@ -21,15 +20,11 @@ const headers = [
 
 type Props = {
   onEdit: (selectedId: number) => void;
-  data: InvestorListResponse;
+  investors: Investor[];
 };
 
-const InvestorManagementTable = (props: Props) => {
-  const { onEdit, data } = props;
-
-  const isEmpty = useMemo(() => {
-    return data.data.length === 0;
-  }, [data.data]);
+const InvestorManagementTable = ({ onEdit, investors }: Props) => {
+  const isEmpty = investors.length === 0;
 
   return (
     <>
@@ -39,7 +34,7 @@ const InvestorManagementTable = (props: Props) => {
             <TableHeaderCell key={header} content={header} />
           ))}
         </TableRow>
-        {data.data.map((investor, i) => (
+        {investors.map((investor, i) => (
           <TableRow key={investor.id}>
             <TableCell content={i + 1} />
             <TableCell content={investor.investor_name} />
