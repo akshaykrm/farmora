@@ -54,7 +54,11 @@ const GeneralSalesPage = () => {
         isShow={isOpen}
         onClose={onClose}
         refetch={() => {
-          updateQueryParams({ page: 1 });
+          if (filter.page === 1) {
+            refetch({ page: 1 });
+          } else {
+            updateQueryParams({ page: 1 });
+          }
         }}
       />
 

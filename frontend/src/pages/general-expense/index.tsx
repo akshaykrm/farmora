@@ -55,14 +55,18 @@ const GeneralExpensePage = () => {
         isShow={isOpen}
         onClose={onClose}
         refetch={() => {
-          updateQueryParams({ page: 1 });
+          if (filter.page === 1) {
+            refetch({ page: 1 });
+          } else {
+            updateQueryParams({ page: 1 });
+          }
         }}
       />
 
       <EditGeneralExpense
         selectedId={selectedId}
         onClose={() => setSelectedId(null)}
-        refetch={() => {}}
+        refetch={() => refetch()}
       />
     </>
   );

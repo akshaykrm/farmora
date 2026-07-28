@@ -17,7 +17,6 @@ function useQueryParameters() {
       if (isValidInvalidValue) {
         params.delete(k);
       } else {
-        console.log(k, v);
         params.set(k, v.toString());
       }
     }
