@@ -207,9 +207,9 @@ const deleteById = async (id, currentUser) => {
 
 const getSalesLedger = async (filter, currentUser) => {
   const { limit, page, buyer_id, from_date, end_date } = filter
-
   const offset = calculateOffSet(page, limit)
 
+  const whereClause = {}
   if (buyer_id) {
     whereClause.buyer_id = buyer_id
   }
@@ -263,7 +263,7 @@ const getSalesLedger = async (filter, currentUser) => {
 
   let balance = parseFloat(buyer.opening_balance || '0')
 
-  let items = []
+  let transactions = []
 
   for (const s of sales) {
     if (s.payment_type === 'credit') {
@@ -271,7 +271,8 @@ const getSalesLedger = async (filter, currentUser) => {
     } else if (s.payment_type === 'paid') {
       balance = parseFloat(balance) - parseFloat(s.amount)
     }
-    items.unshift({
+
+    transactions.unshift({
       created_date: s.date,
       bird_no: s.bird_no,
       weight: s.weight ? parseFloat(s.weight) : null,
@@ -282,15 +283,38 @@ const getSalesLedger = async (filter, currentUser) => {
     })
   }
 
+  const count = transactions.length
+  const paginatedTransactions = transactions.slice(offset, offset + limit)
+  const totalPages = Math.ceil(count / limit)
+
   return {
-    buyer: {
-      id: buyer.id,
-      name: buyer.name,
+    totalPages,
+    count,
+    summary: {
+      buyer: {
+        id: buyer.id,
+        name: buyer.name,
+      },
+      opening_balance: parseFloat(buyer.opening_balance),
+      closing_balance: balance,
+      totals: calculateTotals(transactions),
     },
-    opening_balance: parseFloat(buyer.opening_balance),
-    transactions: items,
-    closing_balance: balance,
+    data: paginatedTransactions,
   }
+}
+
+function calculateTotals(transactions = []) {
+  const totals = transactions.reduce(
+    (acc, item) => ({
+      birds: acc.birds + (item.bird_no || 0),
+      weight:
+        acc.weight + (item.weight ? parseFloat(item.weight.toString()) : 0),
+      amount: acc.amount + parseFloat(item.amount.toString()),
+    }),
+    { birds: 0, weight: 0, amount: 0 }
+  )
+
+  return totals
 }
 
 const addSalesBookEntry = async (payload, currentUser) => {

@@ -106,6 +106,8 @@ const getSalesLedger = async (req, res) => {
     filter.end_date = req.query.end_date
   }
 
+  const ledgerData = await salesService.getSalesLedger(filter, req.user)
+
   res.success(ledgerData, {
     message: 'Sales ledger fetched successfully',
   })

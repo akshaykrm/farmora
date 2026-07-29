@@ -8,6 +8,7 @@ import useSalesFilter from "./hooks/use-sales-filter";
 import useGetSales from "./hooks/use-get-sales";
 import SaleFilter from "./components/filter";
 
+// TODO: update the api and types to module from globally shared
 const SalesPage = () => {
   const { filter, updateQueryParams } = useSalesFilter();
   const [isOpen, setOpenAdd] = useState(false);

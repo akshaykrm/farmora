@@ -1,8 +1,8 @@
 import { Dialog, DialogContent } from "@components/dialog";
 import useAddForm from "@hooks/use-add-form";
-import salesBook from "@api/sales-book.api";
 import type { NewSalesBookEntryRequest } from "@app-types/sales-book.types";
 import SalesBookForm from "./form";
+import salesBookApi from "../api";
 
 const defaultValues: NewSalesBookEntryRequest = {
   date: "",
@@ -14,9 +14,10 @@ const defaultValues: NewSalesBookEntryRequest = {
 type Props = {
   isShow: boolean;
   onClose: () => void;
+  refetch: () => void;
 };
 
-const AddSalesBookEntry = ({ isShow, onClose }: Props) => {
+const AddSalesBookEntry = ({ isShow, onClose, refetch }: Props) => {
   const handleClose = () => {
     onClose();
     methods.reset();
@@ -24,10 +25,11 @@ const AddSalesBookEntry = ({ isShow, onClose }: Props) => {
 
   const { methods, onSubmit } = useAddForm<NewSalesBookEntryRequest>({
     defaultValues,
-    mutationFn: salesBook.create,
+    mutationFn: salesBookApi.create,
     mutationKey: "sales-book:add",
     onSuccess: () => {
       handleClose();
+      refetch();
     },
   });
 
@@ -38,7 +40,11 @@ const AddSalesBookEntry = ({ isShow, onClose }: Props) => {
       onClose={handleClose}
     >
       <DialogContent>
-        <SalesBookForm methods={methods} onSubmit={onSubmit} onCancel={handleClose} />
+        <SalesBookForm
+          methods={methods}
+          onSubmit={onSubmit}
+          onCancel={handleClose}
+        />
       </DialogContent>
     </Dialog>
   );

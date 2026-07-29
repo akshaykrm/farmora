@@ -6,18 +6,14 @@ import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import FilterWrapper from "@components/filter-wrapper";
 import useGetVendorNames from "@hooks/use-get-vendor-name-list";
+import type { Filter } from "@utils/filters";
 
 type Props = {
-  onFilter: (filter: SalesBookFilterRequest) => void;
+  onFilter: (filter: Filter) => void;
+  defaultValue: Filter;
 };
 
-const defaultValue: SalesBookFilterRequest = {
-  buyer_id: "",
-  from_date: "",
-  end_date: "",
-};
-
-const FilterSalesBook = ({ onFilter }: Props) => {
+const FilterSalesBook = ({ onFilter, defaultValue }: Props) => {
   const methods = useForm<SalesBookFilterRequest>({
     defaultValues: defaultValue,
   });
@@ -40,7 +36,7 @@ const FilterSalesBook = ({ onFilter }: Props) => {
   );
 
   return (
-    <Card>
+    <Card className="mb-5">
       <FilterWrapper>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <SelectList

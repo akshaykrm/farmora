@@ -1,4 +1,4 @@
-export function formatCurrency(amount: number) {
+export function formatCurrency(amount: number | null | undefined) {
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
     currency: "INR",

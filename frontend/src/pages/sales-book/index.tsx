@@ -1,15 +1,21 @@
 import PageTitle from "@components/PageTitle";
 import SalesBookTable from "./components/table";
 import AddSalesBookEntry from "./components/add";
-import { Button } from "@mui/material";
+import { Box, Button, Pagination } from "@mui/material";
 import { useState } from "react";
+import useSalesBookFilter from "./hooks/use-sales-book-filter";
+import FilterSalesBook from "./components/filter";
+import useGetSalesBook from "./hooks/use-get-sales-book";
+import Summary from "./components/summary";
 
 const SalesBookPage = () => {
+  const { filter, updateQueryParams } = useSalesBookFilter();
   const [isOpen, setOpenAdd] = useState(false);
 
   const onOpen = () => setOpenAdd(true);
   const onClose = () => setOpenAdd(false);
 
+  const { saleBook, refetch } = useGetSalesBook(filter);
   return (
     <>
       <div className="flex items-center justify-between mb-6">
@@ -18,8 +24,40 @@ const SalesBookPage = () => {
           Add Sales Book Entry
         </Button>
       </div>
-      <SalesBookTable />
-      <AddSalesBookEntry isShow={isOpen} onClose={onClose} />
+
+      <FilterSalesBook
+        onFilter={(f) => updateQueryParams(f)}
+        defaultValue={filter}
+      />
+
+      <Summary summary={saleBook.summary} />
+
+      <SalesBookTable
+        data={saleBook.records}
+        totals={saleBook?.summary?.totals}
+      />
+
+      <Box className="flex justify-end mt-4">
+        <Pagination
+          count={saleBook.totalPages}
+          size="small"
+          page={filter.page}
+          onChange={(_, p) => updateQueryParams({ page: p })}
+        />
+      </Box>
+
+      <AddSalesBookEntry
+        isShow={isOpen}
+        onClose={onClose}
+
+        refetch={() => {
+          if (filter.page === 1) {
+            refetch({ page: 1 });
+          } else {
+            updateQueryParams({ page: 1 });
+          }
+        }}
+      />
     </>
   );
 };
