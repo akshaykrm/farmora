@@ -7,6 +7,7 @@ import useSalesBookFilter from "./hooks/use-sales-book-filter";
 import FilterSalesBook from "./components/filter";
 import useGetSalesBook from "./hooks/use-get-sales-book";
 import Summary from "./components/summary";
+import PaginationWithLimit from "@components/pagination-with-limit";
 
 const SalesBookPage = () => {
   const { filter, updateQueryParams } = useSalesBookFilter();
@@ -38,18 +39,17 @@ const SalesBookPage = () => {
       />
 
       <Box className="flex justify-end mt-4">
-        <Pagination
-          count={saleBook.totalPages}
-          size="small"
+        <PaginationWithLimit
+          limit={filter.limit}
+          totalPages={saleBook.totalPages}
           page={filter.page}
-          onChange={(_, p) => updateQueryParams({ page: p })}
+          onChange={(p) => updateQueryParams(p)}
         />
       </Box>
 
       <AddSalesBookEntry
         isShow={isOpen}
         onClose={onClose}
-
         refetch={() => {
           if (filter.page === 1) {
             refetch({ page: 1 });
