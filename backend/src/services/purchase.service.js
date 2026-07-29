@@ -89,13 +89,15 @@ const createPurchaseBook = async (payload, currentUser) => {
 }
 
 const getPurchaseBook = async (filter, currentUser) => {
-  const { vendorId, start_date, end_date } = filter
+  const { limit, page, vendor_id, start_date, end_date } = filter
+  const offset = calculateOffSet(page, limit)
+  console.log(vendor_id)
   const whereClause = {
-    vendor_id: vendorId,
+    vendor_id: vendor_id,
   }
 
   const returnWhereClause = {
-    to_vendor: vendorId,
+    to_vendor: vendor_id,
   }
 
   if (start_date && end_date) {
@@ -118,7 +120,7 @@ const getPurchaseBook = async (filter, currentUser) => {
     returnWhereClause.master_id = currentUser.id
   }
 
-  const vendor = await vendorService.getById(vendorId, currentUser)
+  const vendor = await vendorService.getById(vendor_id, currentUser)
 
   const purchases = await PurchaseModel.findAll({
     where: {
@@ -194,6 +196,7 @@ const getPurchaseBook = async (filter, currentUser) => {
   creditList.forEach((c) => {
     temp += parseFloat(c.amount)
   })
+
   const totalCredit = creditList.reduce((acc, curr) => {
     return acc + parseFloat(curr.amount)
   }, 0)
@@ -205,11 +208,23 @@ const getPurchaseBook = async (filter, currentUser) => {
     0
   )
 
+  const reversedPurchaseWithBalance = purchasesWithBalance.reverse()
+
+  const count = reversedPurchaseWithBalance.length
+  const paginatedTransactions = reversedPurchaseWithBalance.slice(
+    offset,
+    offset + limit
+  )
+  const totalPages = Math.ceil(count / limit)
+
   return {
-    items: purchasesWithBalance.reverse(),
-    credit: totalCredit,
-    paid: totalPaid,
-    balance: balance,
+    totalPages,
+    data: paginatedTransactions,
+    summary: {
+      credit: totalCredit,
+      paid: totalPaid,
+      balance: balance,
+    },
   }
 }
 

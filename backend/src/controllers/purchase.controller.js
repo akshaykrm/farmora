@@ -48,7 +48,12 @@ const createPurchaseBookEntry = async (req, res) => {
 
 const getPurchaseBook = async (req, res) => {
   const filter = {
-    vendorId: req.query.vendor_id,
+    page: parseInt(req.query.page) || 1,
+    limit: parseInt(req.query.limit) || 10,
+  }
+
+  if (req.query.vendor_id) {
+    filter.vendor_id = req.query.vendor_id
   }
 
   if (req.query.start_date) {

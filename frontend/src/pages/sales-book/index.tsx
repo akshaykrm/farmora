@@ -1,7 +1,7 @@
 import PageTitle from "@components/PageTitle";
 import SalesBookTable from "./components/table";
 import AddSalesBookEntry from "./components/add";
-import { Box, Button, Pagination } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { useState } from "react";
 import useSalesBookFilter from "./hooks/use-sales-book-filter";
 import FilterSalesBook from "./components/filter";

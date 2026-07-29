@@ -1,16 +1,20 @@
-import purchaseBookApi from "@api/purchase-book.api";
 import { Dialog, DialogContent } from "@components/dialog";
 import SelectList from "@components/select-list";
 import dayjs from "dayjs";
-import { useForm, type DefaultValues } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { DatePicker } from "@mui/x-date-pickers";
 import PageTitle from "@components/PageTitle";
-import { Button } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import PurchaseBookTable from "./components/table";
 import { useState } from "react";
 import useGetVendorNames from "@hooks/use-get-vendor-name-list";
 import { RHFTextField } from "@components/form/input";
-import fetcherV2, { type FetcherReturnType } from "@utils/fetcherV2";
+import fetcherV2 from "@utils/fetcherV2";
+import usePurchaseBookFilter from "./hooks/use-purchase-book-filter";
+import useGetPurchaseBook from "./hooks/use-get-purchase-book";
+import FilterPurchaseBook from "./components/filter";
+import PurchaseBookSummaryCard from "./components/summary";
+import PaginationWithLimit from "@components/pagination-with-limit";
 
 type NewPaymentFormValues = {
   vendor_id: number | null;
@@ -18,15 +22,14 @@ type NewPaymentFormValues = {
   date: string | "";
 };
 
+// TODO: Need to fix the add code
 const PurchaseBookPage = () => {
+  const { filter, updateQueryParams } = usePurchaseBookFilter();
   const sellerList = useGetVendorNames({ type: "supplier" });
+  const { purchaseBook, refetch } = useGetPurchaseBook(filter);
 
   const methods = useForm<NewPaymentFormValues>({
-    defaultValues: {
-      vendor_id: null,
-      amount: null,
-      date: "",
-    },
+    defaultValues: filter,
   });
 
   const {
@@ -42,7 +45,6 @@ const PurchaseBookPage = () => {
 
   const values = watch();
 
-  const [filter, setFilter] = useState(null);
   const [isOpen, setOpenAdd] = useState(false);
 
   const onOpen = () => setOpenAdd(true);
@@ -50,6 +52,7 @@ const PurchaseBookPage = () => {
     clearErrors();
     setOpenAdd(false);
   };
+
   const onSubmit = async (inputData: NewPaymentFormValues) => {
     const res = await fetcherV2(
       "items/purchase-book",
@@ -63,7 +66,11 @@ const PurchaseBookPage = () => {
       reset();
       clearErrors();
       if (filter) {
-        handleFilter(filter);
+        if (filter.page === 1) {
+          refetch({ page: 1 });
+        } else {
+          updateQueryParams({ page: 1 });
+        }
       }
     } else if (res.status === "validation_error") {
       res.error.forEach((err) => {
@@ -71,26 +78,6 @@ const PurchaseBookPage = () => {
         setError(name, { message });
       });
     }
-  };
-
-  const [purchaseBook, setPurchaseBook] = useState({
-    items: [],
-    credit: 0,
-    paid: 0,
-    balance: 0,
-  });
-
-  const handleFilter = async (filter) => {
-    const res = await purchaseBookApi.fetchAll(filter);
-    if (res.status === "success") {
-      if (res.data) {
-        setFilter(filter);
-        setPurchaseBook(res.data);
-        return;
-      }
-    }
-    setFilter(null);
-    setPurchaseBook([]);
   };
 
   return (
@@ -101,10 +88,26 @@ const PurchaseBookPage = () => {
           Add Payment
         </Button>
       </div>
-      <PurchaseBookTable
-        purchaseBook={purchaseBook}
-        handleFilter={handleFilter}
-      />
+      <div className="mb-5">
+        <FilterPurchaseBook
+          defaultValues={filter}
+          onFilter={(p) => updateQueryParams(p)}
+        />
+      </div>
+      <PurchaseBookSummaryCard summary={purchaseBook.summary} />
+
+      <PurchaseBookTable data={purchaseBook.records} />
+
+      <Box className="flex justify-end mt-4">
+        <PaginationWithLimit
+          limit={filter.limit}
+          limits={[2, 5, 8]}
+          totalPages={purchaseBook.totalPages}
+          page={filter.page}
+          onChange={(p) => updateQueryParams(p)}
+        />
+      </Box>
+
       <Dialog isOpen={isOpen} headerTitle="Add New Payment" onClose={onClose}>
         <DialogContent>
           <form {...methods} onSubmit={handleSubmit(onSubmit)}>

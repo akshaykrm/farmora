@@ -6,19 +6,17 @@ import { useForm } from "react-hook-form";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import FilterWrapper from "@components/filter-wrapper";
+import type { Filter } from "@utils/filters";
 
 type Props = {
-  onFilter: (filter: PurchaseBookFilterRequest) => Promise<void>;
+  onFilter: (filter: Filter) => void;
+  defaultValues: Filter;
 };
 
 const FilterPurchaseBook = (props: Props) => {
   const vendorNames = useGetVendorNames({ type: "supplier" });
   const methods = useForm<PurchaseBookFilterRequest>({
-    defaultValues: {
-      vendor_id: null,
-      start_date: "",
-      end_date: "",
-    },
+    defaultValues: props.defaultValues,
   });
 
   const {

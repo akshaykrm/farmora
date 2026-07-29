@@ -25,7 +25,6 @@ export type SalesBookSummary = {
 
 export type SalesBookLedgerResponse = {
   summary: SalesBookSummary;
-
   count: number;
   totalPages: number;
   data: SalesBookTransaction[];
