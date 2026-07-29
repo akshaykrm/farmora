@@ -52,7 +52,7 @@ const useLogin = () => {
     [mutation],
   );
 
-  return { onLogin, methods };
+  return { onLogin, methods, isPending: mutation.isPending };
 };
 
 export default useLogin;

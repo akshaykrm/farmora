@@ -1,110 +1,108 @@
-import useLogin from "@hooks/use-login";
-import { useNavigate } from "react-router";
+import {
+  BarChart3,
+  CheckCircle2,
+  Cloud,
+  PieChart,
+  Shield,
+} from "lucide-react"
+import useLogin from "@hooks/use-login"
+import { useNavigate } from "react-router"
+import BrandLogo from "@components/brand-logo"
+import LoginBackground from "./components/login-background"
+import LoginFarmShowcase from "./components/login-farm-showcase"
+import LoginFormCard from "./components/login-form-card"
+
+const FEATURES = [
+  { icon: BarChart3, label: "Real-time Analytics" },
+  { icon: PieChart, label: "Profit Tracking" },
+  { icon: Shield, label: "Secure & Reliable" },
+  { icon: Cloud, label: "Cloud Access" },
+] as const
 
 const LoginPage = () => {
-  const { onLogin, methods } = useLogin();
-  const navigate = useNavigate();
+  const { onLogin, methods, isPending } = useLogin()
+  const navigate = useNavigate()
+  const year = new Date().getFullYear()
 
   return (
-    <div className="flex h-screen w-full overflow-hidden">
-      {/* Hero Section - Left Side (70-80%) - Hidden on tablet and mobile */}
-      <div className="hidden lg:flex relative flex-1 w-full overflow-hidden bg-gradient-to-br from-green-600 via-green-700 to-green-900">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')]"></div>
-        </div>
+    <div className="relative min-h-screen w-full font-sans text-brand-charcoal">
+      <LoginBackground />
 
-        {/* Logo */}
-        <div className="absolute top-8 left-8 z-10 flex items-center gap-2">
-          <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
-            <span className="text-green-600 font-bold text-xl">F</span>
-          </div>
-          <h1 className="text-2xl font-bold text-white">Farmora</h1>
-        </div>
+      <div className="relative z-10 flex min-h-screen flex-col">
+        <div className="flex flex-1 flex-col lg:flex-row lg:items-center max-w-[1280px] mx-auto w-full px-5 sm:px-8 lg:px-10 py-8 lg:py-10 gap-10 lg:gap-12">
+          {/* Marketing column */}
+          <div className="flex-1 flex flex-col min-w-0 lg:pr-4">
+            <button
+              type="button"
+              onClick={() => navigate("/")}
+              className="w-fit text-left mb-6 lg:mb-8"
+              aria-label="Farmora home"
+            >
+              <BrandLogo variant="onLight" priority className="h-11 md:h-12" />
+              <p className="mt-2 text-sm text-brand-steel">
+                Farm Management Made Simple
+              </p>
+            </button>
 
-        {/* Hero Content */}
-        <div className="relative z-10 h-full flex items-center justify-center px-12">
-          <div className="max-w-2xl text-left">
-            <h2 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
-              Farm Management
-              <br />
-              Made Simple
-            </h2>
-            <p className="text-xl text-green-50 mb-8 max-w-xl">
-              Streamline your farm operations with our comprehensive management
-              system. Track inventory, manage seasons, and grow your business.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Login Form - Right Side (20-30%) */}
-      <div className="w-full lg:max-w-md bg-white flex items-center justify-center px-8 py-12 shadow-2xl">
-        <div className="w-full max-w-sm">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Welcome Back
-            </h1>
-            <p className="text-gray-600">Sign in to your account</p>
-          </div>
-
-          <form onSubmit={methods.handleSubmit(onLogin)}>
-            <div className="flex flex-col gap-6">
-              <div>
-                <label
-                  htmlFor="username"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Username
-                </label>
-                <input
-                  id="username"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-                  placeholder="Enter your username"
-                  {...methods.register("username")}
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Password
-                </label>
-                <input
-                  id="password"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-                  placeholder="Enter your password"
-                  {...methods.register("password")}
-                  type="password"
-                />
-              </div>
-
-              <button
-                className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition-colors cursor-pointer"
-                type="submit"
-              >
-                Sign In
-              </button>
+            <div className="inline-flex w-fit items-center gap-2 rounded-full bg-brand-mint border border-brand-pale/70 px-3 py-1.5 mb-6">
+              <CheckCircle2
+                className="w-4 h-4 text-brand-accent shrink-0"
+                aria-hidden
+              />
+              <span className="text-xs font-medium text-brand-slate">
+                Trusted by 1000+ farm businesses worldwide
+              </span>
             </div>
-          </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
-              Don't have an account?{" "}
-              <button
-                onClick={() => navigate("/#packages")}
-                className="text-green-600 hover:text-green-700 font-medium bg-transparent border-none cursor-pointer"
-              >
-                Sign Up
-              </button>
+            <h2 className="text-3xl sm:text-4xl lg:text-[2.5rem] font-bold leading-tight mb-4 max-w-xl">
+              Modern farm management for{" "}
+              <span className="text-brand-accent">smarter livestock</span>
+            </h2>
+            <p className="text-brand-steel text-base md:text-lg leading-relaxed max-w-xl mb-8">
+              Sign in to manage farms, batches, P&amp;L, and investor reports
+              from one dashboard.
             </p>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-3 max-w-xl mb-2">
+              {FEATURES.map(({ icon: Icon, label }) => (
+                <div key={label} className="flex flex-col items-center text-center sm:items-start sm:text-left">
+                  <div className="w-11 h-11 rounded-full bg-white border border-brand-divider shadow-sm flex items-center justify-center text-brand-accent mb-2">
+                    <Icon className="w-5 h-5" strokeWidth={1.75} />
+                  </div>
+                  <span className="text-xs font-medium text-brand-slate leading-snug">
+                    {label}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div className="hidden md:block">
+              <LoginFarmShowcase />
+            </div>
+          </div>
+
+          {/* Form column */}
+          <div className="flex shrink-0 justify-center lg:justify-end w-full lg:w-auto">
+            <LoginFormCard
+              methods={methods}
+              onLogin={onLogin}
+              isPending={isPending}
+            />
           </div>
         </div>
+
+        <footer className="relative z-10 mt-auto px-5 sm:px-8 lg:px-10 pb-6 pt-4 min-h-[3.5rem]">
+          <p className="text-center text-xs text-brand-steel flex items-center justify-center gap-2">
+            <Shield className="w-4 h-4 text-brand-accent shrink-0" aria-hidden />
+            <span>Your data is protected with enterprise-grade security</span>
+          </p>
+          <p className="mt-3 sm:mt-0 sm:absolute sm:bottom-6 sm:right-8 lg:right-10 text-xs text-brand-muted text-center sm:text-right">
+            &copy; {year} Farmora. All rights reserved.
+          </p>
+        </footer>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default LoginPage;
+export default LoginPage
