@@ -15,7 +15,10 @@ const create = async (req, res) => {
 }
 
 const getAll = async (req, res) => {
-  const filter = {}
+  const filter = {
+    page: parseInt(req.query.page) || 1,
+    limit: parseInt(req.query.limit) || 10,
+  }
 
   if (req.query.page) {
     filter.page = parseInt(req.query.page)
@@ -87,18 +90,21 @@ const deleteById = async (req, res) => {
 
 const getSalesLedger = async (req, res) => {
   const filter = {
-    buyer_id: req.query.buyer_id,
+    page: parseInt(req.query.page) || 1,
+    limit: parseInt(req.query.limit) || 10,
+  }
+
+  if (req.query.buyer_id) {
+    filter.buyer_id = req.query.buyer_id
   }
 
   if (req.query.from_date) {
     filter.from_date = req.query.from_date
   }
+
   if (req.query.end_date) {
     filter.end_date = req.query.end_date
   }
-
-  logger.info({ filter }, 'Sales ledger request received')
-  const ledgerData = await salesService.getSalesLedger(filter, req.user)
 
   res.success(ledgerData, {
     message: 'Sales ledger fetched successfully',

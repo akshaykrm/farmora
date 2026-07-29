@@ -88,12 +88,14 @@ const EditSale = ({ selectedId, onClose, refetch }: Props) => {
     }
   };
 
-  console.log(methods.watch());
-
   return (
     <Dialog isOpen={isShow} headerTitle="Edit Sale" onClose={handleClose}>
       <DialogContent>
-        <SaleForm methods={methods} onSubmit={onSubmit} onCancel={handleClose} />
+        <SaleForm
+          methods={methods}
+          onSubmit={onSubmit}
+          onCancel={handleClose}
+        />
       </DialogContent>
     </Dialog>
   );

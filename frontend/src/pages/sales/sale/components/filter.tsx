@@ -4,9 +4,10 @@ import SelectList from "@components/select-list";
 import { useForm } from "react-hook-form";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
-import serializeFilter, { type GenericFilter } from "@utils/serialie-filter";
+import serializeFilter from "@utils/serialie-filter";
 import useGetSeasonNameList from "@hooks/use-get-season-names";
 import useGetBatchNameList from "@hooks/use-get-batch-names";
+import type { Filter } from "@utils/filters";
 
 type SaleFilterType = {
   season_id: number | "";
@@ -16,19 +17,12 @@ type SaleFilterType = {
   end_date: string;
 };
 
-const defaultValues: SaleFilterType = {
-  batch_id: "",
-  season_id: "",
-  buyer_name: "",
-  start_date: "",
-  end_date: "",
-};
-
 type Props = {
-  handleFetch: (filter?: GenericFilter) => void;
+  handleFetch: (filter: Filter) => void;
+  defaultValues: Filter;
 };
 
-const SaleFilter = ({ handleFetch }: Props) => {
+const SaleFilter = ({ handleFetch, defaultValues }: Props) => {
   const seasonList = useGetSeasonNameList();
   const batchList = useGetBatchNameList({ status: "active" });
 

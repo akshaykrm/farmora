@@ -6,6 +6,7 @@ import VendorModel from '@models/vendor'
 import userRoles from '@utils/user-roles'
 import { Op } from 'sequelize'
 import logger from '@utils/logger'
+import { calculateOffSet } from '@utils/pagination'
 
 export async function getAllSalesWithBatchClosed(where) {
   const retunredItems = await SalesModel.findAll({
@@ -60,10 +61,7 @@ const create = async (payload, currentUser) => {
 const getAll = async (payload, currentUser) => {
   const { page, limit, ...filter } = payload
 
-  logger.debug(
-    { payload, actor_id: currentUser.id },
-    'Fetching sales: raw query payload'
-  )
+  const offset = calculateOffSet(page, limit)
 
   if (currentUser.user_type === userRoles.staff.type) {
     filter.master_id = currentUser.master_id
@@ -82,15 +80,6 @@ const getAll = async (payload, currentUser) => {
       delete filter.end_date
     }
   }
-
-  logger.debug(
-    {
-      filter,
-      page,
-      limit,
-    },
-    'Fetching sales: processed query payload'
-  )
 
   const vendorInclude = {
     model: VendorModel,
@@ -111,6 +100,7 @@ const getAll = async (payload, currentUser) => {
   const { count, rows } = await SalesModel.findAndCountAll({
     where: filter,
     limit,
+    offset: offset,
     order: [['id', 'DESC']],
     attributes: {
       exclude: ['season_id', 'batch_id', 'buyer_id'],
@@ -127,11 +117,11 @@ const getAll = async (payload, currentUser) => {
     'Sales Fetched'
   )
 
+  const totalPages = Math.ceil(count / limit)
   return {
-    page,
-    limit,
-    total: count,
+    count,
     data: rows,
+    totalPages,
   }
 }
 
@@ -216,10 +206,12 @@ const deleteById = async (id, currentUser) => {
 }
 
 const getSalesLedger = async (filter, currentUser) => {
-  const { buyer_id, from_date, end_date } = filter
+  const { limit, page, buyer_id, from_date, end_date } = filter
 
-  const whereClause = {
-    buyer_id: buyer_id,
+  const offset = calculateOffSet(page, limit)
+
+  if (buyer_id) {
+    whereClause.buyer_id = buyer_id
   }
 
   if (from_date) {
