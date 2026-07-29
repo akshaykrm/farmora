@@ -51,8 +51,12 @@ const ManagerRegistrationDialog = ({
         navigate("/login");
       }, 2000);
     },
-    onError: (error: any) => {
-      setError(error?.message || "Registration failed. Please try again.");
+    onError: (error: unknown) => {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Registration failed. Please try again.",
+      );
     },
   });
 
@@ -82,16 +86,16 @@ const ManagerRegistrationDialog = ({
     >
       <DialogContent>
         <div className="mb-4">
-          <p className="text-gray-700 mb-2">
+          <p className="text-brand-slate mb-2">
             Complete the registration to get started with the{" "}
-            <span className="font-semibold text-green-600">{packageName}</span>{" "}
+            <span className="font-semibold text-brand-accent">{packageName}</span>{" "}
             package.
           </p>
         </div>
 
         {success && (
-          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-            <p className="text-green-700 text-sm font-medium">
+          <div className="mb-4 p-3 bg-brand-mint border border-brand-pale/50 rounded-lg">
+            <p className="text-brand-primary text-sm font-medium">
               Registration successful! Redirecting to login...
             </p>
           </div>
@@ -107,7 +111,7 @@ const ManagerRegistrationDialog = ({
           <div>
             <label
               htmlFor="name"
-              className="block text-sm font-medium text-gray-700 mb-2"
+              className="block text-sm font-medium text-brand-slate mb-2"
             >
               Full Name
             </label>
@@ -115,7 +119,7 @@ const ManagerRegistrationDialog = ({
               id="name"
               type="text"
               placeholder="Enter your full name"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-3 border border-brand-pale-gray rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all"
               {...register("name", { required: "Full name is required" })}
             />
             {errors.name && (
@@ -126,7 +130,7 @@ const ManagerRegistrationDialog = ({
           <div>
             <label
               htmlFor="username"
-              className="block text-sm font-medium text-gray-700 mb-2"
+              className="block text-sm font-medium text-brand-slate mb-2"
             >
               Username
             </label>
@@ -134,7 +138,7 @@ const ManagerRegistrationDialog = ({
               id="username"
               type="text"
               placeholder="Choose a username"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-3 border border-brand-pale-gray rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all"
               {...register("username", { required: "Username is required" })}
             />
             {errors.username && (
@@ -147,7 +151,7 @@ const ManagerRegistrationDialog = ({
           <div>
             <label
               htmlFor="password"
-              className="block text-sm font-medium text-gray-700 mb-2"
+              className="block text-sm font-medium text-brand-slate mb-2"
             >
               Password
             </label>
@@ -155,7 +159,7 @@ const ManagerRegistrationDialog = ({
               id="password"
               type="password"
               placeholder="Create a password"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-3 border border-brand-pale-gray rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all"
               {...register("password", { required: "Password is required" })}
             />
             {errors.password && (
@@ -177,7 +181,7 @@ const ManagerRegistrationDialog = ({
             <button
               type="submit"
               disabled={mutation.isPending}
-              className="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium transition-colors"
+              className="flex-1 px-4 py-3 bg-brand-accent text-white rounded-lg hover:bg-brand-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium transition-colors"
             >
               {mutation.isPending ? (
                 <>

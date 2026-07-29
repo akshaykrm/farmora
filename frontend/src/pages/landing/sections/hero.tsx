@@ -1,104 +1,212 @@
-import { ChevronDown } from "lucide-react";
-import { Button } from "@mui/material";
-import { useNavigate } from "react-router";
+import { Play } from "lucide-react"
+import HeroAnimatedBackground from "../components/hero-animated-background"
+import HeroMainDashboard from "../components/hero-main-dashboard"
+import { brandGradients } from "../../../theme/brand"
+import { useEffect, useState } from "react"
+import { Menu, X, ArrowRight } from "lucide-react"
+import { Button } from "@mui/material"
+import { useNavigate } from "react-router"
+import BrandLogo from "@components/brand-logo"
 
 interface HeroSectionProps {
-  onScrollToAbout: () => void;
-  onScrollToPackages: () => void;
-  onScrollToContact: () => void;
+  onScrollToFeatures: () => void
+  onScrollToPreview: () => void
+  onScrollToPackages: () => void
+  onScrollToTestimonials: () => void
+  onScrollToContact: () => void
 }
 
+const TRUST_AVATARS = ["RP", "PS", "AM", "KN", "+"]
+
 const HeroSection = ({
-  onScrollToAbout,
+  onScrollToFeatures,
+  onScrollToPreview,
   onScrollToPackages,
+  onScrollToTestimonials,
   onScrollToContact,
 }: HeroSectionProps) => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
+  const [scrolled, setScrolled] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20)
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  const navLinkClass =
+    "text-brand-slate hover:text-brand-charcoal transition-colors text-sm font-medium"
+
+  const navItems = [
+    { label: "Features", action: onScrollToFeatures },
+    { label: "Pricing", action: onScrollToPackages },
+    { label: "About", action: onScrollToTestimonials },
+    { label: "Contact", action: onScrollToContact },
+  ]
 
   return (
-    <div className="relative h-screen w-full overflow-hidden bg-gradient-to-br from-green-600 via-green-700 to-green-900">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')]"></div>
-      </div>
+    <div className="relative w-full overflow-hidden font-sans bg-white">
+      <HeroAnimatedBackground />
 
-      {/* Navigation */}
-      <nav className="absolute top-0 left-0 right-0 z-20 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
-              <span className="text-green-600 font-bold text-xl">F</span>
-            </div>
-            <h1 className="text-2xl font-bold text-white">Farmora</h1>
-          </div>
-          <div className="flex items-center gap-6">
-            <button
-              onClick={onScrollToAbout}
-              className="hidden md:block text-white hover:text-green-200 transition-colors"
-            >
-              About
-            </button>
-            <button
-              onClick={onScrollToPackages}
-              className="hidden md:block text-white hover:text-green-200 transition-colors"
-            >
-              Packages
-            </button>
-            <button
-              onClick={onScrollToContact}
-              className="hidden md:block text-white hover:text-green-200 transition-colors"
-            >
-              Contact
-            </button>
+      <div
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          scrolled
+            ? "bg-white/95 backdrop-blur-md shadow-sm border-b border-brand-divider"
+            : "bg-white/80 backdrop-blur-sm"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-6 py-2 md:py-3 flex items-center justify-between">
+          <button
+            type="button"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            className="shrink-0"
+            aria-label="Scroll to top"
+          >
+            <BrandLogo variant="onLight" priority />
+          </button>
+
+          <div className="hidden md:flex items-center gap-5 lg:gap-6">
+            {navItems.map((item) => (
+              <button
+                key={item.label}
+                type="button"
+                onClick={item.action}
+                className={navLinkClass}
+              >
+                {item.label}
+              </button>
+            ))}
             <Button
-              variant="contained"
-              onClick={() => navigate("/login")}
+              variant="outlined"
+              color="primary"
               size="small"
+              onClick={() => navigate("/login")}
             >
               Login
             </Button>
+            <Button
+              variant="contained"
+              size="small"
+              onClick={onScrollToPackages}
+              sx={{
+                background: brandGradients.cta,
+                "&:hover": {
+                  background: "linear-gradient(90deg, #2E7D32 0%, #1B5E20 100%)",
+                },
+              }}
+            >
+              Get Started
+            </Button>
           </div>
-        </div>
-      </nav>
 
-      {/* Hero Content */}
-      <div className="relative z-10 h-full flex items-center justify-center px-6">
+          <button
+            type="button"
+            className="md:hidden text-brand-charcoal p-1"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+          >
+            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
+
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-white border-t border-brand-divider px-6 py-4 space-y-3 shadow-lg">
+            {navItems.map((item) => (
+              <button
+                key={item.label}
+                type="button"
+                onClick={() => {
+                  item.action()
+                  setMobileMenuOpen(false)
+                }}
+                className={`block w-full text-left py-2 ${navLinkClass}`}
+              >
+                {item.label}
+              </button>
+            ))}
+            <Button
+              variant="outlined"
+              fullWidth
+              size="small"
+              onClick={() => navigate("/login")}
+            >
+              Login
+            </Button>
+            <Button
+              variant="contained"
+              fullWidth
+              size="small"
+              onClick={() => {
+                onScrollToPackages()
+                setMobileMenuOpen(false)
+              }}
+            >
+              Get Started
+            </Button>
+          </div>
+        )}
+      </div>
+
+      <div className="relative z-10 pt-24 md:pt-28 pb-12 md:pb-16 px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-            Farm Management
-            <br />
-            Made Simple
-          </h2>
-          <p className="text-xl md:text-2xl text-green-50 mb-8 max-w-2xl mx-auto">
-            Streamline your farm operations with our comprehensive management
-            system. Track inventory, manage seasons, and grow your business.
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-brand-charcoal mb-6 leading-tight animate-fade-in-up">
+            Modern farm management for{" "}
+            <span className="text-brand-accent">smarter livestock</span>
+          </h1>
+          <p className="text-lg md:text-xl text-brand-steel mb-8 max-w-2xl mx-auto leading-relaxed animate-fade-in-up animate-delay-1">
+            Manage multiple farms, batches, and seasons—track costs and sales,
+            auto-calculate P&amp;L and cost per kg, and share investor profit
+            from one dashboard.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up animate-delay-2">
             <Button
               variant="contained"
               size="large"
               onClick={onScrollToPackages}
+              endIcon={<ArrowRight size={18} />}
+              sx={{
+                background: brandGradients.cta,
+                "&:hover": {
+                  background: "linear-gradient(90deg, #2E7D32 0%, #1B5E20 100%)",
+                },
+              }}
             >
-              View Packages
+              Start free trial
             </Button>
-            <Button variant="contained" size="large" onClick={onScrollToAbout}>
-              Learn More
+            <Button
+              variant="outlined"
+              color="primary"
+              size="large"
+              onClick={onScrollToPreview}
+              startIcon={<Play size={18} className="fill-brand-accent/20" />}
+            >
+              Watch demo
             </Button>
           </div>
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 animate-fade-in-up animate-delay-3">
+            <div className="flex -space-x-2">
+              {TRUST_AVATARS.map((initials, i) => (
+                <div
+                  key={i}
+                  className="w-9 h-9 rounded-full border-2 border-white bg-brand-mint text-[10px] font-semibold text-brand-primary flex items-center justify-center shadow-sm"
+                >
+                  {initials}
+                </div>
+              ))}
+            </div>
+            <p className="text-sm text-brand-steel">
+              Trusted by livestock operators across India
+            </p>
+          </div>
+        </div>
+
+        <div className="relative z-10 max-w-6xl mx-auto mt-12 md:mt-16 px-0 md:px-4 animate-fade-in-up animate-delay-3">
+          <HeroMainDashboard />
         </div>
       </div>
-
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce">
-        <button
-          onClick={onScrollToAbout}
-          className="text-white hover:text-green-200 transition-colors"
-        >
-          <ChevronDown size={40} />
-        </button>
-      </div>
     </div>
-  );
-};
+  )
+}
 
-export default HeroSection;
+export default HeroSection
