@@ -36,3 +36,9 @@ export type PurchaseBookLedgerResponse = {
   summary: PurchaseBookSummary;
   data: PurchaseBookTransaction[];
 };
+
+export type NewPaymentFormValues = {
+  vendor_id: number | null;
+  amount: number | null;
+  date: string | "";
+};
