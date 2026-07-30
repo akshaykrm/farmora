@@ -4,6 +4,7 @@ import IntegrationBookModel from '@models/integationbook'
 import userRoles from '@utils/user-roles'
 import { Op } from 'sequelize'
 import FarmModel from '@models/farm'
+import { calculateOffSet } from '@utils/pagination'
 
 const create = async (payload, currentUser) => {
   if (currentUser.user_type === userRoles.staff.type) {
@@ -17,30 +18,37 @@ const create = async (payload, currentUser) => {
 }
 
 const getAll = async (filter, currentUser) => {
-  const { farm_id, start_date, end_date } = filter
+  const { c_page, c_limit, p_page, p_limit, farm_id, start_date, end_date } =
+    filter
 
   const whereClause = {}
+  const purchaseFilter = {}
 
   if (farm_id) {
     whereClause.farm_id = farm_id
+    purchaseFilter.farm_id = farm_id
   }
 
-  if (currentUser.user_type === userRoles.manager.type) {
+  if (currentUser.user_type === userRoles.staff.type) {
+    whereClause.master_id = currentUser.master_id
+  } else if (currentUser.user_type === userRoles.manager.type) {
     whereClause.master_id = currentUser.id
   }
 
   if (start_date && end_date) {
-    whereClause.date = {
-      [Op.between]: [start_date, end_date],
+    const obj = {
+      [Op.between]: [dayjs(start_date).toDate(), dayjs(end_date).toDate()],
     }
+    whereClause.date = obj
+    purchaseFilter.date = obj
   } else if (start_date) {
-    whereClause.date = {
-      [Op.gte]: start_date,
-    }
+    const obj = { [Op.gte]: dayjs(start_date).toDate() }
+    whereClause.date = obj
+    purchaseFilter.date = obj
   } else if (end_date) {
-    whereClause.date = {
-      [Op.lte]: end_date,
-    }
+    const opts = { [Op.lte]: dayjs(end_date).toDate() }
+    whereClause.date = opts
+    purchaseFilter.date = opts
   }
 
   const item = await itemService.getIntegrationItem(currentUser)
@@ -48,7 +56,7 @@ const getAll = async (filter, currentUser) => {
     filter.category_id = item.id
   }
 
-  const rawPurchases = await purchaseService.getAll(filter, currentUser)
+  const rawPurchases = await purchaseService.getAll(purchaseFilter, currentUser)
 
   const purchases = rawPurchases.data.map((purchase) => purchase.toJSON())
   const credit = purchases
@@ -94,13 +102,32 @@ const getAll = async (filter, currentUser) => {
     return parsedAmount + acc
   }, 0)
 
+  const c_offset = calculateOffSet(c_page, c_limit)
+  const p_offset = calculateOffSet(p_page, p_limit)
+
+  const c_count = credit.length
+  const paginatedCredit = credit.slice(c_offset, c_offset + c_limit)
+  const c_totalPages = Math.ceil(c_count / c_limit)
+
+  const p_count = paid.length
+  const paginatedPaid = paid.slice(p_offset, p_offset + p_limit)
+  const p_totalPages = Math.ceil(p_count / p_limit)
+
   return {
-    credit,
-    paid,
-    totals: {
-      paid: totalPaid,
+    credit: {
+      totalPages: c_totalPages,
+      count: c_count,
+      data: paginatedCredit,
+    },
+    paid: {
+      totalPages: p_totalPages,
+      count: p_count,
+      data: paginatedPaid,
+    },
+    summary: {
       credit: totalCredit,
-      balance:   totalCredit - totalPaid,
+      paid: totalPaid,
+      balance: totalCredit - totalPaid,
     },
   }
 }

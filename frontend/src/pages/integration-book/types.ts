@@ -18,6 +18,29 @@ export type IntegrationBookFilterRequest = {
   end_date: string;
 };
 
+export type IntegrationBookSlot = {
+  totalPages: number;
+  count: number;
+  data: {
+    id: number;
+    date: string;
+    name: string;
+    net_amount: string;
+  }[];
+};
+
+export type IntegrationBookSummary = {
+  credit: number;
+  paid: number;
+  balance: number;
+};
+
+export type IntegrationBookResponse = {
+  credit: IntegrationBookSlot;
+  paid: IntegrationBookSlot;
+  summary?: IntegrationBookSummary;
+};
+
 export type IntegrationBookListResponse = {
   credit_items: IntegrationBookRecord[];
   credit: {

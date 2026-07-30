@@ -1,21 +1,14 @@
-import type {
-  IntegrationBookFilterRequest,
-  IntegrationBookFormValues,
-  IntegrationBookListResponse,
-} from "./types";
+import type { IntegrationBookFormValues, IntegrationBookResponse } from "./types";
+import type { Filter } from "@utils/filters";
 import fetcherV2 from "@utils/fetcherV2";
 
 const integrationBook = {
-  fetchAll: (filter: IntegrationBookFilterRequest) => {
+  fetchAll: (filter: Filter) => {
     const opts = {
       method: "GET" as const,
       filter: filter,
     };
-    return fetcherV2<IntegrationBookListResponse>(
-      "integration-book",
-      null,
-      opts,
-    );
+    return fetcherV2<IntegrationBookResponse>("integration-book", null, opts);
   },
   fetchById: (id: number) => {
     return fetcherV2<IntegrationBookFormValues>(`integration-book/${id}`);

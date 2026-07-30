@@ -12,7 +12,12 @@ const create = async (req, res) => {
 }
 
 const getAll = async (req, res) => {
-  const filter = {}
+  const filter = {
+    c_page: parseInt(req.query.c_page) || 1,
+    c_limit: parseInt(req.query.c_limit) || 10,
+    p_page: parseInt(req.query.p_page) || 1,
+    p_limit: parseInt(req.query.p_limit) || 10,
+  }
   const user = req.user
 
   if (req.query.farm_id) {

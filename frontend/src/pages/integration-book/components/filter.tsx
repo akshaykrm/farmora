@@ -5,22 +5,22 @@ import { useForm } from "react-hook-form";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import type { IntegrationBookFilterRequest } from "../types";
+import type { Filter } from "@utils/filters";
 
 type Props = {
-  onFilter: (inputData: IntegrationBookFilterRequest) => Promise<void>;
-};
-
-const defaultValues: IntegrationBookFilterRequest = {
-  farm_id: null,
-  start_date: "",
-  end_date: "",
+  onFilter: (f: Filter) => void;
+  defaultValues: Filter;
 };
 
 const FilterIntegrationBook = (props: Props) => {
-  const { onFilter } = props;
+  const { onFilter, defaultValues } = props;
 
   const methods = useForm<IntegrationBookFilterRequest>({
-    defaultValues,
+    defaultValues: {
+      farm_id: (defaultValues.farm_id as number) || null,
+      start_date: (defaultValues.start_date as string) || "",
+      end_date: (defaultValues.end_date as string) || "",
+    },
   });
 
   const farmNames = useGetFarmNames();
