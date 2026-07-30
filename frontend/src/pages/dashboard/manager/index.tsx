@@ -47,7 +47,7 @@ const ManagerDashboard = () => {
       {/* KEY PERFORMANCE INDICATORS */}
       <section className="animate-in fade-in duration-700 shrink-0">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {data.metrics.map((metric, idx) => (
+          {data.metrics?.map((metric, idx) => (
             <MetricCard key={idx} {...metric} />
           ))}
         </div>
