@@ -12,7 +12,13 @@ const create = async (req, res) => {
 }
 
 const getAll = async (req, res) => {
-  const filter = {}
+  const filter = {
+    e_page: parseInt(req.query.e_page) || 1,
+    e_limit: parseInt(req.query.e_limit) || 10,
+    i_page: parseInt(req.query.i_page) || 1,
+    i_limit: parseInt(req.query.i_limit) || 10,
+  }
+
   const user = req.user
 
   if (req.query.season_id) {

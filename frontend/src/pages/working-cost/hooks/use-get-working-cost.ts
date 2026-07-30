@@ -1,42 +1,53 @@
-import { useCallback, useRef, useState } from "react";
-import type {
-  WorkingCostListResponse,
-  WorkingCostFilterRequest,
-} from "../types";
+import { useCallback, useEffect, useState } from "react";
+import type { WorkingCostListResponse, WorkingCostResponse } from "../types";
 import workingCost from "../api";
+import { overrideFilters, type Filter } from "@utils/filters";
 
-const defaultValues: WorkingCostFilterRequest = {
-  season_id: null,
-  start_date: "",
-  end_date: "",
-};
+const useGetWorkingCost = (filter: Filter) => {
+  const [workingCostList, setWorkingCostList] = useState<WorkingCostResponse>({
+    income: {
+      count: 0,
+      totalPage: 0,
+      data: [],
+    },
+    expense: {
+      count: 0,
+      totalPage: 0,
+      data: [],
+    },
+  });
 
-const useGetWorkingCost = () => {
-  const currentFilter = useRef<WorkingCostFilterRequest>(defaultValues);
-  const [workingCostList, setWorkingCostList] =
-    useState<WorkingCostListResponse>({
-      income: [],
-      expense: [],
-    });
+  const { e_page, e_limit, i_page, i_limit, season_id, start_date, end_date } =
+    filter;
 
   const handleFetchAllWorkingCost = useCallback(
-    async (filter?: WorkingCostFilterRequest) => {
-      currentFilter.current = filter ? filter : currentFilter.current;
+    async (override?: Filter) => {
+      if (!season_id) {
+        return;
+      }
+      const opts = overrideFilters(filter, override);
 
-      const res = await workingCost.fetchAll(
-        filter ? filter : currentFilter.current,
-      );
+      const res = await workingCost.fetchAll(opts);
 
       if (res.status === "success") {
         if (res.data) {
-          setWorkingCostList(res.data);
+          const { expense, income, summary } = res.data;
+          setWorkingCostList({
+            expense,
+            income,
+            summary,
+          });
         }
       }
     },
-    [],
+    [e_page, e_limit, i_page, i_limit, season_id, start_date, end_date],
   );
 
-  return { workingCostList, handleFetchAllWorkingCost };
+  useEffect(() => {
+    handleFetchAllWorkingCost();
+  }, [handleFetchAllWorkingCost]);
+
+  return { workingCostList, refetch: handleFetchAllWorkingCost };
 };
 
 export default useGetWorkingCost;

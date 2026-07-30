@@ -1,21 +1,18 @@
+import type { Filter } from "@utils/filters";
 import type {
   WorkingCostFormValues,
-  WorkingCostListResponse,
   NewWorkingCostRequest,
+  WorkingCostResponse,
 } from "./types";
 import fetcherV2 from "@utils/fetcherV2";
 
 const workingCost = {
-  fetchAll: (filter: {
-    season_id: number;
-    start_date?: string;
-    end_date?: string;
-  }) => {
+  fetchAll: (filter: Filter) => {
     const opts = {
       method: "GET" as const,
       filter: filter,
     };
-    return fetcherV2<WorkingCostListResponse>("working-costs", null, opts);
+    return fetcherV2<WorkingCostResponse>("working-costs", null, opts);
   },
 
   fetchById: (id: number) => {

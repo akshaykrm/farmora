@@ -17,6 +17,24 @@ export type WorkingCostFilterRequest = {
   end_date: string;
 };
 
+export type WorkingCostSlot = {
+  totalPages: number;
+  count: number;
+  data: WorkingCostRecord[];
+};
+
+export type WorkingCostSummary = {
+  income: number;
+  expense: number;
+  balance: number;
+};
+
+export type WorkingCostResponse = {
+  income: WorkingCostSlot;
+  expense: WorkingCostSlot;
+  summary?: WorkingCostSummary;
+};
+
 export type WorkingCostListResponse = {
   income: WorkingCostRecord[];
   expense: WorkingCostRecord[];

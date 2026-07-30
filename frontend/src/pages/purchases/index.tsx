@@ -1,5 +1,5 @@
 import PageTitle from "@components/PageTitle";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import AddPurchase from "./components/add";
 import ItemTable from "./components/table";
 import EditItem from "./components/edit";

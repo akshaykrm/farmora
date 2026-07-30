@@ -4,6 +4,7 @@ import itemService from '@services/items.service'
 import userRoles from '@utils/user-roles'
 import dayjs from 'dayjs'
 import { Op } from 'sequelize'
+import { calculateOffSet } from '@utils/pagination'
 
 const create = async (payload, currentUser) => {
   if (currentUser.user_type === userRoles.staff.type) {
@@ -17,21 +18,31 @@ const create = async (payload, currentUser) => {
 }
 
 const getAll = async (filter, currentUser) => {
-  const { season_id, start_date, end_date } = filter
+  const { e_page, i_page, e_limit, i_limit, season_id, start_date, end_date } =
+    filter
+
   const whereClause = {}
+  const purchaseFilter = {}
 
   if (season_id) {
     whereClause.season_id = season_id
+    purchaseFilter.season_id = season_id
   }
 
   if (start_date && end_date) {
-    whereClause.date = {
+    const obj = {
       [Op.between]: [dayjs(start_date).toDate(), dayjs(end_date).toDate()],
     }
+    whereClause.date = obj
+    purchaseFilter.date = obj
   } else if (start_date) {
-    whereClause.date = { [Op.gte]: dayjs(start_date).toDate() }
+    const obj = { [Op.gte]: dayjs(start_date).toDate() }
+    whereClause.date = obj
+    purchaseFilter.date = obj
   } else if (end_date) {
-    whereClause.date = { [Op.lte]: dayjs(end_date).toDate() }
+    const opts = { [Op.lte]: dayjs(end_date).toDate() }
+    whereClause.date = opts
+    purchaseFilter.date = opts
   }
 
   if (currentUser.user_type === userRoles.staff.type) {
@@ -58,7 +69,10 @@ const getAll = async (filter, currentUser) => {
     filter.category_id = item.id
   }
 
-  const rawWorkingCost = await purchaseService.getAll(filter, currentUser)
+  const rawWorkingCost = await purchaseService.getAll(
+    purchaseFilter,
+    currentUser
+  )
 
   const parsedWorkingCost = rawWorkingCost.data.map((item) => {
     return {
@@ -107,12 +121,34 @@ const getAll = async (filter, currentUser) => {
     return parsedAmount + acc
   }, 0)
 
+  const e_offset = calculateOffSet(e_page, e_limit)
+  const i_offset = calculateOffSet(i_page, i_limit)
+
+  const i_count = sortedCombinedIncome.length
+  const paginatedIncome = sortedCombinedIncome.slice(
+    i_offset,
+    i_offset + i_limit
+  )
+  const i_totalPages = Math.ceil(i_count / i_limit)
+
+  const e_count = parsedExpense.length
+  const paginatedExpense = parsedExpense.slice(e_offset, e_offset + e_limit)
+  const e_totalPages = Math.ceil(e_count / e_limit)
+
   return {
-    income: sortedCombinedIncome,
-    expense: parsedExpense,
-    totals: {
+    income: {
+      totalPages: i_totalPages,
+      count: i_count,
+      data: paginatedIncome,
+    },
+    expense: {
+      totalPages: e_totalPages,
+      count: e_count,
+      data: paginatedExpense,
+    },
+    summary: {
       income: totalIncome,
-      expanse: totalExpense,
+      expense: totalExpense,
       balance: totalIncome - totalExpense,
     },
   }

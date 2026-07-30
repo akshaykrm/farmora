@@ -5,18 +5,15 @@ import type { WorkingCostFilterRequest } from "../types";
 import { useForm } from "react-hook-form";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
+import type { Filter } from "@utils/filters";
 
 type Props = {
-  onFilter: (inputData: WorkingCostFilterRequest) => Promise<void>;
+  onFilter: (f: Filter) => void;
+  defaultValues: Filter;
 };
 
-const defaultValues: WorkingCostFilterRequest = {
-  season_id: null,
-  start_date: "",
-  end_date: "",
-};
-
-const FilterWorkingCost = ({ onFilter }: Props) => {
+const FilterWorkingCost = (props: Props) => {
+  const { onFilter, defaultValues } = props;
   const methods = useForm<WorkingCostFilterRequest>({
     defaultValues,
   });
