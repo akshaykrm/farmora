@@ -2,22 +2,17 @@ import { Button } from "@mui/material";
 import SelectList from "@components/select-list";
 import type { BatchOverviewFilterRequest } from "@app-types/batch-overview.types";
 import { useForm } from "react-hook-form";
-import batches from "@api/batches.api";
-import type { BatchName } from "@app-types/batch.types";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import useGetSeasonNameList from "@hooks/use-get-season-names";
 import useGetBatchNameList from "@hooks/use-get-batch-names";
+import type { Filter } from "@utils/filters";
 
 type Props = {
-  onFilter: (v: BatchOverviewFilterRequest) => Promise<void>;
+  onFilter: (v: Filter) => void;
+  defaultValues: Filter;
 };
 
-const defaultValues: BatchOverviewFilterRequest = {
-  season_id: "",
-  batch_id: "",
-};
-
-const FilterBatchOverview = ({ onFilter }: Props) => {
+const FilterBatchOverview = ({ onFilter, defaultValues }: Props) => {
   const methods = useForm<BatchOverviewFilterRequest>({ defaultValues });
 
   const {

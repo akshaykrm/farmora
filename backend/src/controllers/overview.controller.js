@@ -5,9 +5,17 @@ import logger from '@utils/logger'
 const getBatchOverview = async (req, res) => {
   const filter = {
     batch_id: parseInt(req.query.batch_id),
+
+    e_page: parseInt(req.query.e_page) || 1,
+    e_limit: parseInt(req.query.e_limit) || 10,
+
+    f_page: parseInt(req.query.f_page) || 1,
+    f_limit: parseInt(req.query.f_limit) || 10,
+
+    s_page: parseInt(req.query.s_page) || 1,
+    s_limit: parseInt(req.query.s_limit) || 10,
   }
 
-  logger.info({ filter }, 'Batch overview request received')
   const overviewData = await overviewService.getBatchOverview(filter, req.user)
 
   res.success(overviewData, {

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import type { WorkingCostListResponse, WorkingCostResponse } from "../types";
+import type { WorkingCostResponse } from "../types";
 import workingCost from "../api";
 import { overrideFilters, type Filter } from "@utils/filters";
 
@@ -7,12 +7,12 @@ const useGetWorkingCost = (filter: Filter) => {
   const [workingCostList, setWorkingCostList] = useState<WorkingCostResponse>({
     income: {
       count: 0,
-      totalPage: 0,
+      totalPages: 0,
       data: [],
     },
     expense: {
       count: 0,
-      totalPage: 0,
+      totalPages: 0,
       data: [],
     },
   });

@@ -51,7 +51,7 @@ export type BatchOverviewBatch = {
   season: {
     id: number;
     name: string;
-  };
+  } | null;
 };
 
 export type OverviewCalculculation = {
@@ -68,15 +68,13 @@ export type OverviewCalculculation = {
   cfcr: number;
 };
 
-export type BatchOverviewData = {
+export type BatchOverviewResponse = {
   batch: BatchOverviewBatch | null;
   expenses: BatchOverviewExpense[];
   sales: BatchOverviewSale[];
   returns: BatchOverviewReturn[];
   overviewCalculations: OverviewCalculculation;
 };
-
-export type BatchOverviewResponse = BatchOverviewData;
 
 export type ExpenseTotals = {
   readonly quantity: number;

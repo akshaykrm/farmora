@@ -11,17 +11,19 @@ import seasonService from '@services/season.service'
 import { Op } from 'sequelize'
 import VendorModel from '@models/vendor'
 import BatchModel from '@models/batch'
+import { calculateOffSet } from '@utils/pagination'
 
-const isFeedType = (type) => {
+function isFeedType(type) {
   return type === 'BF' || type === 'BS' || type === 'PBS'
 }
 
-const calculateTotalFeeds = (records = []) =>
-  records
+function calculateTotalFeeds(records = []) {
+  return records
     .filter((record) => isFeedType(record.category?.type))
     .reduce((acc, item) => acc + item.quantity, 0)
+}
 
-const getBatchOverview = async (filter, currentUser) => {
+async function getBatchOverview(filter, currentUser) {
   const { batch_id } = filter
 
   const userWhereClause = {}
@@ -31,11 +33,11 @@ const getBatchOverview = async (filter, currentUser) => {
     userWhereClause.master_id = currentUser.id
   }
 
-  const batch = await batchService.getById(batch_id, currentUser, {
+  const selectedBatch = await batchService.getById(batch_id, currentUser, {
     include: [{ model: SeasonModel, as: 'season', required: false }],
   })
 
-  if (!batch) {
+  if (!selectedBatch) {
     return {
       batch: null,
       expenses: [],
@@ -67,14 +69,12 @@ const getBatchOverview = async (filter, currentUser) => {
       to_batch: batch_id,
       ...userWhereClause,
     },
-
     attributes: {
       include: [
         ['rate_per_bag', 'price_per_unit'],
         ['total_amount', 'net_amount'],
       ],
     },
-
     include: [{ model: ItemModel, as: 'category', required: false }],
     order: [['date', 'ASC']],
   })
@@ -145,40 +145,59 @@ const getBatchOverview = async (filter, currentUser) => {
   const FCR = netFeedWeight / totalSaleWeight
 
   const CFCR = FCR - (avgWeight - 2.0) * 0.25
+
+  const expenses = [
+    ...purchases.map((p) => ({
+      ...p.get({ plain: true }),
+      date: p.invoice_date,
+    })),
+    ...reassigned,
+  ]
+
+  const batch = {
+    id: selectedBatch.id,
+    name: selectedBatch.name,
+    status: selectedBatch.status,
+    closed_on: selectedBatch.closed_on,
+    closing_statement: selectedBatch.closing_statement,
+    season: selectedBatch.season
+      ? { id: selectedBatch.season.id, name: selectedBatch.season.name }
+      : null,
+  }
+
+  const summary = {
+    total_purchase_feeds: totalPurchasedFeeds,
+    total_purchase_amount: totalPurchaseAmount,
+    total_returned_feeds: totalReturnedFeeds,
+    total_returned_amount: totalReturnAmount,
+    total_sale_weight: totalSaleWeight,
+    total_consumed_feed: netFeedWeight,
+    total_sale_birds: totalSaleBirds,
+    total_sale_amount: totalSaleAmount,
+    avg_weight: avgWeight,
+    total_expense: totalPurchaseAmount - totalReturnAmount,
+    fcr: FCR,
+    cfcr: CFCR,
+  }
+
+  const { e_page, e_limit } = filter
+  const e_offset = calculateOffSet(e_page, e_limit)
+
+  const e_count = parsedExpense.length
+  const paginatedExpense = parsedExpense.slice(e_offset, e_offset + e_limit)
+  const e_totalPages = Math.ceil(e_count / e_limit)
+
   return {
-    batch: {
-      id: batch.id,
-      name: batch.name,
-      status: batch.status,
-      closed_on: batch.closed_on,
-      closing_statement: batch.closing_statement,
-      season: batch.season
-        ? { id: batch.season.id, name: batch.season.name }
-        : null,
+    expense: {
+      totalPages: e_totalPages,
+      count: e_count,
+      data: paginatedExpense,
     },
-    expenses: [
-      ...purchases.map((p) => ({
-        ...p.get({ plain: true }),
-        date: p.invoice_date,
-      })),
-      ...reassigned,
-    ],
+    batch,
+    expenses,
     sales,
     returns,
-    overviewCalculations: {
-      total_purchase_feeds: totalPurchasedFeeds,
-      total_purchase_amount: totalPurchaseAmount,
-      total_returned_feeds: totalReturnedFeeds,
-      total_returned_amount: totalReturnAmount,
-      total_sale_weight: totalSaleWeight,
-      total_consumed_feed: netFeedWeight,
-      total_sale_birds: totalSaleBirds,
-      total_sale_amount: totalSaleAmount,
-      avg_weight: avgWeight,
-      total_expense: totalPurchaseAmount - totalReturnAmount,
-      fcr: FCR,
-      cfcr: CFCR,
-    },
+    overviewCalculations: summary,
   }
 }
 

@@ -1,20 +1,22 @@
 import batchOverview from "@api/batch-overview.api";
-import type { BatchOverviewBatch } from "@app-types/batch-overview.types";
 import { Dialog, DialogContent } from "@components/dialog";
 import Ternary from "@components/ternary";
 import { Button } from "@mui/material";
 import dayjs from "dayjs";
-import { useCallback, useState } from "react";
+import { useState } from "react";
+import type { BatchOverviewBatch } from "../types";
 
 type Props = {
-  batch: BatchOverviewBatch;
+  batch: BatchOverviewBatch | null;
 };
 
-const BatchInformation = ({ batch }: Props) => {
+function BatchInformation({ batch }: Props) {
   const [showConfirm, setShowConfirm] = useState(false);
   const [closingStatement, setClosingStatement] = useState("");
 
-  const handleConfirmClose = useCallback(async () => {
+  if (!batch) return null;
+
+  const handleConfirmClose = async () => {
     const response = await batchOverview.closeBatch(
       batch.id,
       closingStatement || undefined,
@@ -29,7 +31,7 @@ const BatchInformation = ({ batch }: Props) => {
       });
       document.dispatchEvent(batchClosed);
     }
-  }, [batch.id, closingStatement]);
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-4">
@@ -74,9 +76,9 @@ const BatchInformation = ({ batch }: Props) => {
       >
         <DialogContent>
           <p className="text-sm text-gray-600 leading-relaxed">
-            This action will close the batch. Once closed, you will not be
-            able to add new expenses, sales, or returns. You can still view
-            the batch information. This action cannot be undone.
+            This action will close the batch. Once closed, you will not be able
+            to add new expenses, sales, or returns. You can still view the batch
+            information. This action cannot be undone.
           </p>
           <div className="mt-4">
             <label
@@ -111,6 +113,6 @@ const BatchInformation = ({ batch }: Props) => {
       </Dialog>
     </div>
   );
-};
+}
 
 export default BatchInformation;
