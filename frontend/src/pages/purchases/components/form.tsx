@@ -49,7 +49,6 @@ const PurchaseForm = ({
   const { handleGetItemsByVendorID, itemList } = useGetItemsByVendorId();
 
   const seasonNames = useGetSeasonNameList();
-  //TODO: make this get by season id
   const batchList = useGetBatchNameList({
     status: "active",
     season_id: values.season_id,

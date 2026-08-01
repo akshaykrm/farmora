@@ -12,7 +12,6 @@ import FarmsPage from "@pages/farms";
 import PurchasePage from "@pages/purchases";
 import ItemReturnsPage from "@pages/item-returns";
 import PackagesPage from "@pages/packages";
-import SubscriptionsPage from "@pages/subscriptions";
 import PurchaseBookPage from "@pages/purchase-book";
 import IntegrationBookPage from "@pages/integration-book";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -66,7 +65,6 @@ const pageComponents: Record<string, React.ComponentType> = {
   "/overview/batch": BatchOverviewPage,
   "/cash-flow": BalanceSheetPage,
   "/packages": PackagesPage,
-  "/subscriptions": SubscriptionsPage,
 };
 
 // Flatten nested paths into a single array

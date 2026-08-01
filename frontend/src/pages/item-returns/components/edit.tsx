@@ -5,7 +5,7 @@ import ItemReturnForm from "./form";
 import dayjs from "dayjs";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import type { EditPurchaseRequest } from "@app-types/item.types";
+import type { EditPurchaseRequest } from "@pages/purchases/types";
 
 type Props = {
   selectedId: number | null;
