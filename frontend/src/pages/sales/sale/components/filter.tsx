@@ -104,8 +104,8 @@ const SaleFilter = ({ handleFetch, defaultValues }: Props) => {
           }}
         />
 
-        <Button size="small" variant="contained" onClick={onFilter}>
-          Search
+        <Button variant="contained" onClick={onFilter}>
+          Apply filters
         </Button>
       </div>
     </FilterCard>

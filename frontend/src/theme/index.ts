@@ -83,7 +83,19 @@ export const createAppTheme = (mode: ThemeMode = "light"): Theme => {
             borderRadius: radius.md,
             textTransform: "none",
             fontWeight: typography.weights.medium,
-            padding: "10px 24px",
+            letterSpacing: 0,
+            minHeight: 40,
+          },
+          sizeSmall: {
+            minHeight: 32,
+            padding: "6px 12px",
+          },
+          sizeMedium: {
+            padding: "9px 16px",
+          },
+          sizeLarge: {
+            minHeight: 48,
+            padding: "12px 20px",
           },
           contained: {
             boxShadow: "none",
@@ -98,12 +110,17 @@ export const createAppTheme = (mode: ThemeMode = "light"): Theme => {
               backgroundColor: roles.primaryStrong,
             },
           },
-          outlined: {
+          outlinedPrimary: {
             borderColor: roles.primary,
             color: roles.primary,
             "&:hover": {
               borderColor: roles.primaryStrong,
               backgroundColor: alpha(roles.primary, 0.05),
+            },
+          },
+          textPrimary: {
+            "&:hover": {
+              backgroundColor: alpha(roles.primary, 0.08),
             },
           },
         },

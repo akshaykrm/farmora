@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Dialog, DialogContent } from "@components/dialog";
 import auth from "@api/auth.api";
 import type { ManagerRegistrationPayload } from "@app-types/auth.types";
-import { CircularProgress } from "@mui/material";
+import { Button, CircularProgress } from "@mui/material";
 import { useNavigate } from "react-router";
 
 type Props = {
@@ -170,28 +170,30 @@ const ManagerRegistrationDialog = ({
           </div>
 
           <div className="flex gap-3 pt-4">
-            <button
+            <Button
               type="button"
+              variant="outlined"
               onClick={handleClose}
               disabled={mutation.isPending}
-              className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
+              className="flex-1"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
+              variant="contained"
               disabled={mutation.isPending}
-              className="flex-1 px-4 py-3 bg-brand-accent text-white rounded-lg hover:bg-brand-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium transition-colors"
+              className="flex-1"
             >
               {mutation.isPending ? (
                 <>
-                  <CircularProgress size={16} sx={{ color: "white" }} />
+                  <CircularProgress size={16} color="inherit" />
                   <span>Registering...</span>
                 </>
               ) : (
                 "Register"
               )}
-            </button>
+            </Button>
           </div>
         </form>
       </DialogContent>
