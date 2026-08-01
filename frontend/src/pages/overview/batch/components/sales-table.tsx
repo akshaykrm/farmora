@@ -4,11 +4,7 @@ import TableHeaderCell from "@components/TableHeaderCell";
 import TableRow from "@components/TableRow";
 import { roundNumber } from "@utils/number";
 import dayjs from "dayjs";
-import type {
-  BatchOverviewSale,
-  BatchOverviewSlot,
-  BatchOverviewSummary,
-} from "../types";
+import type { BatchOverviewSale, BatchOverviewSummary } from "../types";
 import { formatCurrency } from "@utils/currency";
 
 const salesHeaders = [
@@ -22,13 +18,12 @@ const salesHeaders = [
 ];
 
 type Props = {
-  sales: BatchOverviewSlot<BatchOverviewSale>;
+  data: BatchOverviewSale[];
   summary: BatchOverviewSummary;
 };
 
 const SalesTable = (props: Props) => {
-  const { sales, summary } = props;
-  const { data } = sales;
+  const { data, summary } = props;
 
   const { total_sale_amount, total_sale_birds, total_sale_weight } = summary;
 

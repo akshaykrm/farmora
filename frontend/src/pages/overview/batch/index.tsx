@@ -9,6 +9,7 @@ import FinancialSummaryTable from "./components/financial-summary-table";
 import PerformanceMetrics from "./components/performance-metrics";
 import ReturnItem from "./components/return-items-table";
 import SalesTable from "./components/sales-table";
+import PaginationWithLimit from "@components/pagination-with-limit";
 
 const BatchOverviewPage = () => {
   const { updateQueryParams, filter } = useBatchOverviewFilter();
@@ -48,20 +49,66 @@ const BatchOverviewPage = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="mb-6">
                 <ExpenseTable
-                  expenses={expenses}
+                  data={expenses.data}
                   summary={overviewCalculations}
+                />
+
+                <PaginationWithLimit
+                  onChange={(f) => {
+                    const opts: Record<string, number> = {};
+                    if (f.page) {
+                      opts.e_page = f.page;
+                    }
+                    if (f.limit) {
+                      opts.e_limit = f.limit;
+                    }
+                    updateQueryParams(opts);
+                  }}
+                  page={filter.e_page}
+                  limit={filter.e_limit}
+                  totalPages={expenses.totalPages}
                 />
 
                 <div className="mt-6">
                   <ReturnItem
-                    returns={returns}
+                    data={returns.data}
                     summary={overviewCalculations}
+                  />
+                  <PaginationWithLimit
+                    onChange={(f) => {
+                      const opts: Record<string, number> = {};
+                      if (f.page) {
+                        opts.r_page = f.page;
+                      }
+                      if (f.limit) {
+                        opts.r_limit = f.limit;
+                      }
+                      updateQueryParams(opts);
+                    }}
+                    page={filter.r_page}
+                    limit={filter.r_limit}
+                    totalPages={returns.totalPages}
                   />
                 </div>
               </div>
 
               <div className="mb-6">
-                <SalesTable sales={sales} summary={overviewCalculations} />
+                <SalesTable data={sales.data} summary={overviewCalculations} />
+                <PaginationWithLimit
+                  onChange={(f) => {
+                    const opts: Record<string, number> = {};
+                    if (f.page) {
+                      opts.s_page = f.page;
+                    }
+                    if (f.limit) {
+                      opts.s_limit = f.limit;
+                    }
+                    updateQueryParams(opts);
+                  }}
+                  page={filter.s_page}
+                  limit={filter.s_limit}
+                  totalPages={sales.totalPages}
+                />
                 <div className="mt-6">
                   <FinancialSummaryTable
                     totalSaleAmount={overviewCalculations.total_sale_amount}

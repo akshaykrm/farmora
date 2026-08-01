@@ -4,24 +4,19 @@ import TableHeaderCell from "@components/TableHeaderCell";
 import TableRow from "@components/TableRow";
 import { roundNumber } from "@utils/number";
 import dayjs from "dayjs";
-import type {
-  BatchOverviewExpense,
-  BatchOverviewSlot,
-  BatchOverviewSummary,
-} from "../types";
+import type { BatchOverviewExpense, BatchOverviewSummary } from "../types";
 import { formatCurrency } from "@utils/currency";
 
 const expenseHeaders = ["Date", "Purpose", "Quantity", "Price", "Amount"];
 
 type Props = {
-  expenses: BatchOverviewSlot<BatchOverviewExpense>;
+  data: BatchOverviewExpense[];
   summary: BatchOverviewSummary;
 };
 
 const ExpenseTable = (props: Props) => {
-  const { expenses, summary } = props;
+  const { data, summary } = props;
 
-  const { data } = expenses;
   const { total_purchase_amount, total_purchase_feeds } = summary;
 
   return (
