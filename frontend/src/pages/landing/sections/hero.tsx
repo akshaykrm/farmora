@@ -1,7 +1,7 @@
 import { Play } from "lucide-react"
 import HeroAnimatedBackground from "../components/hero-animated-background"
 import HeroMainDashboard from "../components/hero-main-dashboard"
-import { brandGradients } from "../../../theme/brand"
+import { gradients as brandGradients } from "../../../theme/tokens"
 import { useEffect, useState } from "react"
 import { Menu, X, ArrowRight } from "lucide-react"
 import { Button } from "@mui/material"

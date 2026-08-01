@@ -1,7 +1,7 @@
 import { Button } from "@mui/material"
 import { ArrowRight } from "lucide-react"
 import { useNavigate } from "react-router"
-import { brandGradients } from "../../../theme/brand"
+import { gradients as brandGradients } from "../../../theme/tokens"
 
 type FinalCTAProps = {
   onScrollToPackages: () => void

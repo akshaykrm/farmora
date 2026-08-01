@@ -12,7 +12,7 @@ import type { UseFormReturn } from "react-hook-form"
 import type { LoginPayload } from "@app-types/auth.types"
 import { useNavigate } from "react-router"
 import toast from "react-hot-toast"
-import { brandGradients } from "../../../theme/brand"
+import { gradients as brandGradients } from "../../../theme/tokens"
 
 type LoginFormCardProps = {
   methods: UseFormReturn<LoginPayload>
