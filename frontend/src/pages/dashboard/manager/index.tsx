@@ -3,17 +3,17 @@ import { useQuery } from "@tanstack/react-query";
 import MetricCard from "./components/MetricCard";
 import SectionHeader from "./components/SectionHeader";
 import { PurchasesListing, SalesListing } from "./components/DataListings";
-import dashboardApi from "@api/dashboard.api";
-import type { ManagerDashboardData } from "@app-types/dashboard.types";
 import { CircularProgress, Box } from "@mui/material";
 import { formatCurrency } from "@utils/currency";
+import dashboard from "./api";
+import type { ManagerDashboardData } from "./types";
 
 const ManagerDashboard = () => {
   const { user } = useAuth();
 
   const { data, isLoading, error } = useQuery<ManagerDashboardData>({
     queryKey: ["manager-dashboard"],
-    queryFn: dashboardApi.fetchManagerDashboard,
+    queryFn: dashboard.fetchManagerDashboard,
   });
 
   if (isLoading) {

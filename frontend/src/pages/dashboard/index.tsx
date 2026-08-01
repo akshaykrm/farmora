@@ -8,15 +8,15 @@ import { RecentActivity } from "./components/RecentActivity";
 import { StockLevels } from "./components/StockLevels";
 import { BatchStatusChart } from "./components/BatchStatusChart";
 import { useAuth } from "@store/authentication/context";
-import dashboardApi from "@api/dashboard.api";
-import type { AdminDashboardData } from "@app-types/dashboard.types";
+import dashboard from "./manager/api";
+import type { AdminDashboardData } from "./manager/types";
 
 export const Dashboard = () => {
   const { user } = useAuth();
 
   const { data, isLoading, error } = useQuery<AdminDashboardData>({
     queryKey: ["admin-dashboard"],
-    queryFn: dashboardApi.fetchAdminDashboard,
+    queryFn: dashboard.fetchAdminDashboard,
   });
 
   if (isLoading) {

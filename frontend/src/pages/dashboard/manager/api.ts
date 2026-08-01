@@ -1,8 +1,5 @@
-import type {
-  ManagerDashboardData,
-  AdminDashboardData,
-} from "@app-types/dashboard.types";
 import fetcher from "@utils/fetcher";
+import type { AdminDashboardData, ManagerDashboardData } from "./types";
 
 const dashboard = {
   fetchManagerDashboard: (): Promise<ManagerDashboardData> => {
