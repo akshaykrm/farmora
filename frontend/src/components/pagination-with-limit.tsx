@@ -1,3 +1,4 @@
+import { DEFAULT_PAGE_LIMIT } from "@config";
 import { Box, MenuItem, Pagination, Select, Typography } from "@mui/material";
 
 type PaginationProps = {
@@ -40,8 +41,12 @@ function LimitSelect({
 
 function PaginationWithLimit(props: PaginationProps) {
   const { onChange, page, totalPages } = props;
+  if (totalPages < 2) {
+    return null;
+  }
   const limits = props.limits ?? [10, 25, 50];
   const limit = props.limit ?? limits[0];
+
   return (
     <Box className="flex items-center justify-end gap-4 mt-4">
       <LimitSelect
