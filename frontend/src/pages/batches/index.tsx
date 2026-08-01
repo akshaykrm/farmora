@@ -3,9 +3,10 @@ import { useState } from "react";
 import AddBatch from "./components/add";
 import BatchTable from "./components/table";
 import EditBatch from "./components/edit";
-import { Box, Button, Pagination } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import useGetBatches from "./hooks/use-get-batch";
 import useBatchFilter from "./hooks/use-batch-filter";
+import PaginationWithLimit from "@components/pagination-with-limit";
 
 const BatchPage = () => {
   const [isOpen, setOpenAdd] = useState(false);
@@ -29,14 +30,11 @@ const BatchPage = () => {
         <BatchTable onEdit={(id) => setSelectedId(id)} batches={batches.records} />
       </div>
       <Box className="flex justify-end mt-6">
-        <Pagination
-          count={batches.totalPages}
-          size="small"
-          defaultPage={1}
-          onChange={(_, page) => {
-            updateQueryParams({ page });
-          }}
+        <PaginationWithLimit
+          limit={filter.limit}
+          totalPages={batches.totalPages}
           page={filter.page}
+          onChange={(p) => updateQueryParams(p)}
         />
       </Box>
       <AddBatch

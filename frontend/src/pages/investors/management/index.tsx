@@ -3,10 +3,11 @@ import { useState } from "react";
 import AddInvestor from "./components/AddInvestor";
 import InvestorManagementTable from "./components/InvestorManagementTable";
 import EditInvestor from "./components/EditInvestor";
-import { Box, Button, Pagination } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import useGetInvestors from "./hooks/use-get-investors";
 import useInvestorFilter from "./hooks/use-investor-filter";
 import InvestorManagementFilter from "./components/InvestorManagementFilter";
+import PaginationWithLimit from "@components/pagination-with-limit";
 
 const InvestorManagementPage = () => {
   const { filter, updateQueryParams } = useInvestorFilter();
@@ -36,14 +37,11 @@ const InvestorManagementPage = () => {
         />
       </div>
       <Box className="flex justify-end mt-6">
-        <Pagination
-          count={investors.totalPages}
-          size="small"
-          defaultPage={1}
-          onChange={(_, page) => {
-            updateQueryParams({ page });
-          }}
+        <PaginationWithLimit
+          limit={filter.limit}
+          totalPages={investors.totalPages}
           page={filter.page}
+          onChange={(p) => updateQueryParams(p)}
         />
       </Box>
       <AddInvestor

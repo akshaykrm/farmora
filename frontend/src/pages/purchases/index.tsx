@@ -3,10 +3,11 @@ import { useState } from "react";
 import AddPurchase from "./components/add";
 import ItemTable from "./components/table";
 import EditItem from "./components/edit";
-import { Box, Button, Pagination } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import useGetPurchases from "./hooks/use-get-purchases";
 import FilterItems from "./components/filter";
 import usePurchaseFilter from "./hooks/use-purchase-filter";
+import PaginationWithLimit from "@components/pagination-with-limit";
 
 function PurchasePage() {
   const [isOpen, setOpenAdd] = useState(false);
@@ -39,16 +40,11 @@ function PurchasePage() {
         />
       </div>
       <Box className="flex justify-end mt-6">
-        <Pagination
-          count={purchases.totalPages}
-          size="small"
-          defaultPage={1}
-          onChange={(_, page) => {
-            updateQueryParams({
-              page,
-            });
-          }}
+        <PaginationWithLimit
+          limit={filter.limit}
+          totalPages={purchases.totalPages}
           page={filter.page}
+          onChange={(p) => updateQueryParams(p)}
         />
       </Box>
       <AddPurchase

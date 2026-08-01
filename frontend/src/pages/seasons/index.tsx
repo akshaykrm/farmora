@@ -3,9 +3,10 @@ import { useState } from "react";
 import AddSeason from "./components/add";
 import EditSeason from "./components/edit";
 import SeasonTable from "./components/table";
-import { Box, Button, Pagination } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import useGetSeasons from "./hooks/use-get-seasons";
 import useSeasonFilter from "./hooks/use-season-filter";
+import PaginationWithLimit from "@components/pagination-with-limit";
 
 const SeasonsPage = () => {
   const [isOpen, setOpenAdd] = useState(false);
@@ -29,14 +30,11 @@ const SeasonsPage = () => {
         <SeasonTable onEdit={(id) => setSelectedId(id)} seasons={seasonsList.records} />
       </div>
       <Box className="flex justify-end mt-6">
-        <Pagination
-          count={seasonsList.totalPages}
-          size="small"
-          defaultPage={1}
-          onChange={(_, page) => {
-            updateQueryParams({ page });
-          }}
+        <PaginationWithLimit
+          limit={filter.limit}
+          totalPages={seasonsList.totalPages}
           page={filter.page}
+          onChange={(p) => updateQueryParams(p)}
         />
       </Box>
       <AddSeason

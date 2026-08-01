@@ -3,9 +3,10 @@ import { useState } from "react";
 import AddFarm from "./components/add-farm";
 import EditFarm from "./components/edit-farm";
 import FarmTable from "./components/table";
-import { Box, Button, Pagination } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import useGetFarms from "./hooks/use-get-farms";
 import useFarmFilter from "./hooks/use-farm-filter";
+import PaginationWithLimit from "@components/pagination-with-limit";
 
 const FarmsPage = () => {
   const [isOpen, setOpenAdd] = useState(false);
@@ -29,16 +30,11 @@ const FarmsPage = () => {
         <FarmTable onEdit={(id) => setSelectedId(id)} farms={farms.records} />
       </div>
       <Box className="flex justify-end mt-6">
-        <Pagination
-          count={farms.totalPages}
-          size="small"
-          defaultPage={1}
-          onChange={(_, page) => {
-            updateQueryParams({
-              page,
-            });
-          }}
+        <PaginationWithLimit
+          limit={filter.limit}
+          totalPages={farms.totalPages}
           page={filter.page}
+          onChange={(p) => updateQueryParams(p)}
         />
       </Box>
       <AddFarm

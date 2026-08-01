@@ -2,12 +2,13 @@ import PageTitle from "@components/PageTitle";
 import GeneralSalesTable from "./components/table";
 import AddGeneralSales from "./components/add";
 import EditGeneralSales from "./components/edit";
-import { Box, Button, Pagination } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { useState } from "react";
 import FilterGeneralSales from "./components/filter";
 import useGeneralSalesFilter from "./hooks/use-general-sales-filter";
 import useGetGeneralSales from "./hooks/use-general-sales";
 import { formatCurrency } from "@utils/currency";
+import PaginationWithLimit from "@components/pagination-with-limit";
 
 const GeneralSalesPage = () => {
   const { filter, updateQueryParams } = useGeneralSalesFilter();
@@ -42,11 +43,11 @@ const GeneralSalesPage = () => {
       />
 
       <Box className="flex justify-end mt-4">
-        <Pagination
-          count={generalSales.totalPages}
-          size="small"
+        <PaginationWithLimit
+          limit={filter.limit}
+          totalPages={generalSales.totalPages}
           page={filter.page}
-          onChange={(_, p) => updateQueryParams({ page: p })}
+          onChange={(p) => updateQueryParams(p)}
         />
       </Box>
 

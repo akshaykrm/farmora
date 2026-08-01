@@ -2,12 +2,13 @@ import PageTitle from "@components/PageTitle";
 import GeneralExpenseTable from "./components/table";
 import AddGeneralExpense from "./components/add";
 import EditGeneralExpense from "./components/edit";
-import { Box, Button, Pagination } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { useState } from "react";
 import FilterGeneralExpense from "./components/filter";
 import useGeneralExpenseFilter from "./hooks/use-general-expense-filter";
 import useGetGeneralExpense from "./hooks/use-get-general-expense";
 import { formatCurrency } from "@utils/currency";
+import PaginationWithLimit from "@components/pagination-with-limit";
 
 const GeneralExpensePage = () => {
   const { filter, updateQueryParams } = useGeneralExpenseFilter();
@@ -43,11 +44,11 @@ const GeneralExpensePage = () => {
       />
 
       <Box className="flex justify-end mt-4">
-        <Pagination
-          count={generalExpenses.totalPages}
-          size="small"
+        <PaginationWithLimit
+          limit={filter.limit}
+          totalPages={generalExpenses.totalPages}
           page={filter.page}
-          onChange={(_, p) => updateQueryParams({ page: p })}
+          onChange={(p) => updateQueryParams(p)}
         />
       </Box>
 

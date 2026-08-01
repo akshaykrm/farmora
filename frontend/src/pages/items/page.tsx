@@ -3,9 +3,10 @@ import { useState } from "react";
 import AddItem from "./components/add";
 import ItemTable from "./components/table";
 import EditItem from "./components/edit";
-import { Box, Button, Pagination } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import useGetItems from "./hooks/use-get-items";
 import useItemFilter from "./hooks/use-item-filter";
+import PaginationWithLimit from "@components/pagination-with-limit";
 
 const ItemsPage = () => {
   const [isOpen, setOpenAdd] = useState(false);
@@ -30,16 +31,11 @@ const ItemsPage = () => {
         <ItemTable onEdit={(id) => setSelectedId(id)} data={items.records} />
       </div>
       <Box className="flex justify-end mt-6">
-        <Pagination
-          count={items.totalPages}
-          size="small"
-          defaultPage={1}
-          onChange={(_, page) => {
-            updateQueryParams({
-              page,
-            });
-          }}
+        <PaginationWithLimit
+          limit={filter.limit}
+          totalPages={items.totalPages}
           page={filter.page}
+          onChange={(p) => updateQueryParams(p)}
         />
       </Box>
       <AddItem

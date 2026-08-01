@@ -3,9 +3,10 @@ import { useState } from "react";
 import AddVendor from "./components/add";
 import VendorTable from "./components/table";
 import EditVendor from "./components/edit";
-import { Box, Button, Pagination } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import useGetVendors from "./hooks/use-get-vendors";
 import useVendorFilter from "./hooks/use-vendor-filter";
+import PaginationWithLimit from "@components/pagination-with-limit";
 
 const VendorPage = () => {
   const { filter, updateQueryParams } = useVendorFilter();
@@ -28,14 +29,11 @@ const VendorPage = () => {
         <VendorTable onEdit={(id) => setSelectedId(id)} vendors={vendorsList.records} />
       </div>
       <Box className="flex justify-end mt-6">
-        <Pagination
-          count={vendorsList.totalPages}
-          size="small"
-          defaultPage={1}
-          onChange={(_, page) => {
-            updateQueryParams({ page });
-          }}
+        <PaginationWithLimit
+          limit={filter.limit}
+          totalPages={vendorsList.totalPages}
           page={filter.page}
+          onChange={(p) => updateQueryParams(p)}
         />
       </Box>
       <AddVendor

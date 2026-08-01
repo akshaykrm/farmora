@@ -3,10 +3,11 @@ import { useState } from "react";
 import AddItemReturn from "./components/add";
 import ItemReturnTable from "./components/table";
 import EditItemReturn from "./components/edit";
-import { Box, Button, Pagination } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import useItemReturnFilter from "./hooks/use-purchase-return-filter";
 import useGetItemReturns from "./hooks/use-item-returs";
 import FilterItemReturns from "./components/filter";
+import PaginationWithLimit from "@components/pagination-with-limit";
 
 // TODO: Implement similar pagination to rest of the tables
 // Pagination is now simple and easy to implement use the queryParms hooks to get the data use refetch to get data or over ride data
@@ -41,16 +42,11 @@ const ItemReturnPage = () => {
         />
       </div>
       <Box className="flex justify-end mt-6">
-        <Pagination
-          count={itemReturns.totalPages}
-          size="small"
-          defaultPage={1}
-          onChange={(_, page) => {
-            updateQueryParams({
-              page,
-            });
-          }}
+        <PaginationWithLimit
+          limit={filter.limit}
+          totalPages={itemReturns.totalPages}
           page={filter.page}
+          onChange={(p) => updateQueryParams(p)}
         />
       </Box>
       <AddItemReturn

@@ -1,7 +1,8 @@
 import PageTitle from '@components/PageTitle'
 import { useState } from 'react'
-import { Box, Button, Pagination } from '@mui/material'
+import { Box, Button } from '@mui/material'
 import { Dialog, DialogContent } from '@components/dialog'
+import PaginationWithLimit from '@components/pagination-with-limit'
 import ProfitTable from './ProfitTable'
 import ProfitForm from './ProfitForm'
 import ProfitFilters from './ProfitFilters'
@@ -91,14 +92,11 @@ const ProfitPage = () => {
         />
       </div>
       <Box className="flex justify-end mt-6">
-        <Pagination
-          count={transactions.totalPages}
-          size="small"
-          defaultPage={1}
-          onChange={(_, page) => {
-            updateQueryParams({ page });
-          }}
+        <PaginationWithLimit
+          limit={filter.limit}
+          totalPages={transactions.totalPages}
           page={filter.page}
+          onChange={(p) => updateQueryParams(p)}
         />
       </Box>
       <Dialog

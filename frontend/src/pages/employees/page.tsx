@@ -3,9 +3,10 @@ import PageTitle from "@components/PageTitle";
 import AddNewEmployee from "./components/add-new-employee";
 import EditEmployee from "./components/edit-employee";
 import EmployeesTable from "./components/table";
-import { Box, Button, Pagination } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import useGetEmployees from "./hooks/use-get-employees";
 import useEmployeeFilter from "./hooks/use-employee-filter";
+import PaginationWithLimit from "@components/pagination-with-limit";
 
 const EmployeesPage = () => {
   const [isDialogOpen, setOpenAdd] = useState(false);
@@ -26,14 +27,11 @@ const EmployeesPage = () => {
         <EmployeesTable onEdit={setSelectedId} employees={employees.records} />
       </div>
       <Box className="flex justify-end mt-6">
-        <Pagination
-          count={employees.totalPages}
-          size="small"
-          defaultPage={1}
-          onChange={(_, page) => {
-            updateQueryParams({ page });
-          }}
+        <PaginationWithLimit
+          limit={filter.limit}
+          totalPages={employees.totalPages}
           page={filter.page}
+          onChange={(p) => updateQueryParams(p)}
         />
       </Box>
       <AddNewEmployee
