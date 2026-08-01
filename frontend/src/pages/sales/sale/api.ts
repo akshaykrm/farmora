@@ -1,12 +1,12 @@
 import type { ListResponse } from "@app-types/response.types";
+import fetcherV2 from "@utils/fetcherV2";
+import type { Filter } from "@utils/filters";
 import type {
+  Sale,
   NewSaleRequest,
   EditSalePayload,
   EditSaleRequest,
-  Sale,
-} from "@app-types/sales.types";
-import fetcherV2 from "@utils/fetcherV2";
-import type { Filter } from "@utils/filters";
+} from "./types";
 
 const salesApi = {
   fetchAll: async (filter: Filter) => {

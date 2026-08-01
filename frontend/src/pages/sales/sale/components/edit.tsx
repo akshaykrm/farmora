@@ -1,11 +1,9 @@
 import { Dialog, DialogContent } from "@components/dialog";
-import useEditForm from "@hooks/use-edit-form";
-import useGetById from "@hooks/use-get-by-id";
-import sales from "@api/sales.api";
-import type { EditSaleRequest } from "@app-types/sales.types";
 import SaleForm from "./form";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import salesApi from "../api";
+import type { EditSaleRequest } from "../types";
 
 type Props = {
   selectedId: number | null;
@@ -35,31 +33,15 @@ const EditSale = ({ selectedId, onClose, refetch }: Props) => {
     methods.reset();
   };
 
-  // const query = useGetById<EditSaleRequest>(selectedId, {
-  //   defaultValues,
-  //   queryKey: "sale:get-by-id",
-  //   queryFn: sales.fetchById,
-  // });
-
   const methods = useForm<EditSaleRequest>({
     defaultValues,
   });
-
-  // const { onSubmit } = useEditForm<EditSaleRequest>({
-  //   defaultValues: query.data as EditSaleRequest,
-  //   mutationKey: "sales:edit",
-  //   mutationFn: sales.updateById,
-  //   onSuccess: () => {
-  //     handleClose();
-  //     refetch();
-  //   },
-  // });
 
   const { setError, reset } = methods;
 
   useEffect(() => {
     const handleGetById = async (selectedId: number) => {
-      const res = await sales.fetchById(selectedId);
+      const res = await salesApi.fetchById(selectedId);
       const { data, error, status } = res;
       if (status === "success") {
         reset(data);
@@ -76,7 +58,7 @@ const EditSale = ({ selectedId, onClose, refetch }: Props) => {
   }, [selectedId]);
 
   const onSubmit = async (inputData: EditSaleRequest) => {
-    const res = await sales.updateById(inputData.id, inputData);
+    const res = await salesApi.updateById(inputData.id, inputData);
     if (res.status === "success") {
       handleClose();
       refetch();

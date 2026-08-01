@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { overrideFilters, type Filter } from "@utils/filters";
 import salesApi from "../api";
-import type { Sale } from "@app-types/sales.types";
+import type { Sale } from "../types";
 
 function useGetSales(filter: Filter) {
   const [sales, setSales] = useState<{

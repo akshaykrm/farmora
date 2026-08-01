@@ -6,7 +6,7 @@ import { EditIcon } from "lucide-react";
 import EmptyContentMessage from "@components/EmptyContentMessage";
 import Ternary from "@components/ternary";
 import dayjs from "dayjs";
-import type { Sale } from "@app-types/sales.types";
+import type { Sale } from "../types";
 
 const headers = [
   "ID",
