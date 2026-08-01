@@ -1,4 +1,3 @@
-import Card from "@mui/material/Card";
 import Typography from "@mui/material/Typography";
 import { formatCurrency } from "@utils/currency";
 import type { SalesBookSummary } from "../types";
@@ -11,8 +10,7 @@ function Summary({ summary }: Props) {
   }
 
   return (
-    <Card className="mb-5">
-      <div className="p-5 flex justify-between gap-4 flex-wrap">
+    <div className="mb-5 flex flex-wrap justify-between gap-4 border-b border-brand-border pb-5">
         <div>
           <Typography className="text-sm text-brand-ink-muted">Buyer</Typography>
           <Typography variant="h6" className="font-semibold text-brand-ink">
@@ -35,8 +33,7 @@ function Summary({ summary }: Props) {
             {formatCurrency(summary.closing_balance)}
           </Typography>
         </div>
-      </div>
-    </Card>
+    </div>
   );
 }
 

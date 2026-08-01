@@ -1,4 +1,3 @@
-import Card from "@mui/material/Card";
 import type { ReactNode } from "react";
 
 type TrendTone = "positive" | "negative" | "neutral";
@@ -27,7 +26,7 @@ const StatCard = ({
   valueClassName = "",
 }: Props) => {
   return (
-    <Card className="p-6 h-full">
+    <div className="h-full border-l-2 border-brand-primary px-4 py-1">
       <div className="flex items-start justify-between gap-3">
         <div className="flex flex-col gap-2 min-w-0">
           <h3 className="text-sm font-medium capitalize text-brand-ink-soft">
@@ -50,7 +49,7 @@ const StatCard = ({
           </div>
         )}
       </div>
-    </Card>
+    </div>
   );
 };
 

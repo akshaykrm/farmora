@@ -36,7 +36,7 @@ function BatchInformation({ batch, refetch }: Props) {
   };
 
   return (
-    <div className="bg-brand-card rounded-lg shadow-sm border border-brand-border p-6 mb-4">
+    <section className="mb-6 border-b border-brand-border pb-5">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <p className="text-sm text-brand-ink-soft">Batch</p>
@@ -113,7 +113,7 @@ function BatchInformation({ batch, refetch }: Props) {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </section>
   );
 }
 

@@ -9,24 +9,24 @@ type InvestorProfitSummaryProps = {
 const InvestorProfitSummary = (props: InvestorProfitSummaryProps) => {
   const { totalProfit, totalGeneralCost, totalGeneralSale } = props;
   return (
-    <div className="bg-brand-card rounded-lg shadow-sm border border-brand-border p-6">
+    <section className="border-t border-brand-border pt-5">
       <h2 className="text-xl font-semibold mb-4">Investor Profit Summary</h2>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-brand-info-soft p-4 rounded-lg">
+        <div className="border-l-2 border-brand-info px-4 py-1">
           <p className="text-sm text-brand-ink-soft">Total Batch Profit</p>
           <SummaryItem value={totalProfit} />
         </div>
-        <div className="bg-brand-danger-soft p-4 rounded-lg">
+        <div className="border-l-2 border-brand-danger px-4 py-1">
           <p className="text-sm text-brand-ink-soft">Total General Cost</p>
           <SummaryItem value={totalGeneralCost} />
         </div>
 
-        <div className="bg-brand-success-soft p-4 rounded-lg">
+        <div className="border-l-2 border-brand-success px-4 py-1">
           <p className="text-sm text-brand-ink-soft">Total General Sales</p>
           <SummaryItem value={totalGeneralSale} />
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

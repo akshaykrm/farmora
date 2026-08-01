@@ -77,9 +77,10 @@ const GeneralExpensePage = () => {
 
 function TotalAmount({ totalAmount }: { totalAmount: number }) {
   return (
-    <div className="bg-brand-card border border-brand-border rounded-lg shadow-sm p-6 mb-6">
-      <h5 className="text-md font-semibold text-brand-ink">
-        Total Amount: {formatCurrency(totalAmount)}
+    <div className="mb-6 flex items-baseline gap-2 border-b border-brand-border pb-5">
+      <span className="text-sm text-brand-ink-soft">Total amount</span>
+      <h5 className="text-xl font-semibold text-brand-ink">
+        {formatCurrency(totalAmount)}
       </h5>
     </div>
   );

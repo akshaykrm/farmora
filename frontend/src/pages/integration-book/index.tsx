@@ -2,7 +2,7 @@ import PageHeader from "@components/PageHeader";
 import IntegrationBookTable from "./components/table";
 import AddIntegrationBook from "./components/add";
 import FilterIntegrationBook from "./components/filter";
-import { Button, Card } from "@mui/material";
+import { Button } from "@mui/material";
 import { useState } from "react";
 import useGetIntegrationBook from "./hooks/use-get-integration-book";
 import useIntegrationBookFilter from "./hooks/use-integration-book-filter";
@@ -51,7 +51,7 @@ const IntegrationBookPage = () => {
           <>
             <IntegrationBookTotals summary={summary} />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-              <Card className="overflow-hidden">
+              <section className="min-w-0">
                 <IntegrationBookTable data={paid.data} title="Paid" />
                 <PaginationWithLimit
                   page={filter.p_page}
@@ -68,8 +68,8 @@ const IntegrationBookPage = () => {
                     updateQueryParams(opts);
                   }}
                 />
-              </Card>
-              <Card className="overflow-hidden">
+              </section>
+              <section className="min-w-0">
                 <IntegrationBookTable data={credit.data} title="Credit" />
                 <PaginationWithLimit
                   page={filter.c_page}
@@ -86,7 +86,7 @@ const IntegrationBookPage = () => {
                     updateQueryParams(opts);
                   }}
                 />
-              </Card>
+              </section>
             </div>
           </>
         }

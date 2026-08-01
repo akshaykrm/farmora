@@ -2,7 +2,7 @@ import PageHeader from "@components/PageHeader";
 import WorkingCostTable from "./components/table";
 import AddWorkingCost from "./components/add";
 import FilterWorkingCost from "./components/filter";
-import { Button, Card } from "@mui/material";
+import { Button } from "@mui/material";
 import { useState } from "react";
 import useGetWorkingCost from "./hooks/use-get-working-cost";
 import useWorkingCostFilter from "./hooks/use-working-cost-filter";
@@ -50,7 +50,7 @@ const WorkingCostPage = () => {
           <>
             <WorkingCostTotals summary={summary} />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-              <Card className="overflow-hidden">
+              <section className="min-w-0">
                 <WorkingCostTable data={expense.data} title="Expense" />
                 <PaginationWithLimit
                   page={filter.e_page}
@@ -67,8 +67,8 @@ const WorkingCostPage = () => {
                     updateQueryParams(opts);
                   }}
                 />
-              </Card>
-              <Card className="overflow-hidden">
+              </section>
+              <section className="min-w-0">
                 <WorkingCostTable data={income.data} title="Income" />
                 <PaginationWithLimit
                   page={filter.i_page}
@@ -85,7 +85,7 @@ const WorkingCostPage = () => {
                     updateQueryParams(opts);
                   }}
                 />
-              </Card>
+              </section>
             </div>
           </>
         }

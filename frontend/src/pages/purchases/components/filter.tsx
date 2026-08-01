@@ -1,4 +1,4 @@
-import { Button, Card } from "@mui/material";
+import { Button } from "@mui/material";
 import useGetVendorNames from "@hooks/use-get-vendor-name-list";
 import useGetItemCategoryNames from "@hooks/item-category/use-get-item-category-names";
 import useGetBatchNameList from "@hooks/use-get-batch-names";
@@ -38,8 +38,7 @@ const FilterItems = (props: Props) => {
   });
 
   return (
-    <Card>
-      <FilterWrapper>
+    <FilterWrapper>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
           <SelectList
             options={vendorNames.data}
@@ -119,8 +118,7 @@ const FilterItems = (props: Props) => {
             Apply Filters
           </Button>
         </div>
-      </FilterWrapper>
-    </Card>
+    </FilterWrapper>
   );
 };
 export default FilterItems;

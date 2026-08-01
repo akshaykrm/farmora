@@ -1,4 +1,3 @@
-import Card from "@mui/material/Card";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -9,14 +8,14 @@ type Props = {
 
 const FilterCard = ({ title, children, className = "" }: Props) => {
   return (
-    <Card className={`p-6 mb-6 ${className}`}>
+    <section className={`mb-6 border-b border-brand-border pb-5 ${className}`}>
       {title && (
-        <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-brand-ink">
+        <h3 className="mb-4 text-sm font-semibold text-brand-ink">
           {title}
         </h3>
       )}
       {children}
-    </Card>
+    </section>
   );
 };
 

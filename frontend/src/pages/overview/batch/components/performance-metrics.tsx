@@ -17,7 +17,7 @@ const PerformanceMetrics = (props: Props) => {
   return (
     <>
       <h3 className="text-lg font-semibold mb-3">Performance Metrics</h3>
-      <div className="bg-brand-card rounded-lg shadow-sm border border-brand-border p-4">
+      <section className="border-t border-brand-border pt-4">
         <div className="grid grid-cols-1 gap-3">
           <div className="flex justify-between items-center border-b pb-2">
             <span className="text-brand-ink-soft">Average Weight (kg/bird):</span>
@@ -58,7 +58,7 @@ const PerformanceMetrics = (props: Props) => {
             </span>
           </div>
         </div>
-      </div>
+      </section>
     </>
   );
 };

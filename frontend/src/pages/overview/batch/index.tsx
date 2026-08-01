@@ -142,7 +142,7 @@ const BatchOverviewPage = () => {
 
 function Empty() {
   return (
-    <div className="bg-brand-card rounded-lg shadow-sm border border-brand-border p-12 text-center">
+    <div className="border-y border-brand-border py-12 text-center">
       <p className="text-brand-ink-muted text-lg">
         Please select a season and batch, then click "Apply Filters" to view
         overview

@@ -1,4 +1,4 @@
-import { Button, Card } from "@mui/material";
+import { Button } from "@mui/material";
 import useGetVendorNames from "@hooks/use-get-vendor-name-list";
 import SelectList from "@components/select-list";
 import type { PurchaseBookFilterRequest } from "@app-types/purchase-book.types";
@@ -27,8 +27,7 @@ const FilterPurchaseBook = (props: Props) => {
   const values = watch();
 
   return (
-    <Card>
-      <FilterWrapper>
+    <FilterWrapper>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <SelectList
             options={vendorNames.data}
@@ -86,8 +85,7 @@ const FilterPurchaseBook = (props: Props) => {
             Apply Filters
           </Button>
         </div>
-      </FilterWrapper>
-    </Card>
+    </FilterWrapper>
   );
 };
 export default FilterPurchaseBook;

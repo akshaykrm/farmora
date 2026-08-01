@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import useGetSeasonNames from "@hooks/use-get-season-names";
 import { useEffect } from "react";
 import type { Filter } from "@utils/filters";
+import FilterCard from "@components/FilterCard";
 
 type Props = {
   onFilter: (v: Filter) => void;
@@ -41,7 +42,7 @@ const FilterSeasonOverview = ({ onFilter, defaultValues }: Props) => {
   }, []);
 
   return (
-    <div className="flex items-center justify-between w-full bg-brand-card rounded-lg shadow-sm border border-brand-border p-6 mb-6">
+    <FilterCard className="flex items-center justify-between gap-4">
       <div className="w-[50%]">
         <SelectList
           options={seasonNames.data}
@@ -60,7 +61,7 @@ const FilterSeasonOverview = ({ onFilter, defaultValues }: Props) => {
           Apply Filters
         </Button>
       </div>
-    </div>
+    </FilterCard>
   );
 };
 

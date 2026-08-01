@@ -7,7 +7,6 @@ import { useMemo, type Ref } from "react";
 import DataNotFound from "@components/data-not-found";
 import Ternary from "@components/ternary";
 import dayjs from "dayjs";
-import Card from "@mui/material/Card";
 import type { Purchase, PurchaseFilter } from "../types";
 
 const headers = [
@@ -33,8 +32,7 @@ const ItemTable = ({ onEdit, data }: Props) => {
 
   return (
     <>
-      <Card>
-        <Table>
+      <Table>
           <TableRow>
             {headers.map((header) => (
               <TableHeaderCell key={header} content={header} />
@@ -70,18 +68,17 @@ const ItemTable = ({ onEdit, data }: Props) => {
               </TableRow>
             );
           })}
-        </Table>
+      </Table>
 
-        <Ternary
-          when={isEmpty}
-          then={
-            <DataNotFound
-              title="No purchases found"
-              description="Try adjusting your filters or create a new purchase"
-            />
-          }
-        />
-      </Card>
+      <Ternary
+        when={isEmpty}
+        then={
+          <DataNotFound
+            title="No purchases found"
+            description="Try adjusting your filters or create a new purchase"
+          />
+        }
+      />
     </>
   );
 };

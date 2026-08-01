@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import useGetSeasonNameList from "@hooks/use-get-season-names";
 import useGetBatchNameList from "@hooks/use-get-batch-names";
 import type { Filter } from "@utils/filters";
+import FilterCard from "@components/FilterCard";
 
 type Props = {
   onFilter: (v: Filter) => void;
@@ -43,7 +44,7 @@ const FilterBatchOverview = ({ onFilter, defaultValues }: Props) => {
   );
 
   return (
-    <div className="w-full bg-brand-card rounded-lg shadow-sm border border-brand-border p-6 mb-6">
+    <FilterCard>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <SelectList
           options={seasonsList.data}
@@ -83,7 +84,7 @@ const FilterBatchOverview = ({ onFilter, defaultValues }: Props) => {
           Apply Filters
         </Button>
       </div>
-    </div>
+    </FilterCard>
   );
 };
 
