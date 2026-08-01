@@ -1,6 +1,6 @@
-import generalSales from "@api/general-sales.api";
-import type { GeneralSalesFormValues } from "@app-types/general-sales.types";
 import { useEffect, useState } from "react";
+import generalSalesApi from "../api";
+import type { GeneralSalesFormValues } from "../types";
 
 function useGetGeneralSalesById(selectedId: number | null) {
   const [dataLoaded, setdataLoaded] = useState(false);
@@ -14,7 +14,7 @@ function useGetGeneralSalesById(selectedId: number | null) {
 
   useEffect(() => {
     const handleGetGeneralSalesById = async (id: number) => {
-      const res = await generalSales.fetchById(id);
+      const res = await generalSalesApi.fetchById(id);
       if (res.status === "success") {
         if (res.data) {
           const { amount, purpose, season_id, narration, date } = res.data;

@@ -1,10 +1,10 @@
-import type { NewSalesBookEntryRequest } from "@app-types/sales-book.types";
 import SelectList from "@components/select-list";
 import { TextField, Button } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
 import dayjs from "dayjs";
 import useGetVendorNames from "@hooks/use-get-vendor-name-list";
+import type { NewSalesBookEntryRequest } from "../types";
 
 type AddMethod = UseFormReturn<NewSalesBookEntryRequest, any, FieldValues>;
 

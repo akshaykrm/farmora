@@ -1,8 +1,8 @@
 import { Dialog, DialogContent } from "@components/dialog";
 import useAddForm from "@hooks/use-add-form";
-import type { NewSalesBookEntryRequest } from "@app-types/sales-book.types";
 import SalesBookForm from "./form";
 import salesBookApi from "../api";
+import type { NewSalesBookEntryRequest } from "../types";
 
 const defaultValues: NewSalesBookEntryRequest = {
   date: "",

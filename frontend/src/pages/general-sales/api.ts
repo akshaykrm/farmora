@@ -1,13 +1,13 @@
-import type {
-  GeneralSalesListResponse,
-  GeneralSalesRecord,
-  GeneralSalesFormValues,
-} from "@app-types/general-sales.types";
 import fetcher from "@utils/fetcher";
 import fetcherV2 from "@utils/fetcherV2";
 import type { Filter } from "@utils/filters";
+import type {
+  GeneralSalesFormValues,
+  GeneralSalesListResponse,
+  GeneralSalesRecord,
+} from "./types";
 
-const generalSales = {
+const generalSalesApi = {
   fetchAll: (filter: Filter) => {
     const opts = {
       method: "GET" as const,
@@ -30,4 +30,4 @@ const generalSales = {
     await fetcher(`general-sales/${id}`, null, { method: "DELETE" }),
 };
 
-export default generalSales;
+export default generalSalesApi;

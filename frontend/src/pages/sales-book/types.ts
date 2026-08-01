@@ -36,3 +36,9 @@ export type NewSalesBookEntryRequest = {
   amount: string;
   narration?: string;
 };
+
+export type SalesBookFilterRequest = {
+  buyer_id: number | "";
+  from_date: string;
+  end_date: string;
+};

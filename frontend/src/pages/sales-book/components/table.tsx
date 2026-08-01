@@ -1,4 +1,3 @@
-import type { SalesBookTransaction } from "@app-types/sales-book.types";
 import Table from "@components/Table";
 import TableCell from "@components/TableCell";
 import TableHeaderCell from "@components/TableHeaderCell";
@@ -7,7 +6,7 @@ import EmptyContentMessage from "@components/EmptyContentMessage";
 import dayjs from "dayjs";
 import { formatCurrency } from "@utils/currency";
 import Totals from "./totals";
-import type { SalesBookTotals } from "../types";
+import type { SalesBookTotals, SalesBookTransaction } from "../types";
 
 const headers = [
   "Date",

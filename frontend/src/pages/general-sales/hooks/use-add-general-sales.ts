@@ -1,7 +1,7 @@
-import generalSales from "@api/general-sales.api";
-import type { GeneralSalesFormValues } from "@app-types/general-sales.types";
 import { useState } from "react";
 import type { ValidationError } from "@errors/api.error";
+import generalSalesApi from "../api";
+import type { GeneralSalesFormValues } from "../types";
 
 function useAddGeneralSales(onSuccess: () => void) {
   const [errors, setErrors] = useState<ValidationError[]>([]);
@@ -11,7 +11,7 @@ function useAddGeneralSales(onSuccess: () => void) {
   };
 
   const onSubmit = async (inputData: GeneralSalesFormValues) => {
-    const res = await generalSales.create(inputData);
+    const res = await generalSalesApi.create(inputData);
     if (res.status === "success") {
       onSuccess();
       clearError();

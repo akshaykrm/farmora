@@ -5,7 +5,6 @@ import type {
   Sale,
 } from "@app-types/sales.types";
 import type { PaginatedResponse } from "@hooks/use-get-paginated-data";
-import fetcher from "@utils/fetcher";
 import fetcherV2, { type FetcherReturnType } from "@utils/fetcherV2";
 
 const sales = {

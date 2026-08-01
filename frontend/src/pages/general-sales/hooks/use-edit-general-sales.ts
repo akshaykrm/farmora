@@ -1,7 +1,7 @@
-import generalSales from "@api/general-sales.api";
-import type { GeneralSalesFormValues } from "@app-types/general-sales.types";
 import { useCallback, useState } from "react";
 import type { ValidationError } from "@errors/api.error";
+import generalSalesApi from "../api";
+import type { GeneralSalesFormValues } from "../types";
 
 function useEditGeneralSale(selectedId: number | null, onSuccess: () => void) {
   const [errors, setErrors] = useState<ValidationError[]>([]);
@@ -13,7 +13,7 @@ function useEditGeneralSale(selectedId: number | null, onSuccess: () => void) {
   const onSubmit = useCallback(
     async (inputData: GeneralSalesFormValues) => {
       if (!selectedId) return;
-      const res = await generalSales.updateById(selectedId, inputData);
+      const res = await generalSalesApi.updateById(selectedId, inputData);
       if (res.status === "success") {
         onSuccess();
         clearError();

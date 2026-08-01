@@ -1,4 +1,3 @@
-import type { GeneralSalesFormValues } from "@app-types/general-sales.types";
 import SelectList from "@components/select-list";
 import useGetSeasonNames from "@hooks/use-get-season-names";
 import { TextField, Button } from "@mui/material";
@@ -7,6 +6,7 @@ import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import type { ValidationError } from "@errors/api.error";
 import { useEffect } from "react";
+import type { GeneralSalesFormValues } from "../types";
 
 type Props = {
   defaultValues: DefaultValues<GeneralSalesFormValues>;

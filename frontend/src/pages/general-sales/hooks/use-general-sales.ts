@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
-import generalSale from "@api/general-sales.api";
-import type { GeneralSalesRecord } from "@app-types/general-sales.types";
 import { overrideFilters, type Filter } from "@utils/filters";
+import generalSalesApi from "../api";
+import type { GeneralSalesRecord } from "../types";
 
 function useGetGeneralSales(filter: Filter) {
   const [generalSales, setGeneralSales] = useState<{
@@ -15,7 +15,7 @@ function useGetGeneralSales(filter: Filter) {
   const handlefetchAllGeneralSales = useCallback(
     async (override?: Filter) => {
       const opts = overrideFilters(filter, override);
-      const res = await generalSale.fetchAll(opts);
+      const res = await generalSalesApi.fetchAll(opts);
 
       if (res.status === "success") {
         if (res.data) {

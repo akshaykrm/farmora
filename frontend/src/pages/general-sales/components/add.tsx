@@ -1,7 +1,7 @@
 import { Dialog, DialogContent } from "@components/dialog";
-import type { GeneralSalesFormValues } from "@app-types/general-sales.types";
 import GeneralSalesForm from "./form";
 import useAddGeneralSales from "../hooks/use-add-general-sales";
+import type { GeneralSalesFormValues } from "../types";
 
 const defaultValues: GeneralSalesFormValues = {
   season_id: null,
