@@ -183,8 +183,8 @@ async function getBatchOverview(filter, currentUser) {
   const { e_page, e_limit } = filter
   const e_offset = calculateOffSet(e_page, e_limit)
 
-  const e_count = parsedExpense.length
-  const paginatedExpense = parsedExpense.slice(e_offset, e_offset + e_limit)
+  const e_count = expenses.length
+  const paginatedExpense = expenses.slice(e_offset, e_offset + e_limit)
   const e_totalPages = Math.ceil(e_count / e_limit)
 
   return {
