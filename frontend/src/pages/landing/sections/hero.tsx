@@ -36,7 +36,7 @@ const HeroSection = ({
   }, [])
 
   const navLinkClass =
-    "text-brand-slate hover:text-brand-charcoal transition-colors text-sm font-medium"
+    "text-brand-ink-soft hover:text-brand-ink transition-colors text-sm font-medium"
 
   const navItems = [
     { label: "Features", action: onScrollToFeatures },
@@ -46,14 +46,14 @@ const HeroSection = ({
   ]
 
   return (
-    <div className="relative w-full overflow-hidden font-sans bg-white">
+    <div className="relative w-full overflow-hidden font-sans bg-brand-card">
       <HeroAnimatedBackground />
 
       <div
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled
-            ? "bg-white/95 backdrop-blur-md shadow-sm border-b border-brand-divider"
-            : "bg-white/80 backdrop-blur-sm"
+            ? "bg-brand-card/95 backdrop-blur-md shadow-sm border-b border-brand-border"
+            : "bg-brand-card/80 backdrop-blur-sm"
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 py-2 md:py-3 flex items-center justify-between">
@@ -102,7 +102,7 @@ const HeroSection = ({
 
           <button
             type="button"
-            className="md:hidden text-brand-charcoal p-1"
+            className="md:hidden text-brand-ink p-1"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
           >
@@ -111,7 +111,7 @@ const HeroSection = ({
         </div>
 
         {mobileMenuOpen && (
-          <div className="md:hidden bg-white border-t border-brand-divider px-6 py-4 space-y-3 shadow-lg">
+          <div className="md:hidden bg-brand-card border-t border-brand-border px-6 py-4 space-y-3 shadow-lg">
             {navItems.map((item) => (
               <button
                 key={item.label}
@@ -150,11 +150,11 @@ const HeroSection = ({
 
       <div className="relative z-10 pt-24 md:pt-28 pb-12 md:pb-16 px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-brand-charcoal mb-6 leading-tight animate-fade-in-up">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-brand-ink mb-6 leading-tight animate-fade-in-up">
             Modern farm management for{" "}
             <span className="text-brand-accent">smarter livestock</span>
           </h1>
-          <p className="text-lg md:text-xl text-brand-steel mb-8 max-w-2xl mx-auto leading-relaxed animate-fade-in-up animate-delay-1">
+          <p className="text-lg md:text-xl text-brand-ink-soft mb-8 max-w-2xl mx-auto leading-relaxed animate-fade-in-up animate-delay-1">
             Manage multiple farms, batches, and seasons—track costs and sales,
             auto-calculate P&amp;L and cost per kg, and share investor profit
             from one dashboard.
@@ -189,13 +189,13 @@ const HeroSection = ({
               {TRUST_AVATARS.map((initials, i) => (
                 <div
                   key={i}
-                  className="w-9 h-9 rounded-full border-2 border-white bg-brand-mint text-[10px] font-semibold text-brand-primary flex items-center justify-center shadow-sm"
+                  className="w-9 h-9 rounded-full border-2 border-white bg-brand-canvas text-[10px] font-semibold text-brand-primary flex items-center justify-center shadow-sm"
                 >
                   {initials}
                 </div>
               ))}
             </div>
-            <p className="text-sm text-brand-steel">
+            <p className="text-sm text-brand-ink-soft">
               Trusted by livestock operators across India
             </p>
           </div>

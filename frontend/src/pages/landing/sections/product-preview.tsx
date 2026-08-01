@@ -19,7 +19,7 @@ const ProductPreviewSection = () => {
   return (
     <section
       id="preview"
-      className="landing-section px-6 bg-white font-sans overflow-hidden"
+      className="landing-section px-6 bg-brand-card font-sans overflow-hidden"
     >
       <div className="max-w-7xl mx-auto">
         <RevealDiv>
@@ -38,10 +38,10 @@ const ProductPreviewSection = () => {
                   key={item.title}
                   className="snap-center shrink-0 w-[min(85vw,320px)] md:w-[340px]"
                 >
-                  <p className="text-sm font-semibold text-brand-charcoal mb-3 text-center md:text-left">
+                  <p className="text-sm font-semibold text-brand-ink mb-3 text-center md:text-left">
                     {item.title}
                   </p>
-                  <div className="rounded-2xl border border-brand-divider bg-brand-mint/50 p-2 shadow-lg shadow-brand-charcoal/5">
+                  <div className="rounded-2xl border border-brand-border bg-brand-canvas/50 p-2 shadow-lg shadow-brand-5">
                     <Preview />
                   </div>
                 </div>

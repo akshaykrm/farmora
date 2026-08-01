@@ -4,7 +4,7 @@ import RevealDiv from "../components/reveal"
 
 const HowItWorksSection = () => {
   return (
-    <section className="landing-section px-6 bg-white font-sans">
+    <section className="landing-section px-6 bg-brand-card font-sans">
       <div className="max-w-7xl mx-auto">
         <RevealDiv>
           <SectionHeader
@@ -18,7 +18,7 @@ const HowItWorksSection = () => {
             <RevealDiv key={item.step} delay={index * 0.08} className="relative">
               {index < HOW_IT_WORKS_STEPS.length - 1 && (
                 <div
-                  className="hidden lg:block absolute top-8 left-[calc(50%+2rem)] w-[calc(100%-2rem)] h-0.5 bg-brand-mint"
+                  className="hidden lg:block absolute top-8 left-[calc(50%+2rem)] w-[calc(100%-2rem)] h-0.5 bg-brand-canvas"
                   aria-hidden
                 />
               )}
@@ -26,10 +26,10 @@ const HowItWorksSection = () => {
                 <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-accent text-white text-xl font-bold mb-4 shadow-md shadow-brand-accent/25">
                   {item.step}
                 </div>
-                <h3 className="text-lg font-semibold text-brand-charcoal mb-2">
+                <h3 className="text-lg font-semibold text-brand-ink mb-2">
                   {item.title}
                 </h3>
-                <p className="text-sm text-brand-steel leading-relaxed">
+                <p className="text-sm text-brand-ink-soft leading-relaxed">
                   {item.description}
                 </p>
               </div>

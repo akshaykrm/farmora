@@ -25,51 +25,54 @@ const LoginPage = () => {
   const year = new Date().getFullYear()
 
   return (
-    <div className="relative min-h-screen w-full font-sans text-brand-charcoal">
+    <div className="relative min-h-screen w-full bg-brand-canvas font-sans text-brand-ink">
       <LoginBackground />
 
       <div className="relative z-10 flex min-h-screen flex-col">
-        <div className="flex flex-1 flex-col lg:flex-row lg:items-center max-w-[1280px] mx-auto w-full px-5 sm:px-8 lg:px-10 py-8 lg:py-10 gap-10 lg:gap-12">
+        <div className="mx-auto flex w-full max-w-[1280px] flex-1 flex-col gap-10 px-5 py-8 sm:px-8 lg:flex-row lg:items-center lg:gap-12 lg:px-10 lg:py-10">
           {/* Marketing column */}
-          <div className="flex-1 flex flex-col min-w-0 lg:pr-4">
+          <div className="flex min-w-0 flex-1 flex-col lg:pr-4">
             <button
               type="button"
               onClick={() => navigate("/")}
-              className="w-fit text-left mb-6 lg:mb-8"
+              className="mb-6 w-fit text-left lg:mb-8"
               aria-label="Farmora home"
             >
               <BrandLogo variant="onLight" priority className="h-11 md:h-12" />
-              <p className="mt-2 text-sm text-brand-steel">
+              <p className="mt-2 text-sm text-brand-ink-soft">
                 Farm Management Made Simple
               </p>
             </button>
 
-            <div className="inline-flex w-fit items-center gap-2 rounded-full bg-brand-mint border border-brand-pale/70 px-3 py-1.5 mb-6">
+            <div className="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-brand-border bg-brand-card-soft px-3 py-1.5">
               <CheckCircle2
-                className="w-4 h-4 text-brand-accent shrink-0"
+                className="h-4 w-4 shrink-0 text-brand-accent"
                 aria-hidden
               />
-              <span className="text-xs font-medium text-brand-slate">
+              <span className="text-xs font-medium text-brand-ink-soft">
                 Trusted by 1000+ farm businesses worldwide
               </span>
             </div>
 
-            <h2 className="text-3xl sm:text-4xl lg:text-[2.5rem] font-bold leading-tight mb-4 max-w-xl">
+            <h2 className="mb-4 max-w-xl text-3xl leading-tight font-bold sm:text-4xl lg:text-[2.5rem]">
               Modern farm management for{" "}
               <span className="text-brand-accent">smarter livestock</span>
             </h2>
-            <p className="text-brand-steel text-base md:text-lg leading-relaxed max-w-xl mb-8">
+            <p className="mb-8 max-w-xl text-base leading-relaxed text-brand-ink-soft md:text-lg">
               Sign in to manage farms, batches, P&amp;L, and investor reports
               from one dashboard.
             </p>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-3 max-w-xl mb-2">
+            <div className="mb-2 grid max-w-xl grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-3">
               {FEATURES.map(({ icon: Icon, label }) => (
-                <div key={label} className="flex flex-col items-center text-center sm:items-start sm:text-left">
-                  <div className="w-11 h-11 rounded-full bg-white border border-brand-divider shadow-sm flex items-center justify-center text-brand-accent mb-2">
-                    <Icon className="w-5 h-5" strokeWidth={1.75} />
+                <div
+                  key={label}
+                  className="flex flex-col items-center text-center sm:items-start sm:text-left"
+                >
+                  <div className="mb-2 flex h-11 w-11 items-center justify-center rounded-full border border-brand-border bg-brand-card text-brand-accent shadow-sm">
+                    <Icon className="h-5 w-5" strokeWidth={1.75} />
                   </div>
-                  <span className="text-xs font-medium text-brand-slate leading-snug">
+                  <span className="text-xs leading-snug font-medium text-brand-ink-soft">
                     {label}
                   </span>
                 </div>
@@ -82,7 +85,7 @@ const LoginPage = () => {
           </div>
 
           {/* Form column */}
-          <div className="flex shrink-0 justify-center lg:justify-end w-full lg:w-auto">
+          <div className="flex w-full shrink-0 justify-center lg:w-auto lg:justify-end">
             <LoginFormCard
               methods={methods}
               onLogin={onLogin}
@@ -91,12 +94,12 @@ const LoginPage = () => {
           </div>
         </div>
 
-        <footer className="relative z-10 mt-auto px-5 sm:px-8 lg:px-10 pb-6 pt-4 min-h-[3.5rem]">
-          <p className="text-center text-xs text-brand-steel flex items-center justify-center gap-2">
-            <Shield className="w-4 h-4 text-brand-accent shrink-0" aria-hidden />
+        <footer className="relative z-10 mt-auto min-h-[3.5rem] px-5 pt-4 pb-6 sm:px-8 lg:px-10">
+          <p className="flex items-center justify-center gap-2 text-center text-xs text-brand-ink-soft">
+            <Shield className="h-4 w-4 shrink-0 text-brand-accent" aria-hidden />
             <span>Your data is protected with enterprise-grade security</span>
           </p>
-          <p className="mt-3 sm:mt-0 sm:absolute sm:bottom-6 sm:right-8 lg:right-10 text-xs text-brand-muted text-center sm:text-right">
+          <p className="mt-3 text-center text-xs text-brand-ink-muted sm:absolute sm:right-8 sm:bottom-6 sm:mt-0 sm:text-right lg:right-10">
             &copy; {year} Farmora. All rights reserved.
           </p>
         </footer>

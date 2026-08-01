@@ -51,7 +51,7 @@ const ContactSection = () => {
   }
 
   return (
-    <section className="landing-section px-6 bg-white font-sans">
+    <section className="landing-section px-6 bg-brand-card font-sans">
       <div className="max-w-7xl mx-auto">
         <RevealDiv>
           <SectionHeader
@@ -127,7 +127,7 @@ const ContactSection = () => {
 
           <RevealDiv className="reveal-right space-y-8">
             <div>
-              <h3 className="text-2xl font-bold text-brand-charcoal mb-6">
+              <h3 className="text-2xl font-bold text-brand-ink mb-6">
                 Contact Information
               </h3>
               <div className="space-y-6">
@@ -154,15 +154,15 @@ const ContactSection = () => {
                   const Icon = item.icon
                   return (
                     <div key={i} className="flex items-start gap-4">
-                      <div className="w-12 h-12 bg-brand-mint rounded-xl flex items-center justify-center flex-shrink-0">
+                      <div className="w-12 h-12 bg-brand-canvas rounded-xl flex items-center justify-center flex-shrink-0">
                         <Icon className="w-5 h-5 text-brand-accent" />
                       </div>
                       <div>
-                        <h4 className="font-semibold text-brand-charcoal mb-1">
+                        <h4 className="font-semibold text-brand-ink mb-1">
                           {item.label}
                         </h4>
                         {item.values.map((v, j) => (
-                          <p key={j} className="text-brand-steel">
+                          <p key={j} className="text-brand-ink-soft">
                             {v}
                           </p>
                         ))}
@@ -173,11 +173,11 @@ const ContactSection = () => {
               </div>
             </div>
 
-            <div className="bg-brand-mint rounded-xl p-6">
-              <h4 className="font-semibold text-brand-charcoal mb-3">
+            <div className="bg-brand-canvas rounded-xl p-6">
+              <h4 className="font-semibold text-brand-ink mb-3">
                 Business Hours
               </h4>
-              <div className="space-y-1.5 text-brand-slate text-sm">
+              <div className="space-y-1.5 text-brand-ink-soft text-sm">
                 <div className="flex justify-between">
                   <span>Monday - Friday</span>
                   <span className="font-medium">9:00 AM - 6:00 PM</span>
@@ -193,8 +193,8 @@ const ContactSection = () => {
               </div>
             </div>
 
-            <div className="rounded-xl overflow-hidden border border-brand-pale-gray h-48 bg-brand-mint flex items-center justify-center">
-              <div className="text-center text-brand-muted">
+            <div className="rounded-xl overflow-hidden border border-brand-border-strong h-48 bg-brand-canvas flex items-center justify-center">
+              <div className="text-center text-brand-ink-muted">
                 <MapPin className="w-8 h-8 mx-auto mb-2" />
                 <p className="text-sm">Map integration coming soon</p>
               </div>

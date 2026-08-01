@@ -13,7 +13,7 @@ const Stars = () => (
 
 const SocialProofSection = () => {
   return (
-    <section className="landing-section px-6 bg-white font-sans">
+    <section className="landing-section px-6 bg-brand-card font-sans">
       <div className="max-w-7xl mx-auto">
         <RevealDiv>
           <SectionHeader
@@ -26,13 +26,13 @@ const SocialProofSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
           {TESTIMONIALS.map((t, index) => (
             <RevealDiv key={t.author} delay={index * 0.06}>
-              <article className="h-full rounded-2xl bg-brand-mint border border-brand-divider p-6 flex flex-col shadow-sm hover:shadow-md transition-shadow">
+              <article className="h-full rounded-2xl bg-brand-canvas border border-brand-border p-6 flex flex-col shadow-sm hover:shadow-md transition-shadow">
                 <Stars />
-                <p className="text-sm text-brand-slate leading-relaxed mt-4 flex-1">
+                <p className="text-sm text-brand-ink-soft leading-relaxed mt-4 flex-1">
                   &ldquo;{t.text}&rdquo;
                 </p>
-                <div className="mt-6 flex items-center gap-3 pt-4 border-t border-brand-divider">
-                  <div className="w-10 h-10 rounded-full bg-brand-mint text-brand-primary text-xs font-bold flex items-center justify-center">
+                <div className="mt-6 flex items-center gap-3 pt-4 border-t border-brand-border">
+                  <div className="w-10 h-10 rounded-full bg-brand-canvas text-brand-primary text-xs font-bold flex items-center justify-center">
                     {t.author
                       .split(" ")
                       .map((n) => n[0])
@@ -40,10 +40,10 @@ const SocialProofSection = () => {
                       .slice(0, 2)}
                   </div>
                   <div>
-                    <p className="font-semibold text-brand-charcoal text-sm">
+                    <p className="font-semibold text-brand-ink text-sm">
                       {t.author}
                     </p>
-                    <p className="text-xs text-brand-steel">{t.role}</p>
+                    <p className="text-xs text-brand-ink-soft">{t.role}</p>
                   </div>
                 </div>
               </article>

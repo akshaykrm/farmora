@@ -86,7 +86,7 @@ const ManagerRegistrationDialog = ({
     >
       <DialogContent>
         <div className="mb-4">
-          <p className="text-brand-slate mb-2">
+          <p className="text-brand-ink-soft mb-2">
             Complete the registration to get started with the{" "}
             <span className="font-semibold text-brand-accent">{packageName}</span>{" "}
             package.
@@ -94,7 +94,7 @@ const ManagerRegistrationDialog = ({
         </div>
 
         {success && (
-          <div className="mb-4 p-3 bg-brand-mint border border-brand-pale/50 rounded-lg">
+          <div className="mb-4 p-3 bg-brand-canvas border border-brand-border-strong/50 rounded-lg">
             <p className="text-brand-primary text-sm font-medium">
               Registration successful! Redirecting to login...
             </p>
@@ -102,8 +102,8 @@ const ManagerRegistrationDialog = ({
         )}
 
         {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-700 text-sm">{error}</p>
+          <div className="mb-4 p-3 bg-brand-danger-soft border border-brand-danger-soft rounded-lg">
+            <p className="text-brand-danger-strong text-sm">{error}</p>
           </div>
         )}
 
@@ -111,7 +111,7 @@ const ManagerRegistrationDialog = ({
           <div>
             <label
               htmlFor="name"
-              className="block text-sm font-medium text-brand-slate mb-2"
+              className="block text-sm font-medium text-brand-ink-soft mb-2"
             >
               Full Name
             </label>
@@ -119,18 +119,18 @@ const ManagerRegistrationDialog = ({
               id="name"
               type="text"
               placeholder="Enter your full name"
-              className="w-full px-4 py-3 border border-brand-pale-gray rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-3 border border-brand-border-strong rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all"
               {...register("name", { required: "Full name is required" })}
             />
             {errors.name && (
-              <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
+              <p className="text-brand-danger text-xs mt-1">{errors.name.message}</p>
             )}
           </div>
 
           <div>
             <label
               htmlFor="username"
-              className="block text-sm font-medium text-brand-slate mb-2"
+              className="block text-sm font-medium text-brand-ink-soft mb-2"
             >
               Username
             </label>
@@ -138,11 +138,11 @@ const ManagerRegistrationDialog = ({
               id="username"
               type="text"
               placeholder="Choose a username"
-              className="w-full px-4 py-3 border border-brand-pale-gray rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-3 border border-brand-border-strong rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all"
               {...register("username", { required: "Username is required" })}
             />
             {errors.username && (
-              <p className="text-red-500 text-xs mt-1">
+              <p className="text-brand-danger text-xs mt-1">
                 {errors.username.message}
               </p>
             )}
@@ -151,7 +151,7 @@ const ManagerRegistrationDialog = ({
           <div>
             <label
               htmlFor="password"
-              className="block text-sm font-medium text-brand-slate mb-2"
+              className="block text-sm font-medium text-brand-ink-soft mb-2"
             >
               Password
             </label>
@@ -159,11 +159,11 @@ const ManagerRegistrationDialog = ({
               id="password"
               type="password"
               placeholder="Create a password"
-              className="w-full px-4 py-3 border border-brand-pale-gray rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-3 border border-brand-border-strong rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all"
               {...register("password", { required: "Password is required" })}
             />
             {errors.password && (
-              <p className="text-red-500 text-xs mt-1">
+              <p className="text-brand-danger text-xs mt-1">
                 {errors.password.message}
               </p>
             )}

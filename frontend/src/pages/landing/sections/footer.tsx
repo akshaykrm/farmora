@@ -20,14 +20,14 @@ const Footer = () => {
   }
 
   return (
-    <footer className="bg-[#1B5E20] text-brand-pale-gray relative font-sans">
+    <footer className="bg-[#1B5E20] text-brand-ink-muted relative font-sans">
       <div className="max-w-7xl mx-auto px-6 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
           <div>
             <div className="mb-4">
               <BrandLogo variant="onDark" className="h-10" />
             </div>
-            <p className="text-brand-muted mb-6 text-sm leading-relaxed">
+            <p className="text-brand-ink-muted mb-6 text-sm leading-relaxed">
               Livestock farm management and accounting—batches, seasons, P&amp;L,
               cost per kg, and investor profit sharing in one platform.
             </p>
@@ -37,7 +37,7 @@ const Footer = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Your email"
-                className="flex-1 px-3 py-2 bg-brand-slate border border-brand-steel rounded-lg text-sm text-white placeholder-brand-muted focus:outline-none focus:border-brand-accent transition-colors"
+                className="flex-1 px-3 py-2 bg-brand-ink-soft border border-brand-border-strong rounded-lg text-sm text-white placeholder-brand-ink-muted focus:outline-none focus:border-brand-accent transition-colors"
               />
               <button
                 type="submit"
@@ -60,7 +60,7 @@ const Footer = () => {
               ].map((service, i) => (
                 <li
                   key={i}
-                  className="text-brand-pale/90 text-sm hover:text-white transition-colors cursor-default"
+                  className="text-white/90 text-sm hover:text-white transition-colors cursor-default"
                 >
                   {service}
                 </li>
@@ -81,14 +81,14 @@ const Footer = () => {
                   {"action" in item ? (
                     <button
                       onClick={item.action}
-                      className="text-brand-pale/90 hover:text-white transition-colors text-sm"
+                      className="text-white/90 hover:text-white transition-colors text-sm"
                     >
                       {item.label}
                     </button>
                   ) : (
                     <a
                       href={item.href}
-                      className="text-brand-pale/90 hover:text-white transition-colors text-sm"
+                      className="text-white/90 hover:text-white transition-colors text-sm"
                     >
                       {item.label}
                     </a>
@@ -119,7 +119,7 @@ const Footer = () => {
                 return (
                   <li key={i} className="flex items-start gap-3">
                     <Icon className="w-4 h-4 text-brand-accent flex-shrink-0 mt-0.5" />
-                    <span className="text-brand-muted text-sm">{item.text}</span>
+                    <span className="text-brand-ink-muted text-sm">{item.text}</span>
                   </li>
                 )
               })}
@@ -129,7 +129,7 @@ const Footer = () => {
 
         <div className="border-t border-white/15 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-brand-steel text-sm">
+            <p className="text-brand-ink-soft text-sm">
               &copy; {currentYear} Farmora. All rights reserved.
             </p>
             <div className="flex gap-4">
@@ -138,7 +138,7 @@ const Footer = () => {
                   <a
                     key={social}
                     href="#"
-                    className="w-9 h-9 bg-brand-slate rounded-lg flex items-center justify-center text-brand-muted hover:bg-brand-accent hover:text-white transition-all text-xs font-medium"
+                    className="w-9 h-9 bg-brand-ink-soft rounded-lg flex items-center justify-center text-brand-ink-muted hover:bg-brand-accent hover:text-white transition-all text-xs font-medium"
                   >
                     {social[0]}
                   </a>

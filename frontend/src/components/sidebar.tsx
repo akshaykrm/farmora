@@ -1,11 +1,6 @@
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { Link, useLocation } from "react-router";
-import {
-  ChevronDown,
-  PanelLeftClose,
-  PanelLeftOpen,
-  X,
-} from "lucide-react";
+import { ChevronDown, PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
 import { paths } from "../paths";
 import type { PathItem } from "../types/paths.types";
 
@@ -24,7 +19,8 @@ const hasChildren = (item: PathItem) =>
 
 const itemBaseClasses =
   "flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors";
-const activeClasses = "bg-brand-primary-soft text-brand-primary-strong font-medium";
+const activeClasses =
+  "bg-brand-primary-soft text-brand-primary-strong font-medium";
 const normalClasses =
   "text-brand-ink-soft hover:bg-brand-card-soft hover:text-brand-ink";
 
@@ -109,7 +105,10 @@ const Sidebar = ({
     return Math.min(Math.max(8, rect.top), window.innerHeight - 220);
   };
 
-  const handleFlyoutToggle = (item: PathItem, e: MouseEvent<HTMLButtonElement>) => {
+  const handleFlyoutToggle = (
+    item: PathItem,
+    e: MouseEvent<HTMLButtonElement>,
+  ) => {
     cancelClose();
     if (flyout?.item.pathname === item.pathname) {
       setFlyout(null);
@@ -118,7 +117,10 @@ const Sidebar = ({
     setFlyout({ item, top: getFlyoutTop(e) });
   };
 
-  const handleFlyoutHover = (item: PathItem, e: MouseEvent<HTMLButtonElement>) => {
+  const handleFlyoutHover = (
+    item: PathItem,
+    e: MouseEvent<HTMLButtonElement>,
+  ) => {
     if (flyout?.item.pathname === item.pathname) return;
     cancelClose();
     setFlyout({ item, top: getFlyoutTop(e) });
@@ -133,11 +135,7 @@ const Sidebar = ({
           full ? "" : "w-full justify-center"
         }`}
       >
-        <img
-          src="/logo-mark.svg"
-          alt="Farmora"
-          className="h-8 w-8 shrink-0"
-        />
+        <img src="/logo-mark.svg" alt="Farmora" className="h-8 w-8 shrink-0" />
         {full && (
           <span className="text-lg font-semibold whitespace-nowrap text-brand-ink">
             Farmora

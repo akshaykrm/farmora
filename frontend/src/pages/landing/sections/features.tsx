@@ -5,7 +5,7 @@ import RevealDiv from "../components/reveal"
 
 const FeaturesSection = () => {
   return (
-    <section className="landing-section px-6 bg-white font-sans">
+    <section className="landing-section px-6 bg-brand-card font-sans">
       <div className="max-w-7xl mx-auto">
         <RevealDiv>
           <SectionHeader
