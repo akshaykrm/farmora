@@ -22,11 +22,11 @@ const SectionHeader = ({
           {eyebrow}
         </span>
       )}
-      <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-brand-charcoal mb-4 leading-tight">
+      <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-brand-ink mb-4 leading-tight">
         {title}
       </h2>
       {subtitle && (
-        <p className="text-lg text-brand-steel leading-relaxed">{subtitle}</p>
+        <p className="text-lg text-brand-ink-soft leading-relaxed">{subtitle}</p>
       )}
     </div>
   )

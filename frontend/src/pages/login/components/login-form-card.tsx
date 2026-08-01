@@ -12,7 +12,7 @@ import type { UseFormReturn } from "react-hook-form"
 import type { LoginPayload } from "@app-types/auth.types"
 import { useNavigate } from "react-router"
 import toast from "react-hot-toast"
-import { brandGradients } from "../../../theme/brand"
+import { gradients as brandGradients } from "../../../theme/tokens"
 
 type LoginFormCardProps = {
   methods: UseFormReturn<LoginPayload>
@@ -21,7 +21,7 @@ type LoginFormCardProps = {
 }
 
 const GoogleIcon = () => (
-  <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden>
+  <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden>
     <path
       fill="#4285F4"
       d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -42,7 +42,7 @@ const GoogleIcon = () => (
 )
 
 const fieldClass =
-  "w-full pl-11 pr-4 py-3 border border-brand-divider rounded-xl bg-white text-brand-charcoal placeholder:text-brand-muted text-sm outline-none transition-shadow focus:ring-2 focus:ring-brand-accent/30 focus:border-brand-accent"
+  "w-full rounded-xl border border-brand-border bg-brand-card py-3 pr-4 pl-11 text-sm text-brand-ink outline-none transition-shadow placeholder:text-brand-ink-muted focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/30"
 
 const LoginFormCard = ({ methods, onLogin, isPending }: LoginFormCardProps) => {
   const navigate = useNavigate()
@@ -50,12 +50,12 @@ const LoginFormCard = ({ methods, onLogin, isPending }: LoginFormCardProps) => {
   const [rememberMe, setRememberMe] = useState(false)
 
   return (
-    <div className="w-full max-w-[420px] rounded-3xl border border-brand-divider/80 bg-white p-7 md:p-9 shadow-xl shadow-brand-charcoal/8">
+    <div className="w-full max-w-[420px] rounded-3xl border border-brand-border bg-brand-card p-7 shadow-brand-xl md:p-9">
       <div className="mb-7">
-        <h1 className="text-2xl md:text-[1.75rem] font-bold text-brand-charcoal mb-1.5">
+        <h1 className="mb-1.5 text-2xl font-bold text-brand-ink md:text-[1.75rem]">
           Welcome back
         </h1>
-        <p className="text-brand-steel text-sm">
+        <p className="text-sm text-brand-ink-soft">
           Sign in to your Farmora account
         </p>
       </div>
@@ -64,13 +64,13 @@ const LoginFormCard = ({ methods, onLogin, isPending }: LoginFormCardProps) => {
         <div>
           <label
             htmlFor="username"
-            className="block text-sm font-medium text-brand-slate mb-2"
+            className="mb-2 block text-sm font-medium text-brand-ink-soft"
           >
             Username
           </label>
           <div className="relative">
             <User
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-brand-muted pointer-events-none"
+              className="pointer-events-none absolute top-1/2 left-3.5 h-[18px] w-[18px] -translate-y-1/2 text-brand-ink-muted"
               aria-hidden
             />
             <input
@@ -86,13 +86,13 @@ const LoginFormCard = ({ methods, onLogin, isPending }: LoginFormCardProps) => {
         <div>
           <label
             htmlFor="password"
-            className="block text-sm font-medium text-brand-slate mb-2"
+            className="mb-2 block text-sm font-medium text-brand-ink-soft"
           >
             Password
           </label>
           <div className="relative">
             <Lock
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-brand-muted pointer-events-none"
+              className="pointer-events-none absolute top-1/2 left-3.5 h-[18px] w-[18px] -translate-y-1/2 text-brand-ink-muted"
               aria-hidden
             />
             <input
@@ -105,36 +105,39 @@ const LoginFormCard = ({ methods, onLogin, isPending }: LoginFormCardProps) => {
             />
             <button
               type="button"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-muted hover:text-brand-slate p-0.5"
+              className="absolute top-1/2 right-3 -translate-y-1/2 p-0.5 text-brand-ink-muted hover:text-brand-ink-soft"
               onClick={() => setShowPassword((v) => !v)}
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? (
-                <EyeOff className="w-[18px] h-[18px]" />
+                <EyeOff className="h-[18px] w-[18px]" />
               ) : (
-                <Eye className="w-[18px] h-[18px]" />
+                <Eye className="h-[18px] w-[18px]" />
               )}
             </button>
           </div>
         </div>
 
-        <div className="flex items-center justify-between gap-2 flex-wrap">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <FormControlLabel
             control={
               <Checkbox
                 size="small"
                 checked={rememberMe}
                 onChange={(_, checked) => setRememberMe(checked)}
-                sx={{ color: "primary.main", "&.Mui-checked": { color: "primary.main" } }}
+                sx={{
+                  color: "primary.main",
+                  "&.Mui-checked": { color: "primary.main" },
+                }}
               />
             }
             label={
-              <span className="text-sm text-brand-steel">Remember me</span>
+              <span className="text-sm text-brand-ink-soft">Remember me</span>
             }
           />
           <button
             type="button"
-            className="text-sm font-medium text-brand-accent hover:text-brand-primary bg-transparent border-none cursor-pointer"
+            className="cursor-pointer border-none bg-transparent text-sm font-medium text-brand-accent hover:text-brand-primary"
             onClick={() =>
               toast("Contact support@farmora.com to reset your password.")
             }
@@ -164,12 +167,12 @@ const LoginFormCard = ({ methods, onLogin, isPending }: LoginFormCardProps) => {
         </Button>
       </form>
 
-      <div className="flex items-center gap-3 my-6">
-        <div className="flex-1 h-px bg-brand-divider" />
-        <span className="text-xs font-medium text-brand-muted uppercase tracking-wide">
+      <div className="my-6 flex items-center gap-3">
+        <div className="h-px flex-1 bg-brand-border" />
+        <span className="text-xs font-medium tracking-wide text-brand-ink-muted uppercase">
           Or
         </span>
-        <div className="flex-1 h-px bg-brand-divider" />
+        <div className="h-px flex-1 bg-brand-border" />
       </div>
 
       <Button
@@ -194,21 +197,19 @@ const LoginFormCard = ({ methods, onLogin, isPending }: LoginFormCardProps) => {
       <button
         type="button"
         onClick={() => navigate("/#packages")}
-        className="mt-6 w-full text-left rounded-xl border border-brand-pale/80 bg-brand-mint/70 hover:bg-brand-mint transition-colors p-4 flex items-start gap-3 group"
+        className="group mt-6 flex w-full items-start gap-3 rounded-xl border border-brand-border bg-brand-card-soft p-4 text-left transition-colors hover:bg-brand-primary-soft"
       >
-        <div className="w-9 h-9 rounded-lg bg-white border border-brand-pale flex items-center justify-center shrink-0 text-brand-accent">
-          <Leaf className="w-5 h-5" aria-hidden />
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-brand-border bg-brand-card text-brand-accent">
+          <Leaf className="h-5 w-5" aria-hidden />
         </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-brand-charcoal">
-            New to Farmora?
-          </p>
-          <p className="text-xs text-brand-steel mt-0.5 leading-relaxed">
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold text-brand-ink">New to Farmora?</p>
+          <p className="mt-0.5 text-xs leading-relaxed text-brand-ink-soft">
             Create your account and start your journey today
           </p>
         </div>
         <ArrowRight
-          className="w-5 h-5 text-brand-accent shrink-0 mt-1 group-hover:translate-x-0.5 transition-transform"
+          className="mt-1 h-5 w-5 shrink-0 text-brand-accent transition-transform group-hover:translate-x-0.5"
           aria-hidden
         />
       </button>

@@ -1,6 +1,7 @@
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import SelectList from "@components/select-list";
+import FilterCard from "@components/FilterCard";
 import { useForm } from "react-hook-form";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
@@ -42,9 +43,27 @@ const SaleFilter = ({ handleFetch, defaultValues }: Props) => {
     handleFetch(serializeFilter(data));
   });
 
+  const handleClearAll = () => {
+    const empty: Filter = {
+      season_id: "",
+      batch_id: "",
+      buyer_name: "",
+      start_date: "",
+      end_date: "",
+    };
+    methods.reset({
+      season_id: "",
+      batch_id: "",
+      buyer_name: "",
+      start_date: "",
+      end_date: "",
+    });
+    handleFetch(empty);
+  };
+
   return (
-    <div className="w-full bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-      <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-4">
+    <FilterCard filters={methods.watch()} onClearAll={handleClearAll}>
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
         <SelectList
           label="Season"
           name="season_id"
@@ -65,7 +84,7 @@ const SaleFilter = ({ handleFetch, defaultValues }: Props) => {
           }}
         />
         <TextField
-          label="buyer name"
+          label="Buyer Name"
           size="small"
           {...register("buyer_name")}
         />
@@ -103,11 +122,14 @@ const SaleFilter = ({ handleFetch, defaultValues }: Props) => {
           }}
         />
 
-        <Button size="small" variant="contained" onClick={onFilter}>
-          search
+      </div>
+
+      <div className="flex justify-end">
+        <Button variant="contained" onClick={onFilter}>
+          Apply Filters
         </Button>
       </div>
-    </div>
+    </FilterCard>
   );
 };
 

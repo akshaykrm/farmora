@@ -1,9 +1,12 @@
-import PageTitle from "@components/PageTitle";
+import PageHeader from "@components/PageHeader";
+import AddButton from "@components/AddButton";
 import GeneralExpenseTable from "./components/table";
 import AddGeneralExpense from "./components/add";
 import EditGeneralExpense from "./components/edit";
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import { useState } from "react";
+import { Wallet } from "lucide-react";
+import CardStat from "@components/CardStat";
 import FilterGeneralExpense from "./components/filter";
 import useGeneralExpenseFilter from "./hooks/use-general-expense-filter";
 import useGetGeneralExpense from "./hooks/use-get-general-expense";
@@ -22,12 +25,12 @@ const GeneralExpensePage = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-6">
-        <PageTitle title="General Expense" />
-        <Button variant="contained" onClick={onOpen}>
-          Add General Expense
-        </Button>
-      </div>
+      <PageHeader
+        title="General Expense"
+        action={
+          <AddButton label="General Expense" onClick={onOpen} />
+        }
+      />
 
       <FilterGeneralExpense
         defaultFilter={filter}
@@ -75,10 +78,13 @@ const GeneralExpensePage = () => {
 
 function TotalAmount({ totalAmount }: { totalAmount: number }) {
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-      <h5 className="text-md font-semibold text-gray-800">
-        Total Amount: {formatCurrency(totalAmount)}
-      </h5>
+    <div className="mb-4">
+      <CardStat
+        label="Total amount"
+        value={formatCurrency(totalAmount)}
+        icon={<Wallet className="w-5 h-5" />}
+        valueClassName="text-brand-ink"
+      />
     </div>
   );
 }

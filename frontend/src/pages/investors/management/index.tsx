@@ -1,9 +1,10 @@
 import PageTitle from "@components/PageTitle";
+import AddButton from "@components/AddButton";
 import { useState } from "react";
 import AddInvestor from "./components/AddInvestor";
 import InvestorManagementTable from "./components/InvestorManagementTable";
 import EditInvestor from "./components/EditInvestor";
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import useGetInvestors from "./hooks/use-get-investors";
 import useInvestorFilter from "./hooks/use-investor-filter";
 import InvestorManagementFilter from "./components/InvestorManagementFilter";
@@ -22,9 +23,7 @@ const InvestorManagementPage = () => {
     <>
       <div className="flex items-center justify-between mb-6">
         <PageTitle title="Investors" />
-        <Button variant="contained" onClick={onOpen}>
-          Add Investor
-        </Button>
+        <AddButton label="Investor" onClick={onOpen} />
       </div>
       <InvestorManagementFilter
         defaultFilter={filter}

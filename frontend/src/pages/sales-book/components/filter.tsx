@@ -1,4 +1,4 @@
-import { Button, Card } from "@mui/material";
+import { Button } from "@mui/material";
 import SelectList from "@components/select-list";
 import type { SalesBookFilterRequest } from "@app-types/sales-book.types";
 import { useForm } from "react-hook-form";
@@ -35,9 +35,13 @@ const FilterSalesBook = ({ onFilter, defaultValue }: Props) => {
     },
   );
 
+  const handleClearAll = () => {
+    methods.reset({ buyer_id: "", from_date: "", end_date: "" });
+    onFilter({ buyer_id: "", from_date: "", end_date: "" });
+  };
+
   return (
-    <Card className="mb-5">
-      <FilterWrapper>
+    <FilterWrapper filters={values} onClearAll={handleClearAll} openByDefault>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <SelectList
             options={buyersList.data}
@@ -95,8 +99,7 @@ const FilterSalesBook = ({ onFilter, defaultValue }: Props) => {
             Apply Filters
           </Button>
         </div>
-      </FilterWrapper>
-    </Card>
+    </FilterWrapper>
   );
 };
 

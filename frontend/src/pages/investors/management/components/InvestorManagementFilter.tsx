@@ -1,4 +1,4 @@
-import { Button, Card, TextField } from '@mui/material'
+import { Button, TextField } from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { DatePicker } from '@mui/x-date-pickers'
 import dayjs from 'dayjs'
@@ -20,9 +20,13 @@ const InvestorManagementFilter = ({ onFilter, defaultFilter }: Props) => {
     onFilter(inputData)
   })
 
+  const handleClearAll = () => {
+    methods.reset({ search: '', start_date: '', end_date: '' })
+    onFilter({ search: '', start_date: '', end_date: '' })
+  }
+
   return (
-    <Card>
-      <FilterWrapper>
+    <FilterWrapper filters={values} onClearAll={handleClearAll}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <TextField
             label="Search by name, phone or email"
@@ -67,8 +71,7 @@ const InvestorManagementFilter = ({ onFilter, defaultFilter }: Props) => {
             Apply Filters
           </Button>
         </div>
-      </FilterWrapper>
-    </Card>
+    </FilterWrapper>
   )
 }
 

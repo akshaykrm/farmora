@@ -1,21 +1,23 @@
-import PageTitle from "@components/PageTitle";
+import PageHeader from "@components/PageHeader";
+import AddButton from "@components/AddButton";
 import WorkingCostTable from "./components/table";
 import AddWorkingCost from "./components/add";
 import FilterWorkingCost from "./components/filter";
-import { Button } from "@mui/material";
 import { useState } from "react";
 import useGetWorkingCost from "./hooks/use-get-working-cost";
 import useWorkingCostFilter from "./hooks/use-working-cost-filter";
 import WorkingCostTotals from "./components/totals";
 import Ternary from "@components/ternary";
-import DataNotFound from "@components/data-not-found";
+import EmptyContentMessage from "@components/EmptyContentMessage";
+import LoadingMessage from "@components/LoadingMessage";
+import ApplyFilterMessage from "@components/ApplyFilterMessage";
 import PaginationWithLimit from "@components/pagination-with-limit";
 
 const WorkingCostPage = () => {
   const [isOpen, setOpenAdd] = useState(false);
 
   const { updateQueryParams, filter } = useWorkingCostFilter();
-  const { workingCostList } = useGetWorkingCost(filter);
+  const { workingCostList, isLoading } = useGetWorkingCost(filter);
 
   const onOpen = () => setOpenAdd(true);
   const onClose = () => setOpenAdd(false);
@@ -25,67 +27,81 @@ const WorkingCostPage = () => {
   const isEmpty = expense.data.length === 0 && income.data.length === 0;
   return (
     <>
-      <div className="flex items-center justify-between mb-6">
-        <PageTitle title="Working Cost" />
-        <Button variant="contained" onClick={onOpen}>
-          Add Working Cost Entry
-        </Button>
-      </div>
+      <PageHeader
+        title="Working Cost"
+        action={
+          <AddButton label="Working Cost Entry" onClick={onOpen} />
+        }
+      />
       <FilterWorkingCost
         defaultValues={filter}
         onFilter={(f) => updateQueryParams(f)}
       />
 
       <Ternary
-        when={isEmpty}
-        then={
-          <DataNotFound
-            title="No working cost records found"
-            description="Get started by adding a new entry"
-          />
-        }
+        when={isLoading}
+        then={<LoadingMessage />}
         otherwise={
-          <>
-            <WorkingCostTotals summary={summary} />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-              <div>
-                <WorkingCostTable data={expense.data} title="Expense" />
-                <PaginationWithLimit
-                  page={filter.e_page}
-                  limit={filter.e_limit}
-                  totalPages={expense.totalPages}
-                  onChange={(f) => {
-                    const opts: Record<string, number> = {};
-                    if (f.page) {
-                      opts.e_page = f.page;
-                    }
-                    if (f.limit) {
-                      opts.e_limit = f.limit;
-                    }
-                    updateQueryParams(opts);
-                  }}
-                />
-              </div>
-              <div>
-                <WorkingCostTable data={income.data} title="Income" />
-                <PaginationWithLimit
-                  page={filter.i_page}
-                  limit={filter.i_limit}
-                  totalPages={income.totalPages}
-                  onChange={(f) => {
-                    const opts: Record<string, number> = {};
-                    if (f.page) {
-                      opts.i_page = f.page;
-                    }
-                    if (f.limit) {
-                      opts.i_limit = f.limit;
-                    }
-                    updateQueryParams(opts);
-                  }}
-                />
-              </div>
-            </div>
-          </>
+          <Ternary
+            when={!filter.season_id}
+            then={
+              <ApplyFilterMessage description="Select a season, then click Apply Filters to view working costs" />
+            }
+            otherwise={
+              <Ternary
+                when={isEmpty}
+                then={
+                  <EmptyContentMessage
+                    title="No working cost records found"
+                    description="Get started by adding a new entry"
+                  />
+                }
+                otherwise={
+                  <>
+                    <WorkingCostTotals summary={summary} />
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                      <section className="min-w-0">
+                        <WorkingCostTable data={expense.data} title="Expense" />
+                        <PaginationWithLimit
+                          page={filter.e_page}
+                          limit={filter.e_limit}
+                          totalPages={expense.totalPages}
+                          onChange={(f) => {
+                            const opts: Record<string, number> = {};
+                            if (f.page) {
+                              opts.e_page = f.page;
+                            }
+                            if (f.limit) {
+                              opts.e_limit = f.limit;
+                            }
+                            updateQueryParams(opts);
+                          }}
+                        />
+                      </section>
+                      <section className="min-w-0">
+                        <WorkingCostTable data={income.data} title="Income" />
+                        <PaginationWithLimit
+                          page={filter.i_page}
+                          limit={filter.i_limit}
+                          totalPages={income.totalPages}
+                          onChange={(f) => {
+                            const opts: Record<string, number> = {};
+                            if (f.page) {
+                              opts.i_page = f.page;
+                            }
+                            if (f.limit) {
+                              opts.i_limit = f.limit;
+                            }
+                            updateQueryParams(opts);
+                          }}
+                        />
+                      </section>
+                    </div>
+                  </>
+                }
+              />
+            }
+          />
         }
       />
 

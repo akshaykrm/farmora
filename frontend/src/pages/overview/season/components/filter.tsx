@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import useGetSeasonNames from "@hooks/use-get-season-names";
 import { useEffect } from "react";
 import type { Filter } from "@utils/filters";
+import FilterCard from "@components/FilterCard";
 
 type Props = {
   onFilter: (v: Filter) => void;
@@ -33,6 +34,11 @@ const FilterSeasonOverview = ({ onFilter, defaultValues }: Props) => {
     onFilter(inputData);
   });
 
+  const handleClearAll = () => {
+    setValue("season_id", null);
+    onFilter({ season_id: null });
+  };
+
   useEffect(() => {
     document.addEventListener("seasonOverview:season-closed", () => {
       const values = getValues();
@@ -41,8 +47,8 @@ const FilterSeasonOverview = ({ onFilter, defaultValues }: Props) => {
   }, []);
 
   return (
-    <div className="flex items-center justify-between w-full bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-      <div className="w-[50%]">
+    <FilterCard filters={{ season_id: seasonId }} onClearAll={handleClearAll} openByDefault>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         <SelectList
           options={seasonNames.data}
           value={seasonId}
@@ -55,12 +61,13 @@ const FilterSeasonOverview = ({ onFilter, defaultValues }: Props) => {
           helperText={errors.season_id?.message}
         />
       </div>
-      <div>
+
+      <div className="flex justify-end">
         <Button variant="contained" onClick={handleFilter} disabled={!seasonId}>
           Apply Filters
         </Button>
       </div>
-    </div>
+    </FilterCard>
   );
 };
 

@@ -3,7 +3,7 @@ import Table from "@components/Table";
 import TableCell from "@components/TableCell";
 import TableHeaderCell from "@components/TableHeaderCell";
 import TableRow from "@components/TableRow";
-import DataNotFound from "@components/data-not-found";
+import EmptyContentMessage from "@components/EmptyContentMessage";
 import dayjs from "dayjs";
 import { formatCurrency } from "@utils/currency";
 import Totals from "./totals";
@@ -54,8 +54,8 @@ const SalesBookTable = (props: Props) => {
                   <span
                     className={`px-2 py-1 rounded text-xs ${
                       item.type === "cash"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-yellow-100 text-yellow-800"
+                        ? "bg-brand-success-soft text-brand-success-strong"
+                        : "bg-brand-warning-soft text-brand-warning-strong"
                     }`}
                   >
                     {item.type.toUpperCase()}
@@ -75,7 +75,7 @@ const SalesBookTable = (props: Props) => {
         <Totals totals={totals} />
       </Table>
       {isEmpty ? (
-        <DataNotFound
+        <EmptyContentMessage
           title="Sales Entry not Found"
           description="Current filter do not have any entry, change filter"
         />

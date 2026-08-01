@@ -1,9 +1,10 @@
 import PageTitle from "@components/PageTitle";
+import AddButton from "@components/AddButton";
 import { useState } from "react";
 import AddVendor from "./components/add";
 import VendorTable from "./components/table";
 import EditVendor from "./components/edit";
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import useGetVendors from "./hooks/use-get-vendors";
 import useVendorFilter from "./hooks/use-vendor-filter";
 import PaginationWithLimit from "@components/pagination-with-limit";
@@ -21,9 +22,7 @@ const VendorPage = () => {
     <>
       <div className="flex items-center justify-between mb-6">
         <PageTitle title="Vendor" />
-        <Button variant="contained" onClick={onOpen}>
-          Add Vendor
-        </Button>
+        <AddButton label="Vendor" onClick={onOpen} />
       </div>
       <div>
         <VendorTable onEdit={(id) => setSelectedId(id)} vendors={vendorsList.records} />

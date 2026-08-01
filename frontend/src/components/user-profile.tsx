@@ -34,12 +34,12 @@ const UserProfile = () => {
     <>
       <button
         onClick={handleClick}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer bg-transparent border-none"
+        className="flex items-center gap-2 rounded-lg border-none bg-transparent px-3 py-2 transition-colors hover:bg-brand-card-soft cursor-pointer"
       >
-        <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-          <User className="w-4 h-4 text-green-700" />
+        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-primary-soft">
+          <User className="h-4 w-4 text-brand-primary-strong" />
         </div>
-        <span className="text-sm font-medium text-gray-700">{user.name}</span>
+        <span className="text-sm font-medium text-brand-ink">{user.name}</span>
       </button>
 
       <Popover
@@ -61,18 +61,18 @@ const UserProfile = () => {
         }}
       >
         <div className="p-4">
-          <div className="mb-3 pb-3 border-b border-gray-200">
-            <p className="text-sm font-semibold text-gray-900 mb-1">
+          <div className="mb-3 border-b border-brand-border pb-3">
+            <p className="mb-1 text-sm font-semibold text-brand-ink">
               {user.name}
             </p>
-            <p className="text-xs text-gray-600 mb-1">@{user.username}</p>
-            <p className="text-xs text-gray-500 capitalize">{user.role}</p>
+            <p className="mb-1 text-xs text-brand-ink-soft">@{user.username}</p>
+            <p className="text-xs capitalize text-brand-ink-muted">{user.role}</p>
           </div>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer bg-transparent border-none"
+            className="flex w-full cursor-pointer items-center gap-2 rounded-lg border-none bg-transparent px-3 py-2 text-sm text-brand-danger transition-colors hover:bg-brand-danger-soft"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="h-4 w-4" />
             Logout
           </button>
         </div>

@@ -2,7 +2,8 @@ import { Button, TextField } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs, { type Dayjs } from "dayjs";
+import FilterCard from "@components/FilterCard";
+import type { Dayjs } from "dayjs";
 import { useState, useEffect } from "react";
 import type { BalanceSheetFilterRequest } from "../types";
 
@@ -11,10 +12,6 @@ type Props = {
 };
 
 const BalanceSheetFilter = (props: Props) => {
-  const now = dayjs();
-  const startOfMonth = now.startOf("month");
-  const endOfMonth = now.endOf("month");
-
   const [fromDate, setFromDate] = useState<Dayjs | "">("");
   const [toDate, setToDate] = useState<Dayjs | "">("");
   const [purpose, setPurpose] = useState("");
@@ -39,34 +36,56 @@ const BalanceSheetFilter = (props: Props) => {
     props.onFilter(filter);
   };
 
+  const handleClearAll = () => {
+    setFromDate("");
+    setToDate("");
+    setPurpose("");
+    props.onFilter({});
+  };
+
+  const filters: Record<string, unknown> = {};
+  if (fromDate) {
+    filters.from_date = fromDate.format("YYYY-MM-DD");
+  }
+  if (toDate) {
+    filters.to_date = toDate.format("YYYY-MM-DD");
+  }
+  if (purpose.trim()) {
+    filters.purpose = purpose.trim();
+  }
+
   return (
-    <div className="flex items-center gap-4 bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6 flex-wrap">
-      <TextField
-        label="Search Purpose"
-        value={purpose}
-        onChange={(e) => setPurpose(e.target.value)}
-        size="small"
-        placeholder="Search by purpose..."
-        sx={{ minWidth: 200 }}
-      />
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <DatePicker
-          label="From Date"
-          value={fromDate || null}
-          onChange={(value) => setFromDate(value)}
-          slotProps={{ textField: { size: "small" } }}
+    <FilterCard filters={filters} onClearAll={handleClearAll}>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <TextField
+          label="Search Purpose"
+          value={purpose}
+          onChange={(e) => setPurpose(e.target.value)}
+          size="small"
+          placeholder="Search by purpose..."
         />
-        <DatePicker
-          label="To Date"
-          value={toDate || null}
-          onChange={(value) => setToDate(value)}
-          slotProps={{ textField: { size: "small" } }}
-        />
-      </LocalizationProvider>
-      <Button variant="contained" onClick={handleApply}>
-        Apply Filter
-      </Button>
-    </div>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DatePicker
+            label="From Date"
+            value={fromDate || null}
+            onChange={(value) => setFromDate(value)}
+            slotProps={{ textField: { size: "small" } }}
+          />
+          <DatePicker
+            label="To Date"
+            value={toDate || null}
+            onChange={(value) => setToDate(value)}
+            slotProps={{ textField: { size: "small" } }}
+          />
+        </LocalizationProvider>
+      </div>
+
+      <div className="flex justify-end">
+        <Button variant="contained" onClick={handleApply}>
+          Apply Filters
+        </Button>
+      </div>
+    </FilterCard>
   );
 };
 

@@ -1,4 +1,6 @@
-import { roundNumber } from "@utils/number";
+import { HandCoins, PiggyBank, TrendingUp } from "lucide-react";
+import CardStat from "@components/CardStat";
+import { formatCurrency } from "@utils/currency";
 
 type InvestorProfitSummaryProps = {
   totalProfit: number;
@@ -8,37 +10,30 @@ type InvestorProfitSummaryProps = {
 
 const InvestorProfitSummary = (props: InvestorProfitSummaryProps) => {
   const { totalProfit, totalGeneralCost, totalGeneralSale } = props;
-  return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <h2 className="text-xl font-semibold mb-4">Investor Profit Summary</h2>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-blue-50 p-4 rounded-lg">
-          <p className="text-sm text-gray-600">Total Batch Profit</p>
-          <SummaryItem value={totalProfit} />
-        </div>
-        <div className="bg-red-50 p-4 rounded-lg">
-          <p className="text-sm text-gray-600">Total General Cost</p>
-          <SummaryItem value={totalGeneralCost} />
-        </div>
 
-        <div className="bg-green-50 p-4 rounded-lg">
-          <p className="text-sm text-gray-600">Total General Sales</p>
-          <SummaryItem value={totalGeneralSale} />
-        </div>
-      </div>
+  return (
+    <div className="grid grid-cols-1 gap-3 md:grid-cols-3 mb-6">
+      <CardStat
+        label="Total Batch Profit"
+        value={formatCurrency(totalProfit)}
+        icon={<PiggyBank className="w-5 h-5" />}
+        valueClassName={
+          totalProfit >= 0 ? "text-brand-success" : "text-brand-danger"
+        }
+      />
+      <CardStat
+        label="Total General Cost"
+        value={formatCurrency(totalGeneralCost)}
+        icon={<HandCoins className="w-5 h-5" />}
+        valueClassName="text-brand-danger"
+      />
+      <CardStat
+        label="Total General Sales"
+        value={formatCurrency(totalGeneralSale)}
+        icon={<TrendingUp className="w-5 h-5" />}
+        valueClassName="text-brand-info"
+      />
     </div>
-  );
-};
-
-const SummaryItem = ({ value }: { value: number }) => {
-  return (
-    <p
-      className={`text-2xl font-bold ${
-        value >= 0 ? "text-blue-600" : "text-red-600"
-      }`}
-    >
-      ₹{roundNumber(value)}
-    </p>
   );
 };
 

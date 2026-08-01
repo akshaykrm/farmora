@@ -4,8 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "bunx vite",
-    "build": "vite build",
+    "gen:tokens": "bun scripts/gen-tokens.ts",
+    "dev": "bun run gen:tokens && bunx vite",
+    "build": "bun run gen:tokens && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },

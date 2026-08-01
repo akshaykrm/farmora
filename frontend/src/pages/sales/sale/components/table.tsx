@@ -1,15 +1,11 @@
-import sales from "@api/sales.api";
 import Table from "@components/Table";
 import TableCell from "@components/TableCell";
 import TableHeaderCell from "@components/TableHeaderCell";
 import TableRow from "@components/TableRow";
 import { EditIcon } from "lucide-react";
-import { useMemo } from "react";
-import DataNotFound from "@components/data-not-found";
-import DataLoading from "@components/data-loading";
+import EmptyContentMessage from "@components/EmptyContentMessage";
 import Ternary from "@components/ternary";
 import dayjs from "dayjs";
-import SaleFilter from "./filter";
 import type { Sale } from "@app-types/sales.types";
 
 const headers = [
@@ -62,8 +58,8 @@ const SalesTable = ({ onEdit, data }: Props) => {
                 <span
                   className={`px-2 py-1 rounded text-xs ${
                     sale.payment_type === "cash"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-yellow-100 text-yellow-800"
+                      ? "bg-brand-success-soft text-brand-success-strong"
+                      : "bg-brand-warning-soft text-brand-warning-strong"
                   }`}
                 >
                   {sale.payment_type.toUpperCase()}
@@ -73,7 +69,7 @@ const SalesTable = ({ onEdit, data }: Props) => {
             <TableCell
               content={
                 <EditIcon
-                  className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer"
+                  className="w-6 h-6 text-brand-ink-muted hover:text-brand-ink-soft cursor-pointer"
                   onClick={() => {
                     onEdit(sale.id);
                   }}
@@ -86,7 +82,7 @@ const SalesTable = ({ onEdit, data }: Props) => {
       <Ternary
         when={isEmpty}
         then={
-          <DataNotFound
+          <EmptyContentMessage
             title="No sales found"
             description="Get started by creating a new sale"
           />

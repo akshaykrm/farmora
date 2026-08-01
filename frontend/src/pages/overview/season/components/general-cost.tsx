@@ -30,7 +30,7 @@ const GeneralCostTable = (props: GeneralCostTableProps) => {
             <TableCell content={item.purpose} />
             <TableCell
               content={
-                <span className="text-red-600">{formatCurrency(item.amount)}</span>
+                <span className="text-brand-danger">{formatCurrency(item.amount)}</span>
               }
             />
           </TableRow>
@@ -41,7 +41,7 @@ const GeneralCostTable = (props: GeneralCostTableProps) => {
             <TableCell content="" />
             <TableCell
               content={
-                <strong className="text-red-600">
+                <strong className="text-brand-danger">
                   {formatCurrency(totalAmount)}
                 </strong>
               }
@@ -50,7 +50,7 @@ const GeneralCostTable = (props: GeneralCostTableProps) => {
         )}
       </Table>
       {data.length === 0 && (
-        <div className="bg-gray-50 p-6 text-center text-gray-500">
+        <div className="bg-brand-canvas p-6 text-center text-brand-ink-muted">
           No general costs found
         </div>
       )}

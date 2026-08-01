@@ -5,7 +5,7 @@ type Props = {
 
 const Label = ({ id, name }: Props) => {
   return (
-    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={id}>
+    <label className="mb-2 block text-sm font-bold text-brand-ink-soft" htmlFor={id}>
       {name}
     </label>
   );

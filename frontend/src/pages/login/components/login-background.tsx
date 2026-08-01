@@ -2,7 +2,7 @@
 
 const LoginBackground = () => (
   <div
-    className="pointer-events-none absolute inset-0 z-0 bg-[#F8F9FA]"
+    className="pointer-events-none absolute inset-0 z-0 bg-brand-canvas"
     aria-hidden
   >
     <div className="hero-grid absolute inset-0 opacity-40" />

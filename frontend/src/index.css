@@ -1,23 +1,77 @@
+/* Design tokens are generated from src/theme/tokens.ts (single source of truth).
+   Run `bun run gen:tokens` to regenerate — see scripts/gen-tokens.ts. */
+@import "./theme/tokens.css";
 @import "tailwindcss";
 
-@theme {
-  --font-sans: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
-  --color-brand-primary: #2e7d32;
-  --color-brand-accent: #43a047;
-  --color-brand-light: #66bb6a;
-  --color-brand-soft: #81c784;
-  --color-brand-pale: #a5d6a7;
-  --color-brand-mint: #e8f5e9;
-  --color-brand-surface: #f7fbf6;
+@theme inline {
+  --font-sans: var(--brand-font-sans);
 
-  --color-brand-charcoal: #263238;
-  --color-brand-slate: #37474f;
-  --color-brand-steel: #607d8b;
-  --color-brand-muted: #90a4ae;
-  --color-brand-pale-gray: #b0bec5;
-  --color-brand-divider: #eceff1;
+  /* Legacy brand color names (landing / login) — values preserved.
+     `brand-primary` = green-700 (strong) and `brand-accent` = green-500 (the
+     active accent) both follow the mode-aware semantic roles. */
+  --color-brand-primary: var(--brand-primary-strong);
+  --color-brand-accent: var(--brand-primary);
+  --color-brand-light: var(--brand-green-400);
+  --color-brand-soft: var(--brand-green-300);
+  --color-brand-pale: var(--brand-green-200);
+  --color-brand-mint: var(--brand-green-50);
+  --color-brand-surface: var(--brand-canvas);
+  --color-brand-charcoal: var(--brand-charcoal);
+  --color-brand-slate: var(--brand-slate);
+  --color-brand-steel: var(--brand-steel);
+  --color-brand-muted: var(--brand-muted);
+  --color-brand-pale-gray: var(--brand-pale);
+  --color-brand-divider: var(--brand-border);
+
+  /* Semantic color roles (mode-aware — flip automatically in dark mode) */
+  --color-brand-canvas: var(--brand-canvas);
+  --color-brand-card: var(--brand-card);
+  --color-brand-card-soft: var(--brand-card-soft);
+  --color-brand-card-raised: var(--brand-card-raised);
+  --color-brand-border: var(--brand-border);
+  --color-brand-border-strong: var(--brand-border-strong);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-ink-soft: var(--brand-ink-soft);
+  --color-brand-ink-muted: var(--brand-ink-muted);
+  --color-brand-primary-strong: var(--brand-primary-strong);
+  --color-brand-primary-soft: var(--brand-primary-soft);
+  --color-brand-on-primary: var(--brand-on-primary);
+  --color-brand-success: var(--brand-success);
+  --color-brand-success-soft: var(--brand-success-soft);
+  --color-brand-success-strong: var(--brand-success-strong);
+  --color-brand-warning: var(--brand-warning);
+  --color-brand-warning-soft: var(--brand-warning-soft);
+  --color-brand-warning-strong: var(--brand-warning-strong);
+  --color-brand-danger: var(--brand-danger);
+  --color-brand-danger-soft: var(--brand-danger-soft);
+  --color-brand-danger-strong: var(--brand-danger-strong);
+  --color-brand-info: var(--brand-info);
+  --color-brand-info-soft: var(--brand-info-soft);
+  --color-brand-info-strong: var(--brand-info-strong);
+
+  /* Radius */
+  --radius-brand-sm: var(--brand-radius-sm);
+  --radius-brand-md: var(--brand-radius-md);
+  --radius-brand-lg: var(--brand-radius-lg);
+  --radius-brand-xl: var(--brand-radius-xl);
+  --radius-brand-2xl: var(--brand-radius-2xl);
+
+  /* Shadow */
+  --shadow-brand-xs: var(--brand-shadow-xs);
+  --shadow-brand-sm: var(--brand-shadow-sm);
+  --shadow-brand-md: var(--brand-shadow-md);
+  --shadow-brand-lg: var(--brand-shadow-lg);
+  --shadow-brand-xl: var(--brand-shadow-xl);
+}
+
+:root {
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
 }
 
 body {

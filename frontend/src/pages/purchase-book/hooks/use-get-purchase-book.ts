@@ -4,6 +4,7 @@ import purchaseBookApi from "../api";
 import type { PurchaseBookTransaction, PurchaseBookSummary } from "../types";
 
 function useGetPurchaseBook(filter: Filter) {
+  const [isLoading, setIsLoading] = useState(false);
   const [purchaseBook, setPurchaseBook] = useState<{
     records: PurchaseBookTransaction[];
     totalPages: number;
@@ -21,6 +22,7 @@ function useGetPurchaseBook(filter: Filter) {
         return;
       }
       const opts = overrideFilters(filter, override);
+      setIsLoading(true);
       const res = await purchaseBookApi.fetchAll(opts);
 
       if (res.status === "success") {
@@ -33,6 +35,7 @@ function useGetPurchaseBook(filter: Filter) {
           });
         }
       }
+      setIsLoading(false);
     },
     [start_date, end_date, page, limit, vendor_id],
   );
@@ -41,7 +44,7 @@ function useGetPurchaseBook(filter: Filter) {
     handlefetchAllSales();
   }, [handlefetchAllSales]);
 
-  return { purchaseBook, refetch: handlefetchAllSales };
+  return { purchaseBook, isLoading, refetch: handlefetchAllSales };
 }
 
 export default useGetPurchaseBook;

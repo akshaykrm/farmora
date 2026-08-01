@@ -10,10 +10,13 @@ import PerformanceMetrics from "./components/performance-metrics";
 import ReturnItem from "./components/return-items-table";
 import SalesTable from "./components/sales-table";
 import PaginationWithLimit from "@components/pagination-with-limit";
+import LoadingMessage from "@components/LoadingMessage";
+import ApplyFilterMessage from "@components/ApplyFilterMessage";
+import EmptyContentMessage from "@components/EmptyContentMessage";
 
 const BatchOverviewPage = () => {
   const { updateQueryParams, filter } = useBatchOverviewFilter();
-  const { batchOverview, refetch } = useGetBatchOverview(filter);
+  const { batchOverview, refetch, isLoading } = useGetBatchOverview(filter);
 
   const { expenses, sales, returns, batch, overviewCalculations } =
     batchOverview;
@@ -41,114 +44,117 @@ const BatchOverviewPage = () => {
         onFilter={(f) => updateQueryParams(f)}
       />
       <Ternary
-        when={isEmpty}
-        then={<Empty />}
+        when={isLoading}
+        then={<LoadingMessage />}
         otherwise={
-          <>
-            <BatchInformation batch={batch} refetch={() => refetch()} />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="mb-6">
-                <ExpenseTable
-                  data={expenses.data}
-                  summary={overviewCalculations}
-                />
+          <Ternary
+            when={!filter.batch_id}
+            then={
+              <ApplyFilterMessage description="Select a season and batch, then click Apply Filters to view the overview" />
+            }
+            otherwise={
+              <Ternary
+                when={isEmpty}
+                then={<EmptyContentMessage title="No data found" description="No records available for the selected batch" />}
+                otherwise={
+                  <>
+                    <BatchInformation batch={batch} refetch={() => refetch()} />
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      <div className="mb-6">
+                        <ExpenseTable
+                          data={expenses.data}
+                          summary={overviewCalculations}
+                        />
 
-                <PaginationWithLimit
-                  onChange={(f) => {
-                    const opts: Record<string, number> = {};
-                    if (f.page) {
-                      opts.e_page = f.page;
-                    }
-                    if (f.limit) {
-                      opts.e_limit = f.limit;
-                    }
-                    updateQueryParams(opts);
-                  }}
-                  page={filter.e_page}
-                  limit={filter.e_limit}
-                  totalPages={expenses.totalPages}
-                />
+                        <PaginationWithLimit
+                          onChange={(f) => {
+                            const opts: Record<string, number> = {};
+                            if (f.page) {
+                              opts.e_page = f.page;
+                            }
+                            if (f.limit) {
+                              opts.e_limit = f.limit;
+                            }
+                            updateQueryParams(opts);
+                          }}
+                          page={filter.e_page}
+                          limit={filter.e_limit}
+                          totalPages={expenses.totalPages}
+                        />
 
-                <div className="mt-6">
-                  <ReturnItem
-                    data={returns.data}
-                    summary={overviewCalculations}
-                  />
-                  <PaginationWithLimit
-                    onChange={(f) => {
-                      const opts: Record<string, number> = {};
-                      if (f.page) {
-                        opts.r_page = f.page;
-                      }
-                      if (f.limit) {
-                        opts.r_limit = f.limit;
-                      }
-                      updateQueryParams(opts);
-                    }}
-                    page={filter.r_page}
-                    limit={filter.r_limit}
-                    totalPages={returns.totalPages}
-                  />
-                </div>
-              </div>
+                        <div className="mt-6">
+                          <ReturnItem
+                            data={returns.data}
+                            summary={overviewCalculations}
+                          />
+                          <PaginationWithLimit
+                            onChange={(f) => {
+                              const opts: Record<string, number> = {};
+                              if (f.page) {
+                                opts.r_page = f.page;
+                              }
+                              if (f.limit) {
+                                opts.r_limit = f.limit;
+                              }
+                              updateQueryParams(opts);
+                            }}
+                            page={filter.r_page}
+                            limit={filter.r_limit}
+                            totalPages={returns.totalPages}
+                          />
+                        </div>
+                      </div>
 
-              <div className="mb-6">
-                <SalesTable data={sales.data} summary={overviewCalculations} />
-                <PaginationWithLimit
-                  onChange={(f) => {
-                    const opts: Record<string, number> = {};
-                    if (f.page) {
-                      opts.s_page = f.page;
-                    }
-                    if (f.limit) {
-                      opts.s_limit = f.limit;
-                    }
-                    updateQueryParams(opts);
-                  }}
-                  page={filter.s_page}
-                  limit={filter.s_limit}
-                  totalPages={sales.totalPages}
-                />
-                <div className="mt-6">
-                  <FinancialSummaryTable
-                    totalSaleAmount={overviewCalculations.total_sale_amount}
-                    totalExpense={overviewCalculations.total_expense}
-                    totalReturnAmount={
-                      overviewCalculations.total_returned_amount
-                    }
-                    totalPurchaseAmount={
-                      overviewCalculations.total_purchase_amount
-                    }
-                  />
-                </div>
-                <div className="mt-6">
-                  <PerformanceMetrics
-                    avgCost={avgCost || 0}
-                    avgRate={avgRate || 0}
-                    costRateDifference={avgRate - avgCost}
-                    averageWeight={overviewCalculations.avg_weight}
-                    cfcr={overviewCalculations.cfcr}
-                    fcr={overviewCalculations.fcr}
-                  />
-                </div>
-              </div>
-            </div>
-          </>
+                      <div className="mb-6">
+                        <SalesTable data={sales.data} summary={overviewCalculations} />
+                        <PaginationWithLimit
+                          onChange={(f) => {
+                            const opts: Record<string, number> = {};
+                            if (f.page) {
+                              opts.s_page = f.page;
+                            }
+                            if (f.limit) {
+                              opts.s_limit = f.limit;
+                            }
+                            updateQueryParams(opts);
+                          }}
+                          page={filter.s_page}
+                          limit={filter.s_limit}
+                          totalPages={sales.totalPages}
+                        />
+                        <div className="mt-6">
+                          <FinancialSummaryTable
+                            totalSaleAmount={overviewCalculations.total_sale_amount}
+                            totalExpense={overviewCalculations.total_expense}
+                            totalReturnAmount={
+                              overviewCalculations.total_returned_amount
+                            }
+                            totalPurchaseAmount={
+                              overviewCalculations.total_purchase_amount
+                            }
+                          />
+                        </div>
+                        <div className="mt-6">
+                          <PerformanceMetrics
+                            avgCost={avgCost || 0}
+                            avgRate={avgRate || 0}
+                            costRateDifference={avgRate - avgCost}
+                            averageWeight={overviewCalculations.avg_weight}
+                            cfcr={overviewCalculations.cfcr}
+                            fcr={overviewCalculations.fcr}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                }
+              />
+            }
+          />
         }
       />
     </>
   );
 };
-
-function Empty() {
-  return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-      <p className="text-gray-500 text-lg">
-        Please select a season and batch, then click "Apply Filters" to view
-        overview
-      </p>
-    </div>
-  );
-}
 
 export default BatchOverviewPage;

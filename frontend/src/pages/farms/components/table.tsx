@@ -3,7 +3,7 @@ import TableCell from "@components/TableCell";
 import TableHeaderCell from "@components/TableHeaderCell";
 import TableRow from "@components/TableRow";
 import { EditIcon } from "lucide-react";
-import DataNotFound from "@components/data-not-found";
+import EmptyContentMessage from "@components/EmptyContentMessage";
 import Ternary from "@components/ternary";
 import type { Farm } from "../types";
 
@@ -34,7 +34,7 @@ const FarmTable = ({ onEdit, farms }: Props) => {
             <TableCell
               content={
                 <EditIcon
-                  className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer"
+                  className="w-6 h-6 text-brand-ink-muted hover:text-brand-ink-soft cursor-pointer"
                   onClick={() => {
                     onEdit(farm.id);
                   }}
@@ -47,7 +47,7 @@ const FarmTable = ({ onEdit, farms }: Props) => {
       <Ternary
         when={isEmpty}
         then={
-          <DataNotFound
+          <EmptyContentMessage
             title="No farms found"
             description="Get started by creating a new farm"
           />

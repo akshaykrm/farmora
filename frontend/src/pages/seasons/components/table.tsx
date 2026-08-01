@@ -5,7 +5,7 @@ import TableRow from "@components/TableRow";
 import type { Season } from "../types";
 import dayjs from "dayjs";
 import { EditIcon } from "lucide-react";
-import DataNotFound from "@components/data-not-found";
+import EmptyContentMessage from "@components/EmptyContentMessage";
 import Ternary from "@components/ternary";
 
 const headers = ["ID", "Name", "Status", "From Date", "End Date", "Action"];
@@ -40,7 +40,7 @@ const SeasonTable = ({ onEdit, seasons }: Props) => {
             <TableCell
               content={
                 <EditIcon
-                  className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer"
+                  className="w-6 h-6 text-brand-ink-muted hover:text-brand-ink-soft cursor-pointer"
                   onClick={() => {
                     onEdit(season.id);
                   }}
@@ -53,7 +53,7 @@ const SeasonTable = ({ onEdit, seasons }: Props) => {
       <Ternary
         when={isEmpty}
         then={
-          <DataNotFound
+          <EmptyContentMessage
             title="No seasons found"
             description="Get started by creating a new season"
           />

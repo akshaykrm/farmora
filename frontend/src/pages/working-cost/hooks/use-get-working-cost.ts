@@ -4,6 +4,7 @@ import workingCost from "../api";
 import { overrideFilters, type Filter } from "@utils/filters";
 
 const useGetWorkingCost = (filter: Filter) => {
+  const [isLoading, setIsLoading] = useState(false);
   const [workingCostList, setWorkingCostList] = useState<WorkingCostResponse>({
     income: {
       count: 0,
@@ -26,6 +27,7 @@ const useGetWorkingCost = (filter: Filter) => {
         return;
       }
       const opts = overrideFilters(filter, override);
+      setIsLoading(true);
 
       const res = await workingCost.fetchAll(opts);
 
@@ -39,6 +41,7 @@ const useGetWorkingCost = (filter: Filter) => {
           });
         }
       }
+      setIsLoading(false);
     },
     [e_page, e_limit, i_page, i_limit, season_id, start_date, end_date],
   );
@@ -47,7 +50,7 @@ const useGetWorkingCost = (filter: Filter) => {
     handleFetchAllWorkingCost();
   }, [handleFetchAllWorkingCost]);
 
-  return { workingCostList, refetch: handleFetchAllWorkingCost };
+  return { workingCostList, isLoading, refetch: handleFetchAllWorkingCost };
 };
 
 export default useGetWorkingCost;

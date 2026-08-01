@@ -4,6 +4,7 @@ import integrationBook from "../api";
 import { overrideFilters, type Filter } from "@utils/filters";
 
 const useGetIntegrationBook = (filter: Filter) => {
+  const [isLoading, setIsLoading] = useState(false);
   const [integrationBookList, setIntegrationBookList] =
     useState<IntegrationBookResponse>({
       credit: {
@@ -30,6 +31,7 @@ const useGetIntegrationBook = (filter: Filter) => {
         { c_page, c_limit, p_page, p_limit, farm_id, start_date, end_date },
         override,
       )
+      setIsLoading(true);
 
       const res = await integrationBook.fetchAll(opts);
 
@@ -43,6 +45,7 @@ const useGetIntegrationBook = (filter: Filter) => {
           });
         }
       }
+      setIsLoading(false);
     },
     [c_page, c_limit, p_page, p_limit, farm_id, start_date, end_date],
   );
@@ -51,7 +54,7 @@ const useGetIntegrationBook = (filter: Filter) => {
     handleFetchAllIntegrationBook();
   }, [handleFetchAllIntegrationBook]);
 
-  return { integrationBookList, refetch: handleFetchAllIntegrationBook };
+  return { integrationBookList, isLoading, refetch: handleFetchAllIntegrationBook };
 };
 
 export default useGetIntegrationBook;

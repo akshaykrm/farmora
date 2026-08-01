@@ -7,8 +7,8 @@ import TableRow from "@components/TableRow";
 import useGetAll from "@hooks/use-get-all";
 import { EditIcon } from "lucide-react";
 import { useMemo } from "react";
-import DataNotFound from "@components/data-not-found";
-import DataLoading from "@components/data-loading";
+import EmptyContentMessage from "@components/EmptyContentMessage";
+import LoadingMessage from "@components/LoadingMessage";
 import Ternary from "@components/ternary";
 import dayjs from "dayjs";
 
@@ -45,7 +45,7 @@ const SubscriptionTable = ({ onEdit }: Props) => {
   return (
     <Ternary
       when={isFirstLoading}
-      then={<DataLoading />}
+      then={<LoadingMessage />}
       otherwise={
         <>
           <Table>
@@ -67,7 +67,7 @@ const SubscriptionTable = ({ onEdit }: Props) => {
                 <TableCell
                   content={
                     <EditIcon
-                      className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer"
+                      className="w-6 h-6 text-brand-ink-muted hover:text-brand-ink-soft cursor-pointer"
                       onClick={() => {
                         onEdit(sub.id);
                       }}
@@ -80,7 +80,7 @@ const SubscriptionTable = ({ onEdit }: Props) => {
           <Ternary
             when={isEmpty}
             then={
-              <DataNotFound
+              <EmptyContentMessage
                 title="No subscriptions found"
                 description="Get started by creating a new subscription"
               />

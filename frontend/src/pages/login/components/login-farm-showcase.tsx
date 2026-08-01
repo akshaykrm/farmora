@@ -9,34 +9,36 @@ const KPIs = [
 
 const LoginFarmShowcase = () => {
   return (
-    <div className="relative w-full max-w-lg mt-4 rounded-2xl overflow-hidden shadow-xl shadow-brand-charcoal/10 border border-brand-divider/80">
+    <div className="relative mt-4 w-full max-w-lg overflow-hidden rounded-2xl border border-brand-border shadow-brand-xl">
       <img
         src="https://images.unsplash.com/photo-1500595046743-cd271d694d30?auto=format&fit=crop&w=900&q=80"
         alt=""
-        className="w-full h-48 md:h-56 object-cover"
+        className="h-48 w-full object-cover md:h-56"
         loading="lazy"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-brand-charcoal/50 via-transparent to-transparent" />
-      <div className="absolute bottom-3 left-3 right-3 md:bottom-4 md:left-4 md:right-auto md:max-w-[320px]">
-        <div className="rounded-xl bg-white/95 backdrop-blur-sm border border-white/80 shadow-lg p-3 md:p-4">
-          <p className="text-xs font-semibold text-brand-charcoal mb-2">
+      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+      <div className="absolute right-3 bottom-3 left-3 md:right-auto md:bottom-4 md:left-4 md:max-w-[320px]">
+        <div className="rounded-xl border border-brand-border bg-brand-card/95 p-3 shadow-brand-lg backdrop-blur-sm md:p-4">
+          <p className="mb-2 text-xs font-semibold text-brand-ink">
             Farm Overview
           </p>
-          <div className="grid grid-cols-2 gap-2 mb-3">
+          <div className="mb-3 grid grid-cols-2 gap-2">
             {KPIs.map((kpi) => (
               <div key={kpi.label} className="min-w-0">
-                <p className="text-[9px] text-brand-steel truncate">{kpi.label}</p>
-                <p className="text-xs font-bold text-brand-charcoal tabular-nums truncate">
+                <p className="truncate text-[9px] text-brand-ink-soft">
+                  {kpi.label}
+                </p>
+                <p className="truncate text-xs font-bold text-brand-ink tabular-nums">
                   {kpi.value}
                 </p>
                 <span className="inline-flex items-center gap-0.5 text-[9px] font-medium text-brand-accent">
-                  <TrendingUp className="w-2.5 h-2.5" aria-hidden />
+                  <TrendingUp className="h-2.5 w-2.5" aria-hidden />
                   {kpi.delta}
                 </span>
               </div>
             ))}
           </div>
-          <div className="h-10 flex items-end gap-0.5">
+          <div className="flex h-10 items-end gap-0.5">
             {[30, 45, 38, 55, 48, 62, 58, 72, 68, 85].map((h, i) => (
               <div
                 key={i}

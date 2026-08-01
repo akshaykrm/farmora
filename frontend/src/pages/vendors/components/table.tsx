@@ -2,7 +2,7 @@ import Table from "@components/Table";
 import TableCell from "@components/TableCell";
 import TableHeaderCell from "@components/TableHeaderCell";
 import TableRow from "@components/TableRow";
-import DataNotFound from "@components/data-not-found";
+import EmptyContentMessage from "@components/EmptyContentMessage";
 import Ternary from "@components/ternary";
 import { EditIcon } from "lucide-react";
 import type { Vendor } from "../types";
@@ -44,7 +44,7 @@ const VendorTable = ({ onEdit, vendors }: Props) => {
             <TableCell
               content={
                 <EditIcon
-                  className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer"
+                  className="w-6 h-6 text-brand-ink-muted hover:text-brand-ink-soft cursor-pointer"
                   onClick={() => {
                     onEdit(vendor.id);
                   }}
@@ -57,7 +57,7 @@ const VendorTable = ({ onEdit, vendors }: Props) => {
       <Ternary
         when={isEmpty}
         then={
-          <DataNotFound
+          <EmptyContentMessage
             title="No vendors found"
             description="Get started by creating a new vendor"
           />

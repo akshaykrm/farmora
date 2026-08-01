@@ -1,9 +1,10 @@
-import PageTitle from "@components/PageTitle";
+import PageHeader from "@components/PageHeader";
+import AddButton from "@components/AddButton";
 import { useState } from "react";
 import AddSeason from "./components/add";
 import EditSeason from "./components/edit";
 import SeasonTable from "./components/table";
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import useGetSeasons from "./hooks/use-get-seasons";
 import useSeasonFilter from "./hooks/use-season-filter";
 import PaginationWithLimit from "@components/pagination-with-limit";
@@ -20,12 +21,12 @@ const SeasonsPage = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-6">
-        <PageTitle title="Seasons" />
-        <Button variant="contained" onClick={onOpen}>
-          Add Season
-        </Button>
-      </div>
+      <PageHeader
+        title="Seasons"
+        action={
+          <AddButton label="Season" onClick={onOpen} />
+        }
+      />
       <div>
         <SeasonTable onEdit={(id) => setSelectedId(id)} seasons={seasonsList.records} />
       </div>

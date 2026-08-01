@@ -1,207 +1,232 @@
-import { createTheme } from "@mui/material/styles"
-import { brandFontFamily, brandGreen, brandNeutral } from "./brand"
+import { alpha, createTheme, type Shadows, type Theme } from "@mui/material/styles"
+import { modes, palette, radius, shadow, typography, type ThemeMode } from "./tokens"
 
-const greenColors = brandGreen
+const toMuiShadows = (): Shadows => {
+  const levels: Record<number, string> = {
+    1: shadow.xs,
+    2: shadow.sm,
+    3: shadow.md,
+    4: shadow.lg,
+  }
+  return Array.from({ length: 25 }, (_, i) => {
+    if (i === 0) return "none"
+    if (levels[i]) return levels[i]
+    return shadow.xl
+  }) as Shadows
+}
 
-export const theme = createTheme({
-  palette: {
-    primary: {
-      main: greenColors[500],
-      light: greenColors[400],
-      dark: greenColors[700],
-      contrastText: "#ffffff",
-    },
-    secondary: {
-      main: greenColors[700],
-      light: greenColors[600],
-      dark: greenColors[800],
-      contrastText: "#ffffff",
-    },
-    success: {
-      main: greenColors[500],
-      light: greenColors[400],
-      dark: greenColors[700],
-    },
-    background: {
-      default: greenColors.mint,
-      paper: "#ffffff",
-    },
-    text: {
-      primary: brandNeutral.charcoal,
-      secondary: brandNeutral.steel,
-    },
-  },
-  typography: {
-    fontFamily: brandFontFamily,
-    h1: {
-      fontWeight: 700,
-    },
-    h2: {
-      fontWeight: 700,
-    },
-    h3: {
-      fontWeight: 600,
-    },
-    h4: {
-      fontWeight: 600,
-    },
-    button: {
-      textTransform: "none",
-      fontWeight: 500,
-    },
-  },
-  shape: {
-    borderRadius: 12,
-  },
-  shadows: [
-    "none",
-    "none",
-    "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
-    "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
-    "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
-    "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
-    "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
-    "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
-    "0 25px 50px -12px rgb(0 0 0 / 0.25)",
-    "0 25px 50px -12px rgb(0 0 0 / 0.25)",
-    "0 25px 50px -12px rgb(0 0 0 / 0.25)",
-    "0 25px 50px -12px rgb(0 0 0 / 0.25)",
-    "0 25px 50px -12px rgb(0 0 0 / 0.25)",
-    "0 25px 50px -12px rgb(0 0 0 / 0.25)",
-    "0 25px 50px -12px rgb(0 0 0 / 0.25)",
-    "0 25px 50px -12px rgb(0 0 0 / 0.25)",
-    "0 25px 50px -12px rgb(0 0 0 / 0.25)",
-    "0 25px 50px -12px rgb(0 0 0 / 0.25)",
-    "0 25px 50px -12px rgb(0 0 0 / 0.25)",
-    "0 25px 50px -12px rgb(0 0 0 / 0.25)",
-    "0 25px 50px -12px rgb(0 0 0 / 0.25)",
-    "0 25px 50px -12px rgb(0 0 0 / 0.25)",
-    "0 25px 50px -12px rgb(0 0 0 / 0.25)",
-    "0 25px 50px -12px rgb(0 0 0 / 0.25)",
-    "0 25px 50px -12px rgb(0 0 0 / 0.25)",
-  ],
-  components: {
-    MuiButton: {
-      defaultProps: {
-        disableElevation: true,
+export const createAppTheme = (mode: ThemeMode = "light"): Theme => {
+  const roles = modes[mode]
+
+  return createTheme({
+    palette: {
+      mode,
+      primary: {
+        main: roles.primary,
+        light: palette.green[400],
+        dark: roles.primaryStrong,
+        contrastText: roles.onPrimary,
       },
-      styleOverrides: {
-        root: {
-          borderRadius: 12,
-          textTransform: "none",
-          fontWeight: 500,
-          padding: "10px 24px",
+      secondary: {
+        main: roles.primaryStrong,
+        light: roles.primary,
+        dark: palette.green[800],
+        contrastText: "#ffffff",
+      },
+      success: {
+        main: roles.success,
+        light: palette.green[400],
+        dark: roles.successStrong,
+        contrastText: "#ffffff",
+      },
+      warning: {
+        main: roles.warning,
+        contrastText: "#ffffff",
+      },
+      error: {
+        main: roles.danger,
+        contrastText: "#ffffff",
+      },
+      info: {
+        main: roles.info,
+        contrastText: "#ffffff",
+      },
+      background: {
+        default: roles.canvas,
+        paper: roles.card,
+      },
+      text: {
+        primary: roles.ink,
+        secondary: roles.inkSoft,
+      },
+      divider: roles.border,
+    },
+    typography: {
+      fontFamily: typography.family,
+      h1: { fontWeight: typography.weights.bold },
+      h2: { fontWeight: typography.weights.bold },
+      h3: { fontWeight: typography.weights.semibold },
+      h4: { fontWeight: typography.weights.semibold },
+      button: { textTransform: "none", fontWeight: typography.weights.medium },
+    },
+    shape: {
+      borderRadius: radius.md,
+    },
+    shadows: toMuiShadows(),
+    components: {
+      MuiButton: {
+        defaultProps: {
+          disableElevation: true,
         },
-        contained: {
-          boxShadow: "none",
-          "&:hover": {
+        styleOverrides: {
+          root: {
+            borderRadius: radius.md,
+            textTransform: "none",
+            fontWeight: typography.weights.medium,
+            letterSpacing: 0,
+            minHeight: 40,
+          },
+          sizeSmall: {
+            minHeight: 32,
+            padding: "6px 12px",
+          },
+          sizeMedium: {
+            padding: "9px 16px",
+          },
+          sizeLarge: {
+            minHeight: 48,
+            padding: "12px 20px",
+          },
+          contained: {
             boxShadow: "none",
-          },
-        },
-        containedPrimary: {
-          backgroundColor: greenColors[500],
-          color: "#ffffff",
-          "&:hover": {
-            backgroundColor: greenColors[700],
-          },
-        },
-        outlined: {
-          borderColor: greenColors[500],
-          color: greenColors[500],
-          "&:hover": {
-            borderColor: greenColors[700],
-            backgroundColor: `${greenColors[500]}08`,
-          },
-        },
-      },
-    },
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          "& .MuiOutlinedInput-root": {
-            borderRadius: 12,
-            "& fieldset": {
-              borderColor: brandNeutral.pale,
-            },
-            "&:hover fieldset": {
-              borderColor: greenColors[500],
-            },
-            "&.Mui-focused fieldset": {
-              borderColor: greenColors[500],
-              borderWidth: "2px",
-            },
-          },
-        },
-      },
-    },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          borderRadius: 16,
-          boxShadow:
-            "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
-        },
-      },
-    },
-    MuiDialog: {
-      styleOverrides: {
-        paper: {
-          borderRadius: 16,
-        },
-      },
-    },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          borderRadius: 12,
-        },
-        elevation1: {
-          boxShadow:
-            "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
-        },
-      },
-    },
-    MuiChip: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-        },
-        filled: {
-          backgroundColor: greenColors[100],
-          color: greenColors[800],
-          "&:hover": {
-            backgroundColor: greenColors[200],
-          },
-        },
-      },
-    },
-    MuiTableCell: {
-      styleOverrides: {
-        head: {
-          backgroundColor: greenColors.mint,
-          fontWeight: 600,
-          color: brandNeutral.charcoal,
-        },
-      },
-    },
-    MuiListItemButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          "&.Mui-selected": {
-            backgroundColor: greenColors[50],
-            color: greenColors[700],
             "&:hover": {
-              backgroundColor: greenColors[100],
+              boxShadow: "none",
             },
           },
-          "&:hover": {
-            backgroundColor: greenColors[50],
+          containedPrimary: {
+            backgroundColor: roles.primary,
+            color: roles.onPrimary,
+            "&:hover": {
+              backgroundColor: roles.primaryStrong,
+            },
+          },
+          outlinedPrimary: {
+            borderColor: roles.primary,
+            color: roles.primary,
+            "&:hover": {
+              borderColor: roles.primaryStrong,
+              backgroundColor: alpha(roles.primary, 0.05),
+            },
+          },
+          textPrimary: {
+            "&:hover": {
+              backgroundColor: alpha(roles.primary, 0.08),
+            },
+          },
+        },
+      },
+      MuiTextField: {
+        styleOverrides: {
+          root: {
+            "& .MuiOutlinedInput-root": {
+              borderRadius: radius.md,
+              "& fieldset": {
+                borderColor: roles.borderStrong,
+              },
+              "&:hover fieldset": {
+                borderColor: roles.primary,
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: roles.primary,
+                borderWidth: "2px",
+              },
+            },
+          },
+        },
+      },
+      MuiCard: {
+        styleOverrides: {
+          root: {
+            borderRadius: radius.lg,
+            boxShadow: shadow.sm,
+          },
+        },
+      },
+      MuiDialog: {
+        styleOverrides: {
+          paper: {
+            borderRadius: radius.lg,
+          },
+        },
+      },
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            borderRadius: radius.md,
+          },
+          elevation1: {
+            boxShadow: shadow.sm,
+          },
+        },
+      },
+      MuiChip: {
+        styleOverrides: {
+          root: {
+            borderRadius: radius.sm,
+          },
+          filled: {
+            backgroundColor: roles.primarySoft,
+            color: roles.primaryStrong,
+            "&:hover": {
+              backgroundColor: palette.green[100],
+            },
+          },
+        },
+      },
+      MuiTableCell: {
+        styleOverrides: {
+          head: {
+            backgroundColor: roles.cardSoft,
+            fontWeight: 600,
+            color: roles.ink,
+          },
+        },
+      },
+      MuiListItemButton: {
+        styleOverrides: {
+          root: {
+            borderRadius: radius.sm,
+            "&.Mui-selected": {
+              backgroundColor: roles.primarySoft,
+              color: roles.primaryStrong,
+              "&:hover": {
+                backgroundColor: palette.green[100],
+              },
+            },
+            "&:hover": {
+              backgroundColor: roles.primarySoft,
+            },
+          },
+        },
+      },
+      MuiPaginationItem: {
+        styleOverrides: {
+          root: {
+            "&.Mui-selected": {
+              backgroundColor: roles.primary,
+              color: roles.onPrimary,
+              "&:hover": {
+                backgroundColor: roles.primaryStrong,
+              },
+            },
           },
         },
       },
     },
-  },
-})
+  })
+}
+
+/** Default light theme — used by <ThemeProvider> today. */
+export const theme = createAppTheme("light")
 
 export default theme

@@ -1,4 +1,5 @@
-import Card from "@mui/material/Card";
+import { CircleCheck, CircleDollarSign, Wallet } from "lucide-react";
+import CardStat from "@components/CardStat";
 import type { PurchaseBookSummary } from "../types";
 import { formatCurrency } from "@utils/currency";
 
@@ -13,38 +14,26 @@ function PurchaseBookSummaryCard(props: Props) {
 
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-3 mb-4">
-      <Card className="p-6">
-        <div className="flex flex-col gap-3">
-          <h3 className="text-lg font-semibold capitalize text-muted-foreground">
-            Paid
-          </h3>
-          <p className="text-3xl font-bold tracking-tight text-green-600">
-            {formatCurrency(paid)}
-          </p>
-        </div>
-      </Card>
-      <Card className="p-6">
-        <div className="flex flex-col gap-3">
-          <h3 className="text-lg font-semibold capitalize text-muted-foreground">
-            Credit
-          </h3>
-          <p className="text-3xl font-bold tracking-tight text-red-600">
-            {formatCurrency(credit)}
-          </p>
-        </div>
-      </Card>
-      <Card className="p-6">
-        <div className="flex flex-col gap-3">
-          <h3 className="text-lg font-semibold capitalize text-muted-foreground">
-            Balance
-          </h3>
-          <p
-            className={`text-3xl font-bold tracking-tight ${balance > 0 ? "text-green-600" : "text-red-600"}`}
-          >
-            {formatCurrency(balance)}
-          </p>
-        </div>
-      </Card>
+      <CardStat
+        label="Paid"
+        value={formatCurrency(paid)}
+        icon={<CircleCheck className="w-5 h-5" />}
+        valueClassName="text-brand-success"
+      />
+      <CardStat
+        label="Credit"
+        value={formatCurrency(credit)}
+        icon={<CircleDollarSign className="w-5 h-5" />}
+        valueClassName="text-brand-danger"
+      />
+      <CardStat
+        label="Balance"
+        value={formatCurrency(balance)}
+        icon={<Wallet className="w-5 h-5" />}
+        valueClassName={
+          balance > 0 ? "text-brand-success" : "text-brand-danger"
+        }
+      />
     </div>
   );
 }

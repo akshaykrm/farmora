@@ -54,34 +54,34 @@ const ReversalDialog = ({
     >
       <DialogContent>
         {loading ? (
-          <div className="py-4 text-center text-gray-500">Loading...</div>
+          <div className="py-4 text-center text-brand-ink-muted">Loading...</div>
         ) : transaction ? (
           <div className="space-y-4">
-            <div className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-              <span className="text-sm text-amber-800 font-medium">
+            <div className="flex items-center gap-2 rounded-lg border border-brand-warning-soft bg-brand-warning-soft p-3">
+              <span className="text-sm font-medium text-brand-warning-strong">
                 ⚠ You are about to reverse transaction{' '}
                 <span className="font-bold">{txnId}</span>
               </span>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Investor</p>
-              <p className="font-medium">
+              <p className="text-sm text-brand-ink-muted">Investor</p>
+              <p className="font-medium text-brand-ink">
                 {transaction.investor?.investor_name ?? '-'}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Transaction Type</p>
-              <p className="font-medium">
+              <p className="text-sm text-brand-ink-muted">Transaction Type</p>
+              <p className="font-medium text-brand-ink">
                 {transaction.transaction_type?.name ?? '-'}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Amount</p>
-              <p className="font-medium">{transaction.amount}</p>
+              <p className="text-sm text-brand-ink-muted">Amount</p>
+              <p className="font-medium text-brand-ink">{transaction.amount}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Transaction Date</p>
-              <p className="font-medium">
+              <p className="text-sm text-brand-ink-muted">Transaction Date</p>
+              <p className="font-medium text-brand-ink">
                 {transaction.transaction_date
                   ? dayjs(transaction.transaction_date).format('DD-MM-YYYY')
                   : '-'}
@@ -96,8 +96,8 @@ const ReversalDialog = ({
               onChange={(e) => setRemarks(e.target.value)}
               size="small"
             />
-            <div className="border-t border-red-200 pt-4">
-              <p className="text-sm text-red-600 font-medium mb-2">
+            <div className="border-t border-brand-danger-soft pt-4">
+              <p className="mb-2 text-sm font-medium text-brand-danger">
                 Type <span className="font-bold">{txnId}</span> to confirm
               </p>
               <TextField
@@ -116,7 +116,7 @@ const ReversalDialog = ({
             </div>
           </div>
         ) : (
-          <div className="py-4 text-center text-red-500">
+          <div className="py-4 text-center text-brand-danger">
             Transaction not found
           </div>
         )}

@@ -3,7 +3,7 @@ import Table from "@components/Table";
 import TableCell from "@components/TableCell";
 import TableHeaderCell from "@components/TableHeaderCell";
 import TableRow from "@components/TableRow";
-import DataNotFound from "@components/data-not-found";
+import EmptyContentMessage from "@components/EmptyContentMessage";
 import { formatCurrency } from "@utils/currency";
 import dayjs from "dayjs";
 import { EditIcon } from "lucide-react";
@@ -37,7 +37,7 @@ const GeneralSalesTable = ({ onEdit, data }: Props) => {
             <TableCell
               content={
                 <EditIcon
-                  className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer"
+                  className="w-6 h-6 text-brand-ink-muted hover:text-brand-ink-soft cursor-pointer"
                   onClick={() => {
                     onEdit(item.id);
                   }}
@@ -48,7 +48,7 @@ const GeneralSalesTable = ({ onEdit, data }: Props) => {
         ))}
       </Table>
       {isEmpty && (
-        <DataNotFound
+        <EmptyContentMessage
           title="No general sales records found"
           description="No general sales items found for the selected season and date range"
         />

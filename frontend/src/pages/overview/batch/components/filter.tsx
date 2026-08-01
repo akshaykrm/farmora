@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import useGetSeasonNameList from "@hooks/use-get-season-names";
 import useGetBatchNameList from "@hooks/use-get-batch-names";
 import type { Filter } from "@utils/filters";
+import FilterCard from "@components/FilterCard";
 
 type Props = {
   onFilter: (v: Filter) => void;
@@ -42,8 +43,17 @@ const FilterBatchOverview = ({ onFilter, defaultValues }: Props) => {
     },
   );
 
+  const handleClearAll = () => {
+    methods.reset({ season_id: "", batch_id: "" });
+    onFilter({ season_id: "", batch_id: "" });
+  };
+
   return (
-    <div className="w-full bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+    <FilterCard
+      filters={{ season_id: seasonId, batch_id: batchId }}
+      onClearAll={handleClearAll}
+      openByDefault
+    >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <SelectList
           options={seasonsList.data}
@@ -83,7 +93,7 @@ const FilterBatchOverview = ({ onFilter, defaultValues }: Props) => {
           Apply Filters
         </Button>
       </div>
-    </div>
+    </FilterCard>
   );
 };
 

@@ -27,8 +27,23 @@ const ProfitFilters = ({ onFilter, defaultFilter }: Props) => {
     onFilter(inputData)
   })
 
+  const handleClearAll = () => {
+    methods.reset({
+      investor_id: '',
+      transaction_type_id: '',
+      start_date: '',
+      end_date: '',
+    })
+    onFilter({
+      investor_id: '',
+      transaction_type_id: '',
+      start_date: '',
+      end_date: '',
+    })
+  }
+
   return (
-    <FilterWrapper>
+    <FilterWrapper filters={values} onClearAll={handleClearAll}>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
         <SelectList
           options={investors.data}

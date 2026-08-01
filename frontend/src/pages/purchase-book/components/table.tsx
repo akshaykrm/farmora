@@ -2,7 +2,7 @@ import Table from "@components/Table";
 import TableCell from "@components/TableCell";
 import TableHeaderCell from "@components/TableHeaderCell";
 import TableRow from "@components/TableRow";
-import DataNotFound from "@components/data-not-found";
+import EmptyContentMessage from "@components/EmptyContentMessage";
 import Ternary from "@components/ternary";
 import dayjs from "dayjs";
 import type { PurchaseBookTransaction } from "../types";
@@ -40,7 +40,7 @@ const PurchaseBookTable = (props: Props) => {
               <TableCell content={formatCurrency(item.price)} />
               <TableCell content={formatCurrency(item.amount)} />
               <TableCell
-                className={`${item.type === "return" ? "text-red-700" : "text-black"} capitalize`}
+                className={`${item.type === "return" ? "text-brand-danger-strong" : "text-brand-ink"} capitalize`}
                 content={item.type || "-"}
               />
               <TableCell content={formatCurrency(item.balance)} />
@@ -51,7 +51,7 @@ const PurchaseBookTable = (props: Props) => {
       <Ternary
         when={isEmpty}
         then={
-          <DataNotFound
+          <EmptyContentMessage
             title="No purchase records found"
             description="No purchases found for the selected vendor and date range"
           />

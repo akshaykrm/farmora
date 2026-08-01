@@ -1,4 +1,4 @@
-import PageTitle from "@components/PageTitle";
+import PageHeader from "@components/PageHeader";
 import BalanceSheetFilter from "./components/filter";
 import BalanceSheetTable from "./components/table";
 import useGetBalanceSheet from "./hooks/use-get-balance-sheet";
@@ -16,9 +16,7 @@ const BalanceSheetPage = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-6">
-        <PageTitle title="Cash Flow" />
-      </div>
+      <PageHeader title="Cash Flow" />
       <BalanceSheetFilter onFilter={handleFilter} />
       <BalanceSheetTable
         data={balanceSheetData}

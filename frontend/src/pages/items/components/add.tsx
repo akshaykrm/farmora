@@ -33,7 +33,7 @@ const AddItem = ({ isShow, onClose, refetch }: Props) => {
   return (
     <Dialog isOpen={isShow} headerTitle="Add New Item" onClose={handleClose}>
       <DialogContent>
-        <p className="text-gray-700">Add new Item</p>
+        <p className="text-brand-ink-soft">Add new Item</p>
         <ItemForm
           onSubmit={onSubmit}
           defaultValues={defaultValues}

@@ -4,10 +4,9 @@ import TableHeaderCell from "@components/TableHeaderCell";
 import TableRow from "@components/TableRow";
 import { EditIcon } from "lucide-react";
 import { useMemo, type Ref } from "react";
-import DataNotFound from "@components/data-not-found";
+import EmptyContentMessage from "@components/EmptyContentMessage";
 import Ternary from "@components/ternary";
 import dayjs from "dayjs";
-import Card from "@mui/material/Card";
 import type { Purchase, PurchaseFilter } from "../types";
 
 const headers = [
@@ -33,8 +32,7 @@ const ItemTable = ({ onEdit, data }: Props) => {
 
   return (
     <>
-      <Card>
-        <Table>
+      <Table>
           <TableRow>
             {headers.map((header) => (
               <TableHeaderCell key={header} content={header} />
@@ -60,7 +58,7 @@ const ItemTable = ({ onEdit, data }: Props) => {
                 <TableCell
                   content={
                     <EditIcon
-                      className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer"
+                      className="w-6 h-6 text-brand-ink-muted hover:text-brand-ink-soft cursor-pointer"
                       onClick={() => {
                         onEdit(item.id);
                       }}
@@ -70,18 +68,17 @@ const ItemTable = ({ onEdit, data }: Props) => {
               </TableRow>
             );
           })}
-        </Table>
+      </Table>
 
-        <Ternary
-          when={isEmpty}
-          then={
-            <DataNotFound
-              title="No purchases found"
-              description="Try adjusting your filters or create a new purchase"
-            />
-          }
-        />
-      </Card>
+      <Ternary
+        when={isEmpty}
+        then={
+          <EmptyContentMessage
+            title="No purchases found"
+            description="Try adjusting your filters or create a new purchase"
+          />
+        }
+      />
     </>
   );
 };

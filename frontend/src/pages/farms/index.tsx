@@ -1,9 +1,10 @@
-import PageTitle from "@components/PageTitle";
+import PageHeader from "@components/PageHeader";
+import AddButton from "@components/AddButton";
 import { useState } from "react";
 import AddFarm from "./components/add-farm";
 import EditFarm from "./components/edit-farm";
 import FarmTable from "./components/table";
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import useGetFarms from "./hooks/use-get-farms";
 import useFarmFilter from "./hooks/use-farm-filter";
 import PaginationWithLimit from "@components/pagination-with-limit";
@@ -20,12 +21,10 @@ const FarmsPage = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-6">
-        <PageTitle title="Farms" />
-        <Button variant="contained" onClick={onOpen}>
-          Add Farms
-        </Button>
-      </div>
+      <PageHeader
+        title="Farms"
+        action={<AddButton label="Farm" onClick={onOpen} />}
+      />
       <div>
         <FarmTable onEdit={(id) => setSelectedId(id)} farms={farms.records} />
       </div>

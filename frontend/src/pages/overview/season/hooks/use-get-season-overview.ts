@@ -22,6 +22,7 @@ function searializeFilter(filter: Filter, override?: Filter) {
 }
 
 function useGetSeasonOverview(filter: Filter) {
+  const [isLoading, setIsLoading] = useState(false);
   const [seasonOverview, setSeasonOverview] = useState<SeasonOverviewResponse>({
     season: null,
     totals: {
@@ -60,6 +61,7 @@ function useGetSeasonOverview(filter: Filter) {
         return;
       }
       const opts = searializeFilter(filter, override);
+      setIsLoading(true);
 
       const res = await seasonOverviewApi.fetchOverview(opts);
       if (res.status === "success") {
@@ -67,6 +69,7 @@ function useGetSeasonOverview(filter: Filter) {
           setSeasonOverview(res.data);
         }
       }
+      setIsLoading(false);
     },
     [
       season_id,
@@ -85,6 +88,7 @@ function useGetSeasonOverview(filter: Filter) {
 
   return {
     seasonOverview,
+    isLoading,
     refetch: handleGetSeasonOverview,
   };
 }

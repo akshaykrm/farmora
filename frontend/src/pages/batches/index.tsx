@@ -1,9 +1,10 @@
-import PageTitle from "@components/PageTitle";
+import PageHeader from "@components/PageHeader";
+import AddButton from "@components/AddButton";
 import { useState } from "react";
 import AddBatch from "./components/add";
 import BatchTable from "./components/table";
 import EditBatch from "./components/edit";
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import useGetBatches from "./hooks/use-get-batch";
 import useBatchFilter from "./hooks/use-batch-filter";
 import PaginationWithLimit from "@components/pagination-with-limit";
@@ -20,12 +21,12 @@ const BatchPage = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-6">
-        <PageTitle title="Batch" />
-        <Button variant="contained" onClick={onOpen}>
-          Add Batch
-        </Button>
-      </div>
+      <PageHeader
+        title="Batch"
+        action={
+          <AddButton label="Batch" onClick={onOpen} />
+        }
+      />
       <div>
         <BatchTable onEdit={(id) => setSelectedId(id)} batches={batches.records} />
       </div>

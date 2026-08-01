@@ -1,6 +1,7 @@
 import PageTitle from '@components/PageTitle'
+import AddButton from '@components/AddButton'
 import { useState } from 'react'
-import { Box, Button } from '@mui/material'
+import { Box } from '@mui/material'
 import { Dialog, DialogContent } from '@components/dialog'
 import PaginationWithLimit from '@components/pagination-with-limit'
 import InvestTable from './InvestTable'
@@ -70,9 +71,7 @@ const InvestPage = () => {
     <>
       <div className="flex items-center justify-between mb-6">
         <PageTitle title="Investments" />
-        <Button variant="contained" onClick={onOpen}>
-          Add Investment
-        </Button>
+        <AddButton label="Investment" onClick={onOpen} />
       </div>
       <InvestFilters defaultFilter={filter} onFilter={(f) => updateQueryParams(f)} />
       <div className="mt-4">

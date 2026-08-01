@@ -9,7 +9,12 @@ import AuthProvider from "@store/authentication/index";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
-      <Toaster position="top-right" />
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          className: "!bg-brand-card !text-brand-ink !border !border-brand-border !shadow-brand-md",
+        }}
+      />
       <AuthProvider>
         <App />
       </AuthProvider>

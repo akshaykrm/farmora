@@ -1,6 +1,7 @@
 import PageTitle from '@components/PageTitle'
+import AddButton from '@components/AddButton'
 import { useState } from 'react'
-import { Box, Button } from '@mui/material'
+import { Box } from '@mui/material'
 import { Dialog, DialogContent } from '@components/dialog'
 import PaginationWithLimit from '@components/pagination-with-limit'
 import ProfitTable from './ProfitTable'
@@ -70,9 +71,7 @@ const ProfitPage = () => {
     <>
       <div className="flex items-center justify-between mb-6">
         <PageTitle title="Profits" />
-        <Button variant="contained" onClick={onOpen}>
-          Add Profit
-        </Button>
+        <AddButton label="Profit" onClick={onOpen} />
       </div>
       <ProfitFilters defaultFilter={filter} onFilter={(f) => updateQueryParams(f)} />
       <div className="mt-4">

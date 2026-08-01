@@ -1,9 +1,10 @@
-import PageTitle from "@components/PageTitle";
+import PageHeader from "@components/PageHeader";
+import AddButton from "@components/AddButton";
 import { useState } from "react";
 import AddItemReturn from "./components/add";
 import ItemReturnTable from "./components/table";
 import EditItemReturn from "./components/edit";
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import useItemReturnFilter from "./hooks/use-purchase-return-filter";
 import useGetItemReturns from "./hooks/use-item-returs";
 import FilterItemReturns from "./components/filter";
@@ -22,12 +23,12 @@ const ItemReturnPage = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between">
-        <PageTitle title="Item Returns" />
-        <Button variant="contained" onClick={onOpen}>
-          Add Return
-        </Button>
-      </div>
+      <PageHeader
+        title="Item Returns"
+        action={
+          <AddButton label="Return" onClick={onOpen} />
+        }
+      />
 
       <div className="mt-6">
         <FilterItemReturns

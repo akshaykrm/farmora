@@ -35,7 +35,7 @@ const ExpenseTable = (props: Props) => {
               <TableCell
                 content={
                   <span
-                    className={`capitalize ${item.return_type === "batch" ? "text-red-600" : ""}`}
+                    className={`capitalize ${item.return_type === "batch" ? "text-brand-danger" : ""}`}
                   >
                     {item.category.type}
                   </span>
@@ -61,7 +61,7 @@ const ExpenseTable = (props: Props) => {
         </TableRow>
       </Table>
       {data.length === 0 && (
-        <div className="bg-gray-50 p-6 text-center text-gray-500">
+        <div className="bg-brand-canvas p-6 text-center text-brand-ink-muted">
           No expenses found
         </div>
       )}

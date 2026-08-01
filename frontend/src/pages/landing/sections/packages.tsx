@@ -27,7 +27,7 @@ interface Package {
 const features = [...PACKAGE_FEATURE_BULLETS]
 
 const PackageSkeleton = () => (
-  <div className="bg-white rounded-2xl p-6 border border-brand-divider shadow-sm">
+  <div className="bg-brand-card rounded-2xl p-6 border border-brand-border shadow-sm">
     <Skeleton variant="text" width="60%" height={32} />
     <Skeleton variant="text" width="40%" height={48} sx={{ mt: 1 }} />
     <Skeleton variant="text" width="80%" height={20} sx={{ mt: 2 }} />
@@ -67,7 +67,7 @@ const PackagesSection = () => {
         packageId={selectedPackage?.id || 0}
         packageName={selectedPackage?.name || ""}
       />
-      <section className="landing-section px-6 bg-brand-surface font-sans">
+      <section className="landing-section px-6 bg-brand-canvas font-sans">
         <div className="max-w-7xl mx-auto">
           <RevealDiv>
             <SectionHeader
@@ -119,27 +119,27 @@ const PackagesSection = () => {
                     )}
 
                     <CardContent sx={{ flexGrow: 1, p: 4 }}>
-                      <h3 className="text-2xl font-bold text-brand-charcoal mb-2">
+                      <h3 className="text-2xl font-bold text-brand-ink mb-2">
                         {pkg.name}
                       </h3>
                       <div className="mb-4">
                         <span className="text-4xl font-bold text-brand-accent">
                           ₹{parseFloat(pkg.price).toLocaleString()}
                         </span>
-                        <span className="text-brand-steel ml-2 text-sm">
+                        <span className="text-brand-ink-soft ml-2 text-sm">
                           / {pkg.duration} days
                         </span>
                       </div>
-                      <p className="text-brand-steel mb-6 text-sm leading-relaxed">
+                      <p className="text-brand-ink-soft mb-6 text-sm leading-relaxed">
                         {pkg.description}
                       </p>
                       <div className="space-y-3">
                         {features.map((feature, i) => (
                           <div key={i} className="flex items-start gap-3">
-                            <div className="w-5 h-5 bg-brand-mint rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <div className="w-5 h-5 bg-brand-canvas rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                               <Check className="w-3 h-3 text-brand-accent" />
                             </div>
-                            <span className="text-brand-slate text-sm">
+                            <span className="text-brand-ink-soft text-sm">
                               {feature}
                             </span>
                           </div>
@@ -166,7 +166,7 @@ const PackagesSection = () => {
           {!isLoading &&
             (!activePackages || activePackages.length === 0) && (
               <div className="text-center py-12">
-                <p className="text-brand-steel text-lg">
+                <p className="text-brand-ink-soft text-lg">
                   No packages available at the moment. Please check back later.
                 </p>
               </div>

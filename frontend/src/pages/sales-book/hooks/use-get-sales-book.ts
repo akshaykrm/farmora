@@ -4,6 +4,7 @@ import type { SalesBookSummary, SalesBookTransaction } from "../types";
 import salesBookApi from "../api";
 
 function useGetSalesBook(filter: Filter) {
+  const [isLoading, setIsLoading] = useState(false);
   const [saleBook, setSalesBook] = useState<{
     records: SalesBookTransaction[];
     totalPages: number;
@@ -21,6 +22,7 @@ function useGetSalesBook(filter: Filter) {
         return;
       }
       const opts = overrideFilters(filter, override);
+      setIsLoading(true);
       const res = await salesBookApi.fetchAll(opts);
 
       if (res.status === "success") {
@@ -33,6 +35,7 @@ function useGetSalesBook(filter: Filter) {
           });
         }
       }
+      setIsLoading(false);
     },
     [start_date, end_date, page, limit, buyer_id],
   );
@@ -41,7 +44,7 @@ function useGetSalesBook(filter: Filter) {
     handlefetchAllSales();
   }, [handlefetchAllSales]);
 
-  return { saleBook, refetch: handlefetchAllSales };
+  return { saleBook, isLoading, refetch: handlefetchAllSales };
 }
 
 export default useGetSalesBook;
