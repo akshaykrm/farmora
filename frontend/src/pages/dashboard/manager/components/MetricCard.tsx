@@ -1,10 +1,10 @@
 import type { MetricData } from "../types";
 
 const colorMap: Record<string, string> = {
-  blue: "text-green-600 bg-green-50 border-green-100",
-  amber: "text-amber-600 bg-amber-50 border-amber-100",
-  emerald: "text-emerald-600 bg-emerald-50 border-emerald-100",
-  rose: "text-rose-600 bg-rose-50 border-rose-100",
+  blue: "text-brand-success bg-brand-success-soft border-brand-success-soft",
+  amber: "text-brand-warning bg-brand-warning-soft border-brand-warning-soft",
+  emerald: "text-brand-success bg-brand-success-soft border-brand-success-soft",
+  rose: "text-brand-danger bg-brand-danger-soft border-brand-danger-soft",
 };
 
 function formatMetricValue(val: number, unit?: string, decimals?: number) {
@@ -33,7 +33,7 @@ const MetricCard = ({ label, value, trend, color, unit, subtitle, decimals }: Me
   );
 
   return (
-    <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+    <div className="bg-brand-card p-4 rounded-2xl border border-brand-border shadow-sm hover:shadow-md transition-shadow">
       <div className="flex justify-between items-start mb-3">
         <div className={`p-2.5 rounded-xl border ${accentColor}`}>
           <svg
@@ -53,8 +53,8 @@ const MetricCard = ({ label, value, trend, color, unit, subtitle, decimals }: Me
         <div
           className={`flex items-center text-xs font-bold px-2 py-1 rounded-lg ${
             isPositive
-              ? "text-emerald-600 bg-emerald-50"
-              : "text-rose-600 bg-rose-50"
+              ? "text-brand-success bg-brand-success-soft"
+              : "text-brand-danger bg-brand-danger-soft"
           }`}
         >
           {isPositive ? "+" : ""}
@@ -75,23 +75,23 @@ const MetricCard = ({ label, value, trend, color, unit, subtitle, decimals }: Me
         </div>
       </div>
       <div>
-        <p className="text-sm font-medium text-slate-500 mb-1">{label}</p>
-        <h3 className="text-2xl font-bold text-slate-800 tracking-tight">
+        <p className="text-sm font-medium text-brand-ink-muted mb-1">{label}</p>
+        <h3 className="text-2xl font-bold text-brand-ink tracking-tight">
           {value < 0 ? "-" : ""}
           {prefix}
           {formatted}
           {suffix}
           {subtitle && (
-            <span className="text-sm font-normal text-slate-400">
+            <span className="text-sm font-normal text-brand-ink-muted">
               {" "}
               / {subtitle}
             </span>
           )}
         </h3>
       </div>
-      <div className="mt-3 pt-3 border-t border-slate-50">
-        <div className="flex items-center text-xs text-slate-400">
-          <span className="font-semibold text-slate-500 mr-2">Prev:</span>
+      <div className="mt-3 pt-3 border-t border-brand-border">
+        <div className="flex items-center text-xs text-brand-ink-muted">
+          <span className="font-semibold text-brand-ink-muted mr-2">Prev:</span>
           {prev.prefix}
           {prev.formatted}
           {prev.suffix}

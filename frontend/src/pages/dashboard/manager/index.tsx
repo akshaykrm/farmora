@@ -27,7 +27,7 @@ const ManagerDashboard = () => {
   if (error || !data) {
     return (
       <Box className="flex items-center justify-center h-96">
-        <p className="text-red-500">Failed to load dashboard data</p>
+        <p className="text-brand-danger">Failed to load dashboard data</p>
       </Box>
     );
   }
@@ -36,10 +36,10 @@ const ManagerDashboard = () => {
     <div className="h-full flex flex-col w-full gap-4 overflow-hidden">
       {/* Welcome Header */}
       <div className="mb-2 shrink-0">
-        <h1 className="text-3xl font-bold text-slate-800 mb-1">
+        <h1 className="text-3xl font-bold text-brand-ink mb-1">
           Hi, {user?.name} 👋
         </h1>
-        <p className="text-slate-500">
+        <p className="text-brand-ink-muted">
           Welcome back! Here's what's happening with your farm today.
         </p>
       </div>

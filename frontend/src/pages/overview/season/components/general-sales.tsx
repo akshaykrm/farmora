@@ -30,7 +30,7 @@ const GeneralSalesTable = (props: GeneralSalesTableProps) => {
             <TableCell content={item.purpose} />
             <TableCell
               content={
-                <span className="text-green-600">{formatCurrency(item.amount)}</span>
+                <span className="text-brand-success">{formatCurrency(item.amount)}</span>
               }
             />
           </TableRow>
@@ -41,7 +41,7 @@ const GeneralSalesTable = (props: GeneralSalesTableProps) => {
             <TableCell content="" />
             <TableCell
               content={
-                <strong className="text-green-600">
+                <strong className="text-brand-success">
                   {formatCurrency(totalAmount)}
                 </strong>
               }
@@ -50,7 +50,7 @@ const GeneralSalesTable = (props: GeneralSalesTableProps) => {
         )}
       </Table>
       {data.length === 0 && (
-        <div className="bg-gray-50 p-6 text-center text-gray-500">
+        <div className="bg-brand-canvas p-6 text-center text-brand-ink-muted">
           No general sales found
         </div>
       )}

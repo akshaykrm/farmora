@@ -65,7 +65,7 @@ const SalesTable = (props: Props) => {
         </TableRow>
       </Table>
       {data.length === 0 && (
-        <div className="bg-gray-50 p-6 text-center text-gray-500">
+        <div className="bg-brand-canvas p-6 text-center text-brand-ink-muted">
           No sales found
         </div>
       )}

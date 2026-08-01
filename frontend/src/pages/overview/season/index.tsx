@@ -115,8 +115,8 @@ const SeasonOverviewPage = () => {
 
 function Empty() {
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-      <p className="text-gray-500 text-lg">
+    <div className="bg-brand-card rounded-lg shadow-sm border border-brand-border p-12 text-center">
+      <p className="text-brand-ink-muted text-lg">
         Please select a season, then click "Apply Filters" to view overview
       </p>
     </div>

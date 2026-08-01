@@ -41,7 +41,7 @@ const FilterSeasonOverview = ({ onFilter, defaultValues }: Props) => {
   }, []);
 
   return (
-    <div className="flex items-center justify-between w-full bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+    <div className="flex items-center justify-between w-full bg-brand-card rounded-lg shadow-sm border border-brand-border p-6 mb-6">
       <div className="w-[50%]">
         <SelectList
           options={seasonNames.data}

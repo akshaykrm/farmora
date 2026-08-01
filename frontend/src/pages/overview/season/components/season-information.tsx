@@ -33,14 +33,14 @@ const SeasonInformation = (props: SeasonInformationProps) => {
   }, [season_id]);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-4">
+    <div className="bg-brand-card rounded-lg shadow-sm border border-brand-border p-6 mb-4">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <p className="text-sm text-gray-600">Season</p>
+          <p className="text-sm text-brand-ink-soft">Season</p>
           <p className="text-lg font-semibold">{name}</p>
         </div>
         <div>
-          <p className="text-sm text-gray-600">Total Batches</p>
+          <p className="text-sm text-brand-ink-soft">Total Batches</p>
           <p className="text-lg font-semibold">{batchLength}</p>
         </div>
         <div className="flex justify-end w-full items-center">
@@ -67,7 +67,7 @@ const SeasonInformation = (props: SeasonInformationProps) => {
         onClose={() => setShowConfirm(false)}
       >
         <DialogContent>
-          <p className="text-sm text-gray-600 leading-relaxed">
+          <p className="text-sm text-brand-ink-soft leading-relaxed">
             This action will close the season. Once closed, you will not be
             able to add new batches, expenses, sales, or returns. You can
             still view the season information. This action cannot be undone.

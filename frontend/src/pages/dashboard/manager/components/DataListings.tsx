@@ -9,7 +9,7 @@ import type { RecentPurchase, RecentSale } from "@app-types/dashboard.types";
 import dayjs from "dayjs";
 
 const TableHeader = ({ children }: { children: ReactNode }) => (
-  <th className="px-4 py-2.5 text-left text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-50">
+  <th className="px-4 py-2.5 text-left text-[10px] font-bold text-brand-ink-muted uppercase tracking-widest border-b border-brand-border">
     {children}
   </th>
 );
@@ -22,11 +22,11 @@ const Badge = ({
   children: ReactNode;
 }) => {
   const styles = {
-    green: "bg-emerald-50 text-emerald-700 border-emerald-100",
-    blue: "bg-blue-50 text-blue-700 border-blue-100",
-    slate: "bg-slate-50 text-slate-700 border-slate-100",
-    amber: "bg-amber-50 text-amber-700 border-amber-100",
-    red: "bg-rose-50 text-rose-700 border-rose-100",
+    green: "bg-brand-success-soft text-brand-success-strong border-brand-success-soft",
+    blue: "bg-brand-info-soft text-brand-info-strong border-brand-info-soft",
+    slate: "bg-brand-canvas text-brand-ink-soft border-brand-border",
+    amber: "bg-brand-warning-soft text-brand-warning-strong border-brand-warning-soft",
+    red: "bg-brand-danger-soft text-brand-danger-strong border-brand-danger-soft",
   };
   return (
     <span
@@ -38,10 +38,10 @@ const Badge = ({
 };
 
 export const FarmsListing = ({ data }: { data: Farm[] }) => (
-  <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+  <div className="bg-brand-card rounded-xl border border-brand-border shadow-sm overflow-hidden">
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
-        <thead className="bg-slate-50/30">
+        <thead className="bg-brand-canvas">
           <tr>
             <TableHeader>Farm Name</TableHeader>
             <TableHeader>Location</TableHeader>
@@ -49,17 +49,17 @@ export const FarmsListing = ({ data }: { data: Farm[] }) => (
             <TableHeader>Status</TableHeader>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-100">
+        <tbody className="divide-y divide-brand-border">
           {data.map((farm) => (
             <tr
               key={farm.id}
-              className="hover:bg-slate-50/50 transition-colors"
+              className="hover:bg-brand-canvas transition-colors"
             >
-              <td className="px-4 py-2.5 font-bold text-slate-800">
+              <td className="px-4 py-2.5 font-bold text-brand-ink">
                 {farm.name}
               </td>
-              <td className="px-4 py-2.5 text-slate-500">{farm.place || "-"}</td>
-              <td className="px-4 py-2.5 text-slate-600 font-medium">
+              <td className="px-4 py-2.5 text-brand-ink-muted">{farm.place || "-"}</td>
+              <td className="px-4 py-2.5 text-brand-ink-soft font-medium">
                 {farm.capacity || "-"}
               </td>
               <td className="px-4 py-2.5">
@@ -73,21 +73,21 @@ export const FarmsListing = ({ data }: { data: Farm[] }) => (
       </table>
     </div>
     {data.length === 0 && (
-      <div className="p-4 pt-8 text-center text-slate-400 flex items-start justify-center flex-1">No farms found</div>
+      <div className="p-4 pt-8 text-center text-brand-ink-muted flex items-start justify-center flex-1">No farms found</div>
     )}
   </div>
 );
 
 export const BatchesListing = ({ data }: { data: Batch[] }) => (
-  <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden h-full flex flex-col">
-    <div className="p-4 border-b border-slate-50 flex justify-between items-center">
-      <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+  <div className="bg-brand-card rounded-xl border border-brand-border shadow-sm overflow-hidden h-full flex flex-col">
+    <div className="p-4 border-b border-brand-border flex justify-between items-center">
+      <span className="text-xs font-bold text-brand-ink-muted uppercase tracking-widest">
         Recent Batches
       </span>
     </div>
     <div className="overflow-x-auto flex-1">
       <table className="w-full text-sm">
-        <thead className="bg-slate-50/30">
+        <thead className="bg-brand-canvas">
           <tr>
             <TableHeader>Name</TableHeader>
             <TableHeader>Season / Farm</TableHeader>
@@ -95,23 +95,23 @@ export const BatchesListing = ({ data }: { data: Batch[] }) => (
             <TableHeader>Status</TableHeader>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-100">
+        <tbody className="divide-y divide-brand-border">
           {data.map((batch) => (
             <tr
               key={batch.id}
-              className="hover:bg-slate-50/50 transition-colors"
+              className="hover:bg-brand-canvas transition-colors"
             >
-              <td className="px-4 py-2.5 font-bold text-slate-800">
+              <td className="px-4 py-2.5 font-bold text-brand-ink">
                 {batch.name}
               </td>
-              <td className="px-4 py-2.5 text-slate-500 text-xs">
+              <td className="px-4 py-2.5 text-brand-ink-muted text-xs">
                 {batch.season_name} / {batch.farm_name}
               </td>
               <td
                 className={`px-4 py-2.5 font-bold text-xs ${
                   (batch.profit || 0) >= 0
-                    ? "text-emerald-600"
-                    : "text-rose-600"
+                    ? "text-brand-success"
+                    : "text-brand-danger"
                 }`}
               >
                 ₹{(batch.profit || 0).toLocaleString()}
@@ -127,37 +127,37 @@ export const BatchesListing = ({ data }: { data: Batch[] }) => (
       </table>
     </div>
     {data.length === 0 && (
-      <div className="p-4 pt-8 text-center text-slate-400 flex items-start justify-center flex-1">No batches found</div>
+      <div className="p-4 pt-8 text-center text-brand-ink-muted flex items-start justify-center flex-1">No batches found</div>
     )}
   </div>
 );
 
 export const SeasonsListing = ({ data }: { data: Season[] }) => (
-  <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden h-full flex flex-col">
-    <div className="p-4 border-b border-slate-50 flex justify-between items-center">
-      <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+  <div className="bg-brand-card rounded-xl border border-brand-border shadow-sm overflow-hidden h-full flex flex-col">
+    <div className="p-4 border-b border-brand-border flex justify-between items-center">
+      <span className="text-xs font-bold text-brand-ink-muted uppercase tracking-widest">
         Seasonal Data
       </span>
     </div>
     <div className="overflow-x-auto flex-1">
       <table className="w-full text-sm">
-        <thead className="bg-slate-50/30">
+        <thead className="bg-brand-canvas">
           <tr>
             <TableHeader>Season</TableHeader>
             <TableHeader>Period</TableHeader>
             <TableHeader>Margin</TableHeader>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-100">
+        <tbody className="divide-y divide-brand-border">
           {data.map((season) => (
             <tr
               key={season.id}
-              className="hover:bg-slate-50/50 transition-colors"
+              className="hover:bg-brand-canvas transition-colors"
             >
-              <td className="px-4 py-2.5 font-bold text-slate-800">
+              <td className="px-4 py-2.5 font-bold text-brand-ink">
                 {season.name}
               </td>
-              <td className="px-4 py-2.5 text-slate-500 text-xs">
+              <td className="px-4 py-2.5 text-brand-ink-muted text-xs">
                 {dayjs(season.from_date).format("MMM YYYY")} -{" "}
                 {season.to_date
                   ? dayjs(season.to_date).format("MMM YYYY")
@@ -165,9 +165,9 @@ export const SeasonsListing = ({ data }: { data: Season[] }) => (
               </td>
               <td className="px-4 py-2.5">
                 <div className="flex items-center gap-2">
-                  <div className="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="w-16 h-1.5 bg-brand-card-soft rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-emerald-500"
+                      className="h-full bg-brand-success"
                       style={{ width: `${season.margin || 0}%` }}
                     ></div>
                   </div>
@@ -182,16 +182,16 @@ export const SeasonsListing = ({ data }: { data: Season[] }) => (
       </table>
     </div>
     {data.length === 0 && (
-      <div className="p-4 pt-8 text-center text-slate-400 flex items-start justify-center flex-1">No seasons found</div>
+      <div className="p-4 pt-8 text-center text-brand-ink-muted flex items-start justify-center flex-1">No seasons found</div>
     )}
   </div>
 );
 
 export const SalesListing = ({ data }: { data: RecentSale[] }) => (
-  <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex-1 flex flex-col min-h-0">
+  <div className="bg-brand-card rounded-xl border border-brand-border shadow-sm overflow-hidden flex-1 flex flex-col min-h-0">
     <div className="overflow-y-auto flex-1 min-h-0">
       <table className="w-full text-sm">
-        <thead className="bg-slate-50/30">
+        <thead className="bg-brand-canvas">
           <tr>
             <TableHeader>Date</TableHeader>
             <TableHeader>Batch</TableHeader>
@@ -202,25 +202,25 @@ export const SalesListing = ({ data }: { data: RecentSale[] }) => (
             <TableHeader>Amount</TableHeader>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-100">
+        <tbody className="divide-y divide-brand-border">
           {data.map((sale) => (
             <tr
               key={sale.id}
-              className="hover:bg-slate-50/50 transition-colors"
+              className="hover:bg-brand-canvas transition-colors"
             >
-              <td className="px-4 py-2.5 text-slate-500 text-xs">
+              <td className="px-4 py-2.5 text-brand-ink-muted text-xs">
                 {dayjs(sale.date).format("DD MMM YYYY")}
               </td>
-              <td className="px-4 py-2.5 font-bold text-slate-800 text-xs">
+              <td className="px-4 py-2.5 font-bold text-brand-ink text-xs">
                 {sale.batch}
               </td>
-              <td className="px-4 py-2.5 text-slate-600 font-medium text-xs">
+              <td className="px-4 py-2.5 text-brand-ink-soft font-medium text-xs">
                 {sale.buyer}
               </td>
-              <td className="px-4 py-2.5 text-slate-600 text-xs">
+              <td className="px-4 py-2.5 text-brand-ink-soft text-xs">
                 {parseFloat(sale.weight).toLocaleString()}
               </td>
-              <td className="px-4 py-2.5 text-slate-600 text-xs">
+              <td className="px-4 py-2.5 text-brand-ink-soft text-xs">
                 {sale.birds?.toLocaleString() ?? "-"}
               </td>
               <td className="px-4 py-2.5">
@@ -228,7 +228,7 @@ export const SalesListing = ({ data }: { data: RecentSale[] }) => (
                   {sale.payment_type}
                 </Badge>
               </td>
-              <td className="px-4 py-2.5 font-bold text-slate-800">
+              <td className="px-4 py-2.5 font-bold text-brand-ink">
                 ₹{parseFloat(sale.amount).toLocaleString()}
               </td>
             </tr>
@@ -237,16 +237,16 @@ export const SalesListing = ({ data }: { data: RecentSale[] }) => (
       </table>
     </div>
     {data.length === 0 && (
-      <div className="p-4 pt-8 text-center text-slate-400 flex items-start justify-center flex-1">No sales found</div>
+      <div className="p-4 pt-8 text-center text-brand-ink-muted flex items-start justify-center flex-1">No sales found</div>
     )}
   </div>
 );
 
 export const PurchasesListing = ({ data }: { data: RecentPurchase[] }) => (
-  <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex-1 flex flex-col min-h-0">
+  <div className="bg-brand-card rounded-xl border border-brand-border shadow-sm overflow-hidden flex-1 flex flex-col min-h-0">
     <div className="overflow-y-auto flex-1 min-h-0">
       <table className="w-full text-sm">
-        <thead className="bg-slate-50/30">
+        <thead className="bg-brand-canvas">
           <tr>
             <TableHeader>Invoice #</TableHeader>
             <TableHeader>Date</TableHeader>
@@ -256,16 +256,16 @@ export const PurchasesListing = ({ data }: { data: RecentPurchase[] }) => (
             <TableHeader>Amount</TableHeader>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-100">
+        <tbody className="divide-y divide-brand-border">
           {data.map((purchase) => (
             <tr
               key={purchase.id}
-              className="hover:bg-slate-50/50 transition-colors"
+              className="hover:bg-brand-canvas transition-colors"
             >
-              <td className="px-4 py-2.5 text-slate-500 text-xs font-medium">
+              <td className="px-4 py-2.5 text-brand-ink-muted text-xs font-medium">
                 {purchase.invoice_number}
               </td>
-              <td className="px-4 py-2.5 text-slate-500 text-xs">
+              <td className="px-4 py-2.5 text-brand-ink-muted text-xs">
                 {dayjs(purchase.invoice_date).format("DD MMM YYYY")}
               </td>
               <td className="px-4 py-2.5">
@@ -273,13 +273,13 @@ export const PurchasesListing = ({ data }: { data: RecentPurchase[] }) => (
                   {purchase.type}
                 </Badge>
               </td>
-              <td className="px-4 py-2.5 text-slate-600 font-medium text-xs">
+              <td className="px-4 py-2.5 text-brand-ink-soft font-medium text-xs">
                 {purchase.quantity}
               </td>
-              <td className="px-4 py-2.5 font-bold text-slate-800">
+              <td className="px-4 py-2.5 font-bold text-brand-ink">
                 {purchase.supplier_name}
               </td>
-              <td className="px-4 py-2.5 font-bold text-slate-800">
+              <td className="px-4 py-2.5 font-bold text-brand-ink">
                 ₹{parseFloat(purchase.amount).toLocaleString()}
               </td>
             </tr>
@@ -288,32 +288,32 @@ export const PurchasesListing = ({ data }: { data: RecentPurchase[] }) => (
       </table>
     </div>
     {data.length === 0 && (
-      <div className="p-4 pt-8 text-center text-slate-400 flex items-start justify-center flex-1">No purchases found</div>
+      <div className="p-4 pt-8 text-center text-brand-ink-muted flex items-start justify-center flex-1">No purchases found</div>
     )}
   </div>
 );
 
 export const TransactionsListing = ({ data }: { data: Transaction[] }) => (
-  <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+  <div className="bg-brand-card rounded-xl border border-brand-border shadow-sm overflow-hidden">
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
-        <thead className="bg-slate-50/30">
+        <thead className="bg-brand-canvas">
           <tr>
             <TableHeader>Transaction Details</TableHeader>
             <TableHeader>Type</TableHeader>
             <TableHeader>Amount</TableHeader>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-100">
+        <tbody className="divide-y divide-brand-border">
           {data.map((tx) => (
-            <tr key={tx.id} className="hover:bg-slate-50/50 transition-colors">
+            <tr key={tx.id} className="hover:bg-brand-canvas transition-colors">
               <td className="px-4 py-2.5">
                 <div className="flex items-center gap-3">
                   <div
                     className={`p-2 rounded-lg ${
                       tx.type === "credit"
-                        ? "bg-emerald-50 text-emerald-600"
-                        : "bg-rose-50 text-rose-600"
+                        ? "bg-brand-success-soft text-brand-success"
+                        : "bg-brand-danger-soft text-brand-danger"
                     }`}
                   >
                     {tx.type === "credit" ? (
@@ -347,8 +347,8 @@ export const TransactionsListing = ({ data }: { data: Transaction[] }) => (
                     )}
                   </div>
                   <div>
-                    <p className="font-bold text-slate-800">{tx.description}</p>
-                    <p className="text-[10px] text-slate-400 uppercase tracking-widest">
+                    <p className="font-bold text-brand-ink">{tx.description}</p>
+                    <p className="text-[10px] text-brand-ink-muted uppercase tracking-widest">
                       {dayjs(tx.date).format("DD MMM YYYY")} • {tx.category}
                     </p>
                   </div>
@@ -361,7 +361,7 @@ export const TransactionsListing = ({ data }: { data: Transaction[] }) => (
               </td>
               <td
                 className={`px-4 py-2.5 font-bold text-base ${
-                  tx.type === "credit" ? "text-emerald-600" : "text-rose-600"
+                  tx.type === "credit" ? "text-brand-success" : "text-brand-danger"
                 }`}
               >
                 {tx.type === "credit" ? "+" : "-"}₹{tx.amount.toLocaleString()}
@@ -372,7 +372,7 @@ export const TransactionsListing = ({ data }: { data: Transaction[] }) => (
       </table>
     </div>
     {data.length === 0 && (
-      <div className="p-4 pt-8 text-center text-slate-400 flex items-start justify-center flex-1">
+      <div className="p-4 pt-8 text-center text-brand-ink-muted flex items-start justify-center flex-1">
         No transactions found
       </div>
     )}

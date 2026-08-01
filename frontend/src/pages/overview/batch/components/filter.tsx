@@ -43,7 +43,7 @@ const FilterBatchOverview = ({ onFilter, defaultValues }: Props) => {
   );
 
   return (
-    <div className="w-full bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+    <div className="w-full bg-brand-card rounded-lg shadow-sm border border-brand-border p-6 mb-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <SelectList
           options={seasonsList.data}
