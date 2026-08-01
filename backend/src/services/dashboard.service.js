@@ -217,7 +217,7 @@ async function getWorkingBalance(currentUser) {
       { season_id: s.id },
       currentUser
     )
-    balance += res.totals.balance
+    balance += res.summary.balance
   }
 
   return balance
@@ -231,7 +231,7 @@ async function getIntegrationBalance(currentUser) {
       { farm_id: f.id },
       currentUser
     )
-    balance += res.totals.balance
+    balance += res.summary.balance
   }
 
   return balance
@@ -239,10 +239,10 @@ async function getIntegrationBalance(currentUser) {
 
 async function getSupplierBalance(supplier, currentUser) {
   const res = await purchaseService.getPurchaseBook(
-    { vendorId: supplier.id },
+    { vendor_id: supplier.id },
     currentUser
   )
-  return res.balance
+  return res.summary.balance
 }
 
 async function getCustomerBalance(customer, currentUser) {
@@ -250,7 +250,7 @@ async function getCustomerBalance(customer, currentUser) {
     { buyer_id: customer.id },
     currentUser
   )
-  return res.closing_balance
+  return res.summary.closing_balance
 }
 
 async function getBalanceInHand(currentUser) {
