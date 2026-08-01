@@ -1,39 +1,34 @@
+/**
+ * Backward-compatible re-exports of the legacy brand constants.
+ *
+ * The real values now live in src/theme/tokens.ts (single source of truth).
+ * Keep this file only until all consumers migrate to tokens; then delete it.
+ */
+import { gradients, palette, typography } from "./tokens"
+
 export const brandGreen = {
-  900: '#1B5E20',
-  800: '#27632B',
-  700: '#2E7D32',
-  600: '#388E3C',
-  500: '#43A047',
-  400: '#66BB6A',
-  300: '#81C784',
-  200: '#A5D6A7',
-  100: '#C8E6C9',
-  50: '#E8F5E9',
-  mint: '#F7FBF6',
+  900: palette.green[900],
+  800: palette.green[800],
+  700: palette.green[700],
+  600: palette.green[600],
+  500: palette.green[500],
+  400: palette.green[400],
+  300: palette.green[300],
+  200: palette.green[200],
+  100: palette.green[100],
+  50: palette.green[50],
+  mint: palette.mint,
 } as const
 
 export const brandNeutral = {
-  charcoal: '#263238',
-  slate: '#37474F',
-  steel: '#607D8B',
-  muted: '#90A4AE',
-  pale: '#B0BEC5',
-  divider: '#ECEFF1',
+  charcoal: palette.neutral.charcoal,
+  slate: palette.neutral.slate,
+  steel: palette.neutral.steel,
+  muted: palette.neutral.muted,
+  pale: palette.neutral.pale,
+  divider: palette.neutral.divider,
 } as const
 
-export const brandGradients = {
-  hero: 'linear-gradient(135deg, #43A047 0%, #2E7D32 100%)',
-  heroHorizontal: 'linear-gradient(90deg, #43A047 0%, #2E7D32 100%)',
-  cta: 'linear-gradient(90deg, #43A047 0%, #2E7D32 100%)',
-} as const
+export const brandGradients = gradients
 
-export const brandFontFamily = [
-  '"Montserrat"',
-  '-apple-system',
-  'BlinkMacSystemFont',
-  '"Segoe UI"',
-  'Roboto',
-  '"Helvetica Neue"',
-  'Arial',
-  'sans-serif',
-].join(',')
+export const brandFontFamily = typography.family
