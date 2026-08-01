@@ -26,6 +26,15 @@ const getBatchOverview = async (req, res) => {
 const getSeasonOverview = async (req, res) => {
   const filter = {
     season_id: parseInt(req.query.season_id),
+
+    b_page: parseInt(req.query.b_page) || 1,
+    b_limit: parseInt(req.query.b_limit) || 10,
+
+    gc_page: parseInt(req.query.gc_page) || 1,
+    gc_limit: parseInt(req.query.gc_limit) || 10,
+
+    gs_page: parseInt(req.query.gs_page) || 1,
+    gs_limit: parseInt(req.query.gs_limit) || 10,
   }
 
   logger.info({ filter }, 'Season overview request received')

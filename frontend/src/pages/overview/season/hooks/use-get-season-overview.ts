@@ -1,28 +1,92 @@
-import { useState } from "react";
-import type {
-  SeasonOverviewFilterRequest,
-  SeasonOverviewResponse,
-} from "../types";
-import seasonOverview from "../api";
+import { overrideFilters, type Filter } from "@utils/filters";
+import seasonOverviewApi from "../api";
+import type { SeasonOverviewResponse } from "../types";
+import { useCallback, useEffect, useState } from "react";
 
-const useGetSeasonOverview = () => {
-  const [overview, setOverview] = useState<SeasonOverviewResponse>({
-    batches: [],
-    general_costs: [],
-    general_sales: [],
+function searializeFilter(filter: Filter, override?: Filter) {
+  const { season_id, b_page, b_limit, gc_page, gc_limit, gs_page, gs_limit } =
+    filter;
+
+  return overrideFilters(
+    {
+      season_id,
+      b_page,
+      b_limit,
+      gc_page,
+      gc_limit,
+      gs_page,
+      gs_limit,
+    },
+    override,
+  );
+}
+
+function useGetSeasonOverview(filter: Filter) {
+  const [seasonOverview, setSeasonOverview] = useState<SeasonOverviewResponse>({
     season: null,
+    totals: {
+      total_avg_weight: 0,
+      fcr: 0,
+      cfcr: 0,
+      avg_cost: 0,
+      avg_rate: 0,
+      profit_loss_percentage: 0,
+      profit: 0,
+    },
+    batches: {
+      count: 0,
+      data: [],
+      totalPages: 0,
+    },
+    general_costs: {
+      count: 0,
+      data: [],
+      totalPages: 0,
+    },
+    general_sales: {
+      count: 0,
+      data: [],
+      totalPages: 0,
+    },
     summary: null,
   });
-  const onFilter = async (filter: SeasonOverviewFilterRequest) => {
-    const { status, data } = await seasonOverview.fetchOverview(filter);
-    if (status === "success") {
-      if (data) {
-        setOverview(data);
-      }
-    }
-  };
 
-  return { onFilter, overview };
-};
+  const { season_id, b_page, b_limit, gc_page, gc_limit, gs_page, gs_limit } =
+    filter;
+
+  const handleGetSeasonOverview = useCallback(
+    async (override?: Filter) => {
+      if (!season_id) {
+        return;
+      }
+      const opts = searializeFilter(filter, override);
+
+      const res = await seasonOverviewApi.fetchOverview(opts);
+      if (res.status === "success") {
+        if (res.data) {
+          setSeasonOverview(res.data);
+        }
+      }
+    },
+    [
+      season_id,
+      b_page,
+      b_limit,
+      gc_page,
+      gc_limit,
+      gs_page,
+      gs_limit,
+    ],
+  );
+
+  useEffect(() => {
+    handleGetSeasonOverview();
+  }, [handleGetSeasonOverview]);
+
+  return {
+    seasonOverview,
+    refetch: handleGetSeasonOverview,
+  };
+}
 
 export default useGetSeasonOverview;

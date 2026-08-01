@@ -4,14 +4,18 @@ import type { SeasonOverviewFilterRequest } from "../types";
 import { useForm } from "react-hook-form";
 import useGetSeasonNames from "@hooks/use-get-season-names";
 import { useEffect } from "react";
+import type { Filter } from "@utils/filters";
 
 type Props = {
-  onFilter: (filter: SeasonOverviewFilterRequest) => Promise<void>;
+  onFilter: (v: Filter) => void;
+  defaultValues: Filter;
 };
 
-const FilterSeasonOverview = (props: Props) => {
+const FilterSeasonOverview = ({ onFilter, defaultValues }: Props) => {
   const methods = useForm<SeasonOverviewFilterRequest>({
-    defaultValues: { season_id: null },
+    defaultValues: {
+      season_id: (defaultValues.season_id as number | null) ?? null,
+    },
   });
 
   const {
@@ -25,14 +29,14 @@ const FilterSeasonOverview = (props: Props) => {
 
   const seasonNames = useGetSeasonNames();
 
-  const handleFilter = handleSubmit(async (inputData) => {
-    props.onFilter(inputData);
+  const handleFilter = handleSubmit((inputData) => {
+    onFilter(inputData);
   });
 
   useEffect(() => {
-    document.addEventListener("batchOverview:batch-closed", () => {
+    document.addEventListener("seasonOverview:season-closed", () => {
       const values = getValues();
-      props.onFilter(values);
+      onFilter(values);
     });
   }, []);
 

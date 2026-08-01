@@ -38,16 +38,12 @@ export type BatchOverviewItem = {
     closed_on: string;
   };
   overviewCalculations: OverviewCalculculation;
-  batch_id: number;
-  batch_name: string;
-  close_date: string | null;
-  avg_weight: number;
-  fcr: number;
-  cfsr: number;
-  avg_cost: number;
-  avg_rate: number;
-  profit_loss_percentage: number;
-  profit: number;
+};
+
+export type SeasonOverviewSlot<T> = {
+  totalPages: number;
+  count: number;
+  data: T[];
 };
 
 export type SeasonOverviewFilterRequest = {
@@ -61,8 +57,8 @@ export type SeasonOverviewResponse = {
     closed_on: string | null;
   } | null;
   totals: Totals;
-  batches: BatchOverviewItem[];
-  general_costs: GeneralCostItem[];
-  general_sales: GeneralSaleItem[];
+  batches: SeasonOverviewSlot<BatchOverviewItem>;
+  general_costs: SeasonOverviewSlot<GeneralCostItem>;
+  general_sales: SeasonOverviewSlot<GeneralSaleItem>;
   summary: SeasonOverviewSummary | null;
 };

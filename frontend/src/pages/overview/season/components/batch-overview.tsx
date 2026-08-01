@@ -19,12 +19,12 @@ const batchHeaders = [
 ];
 
 type BatchOverviewTableProps = {
-  batches: BatchOverviewItem[];
+  data: BatchOverviewItem[];
   totals: Totals;
 };
 
 const BatchOverviewTable = (props: BatchOverviewTableProps) => {
-  const { batches, totals } = props;
+  const { data, totals } = props;
 
   const {
     total_avg_weight,
@@ -45,7 +45,7 @@ const BatchOverviewTable = (props: BatchOverviewTableProps) => {
             <TableHeaderCell key={header} content={header} />
           ))}
         </TableRow>
-        {batches.map((item) => {
+        {data.map((item) => {
           const {
             avg_weight,
             fcr,
@@ -59,7 +59,7 @@ const BatchOverviewTable = (props: BatchOverviewTableProps) => {
           const avgRate = total_sale_amount / total_sale_weight;
 
           return (
-            <TableRow key={item.batch_id}>
+            <TableRow key={item.batch.id}>
               <TableCell content={item.batch.name} />
               <TableCell
                 content={

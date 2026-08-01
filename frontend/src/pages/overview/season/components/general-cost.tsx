@@ -4,16 +4,17 @@ import TableHeaderCell from "@components/TableHeaderCell";
 import TableRow from "@components/TableRow";
 import dayjs from "dayjs";
 import type { GeneralCostItem } from "../types";
-import { roundNumber } from "@utils/number";
+import { formatCurrency } from "@utils/currency";
 
 const generalHeaders = ["Date", "Purpose", "Amount"];
 
 type GeneralCostTableProps = {
-  generalCost: GeneralCostItem[];
+  data: GeneralCostItem[];
+  totalAmount: number;
 };
 
 const GeneralCostTable = (props: GeneralCostTableProps) => {
-  const { generalCost } = props;
+  const { data, totalAmount } = props;
   return (
     <div className="flex-1">
       <h2 className="text-xl font-semibold mb-3">General Cost</h2>
@@ -23,38 +24,36 @@ const GeneralCostTable = (props: GeneralCostTableProps) => {
             <TableHeaderCell key={header} content={header} />
           ))}
         </TableRow>
-        {generalCost.map((item) => (
+        {data.map((item) => (
           <TableRow key={item.id}>
             <TableCell content={dayjs(item.date).format("DD-MM-YYYY")} />
             <TableCell content={item.purpose} />
             <TableCell
               content={
-                <span className="text-red-600">
-                  ₹{roundNumber(item.amount)}
-                </span>
+                <span className="text-red-600">{formatCurrency(item.amount)}</span>
               }
             />
           </TableRow>
         ))}
-        {/*overview?.general_costs && overview.general_costs.length > 0 && (
+        {data.length > 0 && (
           <TableRow>
             <TableCell content={<strong>Total</strong>} />
             <TableCell content="" />
             <TableCell
               content={
                 <strong className="text-red-600">
-                  ₹{roundNumber(overview.summary?.total_general_cost)}
+                  {formatCurrency(totalAmount)}
                 </strong>
               }
             />
           </TableRow>
-        )*/}
+        )}
       </Table>
-      {/*overview?.general_costs.length === 0 && (
+      {data.length === 0 && (
         <div className="bg-gray-50 p-6 text-center text-gray-500">
           No general costs found
         </div>
-      )*/}
+      )}
     </div>
   );
 };

@@ -8,9 +8,10 @@ import type { BatchOverviewBatch } from "../types";
 
 type Props = {
   batch?: BatchOverviewBatch;
+  refetch: () => void;
 };
 
-function BatchInformation({ batch }: Props) {
+function BatchInformation({ batch, refetch }: Props) {
   const [showConfirm, setShowConfirm] = useState(false);
   const [closingStatement, setClosingStatement] = useState("");
 
@@ -24,6 +25,7 @@ function BatchInformation({ batch }: Props) {
     if (response.status === "success") {
       setShowConfirm(false);
       setClosingStatement("");
+      refetch();
       const batchClosed = new CustomEvent("batchOverview:batch-closed", {
         detail: {
           status: "closed",

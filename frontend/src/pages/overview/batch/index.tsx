@@ -13,7 +13,7 @@ import PaginationWithLimit from "@components/pagination-with-limit";
 
 const BatchOverviewPage = () => {
   const { updateQueryParams, filter } = useBatchOverviewFilter();
-  const { batchOverview } = useGetBatchOverview(filter);
+  const { batchOverview, refetch } = useGetBatchOverview(filter);
 
   const { expenses, sales, returns, batch, overviewCalculations } =
     batchOverview;
@@ -45,7 +45,7 @@ const BatchOverviewPage = () => {
         then={<Empty />}
         otherwise={
           <>
-            <BatchInformation batch={batch} />
+            <BatchInformation batch={batch} refetch={() => refetch()} />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="mb-6">
                 <ExpenseTable

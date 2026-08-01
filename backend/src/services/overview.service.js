@@ -299,12 +299,29 @@ const getSeasonOverview = async (filter, currentUser) => {
 
   const batchOverviews = await Promise.all(
     batches.map((b) => {
-      return getBatchOverview({ batch_id: b.id }, currentUser)
+      return getBatchOverview(
+        {
+          batch_id: b.id,
+          e_page: 1,
+          e_limit: 10,
+          s_page: 1,
+          s_limit: 10,
+          r_page: 1,
+          r_limit: 10,
+        },
+        currentUser
+      )
     })
   )
   const totals = calculateBatchTotals(batchOverviews)
   const totalAvgWeight = totals.totalSaleWeight / totals.totalSaleBirds
-  const totalBatchProfit = batchOverviews.reduce((sum, b) => sum + b.profit, 0)
+  const totalBatchProfit = batchOverviews.reduce(
+    (sum, b) =>
+      sum +
+      (b.overviewCalculations.total_sale_amount -
+        b.overviewCalculations.total_expense),
+    0
+  )
 
   const generalExpenses = await GeneralExpenseModel.findAll({
     where: {
@@ -349,11 +366,51 @@ const getSeasonOverview = async (filter, currentUser) => {
 
   const avgCost = totalExpense / totals.totalSaleWeight
   const avgRate = totals.totalSaleAmount / totals.totalSaleWeight
+
+  const { b_page, b_limit } = filter
+  const b_offset = calculateOffSet(b_page, b_limit)
+
+  const b_count = batchOverviews.length
+  const paginatedBatches = batchOverviews.slice(b_offset, b_offset + b_limit)
+  const b_totalPages = Math.ceil(b_count / b_limit)
+
+  const { gc_page, gc_limit } = filter
+  const gc_offset = calculateOffSet(gc_page, gc_limit)
+
+  const gc_count = generalCosts.length
+  const paginatedGeneralCosts = generalCosts.slice(
+    gc_offset,
+    gc_offset + gc_limit
+  )
+  const gc_totalPages = Math.ceil(gc_count / gc_limit)
+
+  const { gs_page, gs_limit } = filter
+  const gs_offset = calculateOffSet(gs_page, gs_limit)
+
+  const gs_count = generalSalesData.length
+  const paginatedGeneralSales = generalSalesData.slice(
+    gs_offset,
+    gs_offset + gs_limit
+  )
+  const gs_totalPages = Math.ceil(gs_count / gs_limit)
+
   return {
     season: { id: season.id, name: season.name, closed_on: season.closed_on },
-    batches: batchOverviews,
-    general_costs: generalCosts,
-    general_sales: generalSalesData,
+    batches: {
+      totalPages: b_totalPages,
+      count: b_count,
+      data: paginatedBatches,
+    },
+    general_costs: {
+      totalPages: gc_totalPages,
+      count: gc_count,
+      data: paginatedGeneralCosts,
+    },
+    general_sales: {
+      totalPages: gs_totalPages,
+      count: gs_count,
+      data: paginatedGeneralSales,
+    },
     totals: {
       total_avg_weight: totalAvgWeight,
       fcr: totals.FCR,
