@@ -1,11 +1,11 @@
+import type { ListResponse } from "@app-types/response.types";
+import fetcherV2 from "@utils/fetcherV2";
 import type {
+  ItemReturn,
   NewItemReturnRequest,
   EditItemReturnPayload,
   EditItemReturnRequest,
-  ItemReturn,
-} from "@app-types/item-return.types";
-import type { ListResponse } from "@app-types/response.types";
-import fetcherV2 from "@utils/fetcherV2";
+} from "./types";
 
 const itemReturn = {
   fetchAll: (filter?: {}) => {

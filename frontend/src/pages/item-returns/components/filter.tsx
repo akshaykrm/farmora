@@ -3,7 +3,6 @@ import useGetVendorNames from "@hooks/use-get-vendor-name-list";
 import useGetItemCategoryNames from "@hooks/item-category/use-get-item-category-names";
 import SelectList from "@components/select-list";
 import FilterCard from "@components/FilterCard";
-import type { ItemReturnFilterRequest } from "@app-types/item-return.types";
 import { useForm } from "react-hook-form";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
@@ -12,6 +11,7 @@ import {
   swapNameWithTypeAndRemoveType,
 } from "@utils/remove-internal";
 import useGetBatchNameList from "@hooks/use-get-batch-names";
+import type { ItemReturnFilterRequest } from "../types";
 
 type Props = {
   onFilter: (filterData: ItemReturnFilterRequest) => void;

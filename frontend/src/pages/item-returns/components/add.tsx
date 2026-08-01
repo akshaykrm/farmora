@@ -1,9 +1,9 @@
 import { Dialog, DialogContent } from "@components/dialog";
-import itemReturn from "@api/item-return.api";
-import type { NewItemReturnRequest } from "@app-types/item-return.types";
 import ItemReturnForm from "./form";
 import dayjs from "dayjs";
 import { useForm } from "react-hook-form";
+import itemReturn from "../api";
+import type { NewItemReturnRequest } from "../types";
 
 const defaultValues: NewItemReturnRequest = {
   return_type: "vendor",

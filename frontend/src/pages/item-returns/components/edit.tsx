@@ -1,11 +1,10 @@
 import { Dialog, DialogContent } from "@components/dialog";
-import itemReturn from "@api/item-return.api";
-import type { EditItemReturnRequest } from "@app-types/item-return.types";
 import ItemReturnForm from "./form";
 import dayjs from "dayjs";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import type { EditPurchaseRequest } from "@pages/purchases/types";
+import itemReturn from "../api";
+import type { EditItemReturnRequest } from "../types";
 
 type Props = {
   selectedId: number | null;
@@ -69,7 +68,7 @@ const EditItemReturn = ({ selectedId, onClose, refetch }: Props) => {
     return () => methods.reset(defaultValues);
   }, [selectedId]);
 
-  const onSubmit = async (inputData: EditPurchaseRequest) => {
+  const onSubmit = async (inputData: EditItemReturnRequest) => {
     const res = await itemReturn.updateById(inputData.id, inputData);
     if (res.status === "success") {
       onClose();
