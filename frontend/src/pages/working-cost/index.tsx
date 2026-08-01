@@ -1,8 +1,8 @@
-import PageTitle from "@components/PageTitle";
+import PageHeader from "@components/PageHeader";
 import WorkingCostTable from "./components/table";
 import AddWorkingCost from "./components/add";
 import FilterWorkingCost from "./components/filter";
-import { Button } from "@mui/material";
+import { Button, Card } from "@mui/material";
 import { useState } from "react";
 import useGetWorkingCost from "./hooks/use-get-working-cost";
 import useWorkingCostFilter from "./hooks/use-working-cost-filter";
@@ -25,12 +25,14 @@ const WorkingCostPage = () => {
   const isEmpty = expense.data.length === 0 && income.data.length === 0;
   return (
     <>
-      <div className="flex items-center justify-between mb-6">
-        <PageTitle title="Working Cost" />
-        <Button variant="contained" onClick={onOpen}>
-          Add Working Cost Entry
-        </Button>
-      </div>
+      <PageHeader
+        title="Working Cost"
+        action={
+          <Button variant="contained" onClick={onOpen}>
+            Add Working Cost Entry
+          </Button>
+        }
+      />
       <FilterWorkingCost
         defaultValues={filter}
         onFilter={(f) => updateQueryParams(f)}
@@ -48,7 +50,7 @@ const WorkingCostPage = () => {
           <>
             <WorkingCostTotals summary={summary} />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-              <div>
+              <Card className="overflow-hidden">
                 <WorkingCostTable data={expense.data} title="Expense" />
                 <PaginationWithLimit
                   page={filter.e_page}
@@ -65,8 +67,8 @@ const WorkingCostPage = () => {
                     updateQueryParams(opts);
                   }}
                 />
-              </div>
-              <div>
+              </Card>
+              <Card className="overflow-hidden">
                 <WorkingCostTable data={income.data} title="Income" />
                 <PaginationWithLimit
                   page={filter.i_page}
@@ -83,7 +85,7 @@ const WorkingCostPage = () => {
                     updateQueryParams(opts);
                   }}
                 />
-              </div>
+              </Card>
             </div>
           </>
         }

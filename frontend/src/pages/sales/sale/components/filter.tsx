@@ -65,7 +65,7 @@ const SaleFilter = ({ handleFetch, defaultValues }: Props) => {
           }}
         />
         <TextField
-          label="buyer name"
+          label="Buyer Name"
           size="small"
           {...register("buyer_name")}
         />
@@ -104,7 +104,7 @@ const SaleFilter = ({ handleFetch, defaultValues }: Props) => {
         />
 
         <Button size="small" variant="contained" onClick={onFilter}>
-          search
+          Search
         </Button>
       </div>
     </div>

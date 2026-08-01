@@ -25,21 +25,21 @@ const ItemTable = ({ onEdit, data }: Props) => {
             <TableHeaderCell key={header} content={header} />
           ))}
         </TableRow>
-        {data.map((itemCategory, i) => (
-          <TableRow key={itemCategory.id}>
+        {data.map((item, i) => (
+          <TableRow key={item.id}>
             <TableCell content={i + 1} />
-            <TableCell content={itemCategory.name} />
-            <TableCell content={itemCategory.base_price} />
+            <TableCell content={item.name} />
+            <TableCell content={item.base_price} />
             <TableCell
-              content={<span className="capitalize">{itemCategory.type}</span>}
+              content={<span className="capitalize">{item.type}</span>}
             />
-            <TableCell content={itemCategory.vendor.name} />
+            <TableCell content={item.vendor.name} />
             <TableCell
               content={
                 <EditIcon
                   className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer"
                   onClick={() => {
-                    onEdit(itemCategory.id);
+                    onEdit(item.id);
                   }}
                 />
               }
@@ -52,8 +52,8 @@ const ItemTable = ({ onEdit, data }: Props) => {
         when={isEmpty}
         then={
           <DataNotFound
-            title="No employees found"
-            description="Get started by creating a new employee"
+            title="No items found"
+            description="Get started by creating a new item"
           />
         }
       />

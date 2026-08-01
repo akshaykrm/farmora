@@ -8,7 +8,7 @@ type Props = {
 const TableRow = ({ children, className }: Props) => {
   return (
     <tr
-      className={`border-b border-gray-200 hover:bg-gray-50 ${className || ""}`}
+      className={`border-b border-brand-border hover:bg-brand-canvas ${className || ""}`}
     >
       {children}
     </tr>

@@ -43,6 +43,7 @@ const EmployeeForm = (props: Props) => {
             label="Name"
             type="text"
             placeholder="name"
+            size="small"
             {...register("name")}
             error={Boolean(errors.name)}
             helperText={errors.name?.message}
@@ -51,6 +52,7 @@ const EmployeeForm = (props: Props) => {
             label="Username"
             type="text"
             placeholder="username"
+            size="small"
             {...register("username")}
             error={Boolean(errors.username)}
             helperText={errors.username?.message}
@@ -61,6 +63,7 @@ const EmployeeForm = (props: Props) => {
               <TextField
                 label="Password"
                 placeholder="password"
+                size="small"
                 {...register("password")}
                 error={Boolean(errors.password)}
                 helperText={errors.password?.message}

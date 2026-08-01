@@ -6,7 +6,7 @@ type Props = {
 const TableHeaderCell = ({ content, className }: Props) => {
   return (
     <th
-      className={`px-4 py-3 text-sm font-bold text-white bg-green-600 text-left whitespace-nowrap ${className || ""}`}
+      className={`px-4 py-3 text-xs font-semibold uppercase tracking-wider text-brand-charcoal bg-brand-mint text-left whitespace-nowrap ${className || ""}`}
     >
       {content}
     </th>
