@@ -52,6 +52,7 @@ const FilterBatchOverview = ({ onFilter, defaultValues }: Props) => {
     <FilterCard
       filters={{ season_id: seasonId, batch_id: batchId }}
       onClearAll={handleClearAll}
+      openByDefault
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <SelectList

@@ -1,5 +1,7 @@
+import Badge from "@components/Badge";
 import { Dialog, DialogContent } from "@components/dialog";
 import Ternary from "@components/ternary";
+import { CalendarDays } from "lucide-react";
 import { Button } from "@mui/material";
 import dayjs from "dayjs";
 import { useCallback, useState } from "react";
@@ -32,18 +34,30 @@ const SeasonInformation = (props: SeasonInformationProps) => {
     }
   }, [season_id]);
 
+  const isClosed = Boolean(closedOn);
+
   return (
-    <section className="mb-6 border-b border-brand-border pb-5">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
-          <p className="text-sm text-brand-ink-soft">Season</p>
-          <p className="text-lg font-semibold">{name}</p>
+    <section className="mb-6 rounded-xl border border-brand-border bg-brand-card p-4 shadow-xs">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-center gap-3 min-w-0">
+          <span className="w-10 h-10 shrink-0 rounded-xl bg-brand-primary-soft text-brand-accent flex items-center justify-center">
+            <CalendarDays className="w-5 h-5" />
+          </span>
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-semibold text-brand-ink truncate">
+                {name}
+              </h2>
+              <Badge variant={isClosed ? "neutral" : "success"}>
+                {isClosed ? "Closed" : "Active"}
+              </Badge>
+            </div>
+            <p className="text-sm text-brand-ink-soft mt-0.5">
+              Total batches: {batchLength}
+            </p>
+          </div>
         </div>
-        <div>
-          <p className="text-sm text-brand-ink-soft">Total Batches</p>
-          <p className="text-lg font-semibold">{batchLength}</p>
-        </div>
-        <div className="flex justify-end w-full items-center">
+        <div className="flex justify-end items-center shrink-0">
           <Ternary
             when={closedOn === null}
             then={
@@ -52,7 +66,7 @@ const SeasonInformation = (props: SeasonInformationProps) => {
               </Button>
             }
             otherwise={
-              <p>
+              <p className="text-sm text-brand-ink-soft">
                 Closed on:&nbsp;
                 {dayjs(closedOn).format("DD MMM YYYY").toString()}
               </p>

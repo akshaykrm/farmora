@@ -4,7 +4,7 @@ import TableHeaderCell from "@components/TableHeaderCell";
 import TableRow from "@components/TableRow";
 import { EditIcon } from "lucide-react";
 import { useMemo, type Ref } from "react";
-import DataNotFound from "@components/data-not-found";
+import EmptyContentMessage from "@components/EmptyContentMessage";
 import Ternary from "@components/ternary";
 import dayjs from "dayjs";
 import type { Purchase, PurchaseFilter } from "../types";
@@ -73,7 +73,7 @@ const ItemTable = ({ onEdit, data }: Props) => {
       <Ternary
         when={isEmpty}
         then={
-          <DataNotFound
+          <EmptyContentMessage
             title="No purchases found"
             description="Try adjusting your filters or create a new purchase"
           />

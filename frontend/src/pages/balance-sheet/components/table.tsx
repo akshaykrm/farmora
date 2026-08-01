@@ -4,8 +4,8 @@ import TableCell from "@components/TableCell";
 import Badge from "@components/Badge";
 import CardStat from "@components/CardStat";
 import { ArrowDownCircle, ArrowUpCircle, Wallet } from "lucide-react";
-import DataLoading from "@components/data-loading";
-import DataNotFound from "@components/data-not-found";
+import LoadingMessage from "@components/LoadingMessage";
+import EmptyContentMessage from "@components/EmptyContentMessage";
 import Ternary from "@components/ternary";
 import type { BalanceSheetResponse, Transaction } from "../types";
 import dayjs from "dayjs";
@@ -31,7 +31,7 @@ function BalanceSheetTable(props: Props) {
   return (
     <Ternary
       when={isLoading}
-      then={<DataLoading />}
+      then={<LoadingMessage />}
       otherwise={
         <Ternary
           when={data !== null}
@@ -44,7 +44,7 @@ function BalanceSheetTable(props: Props) {
             />
           }
           otherwise={
-            <DataNotFound
+            <EmptyContentMessage
               title="No data found"
               description="Apply filters to view cash flow"
             />

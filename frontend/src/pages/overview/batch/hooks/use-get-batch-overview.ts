@@ -33,6 +33,7 @@ function searializeFilter(filter: Filter, override?: Filter) {
 }
 
 function useGetBatchOverview(filter: Filter) {
+  const [isLoading, setIsLoading] = useState(false);
   const [batchOverview, setBatchOverview] = useState<BatchOverviewResponse>({
     expenses: {
       count: 0,
@@ -83,6 +84,7 @@ function useGetBatchOverview(filter: Filter) {
         return;
       }
       const opts = searializeFilter(filter, override);
+      setIsLoading(true);
 
       const res = await batchOverviewApi.fetchOverview(opts);
       if (res.status === "success") {
@@ -98,6 +100,7 @@ function useGetBatchOverview(filter: Filter) {
           });
         }
       }
+      setIsLoading(false);
     },
     [
       e_page,
@@ -119,6 +122,7 @@ function useGetBatchOverview(filter: Filter) {
 
   return {
     batchOverview,
+    isLoading,
     refetch: handleGetBatchOverview,
   };
 }

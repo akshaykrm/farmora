@@ -8,14 +8,16 @@ import useGetWorkingCost from "./hooks/use-get-working-cost";
 import useWorkingCostFilter from "./hooks/use-working-cost-filter";
 import WorkingCostTotals from "./components/totals";
 import Ternary from "@components/ternary";
-import DataNotFound from "@components/data-not-found";
+import EmptyContentMessage from "@components/EmptyContentMessage";
+import LoadingMessage from "@components/LoadingMessage";
+import ApplyFilterMessage from "@components/ApplyFilterMessage";
 import PaginationWithLimit from "@components/pagination-with-limit";
 
 const WorkingCostPage = () => {
   const [isOpen, setOpenAdd] = useState(false);
 
   const { updateQueryParams, filter } = useWorkingCostFilter();
-  const { workingCostList } = useGetWorkingCost(filter);
+  const { workingCostList, isLoading } = useGetWorkingCost(filter);
 
   const onOpen = () => setOpenAdd(true);
   const onClose = () => setOpenAdd(false);
@@ -37,55 +39,69 @@ const WorkingCostPage = () => {
       />
 
       <Ternary
-        when={isEmpty}
-        then={
-          <DataNotFound
-            title="No working cost records found"
-            description="Get started by adding a new entry"
-          />
-        }
+        when={isLoading}
+        then={<LoadingMessage />}
         otherwise={
-          <>
-            <WorkingCostTotals summary={summary} />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-              <section className="min-w-0">
-                <WorkingCostTable data={expense.data} title="Expense" />
-                <PaginationWithLimit
-                  page={filter.e_page}
-                  limit={filter.e_limit}
-                  totalPages={expense.totalPages}
-                  onChange={(f) => {
-                    const opts: Record<string, number> = {};
-                    if (f.page) {
-                      opts.e_page = f.page;
-                    }
-                    if (f.limit) {
-                      opts.e_limit = f.limit;
-                    }
-                    updateQueryParams(opts);
-                  }}
-                />
-              </section>
-              <section className="min-w-0">
-                <WorkingCostTable data={income.data} title="Income" />
-                <PaginationWithLimit
-                  page={filter.i_page}
-                  limit={filter.i_limit}
-                  totalPages={income.totalPages}
-                  onChange={(f) => {
-                    const opts: Record<string, number> = {};
-                    if (f.page) {
-                      opts.i_page = f.page;
-                    }
-                    if (f.limit) {
-                      opts.i_limit = f.limit;
-                    }
-                    updateQueryParams(opts);
-                  }}
-                />
-              </section>
-            </div>
-          </>
+          <Ternary
+            when={!filter.season_id}
+            then={
+              <ApplyFilterMessage description="Select a season, then click Apply Filters to view working costs" />
+            }
+            otherwise={
+              <Ternary
+                when={isEmpty}
+                then={
+                  <EmptyContentMessage
+                    title="No working cost records found"
+                    description="Get started by adding a new entry"
+                  />
+                }
+                otherwise={
+                  <>
+                    <WorkingCostTotals summary={summary} />
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                      <section className="min-w-0">
+                        <WorkingCostTable data={expense.data} title="Expense" />
+                        <PaginationWithLimit
+                          page={filter.e_page}
+                          limit={filter.e_limit}
+                          totalPages={expense.totalPages}
+                          onChange={(f) => {
+                            const opts: Record<string, number> = {};
+                            if (f.page) {
+                              opts.e_page = f.page;
+                            }
+                            if (f.limit) {
+                              opts.e_limit = f.limit;
+                            }
+                            updateQueryParams(opts);
+                          }}
+                        />
+                      </section>
+                      <section className="min-w-0">
+                        <WorkingCostTable data={income.data} title="Income" />
+                        <PaginationWithLimit
+                          page={filter.i_page}
+                          limit={filter.i_limit}
+                          totalPages={income.totalPages}
+                          onChange={(f) => {
+                            const opts: Record<string, number> = {};
+                            if (f.page) {
+                              opts.i_page = f.page;
+                            }
+                            if (f.limit) {
+                              opts.i_limit = f.limit;
+                            }
+                            updateQueryParams(opts);
+                          }}
+                        />
+                      </section>
+                    </div>
+                  </>
+                }
+              />
+            }
+          />
         }
       />
 

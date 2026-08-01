@@ -3,7 +3,7 @@ import Table from "@components/Table";
 import TableCell from "@components/TableCell";
 import TableHeaderCell from "@components/TableHeaderCell";
 import TableRow from "@components/TableRow";
-import DataNotFound from "@components/data-not-found";
+import EmptyContentMessage from "@components/EmptyContentMessage";
 import dayjs from "dayjs";
 import { formatCurrency } from "@utils/currency";
 import Totals from "./totals";
@@ -75,7 +75,7 @@ const SalesBookTable = (props: Props) => {
         <Totals totals={totals} />
       </Table>
       {isEmpty ? (
-        <DataNotFound
+        <EmptyContentMessage
           title="Sales Entry not Found"
           description="Current filter do not have any entry, change filter"
         />

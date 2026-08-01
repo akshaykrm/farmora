@@ -47,7 +47,7 @@ const FilterSeasonOverview = ({ onFilter, defaultValues }: Props) => {
   }, []);
 
   return (
-    <FilterCard filters={{ season_id: seasonId }} onClearAll={handleClearAll}>
+    <FilterCard filters={{ season_id: seasonId }} onClearAll={handleClearAll} openByDefault>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         <SelectList
           options={seasonNames.data}

@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import TableCell from "@components/TableCell";
 import TableHeaderCell from "@components/TableHeaderCell";
 import TableRow from "@components/TableRow";
-import DataNotFound from "@components/data-not-found";
+import EmptyContentMessage from "@components/EmptyContentMessage";
 import Ternary from "@components/ternary";
 import { Undo2 } from "lucide-react";
 import type { InvestorTransaction } from "../types";
@@ -97,7 +97,7 @@ const ProfitTable = ({ onReverse, transactions }: Props) => {
       <Ternary
         when={isEmpty}
         then={
-          <DataNotFound
+          <EmptyContentMessage
             title="No profit transactions found"
             description="Get started by creating a new profit transaction"
           />

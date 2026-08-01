@@ -1,4 +1,6 @@
-import { roundNumber } from "@utils/number";
+import { HandCoins, PiggyBank, TrendingUp } from "lucide-react";
+import CardStat from "@components/CardStat";
+import { formatCurrency } from "@utils/currency";
 
 type InvestorProfitSummaryProps = {
   totalProfit: number;
@@ -8,37 +10,30 @@ type InvestorProfitSummaryProps = {
 
 const InvestorProfitSummary = (props: InvestorProfitSummaryProps) => {
   const { totalProfit, totalGeneralCost, totalGeneralSale } = props;
-  return (
-    <section className="border-t border-brand-border pt-5">
-      <h2 className="text-xl font-semibold mb-4">Investor Profit Summary</h2>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="border-l-2 border-brand-info px-4 py-1">
-          <p className="text-sm text-brand-ink-soft">Total Batch Profit</p>
-          <SummaryItem value={totalProfit} />
-        </div>
-        <div className="border-l-2 border-brand-danger px-4 py-1">
-          <p className="text-sm text-brand-ink-soft">Total General Cost</p>
-          <SummaryItem value={totalGeneralCost} />
-        </div>
 
-        <div className="border-l-2 border-brand-success px-4 py-1">
-          <p className="text-sm text-brand-ink-soft">Total General Sales</p>
-          <SummaryItem value={totalGeneralSale} />
-        </div>
-      </div>
-    </section>
-  );
-};
-
-const SummaryItem = ({ value }: { value: number }) => {
   return (
-    <p
-      className={`text-2xl font-bold ${
-        value >= 0 ? "text-brand-info" : "text-brand-danger"
-      }`}
-    >
-      ₹{roundNumber(value)}
-    </p>
+    <div className="grid grid-cols-1 gap-3 md:grid-cols-3 mb-6">
+      <CardStat
+        label="Total Batch Profit"
+        value={formatCurrency(totalProfit)}
+        icon={<PiggyBank className="w-5 h-5" />}
+        valueClassName={
+          totalProfit >= 0 ? "text-brand-success" : "text-brand-danger"
+        }
+      />
+      <CardStat
+        label="Total General Cost"
+        value={formatCurrency(totalGeneralCost)}
+        icon={<HandCoins className="w-5 h-5" />}
+        valueClassName="text-brand-danger"
+      />
+      <CardStat
+        label="Total General Sales"
+        value={formatCurrency(totalGeneralSale)}
+        icon={<TrendingUp className="w-5 h-5" />}
+        valueClassName="text-brand-info"
+      />
+    </div>
   );
 };
 

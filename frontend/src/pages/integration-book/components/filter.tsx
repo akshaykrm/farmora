@@ -44,7 +44,7 @@ const FilterIntegrationBook = (props: Props) => {
   };
 
   return (
-    <FilterCard filters={values} onClearAll={handleClearAll}>
+    <FilterCard filters={values} onClearAll={handleClearAll} openByDefault>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         <SelectList
           options={farmNames.data}

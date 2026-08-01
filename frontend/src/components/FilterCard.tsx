@@ -7,6 +7,7 @@ type Props = {
   className?: string;
   filters?: Record<string, unknown>;
   onClearAll?: () => void;
+  openByDefault?: boolean;
 };
 
 const ignoredFilterKeys = new Set([
@@ -71,8 +72,8 @@ const getFilterChips = (filters?: Record<string, unknown>) => {
   });
 };
 
-const FilterCard = ({ title, children, className = "", filters, onClearAll }: Props) => {
-  const [isOpen, setIsOpen] = useState(false);
+const FilterCard = ({ title, children, className = "", filters, onClearAll, openByDefault }: Props) => {
+  const [isOpen, setIsOpen] = useState(openByDefault ?? false);
   const chips = getFilterChips(filters);
 
   return (

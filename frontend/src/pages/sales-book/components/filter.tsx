@@ -41,7 +41,7 @@ const FilterSalesBook = ({ onFilter, defaultValue }: Props) => {
   };
 
   return (
-    <FilterWrapper filters={values} onClearAll={handleClearAll}>
+    <FilterWrapper filters={values} onClearAll={handleClearAll} openByDefault>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <SelectList
             options={buyersList.data}

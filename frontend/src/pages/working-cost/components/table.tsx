@@ -3,7 +3,7 @@ import Table from "@components/Table";
 import TableCell from "@components/TableCell";
 import TableHeaderCell from "@components/TableHeaderCell";
 import TableRow from "@components/TableRow";
-import DataNotFound from "@components/data-not-found";
+import EmptyContentMessage from "@components/EmptyContentMessage";
 import dayjs from "dayjs";
 import { formatCurrency } from "@utils/currency";
 
@@ -32,7 +32,7 @@ const WorkingCostTable = (props: Props) => {
         </TableRow>
       ))}
       {data.length === 0 && (
-        <DataNotFound
+        <EmptyContentMessage
           title={`No ${title.toLowerCase()} records found`}
           description={`No ${title.toLowerCase()} data found`}
         />

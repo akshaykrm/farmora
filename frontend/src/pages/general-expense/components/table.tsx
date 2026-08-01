@@ -3,7 +3,7 @@ import Table from "@components/Table";
 import TableCell from "@components/TableCell";
 import TableHeaderCell from "@components/TableHeaderCell";
 import TableRow from "@components/TableRow";
-import DataNotFound from "@components/data-not-found";
+import EmptyContentMessage from "@components/EmptyContentMessage";
 import { formatCurrency } from "@utils/currency";
 import dayjs from "dayjs";
 import { EditIcon } from "lucide-react";
@@ -48,7 +48,7 @@ const GeneralExpenseTable = ({ onEdit, data }: Props) => {
         ))}
       </Table>
       {isEmpty && (
-        <DataNotFound
+        <EmptyContentMessage
           title="No general expense records found"
           description="No general expense items found for the selected season and date range"
         />

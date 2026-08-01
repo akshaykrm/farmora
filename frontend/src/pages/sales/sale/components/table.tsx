@@ -1,15 +1,11 @@
-import sales from "@api/sales.api";
 import Table from "@components/Table";
 import TableCell from "@components/TableCell";
 import TableHeaderCell from "@components/TableHeaderCell";
 import TableRow from "@components/TableRow";
 import { EditIcon } from "lucide-react";
-import { useMemo } from "react";
-import DataNotFound from "@components/data-not-found";
-import DataLoading from "@components/data-loading";
+import EmptyContentMessage from "@components/EmptyContentMessage";
 import Ternary from "@components/ternary";
 import dayjs from "dayjs";
-import SaleFilter from "./filter";
 import type { Sale } from "@app-types/sales.types";
 
 const headers = [
@@ -86,7 +82,7 @@ const SalesTable = ({ onEdit, data }: Props) => {
       <Ternary
         when={isEmpty}
         then={
-          <DataNotFound
+          <EmptyContentMessage
             title="No sales found"
             description="Get started by creating a new sale"
           />
