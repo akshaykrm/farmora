@@ -25,7 +25,7 @@ const BalanceSheetPage = () => {
         isLoading={isLoading}
         page={page}
         limit={limit}
-        onPageChange={(p) => updateQueryParams({ page: p })}
+        onPageChange={(f) => updateQueryParams(f)}
       />
     </>
   );
