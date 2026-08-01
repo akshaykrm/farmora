@@ -1,4 +1,4 @@
-import type { BatchName } from "./batch.types";
+import type { BatchName } from "@pages/batches/types";
 import type { SeasonName } from "./season.types";
 import type { VendorName } from "./vendor.types";
 

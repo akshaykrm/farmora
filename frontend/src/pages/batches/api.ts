@@ -1,4 +1,8 @@
-import type { BatchListResponse, BatchFormValues } from "./types";
+import type {
+  BatchListResponse,
+  BatchFormValues,
+  BatchNameFilter,
+} from "./types";
 import type { ItemName } from "@pages/items/types";
 import fetcher from "@utils/fetcher";
 import fetcherV2, { type FetcherReturnType } from "@utils/fetcherV2";
@@ -12,7 +16,11 @@ const batches = {
     };
     return fetcherV2<BatchListResponse>("batches", null, opts);
   },
-  getNames: () => fetcher("batches/names"),
+  getNames: (filter?: BatchNameFilter) =>
+    fetcher("batches/names", null, {
+      method: "GET",
+      filter,
+    }),
   getBySeasonId: async (
     seasonId: number,
   ): Promise<FetcherReturnType<ItemName[]>> => {

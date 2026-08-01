@@ -1,4 +1,4 @@
-import batches from "@api/batches.api";
+import batches from "@pages/batches/api";
 import type { BatchName, BatchNameFilter } from "@pages/batches/types";
 import { useState, useEffect } from "react";
 
