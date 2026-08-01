@@ -1,21 +1,29 @@
-import type { BatchOverviewReturn } from "@app-types/batch-overview.types";
 import Table from "@components/Table";
 import TableCell from "@components/TableCell";
 import TableHeaderCell from "@components/TableHeaderCell";
 import TableRow from "@components/TableRow";
 import { roundNumber } from "@utils/number";
 import dayjs from "dayjs";
+import type {
+  BatchOverviewReturn,
+  BatchOverviewSlot,
+  BatchOverviewSummary,
+} from "../types";
+import { formatCurrency } from "@utils/currency";
 
 const returnHeaders = ["Date", "Purpose", "Quantity", "Price", "Amount"];
 
 type Props = {
-  returns: BatchOverviewReturn[];
-  totalReturnFeeds: number;
-  totalReturnAmount: number;
+  returns: BatchOverviewSlot<BatchOverviewReturn>;
+  summary: BatchOverviewSummary;
 };
 
 const ReturnItem = (props: Props) => {
-  const { returns, totalReturnAmount, totalReturnFeeds } = props;
+  const { returns, summary } = props;
+
+  const { data } = returns;
+
+  const { total_returned_amount, total_returned_feeds } = summary;
   return (
     <>
       <h3 className="text-lg font-semibold mb-3">Returned Items</h3>
@@ -25,7 +33,7 @@ const ReturnItem = (props: Props) => {
             <TableHeaderCell key={header} content={header} />
           ))}
         </TableRow>
-        {returns.map((item, index) => {
+        {data.map((item, index) => {
           const returnTo =
             item.return_type === "vendor"
               ? item.vendor?.name
@@ -46,15 +54,15 @@ const ReturnItem = (props: Props) => {
           <TableCell content={<strong>Total</strong>} />
           <TableCell content="" />
           <TableCell
-            content={<strong>{roundNumber(totalReturnFeeds)}</strong>}
+            content={<strong>{roundNumber(total_returned_feeds)}</strong>}
           />
           <TableCell content="" />
           <TableCell
-            content={<strong>₹{roundNumber(totalReturnAmount)}</strong>}
+            content={<strong>{formatCurrency(total_returned_amount)}</strong>}
           />
         </TableRow>
       </Table>
-      {returns && returns.length === 0 && (
+      {data.length === 0 && (
         <div className="bg-gray-50 p-6 text-center text-gray-500">
           No returned items found
         </div>

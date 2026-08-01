@@ -180,6 +180,7 @@ async function getBatchOverview(filter, currentUser) {
     cfcr: CFCR,
   }
 
+  // Expense
   const { e_page, e_limit } = filter
   const e_offset = calculateOffSet(e_page, e_limit)
 
@@ -187,16 +188,39 @@ async function getBatchOverview(filter, currentUser) {
   const paginatedExpense = expenses.slice(e_offset, e_offset + e_limit)
   const e_totalPages = Math.ceil(e_count / e_limit)
 
+  // Sales
+  const { s_page, s_limit } = filter
+  const s_offset = calculateOffSet(s_page, s_limit)
+
+  const s_count = sales.length
+  const paginatedSales = sales.slice(s_offset, s_offset + s_limit)
+  const s_totalPages = Math.ceil(s_count / s_limit)
+
+  //Return
+  const { r_page, r_limit } = filter
+  const r_offset = calculateOffSet(r_page, r_limit)
+
+  const r_count = returns.length
+  const paginatedReturns = returns.slice(r_offset, r_offset + r_limit)
+  const r_totalPages = Math.ceil(r_count / r_limit)
+
   return {
-    expense: {
+    expenses: {
       totalPages: e_totalPages,
       count: e_count,
       data: paginatedExpense,
     },
+    sales: {
+      totalPages: s_totalPages,
+      count: s_count,
+      data: paginatedSales,
+    },
+    returns: {
+      totalPages: r_totalPages,
+      count: r_count,
+      data: paginatedReturns,
+    },
     batch,
-    expenses,
-    sales,
-    returns,
     overviewCalculations: summary,
   }
 }

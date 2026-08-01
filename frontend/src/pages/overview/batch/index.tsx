@@ -12,11 +12,15 @@ import SalesTable from "./components/sales-table";
 
 const BatchOverviewPage = () => {
   const { updateQueryParams, filter } = useBatchOverviewFilter();
+  const { batchOverview } = useGetBatchOverview(filter);
+
   const { expenses, sales, returns, batch, overviewCalculations } =
-    useGetBatchOverview(filter);
+    batchOverview;
 
   const isEmpty =
-    expenses.length === 0 && sales.length === 0 && returns.length === 0;
+    expenses.data.length === 0 &&
+    sales.data.length === 0 &&
+    returns.data.length === 0;
 
   const avgCost =
     overviewCalculations.total_expense /
@@ -45,31 +49,19 @@ const BatchOverviewPage = () => {
               <div className="mb-6">
                 <ExpenseTable
                   expenses={expenses}
-                  totalPurchaseAmount={
-                    overviewCalculations.total_purchase_amount
-                  }
-                  totalPurchaseFeeds={overviewCalculations.total_purchase_feeds}
+                  summary={overviewCalculations}
                 />
 
                 <div className="mt-6">
                   <ReturnItem
                     returns={returns}
-                    totalReturnAmount={
-                      overviewCalculations.total_returned_amount
-                    }
-                    totalReturnFeeds={overviewCalculations.total_returned_feeds}
+                    summary={overviewCalculations}
                   />
                 </div>
               </div>
 
               <div className="mb-6">
-                <SalesTable
-                  sales={sales}
-                  totalSaleCount={overviewCalculations.total_sale_birds}
-                  totalWeight={overviewCalculations.total_sale_weight}
-                  totalSaleAmount={overviewCalculations.total_sale_amount}
-                />
-
+                <SalesTable sales={sales} summary={overviewCalculations} />
                 <div className="mt-6">
                   <FinancialSummaryTable
                     totalSaleAmount={overviewCalculations.total_sale_amount}

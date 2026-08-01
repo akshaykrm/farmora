@@ -20,12 +20,12 @@ function useBatchOverviewFilter() {
     ? parseInt(queryParms.s_limit)
     : DEFAULT_PAGE_LIMIT;
 
-  const f_page = queryParms.f_page
-    ? parseInt(queryParms.f_page)
+  const r_page = queryParms.r_page
+    ? parseInt(queryParms.r_page)
     : DEFAULT_FIRST_PAGE;
 
-  const f_limit = queryParms.f_limit
-    ? parseInt(queryParms.f_limit)
+  const r_limit = queryParms.r_limit
+    ? parseInt(queryParms.r_limit)
     : DEFAULT_PAGE_LIMIT;
 
   const season_id = queryParms.season_id
@@ -41,8 +41,8 @@ function useBatchOverviewFilter() {
       e_limit,
       s_page,
       s_limit,
-      f_limit,
-      f_page,
+      r_limit,
+      r_page,
       season_id,
       batch_id,
     },

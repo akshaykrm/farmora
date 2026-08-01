@@ -9,8 +9,8 @@ const getBatchOverview = async (req, res) => {
     e_page: parseInt(req.query.e_page) || 1,
     e_limit: parseInt(req.query.e_limit) || 10,
 
-    f_page: parseInt(req.query.f_page) || 1,
-    f_limit: parseInt(req.query.f_limit) || 10,
+    r_page: parseInt(req.query.r_page) || 1,
+    r_limit: parseInt(req.query.r_limit) || 10,
 
     s_page: parseInt(req.query.s_page) || 1,
     s_limit: parseInt(req.query.s_limit) || 10,

@@ -1,3 +1,5 @@
+import type { NameResponse } from "@app-types/gen.types";
+
 export type BatchOverviewFilterRequest = {
   season_id: number | "";
   batch_id: number | "";
@@ -32,6 +34,8 @@ export type BatchOverviewReturn = {
   quantity: number;
   rate_per_bag: number;
   total_amount: number;
+  return_type: string;
+  to_batch_data: NameResponse;
   category: {
     id: number;
     type: string;
@@ -54,7 +58,7 @@ export type BatchOverviewBatch = {
   } | null;
 };
 
-export type OverviewCalculculation = {
+export type BatchOverviewSummary = {
   total_purchase_feeds: number;
   total_purchase_amount: number;
   total_returned_feeds: number;
@@ -68,12 +72,18 @@ export type OverviewCalculculation = {
   cfcr: number;
 };
 
+export type BatchOverviewSlot<T> = {
+  totalPages: number;
+  count: number;
+  data: T[];
+};
+
 export type BatchOverviewResponse = {
-  batch: BatchOverviewBatch | null;
-  expenses: BatchOverviewExpense[];
-  sales: BatchOverviewSale[];
-  returns: BatchOverviewReturn[];
-  overviewCalculations: OverviewCalculculation;
+  expenses: BatchOverviewSlot<BatchOverviewExpense>;
+  sales: BatchOverviewSlot<BatchOverviewSale>;
+  returns: BatchOverviewSlot<BatchOverviewReturn>;
+  overviewCalculations: BatchOverviewSummary;
+  batch?: BatchOverviewBatch;
 };
 
 export type ExpenseTotals = {

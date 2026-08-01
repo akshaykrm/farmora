@@ -7,7 +7,7 @@ import { useState } from "react";
 import type { BatchOverviewBatch } from "../types";
 
 type Props = {
-  batch: BatchOverviewBatch | null;
+  batch?: BatchOverviewBatch;
 };
 
 function BatchInformation({ batch }: Props) {

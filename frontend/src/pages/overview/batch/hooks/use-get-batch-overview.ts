@@ -1,12 +1,6 @@
 import { overrideFilters, type Filter } from "@utils/filters";
-import batchOverview from "../api";
-import type {
-  BatchOverviewBatch,
-  BatchOverviewExpense,
-  BatchOverviewReturn,
-  BatchOverviewSale,
-  OverviewCalculculation,
-} from "../types";
+import batchOverviewApi from "../api";
+import type { BatchOverviewResponse } from "../types";
 import { useCallback, useEffect, useState } from "react";
 
 function searializeFilter(filter: Filter, override?: Filter) {
@@ -15,8 +9,8 @@ function searializeFilter(filter: Filter, override?: Filter) {
     e_limit,
     s_page,
     s_limit,
-    f_limit,
-    f_page,
+    r_limit,
+    r_page,
     batch_id,
     start_date,
     end_date,
@@ -28,8 +22,8 @@ function searializeFilter(filter: Filter, override?: Filter) {
       e_limit,
       s_page,
       s_limit,
-      f_limit,
-      f_page,
+      r_limit,
+      r_page,
       batch_id,
       start_date,
       end_date,
@@ -39,13 +33,23 @@ function searializeFilter(filter: Filter, override?: Filter) {
 }
 
 function useGetBatchOverview(filter: Filter) {
-  const [expenses, setExpenses] = useState<BatchOverviewExpense[]>([]);
-  const [sales, setSales] = useState<BatchOverviewSale[]>([]);
-  const [returns, setReturns] = useState<BatchOverviewReturn[]>([]);
-  const [batch, setBatch] = useState<BatchOverviewBatch | null>(null);
-
-  const [overviewCalculations, setOverviewCalculations] =
-    useState<OverviewCalculculation>({
+  const [batchOverview, setBatchOverview] = useState<BatchOverviewResponse>({
+    expenses: {
+      count: 0,
+      data: [],
+      totalPages: 0,
+    },
+    returns: {
+      count: 0,
+      data: [],
+      totalPages: 0,
+    },
+    sales: {
+      count: 0,
+      data: [],
+      totalPages: 0,
+    },
+    overviewCalculations: {
       total_expense: 0,
       avg_weight: 0,
       cfcr: 0,
@@ -57,15 +61,16 @@ function useGetBatchOverview(filter: Filter) {
       total_sale_birds: 0,
       total_sale_weight: 0,
       total_sale_amount: 0,
-    });
+    },
+  });
 
   const {
     e_page,
     e_limit,
     s_page,
     s_limit,
-    f_limit,
-    f_page,
+    r_limit,
+    r_page,
     season_id,
     batch_id,
     start_date,
@@ -79,16 +84,18 @@ function useGetBatchOverview(filter: Filter) {
       }
       const opts = searializeFilter(filter, override);
 
-      const res = await batchOverview.fetchOverview(opts);
+      const res = await batchOverviewApi.fetchOverview(opts);
       if (res.status === "success") {
         if (res.data) {
           const { expenses, returns, sales, batch, overviewCalculations } =
             res.data;
-          setOverviewCalculations(overviewCalculations);
-          setExpenses(expenses);
-          setSales(sales);
-          setReturns(returns);
-          setBatch(batch);
+          setBatchOverview({
+            expenses,
+            returns,
+            sales,
+            batch,
+            overviewCalculations,
+          });
         }
       }
     },
@@ -97,8 +104,8 @@ function useGetBatchOverview(filter: Filter) {
       e_limit,
       s_page,
       s_limit,
-      f_limit,
-      f_page,
+      r_limit,
+      r_page,
       season_id,
       batch_id,
       start_date,
@@ -111,11 +118,7 @@ function useGetBatchOverview(filter: Filter) {
   }, [handleGetBatchOverview]);
 
   return {
-    expenses,
-    sales,
-    returns,
-    batch,
-    overviewCalculations,
+    batchOverview,
     refetch: handleGetBatchOverview,
   };
 }

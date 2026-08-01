@@ -1,10 +1,15 @@
-import type { BatchOverviewSale } from "@app-types/batch-overview.types";
 import Table from "@components/Table";
 import TableCell from "@components/TableCell";
 import TableHeaderCell from "@components/TableHeaderCell";
 import TableRow from "@components/TableRow";
 import { roundNumber } from "@utils/number";
 import dayjs from "dayjs";
+import type {
+  BatchOverviewSale,
+  BatchOverviewSlot,
+  BatchOverviewSummary,
+} from "../types";
+import { formatCurrency } from "@utils/currency";
 
 const salesHeaders = [
   "Date",
@@ -17,14 +22,16 @@ const salesHeaders = [
 ];
 
 type Props = {
-  sales: BatchOverviewSale[];
-  totalWeight: number;
-  totalSaleCount: number;
-  totalSaleAmount: number;
+  sales: BatchOverviewSlot<BatchOverviewSale>;
+  summary: BatchOverviewSummary;
 };
 
 const SalesTable = (props: Props) => {
-  const { sales, totalSaleCount, totalWeight, totalSaleAmount } = props;
+  const { sales, summary } = props;
+  const { data } = sales;
+
+  const { total_sale_amount, total_sale_birds, total_sale_weight } = summary;
+
   return (
     <>
       <h2 className="text-xl font-semibold mb-3">Sales</h2>
@@ -34,31 +41,35 @@ const SalesTable = (props: Props) => {
             <TableHeaderCell key={header} content={header} />
           ))}
         </TableRow>
-        {sales.map((item, index) => (
+        {data.map((item, index) => (
           <TableRow key={index}>
             <TableCell content={dayjs(item.date).format("DD-MM-YYYY")} />
             <TableCell content={item.vehicle_no} />
             <TableCell content={item.weight ? item.weight : "-"} />
             <TableCell content={item.bird_no ?? "-"} />
             <TableCell content={item.avg_weight ? item.avg_weight : "-"} />
-            <TableCell content={item.price ? `₹${item.price}` : "-"} />
-            <TableCell content={`₹${item.amount}`} />
+            <TableCell content={formatCurrency(item.price)} />
+            <TableCell content={formatCurrency(item.amount)} />
           </TableRow>
         ))}
 
         <TableRow>
           <TableCell content={<strong>Total</strong>} />
           <TableCell content="" />
-          <TableCell content={<strong>{roundNumber(totalWeight)}</strong>} />
-          <TableCell content={<strong>{roundNumber(totalSaleCount)}</strong>} />
+          <TableCell
+            content={<strong>{roundNumber(total_sale_weight)}</strong>}
+          />
+          <TableCell
+            content={<strong>{roundNumber(total_sale_birds)}</strong>}
+          />
           <TableCell content="" />
           <TableCell content="" />
           <TableCell
-            content={<strong>₹{roundNumber(totalSaleAmount)}</strong>}
+            content={<strong>{formatCurrency(total_sale_amount)}</strong>}
           />
         </TableRow>
       </Table>
-      {sales && sales.length === 0 && (
+      {data.length === 0 && (
         <div className="bg-gray-50 p-6 text-center text-gray-500">
           No sales found
         </div>
