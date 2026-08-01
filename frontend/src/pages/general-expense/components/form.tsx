@@ -1,4 +1,3 @@
-import type { GeneralExpanceFormValues } from "@app-types/general-expense.types";
 import { RHFTextField } from "@components/form/input";
 import SelectList from "@components/select-list";
 import type { ValidationError } from "@errors/api.error";
@@ -8,6 +7,7 @@ import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import { useEffect } from "react";
 import { useForm, type DefaultValues } from "react-hook-form";
+import type { GeneralExpanceFormValues } from "../types";
 
 type Props = {
   onSubmit: (payload: any) => void;

@@ -1,9 +1,9 @@
 import { Dialog, DialogContent } from "@components/dialog";
 import GeneralExpenseForm from "./form";
-import generalExpense from "@api/general-expense.api";
-import type { GeneralExpanceFormValues } from "@app-types/general-expense.types";
 import { useCallback, useEffect, useState } from "react";
 import type { ValidationError } from "@errors/api.error";
+import generalExpense from "../api";
+import type { GeneralExpanceFormValues } from "../types";
 
 type Props = {
   selectedId: number | null;

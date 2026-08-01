@@ -2,8 +2,7 @@ import type {
   GeneralExpenseListResponse,
   GeneralExpenseRecord,
   GeneralExpanceFormValues,
-} from "@app-types/general-expense.types";
-import fetcher from "@utils/fetcher";
+} from "./types";
 import fetcherV2 from "@utils/fetcherV2";
 import type { Filter } from "@utils/filters";
 
@@ -41,8 +40,6 @@ const generalExpense = {
       },
     );
   },
-  deleteById: async (id: number) =>
-    await fetcher(`general-expenses/${id}`, null, { method: "DELETE" }),
 };
 
 export default generalExpense;

@@ -1,4 +1,4 @@
-import type { Season } from "./season.types";
+import type { Season } from "@pages/seasons/types";
 
 export type GeneralExpenseRecord = {
   id: number;

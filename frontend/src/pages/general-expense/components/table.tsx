@@ -1,4 +1,3 @@
-import type { GeneralExpenseRecord } from "@app-types/general-expense.types";
 import Table from "@components/Table";
 import TableCell from "@components/TableCell";
 import TableHeaderCell from "@components/TableHeaderCell";
@@ -7,6 +6,7 @@ import EmptyContentMessage from "@components/EmptyContentMessage";
 import { formatCurrency } from "@utils/currency";
 import dayjs from "dayjs";
 import { EditIcon } from "lucide-react";
+import type { GeneralExpenseRecord } from "../types";
 
 const headers = ["Date", "Season", "Purpose", "Amount", "Action"];
 

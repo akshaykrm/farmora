@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { overrideFilters, type Filter } from "@utils/filters";
-import type { GeneralExpenseRecord } from "@app-types/general-expense.types";
-import generalExpense from "@api/general-expense.api";
+import generalExpense from "../api";
+import type { GeneralExpenseRecord } from "../types";
 
 function useGetGeneralExpense(filter: Filter) {
   const [generalExpenses, setGeneralExpense] = useState<{
