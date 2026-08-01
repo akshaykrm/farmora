@@ -1,9 +1,12 @@
 import PageHeader from "@components/PageHeader";
+import AddButton from "@components/AddButton";
 import GeneralExpenseTable from "./components/table";
 import AddGeneralExpense from "./components/add";
 import EditGeneralExpense from "./components/edit";
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import { useState } from "react";
+import { Wallet } from "lucide-react";
+import CardStat from "@components/CardStat";
 import FilterGeneralExpense from "./components/filter";
 import useGeneralExpenseFilter from "./hooks/use-general-expense-filter";
 import useGetGeneralExpense from "./hooks/use-get-general-expense";
@@ -25,9 +28,7 @@ const GeneralExpensePage = () => {
       <PageHeader
         title="General Expense"
         action={
-          <Button variant="contained" onClick={onOpen}>
-            Add General Expense
-          </Button>
+          <AddButton label="General Expense" onClick={onOpen} />
         }
       />
 
@@ -77,11 +78,13 @@ const GeneralExpensePage = () => {
 
 function TotalAmount({ totalAmount }: { totalAmount: number }) {
   return (
-    <div className="mb-6 flex items-baseline gap-2 border-b border-brand-border pb-5">
-      <span className="text-sm text-brand-ink-soft">Total amount</span>
-      <h5 className="text-xl font-semibold text-brand-ink">
-        {formatCurrency(totalAmount)}
-      </h5>
+    <div className="mb-4">
+      <CardStat
+        label="Total amount"
+        value={formatCurrency(totalAmount)}
+        icon={<Wallet className="w-5 h-5" />}
+        valueClassName="text-brand-ink"
+      />
     </div>
   );
 }

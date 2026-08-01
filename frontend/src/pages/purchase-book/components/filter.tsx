@@ -26,8 +26,13 @@ const FilterPurchaseBook = (props: Props) => {
   } = methods;
   const values = watch();
 
+  const handleClearAll = () => {
+    methods.reset({ vendor_id: null, start_date: "", end_date: "" });
+    props.onFilter({ vendor_id: null, start_date: "", end_date: "" });
+  };
+
   return (
-    <FilterWrapper>
+    <FilterWrapper filters={values} onClearAll={handleClearAll}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <SelectList
             options={vendorNames.data}

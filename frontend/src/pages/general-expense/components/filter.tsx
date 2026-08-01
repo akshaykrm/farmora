@@ -31,8 +31,13 @@ const FilterGeneralExpense = ({ onFilter, defaultFilter }: Props) => {
     onFilter(methods.getValues());
   };
 
+  const handleClearAll = () => {
+    methods.reset({ season_id: null, purpose: "", start_date: "", end_date: "" });
+    onFilter({ season_id: null, purpose: "", start_date: "", end_date: "" });
+  };
+
   return (
-    <FilterCard>
+    <FilterCard filters={values} onClearAll={handleClearAll}>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         <SelectList
           options={seasonNames.data}

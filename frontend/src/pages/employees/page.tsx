@@ -1,9 +1,10 @@
 import { useState } from "react";
 import PageHeader from "@components/PageHeader";
+import AddButton from "@components/AddButton";
 import AddNewEmployee from "./components/add-new-employee";
 import EditEmployee from "./components/edit-employee";
 import EmployeesTable from "./components/table";
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import useGetEmployees from "./hooks/use-get-employees";
 import useEmployeeFilter from "./hooks/use-employee-filter";
 import PaginationWithLimit from "@components/pagination-with-limit";
@@ -20,9 +21,7 @@ const EmployeesPage = () => {
       <PageHeader
         title="Employees"
         action={
-          <Button variant="contained" onClick={() => setOpenAdd(true)}>
-            Add Employee
-          </Button>
+          <AddButton label="Employee" onClick={() => setOpenAdd(true)} />
         }
       />
       <div>

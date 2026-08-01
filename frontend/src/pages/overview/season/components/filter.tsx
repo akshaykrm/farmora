@@ -34,6 +34,11 @@ const FilterSeasonOverview = ({ onFilter, defaultValues }: Props) => {
     onFilter(inputData);
   });
 
+  const handleClearAll = () => {
+    setValue("season_id", null);
+    onFilter({ season_id: null });
+  };
+
   useEffect(() => {
     document.addEventListener("seasonOverview:season-closed", () => {
       const values = getValues();
@@ -42,8 +47,8 @@ const FilterSeasonOverview = ({ onFilter, defaultValues }: Props) => {
   }, []);
 
   return (
-    <FilterCard className="flex items-center justify-between gap-4">
-      <div className="w-[50%]">
+    <FilterCard filters={{ season_id: seasonId }} onClearAll={handleClearAll}>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         <SelectList
           options={seasonNames.data}
           value={seasonId}
@@ -56,7 +61,8 @@ const FilterSeasonOverview = ({ onFilter, defaultValues }: Props) => {
           helperText={errors.season_id?.message}
         />
       </div>
-      <div>
+
+      <div className="flex justify-end">
         <Button variant="contained" onClick={handleFilter} disabled={!seasonId}>
           Apply Filters
         </Button>

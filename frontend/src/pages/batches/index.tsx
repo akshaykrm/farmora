@@ -1,9 +1,10 @@
 import PageHeader from "@components/PageHeader";
+import AddButton from "@components/AddButton";
 import { useState } from "react";
 import AddBatch from "./components/add";
 import BatchTable from "./components/table";
 import EditBatch from "./components/edit";
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import useGetBatches from "./hooks/use-get-batch";
 import useBatchFilter from "./hooks/use-batch-filter";
 import PaginationWithLimit from "@components/pagination-with-limit";
@@ -23,9 +24,7 @@ const BatchPage = () => {
       <PageHeader
         title="Batch"
         action={
-          <Button variant="contained" onClick={onOpen}>
-            Add Batch
-          </Button>
+          <AddButton label="Batch" onClick={onOpen} />
         }
       />
       <div>

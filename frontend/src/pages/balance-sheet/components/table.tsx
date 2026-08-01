@@ -2,7 +2,7 @@ import TableHeaderCell from "@components/TableHeaderCell";
 import TableRow from "@components/TableRow";
 import TableCell from "@components/TableCell";
 import Badge from "@components/Badge";
-import StatCard from "@components/StatCard";
+import CardStat from "@components/CardStat";
 import { ArrowDownCircle, ArrowUpCircle, Wallet } from "lucide-react";
 import DataLoading from "@components/data-loading";
 import DataNotFound from "@components/data-not-found";
@@ -137,19 +137,19 @@ const AllTables = ({
   return (
     <div>
       <div className="grid grid-cols-1 gap-3 md:grid-cols-3 mb-4">
-        <StatCard
+        <CardStat
           label="Total In"
           value={formatCurrency(summary.total_in)}
           icon={<ArrowDownCircle className="w-5 h-5" />}
           valueClassName="text-brand-success"
         />
-        <StatCard
+        <CardStat
           label="Total Out"
           value={formatCurrency(summary.total_out)}
           icon={<ArrowUpCircle className="w-5 h-5" />}
           valueClassName="text-brand-danger"
         />
-        <StatCard
+        <CardStat
           label="Balance"
           value={formatCurrency(balance)}
           icon={<Wallet className="w-5 h-5" />}

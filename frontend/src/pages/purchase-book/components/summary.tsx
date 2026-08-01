@@ -1,5 +1,5 @@
 import { CircleCheck, CircleDollarSign, Wallet } from "lucide-react";
-import StatCard from "@components/StatCard";
+import CardStat from "@components/CardStat";
 import type { PurchaseBookSummary } from "../types";
 import { formatCurrency } from "@utils/currency";
 
@@ -14,19 +14,19 @@ function PurchaseBookSummaryCard(props: Props) {
 
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-3 mb-4">
-      <StatCard
+      <CardStat
         label="Paid"
         value={formatCurrency(paid)}
         icon={<CircleCheck className="w-5 h-5" />}
         valueClassName="text-brand-success"
       />
-      <StatCard
+      <CardStat
         label="Credit"
         value={formatCurrency(credit)}
         icon={<CircleDollarSign className="w-5 h-5" />}
         valueClassName="text-brand-danger"
       />
-      <StatCard
+      <CardStat
         label="Balance"
         value={formatCurrency(balance)}
         icon={<Wallet className="w-5 h-5" />}

@@ -1,9 +1,10 @@
 import PageTitle from "@components/PageTitle";
+import AddButton from "@components/AddButton";
 import { useState } from "react";
 import AddSale from "./components/add";
 import SalesTable from "./components/table";
 import EditSale from "./components/edit";
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import useSalesFilter from "./hooks/use-sales-filter";
 import useGetSales from "./hooks/use-get-sales";
 import SaleFilter from "./components/filter";
@@ -24,9 +25,7 @@ const SalesPage = () => {
     <>
       <div className="flex items-center justify-between mb-6">
         <PageTitle title="Sales" />
-        <Button variant="contained" onClick={onOpen}>
-          Add Sale
-        </Button>
+        <AddButton label="Sale" onClick={onOpen} />
       </div>
 
       <SaleFilter

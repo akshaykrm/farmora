@@ -1,9 +1,9 @@
 import PageHeader from "@components/PageHeader";
+import AddButton from "@components/AddButton";
 import { useState } from "react";
 import AddSubscription from "./components/add";
 import SubscriptionTable from "./components/table";
 import EditSubscription from "./components/edit";
-import { Button } from "@mui/material";
 
 const SubscriptionsPage = () => {
   const [isOpen, setOpenAdd] = useState(false);
@@ -17,9 +17,7 @@ const SubscriptionsPage = () => {
       <PageHeader
         title="Subscriptions"
         action={
-          <Button variant="contained" onClick={onOpen}>
-            Add Subscription
-          </Button>
+          <AddButton label="Subscription" onClick={onOpen} />
         }
       />
 

@@ -43,9 +43,27 @@ const SaleFilter = ({ handleFetch, defaultValues }: Props) => {
     handleFetch(serializeFilter(data));
   });
 
+  const handleClearAll = () => {
+    const empty: Filter = {
+      season_id: "",
+      batch_id: "",
+      buyer_name: "",
+      start_date: "",
+      end_date: "",
+    };
+    methods.reset({
+      season_id: "",
+      batch_id: "",
+      buyer_name: "",
+      start_date: "",
+      end_date: "",
+    });
+    handleFetch(empty);
+  };
+
   return (
-    <FilterCard>
-      <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-4">
+    <FilterCard filters={methods.watch()} onClearAll={handleClearAll}>
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
         <SelectList
           label="Season"
           name="season_id"
@@ -104,8 +122,11 @@ const SaleFilter = ({ handleFetch, defaultValues }: Props) => {
           }}
         />
 
+      </div>
+
+      <div className="flex justify-end">
         <Button variant="contained" onClick={onFilter}>
-          Apply filters
+          Apply Filters
         </Button>
       </div>
     </FilterCard>

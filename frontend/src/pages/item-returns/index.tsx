@@ -1,9 +1,10 @@
 import PageHeader from "@components/PageHeader";
+import AddButton from "@components/AddButton";
 import { useState } from "react";
 import AddItemReturn from "./components/add";
 import ItemReturnTable from "./components/table";
 import EditItemReturn from "./components/edit";
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import useItemReturnFilter from "./hooks/use-purchase-return-filter";
 import useGetItemReturns from "./hooks/use-item-returs";
 import FilterItemReturns from "./components/filter";
@@ -25,9 +26,7 @@ const ItemReturnPage = () => {
       <PageHeader
         title="Item Returns"
         action={
-          <Button variant="contained" onClick={onOpen}>
-            Add Return
-          </Button>
+          <AddButton label="Return" onClick={onOpen} />
         }
       />
 

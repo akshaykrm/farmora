@@ -1,9 +1,10 @@
 import PageTitle from "@components/PageTitle";
+import AddButton from "@components/AddButton";
 import { useState } from "react";
 import AddItem from "./components/add";
 import ItemTable from "./components/table";
 import EditItem from "./components/edit";
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import useGetItems from "./hooks/use-get-items";
 import useItemFilter from "./hooks/use-item-filter";
 import PaginationWithLimit from "@components/pagination-with-limit";
@@ -23,9 +24,7 @@ const ItemsPage = () => {
     <>
       <div className="flex items-center justify-between mb-6">
         <PageTitle title="Items" />
-        <Button variant="contained" onClick={onOpen}>
-          Add Item
-        </Button>
+        <AddButton label="Item" onClick={onOpen} />
       </div>
       <div>
         <ItemTable onEdit={(id) => setSelectedId(id)} data={items.records} />

@@ -1,5 +1,6 @@
 import PageHeader from "@components/PageHeader";
-import { Box, Button } from "@mui/material";
+import AddButton from "@components/AddButton";
+import { Box } from "@mui/material";
 import PurchaseBookTable from "./components/table";
 import { useState } from "react";
 import usePurchaseBookFilter from "./hooks/use-purchase-book-filter";
@@ -26,9 +27,7 @@ const PurchaseBookPage = () => {
       <PageHeader
         title="Purchase Book"
         action={
-          <Button variant="contained" onClick={onOpen}>
-            Add Payment
-          </Button>
+          <AddButton label="Payment" onClick={onOpen} />
         }
       />
       <div className="mb-5">

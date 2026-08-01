@@ -36,16 +36,33 @@ const BalanceSheetFilter = (props: Props) => {
     props.onFilter(filter);
   };
 
+  const handleClearAll = () => {
+    setFromDate("");
+    setToDate("");
+    setPurpose("");
+    props.onFilter({});
+  };
+
+  const filters: Record<string, unknown> = {};
+  if (fromDate) {
+    filters.from_date = fromDate.format("YYYY-MM-DD");
+  }
+  if (toDate) {
+    filters.to_date = toDate.format("YYYY-MM-DD");
+  }
+  if (purpose.trim()) {
+    filters.purpose = purpose.trim();
+  }
+
   return (
-    <FilterCard>
-      <div className="flex items-center gap-4 flex-wrap">
+    <FilterCard filters={filters} onClearAll={handleClearAll}>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         <TextField
           label="Search Purpose"
           value={purpose}
           onChange={(e) => setPurpose(e.target.value)}
           size="small"
           placeholder="Search by purpose..."
-          sx={{ minWidth: 200 }}
         />
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DatePicker
@@ -61,8 +78,11 @@ const BalanceSheetFilter = (props: Props) => {
             slotProps={{ textField: { size: "small" } }}
           />
         </LocalizationProvider>
+      </div>
+
+      <div className="flex justify-end">
         <Button variant="contained" onClick={handleApply}>
-          Apply Filter
+          Apply Filters
         </Button>
       </div>
     </FilterCard>

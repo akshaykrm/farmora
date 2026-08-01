@@ -1,8 +1,8 @@
 import PageHeader from "@components/PageHeader";
+import AddButton from "@components/AddButton";
 import WorkingCostTable from "./components/table";
 import AddWorkingCost from "./components/add";
 import FilterWorkingCost from "./components/filter";
-import { Button } from "@mui/material";
 import { useState } from "react";
 import useGetWorkingCost from "./hooks/use-get-working-cost";
 import useWorkingCostFilter from "./hooks/use-working-cost-filter";
@@ -28,9 +28,7 @@ const WorkingCostPage = () => {
       <PageHeader
         title="Working Cost"
         action={
-          <Button variant="contained" onClick={onOpen}>
-            Add Working Cost Entry
-          </Button>
+          <AddButton label="Working Cost Entry" onClick={onOpen} />
         }
       />
       <FilterWorkingCost

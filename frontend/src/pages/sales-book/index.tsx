@@ -1,7 +1,8 @@
 import PageHeader from "@components/PageHeader";
+import AddButton from "@components/AddButton";
 import SalesBookTable from "./components/table";
 import AddSalesBookEntry from "./components/add";
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import { useState } from "react";
 import useSalesBookFilter from "./hooks/use-sales-book-filter";
 import FilterSalesBook from "./components/filter";
@@ -22,9 +23,7 @@ const SalesBookPage = () => {
       <PageHeader
         title="Sales Book"
         action={
-          <Button variant="contained" onClick={onOpen}>
-            Add Sales Book Entry
-          </Button>
+          <AddButton label="Sales Book Entry" onClick={onOpen} />
         }
       />
 

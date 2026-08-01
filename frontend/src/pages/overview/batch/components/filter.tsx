@@ -43,8 +43,16 @@ const FilterBatchOverview = ({ onFilter, defaultValues }: Props) => {
     },
   );
 
+  const handleClearAll = () => {
+    methods.reset({ season_id: "", batch_id: "" });
+    onFilter({ season_id: "", batch_id: "" });
+  };
+
   return (
-    <FilterCard>
+    <FilterCard
+      filters={{ season_id: seasonId, batch_id: batchId }}
+      onClearAll={handleClearAll}
+    >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <SelectList
           options={seasonsList.data}

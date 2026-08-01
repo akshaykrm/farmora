@@ -1,9 +1,10 @@
 import PageHeader from "@components/PageHeader";
+import AddButton from "@components/AddButton";
 import { useState } from "react";
 import AddSeason from "./components/add";
 import EditSeason from "./components/edit";
 import SeasonTable from "./components/table";
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import useGetSeasons from "./hooks/use-get-seasons";
 import useSeasonFilter from "./hooks/use-season-filter";
 import PaginationWithLimit from "@components/pagination-with-limit";
@@ -23,9 +24,7 @@ const SeasonsPage = () => {
       <PageHeader
         title="Seasons"
         action={
-          <Button variant="contained" onClick={onOpen}>
-            Add Season
-          </Button>
+          <AddButton label="Season" onClick={onOpen} />
         }
       />
       <div>

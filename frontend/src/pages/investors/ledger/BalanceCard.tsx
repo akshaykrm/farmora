@@ -39,13 +39,7 @@ const BalanceCard = ({
       : null
 
   return (
-    <div
-      className={`border-l-2 px-4 py-2 ${
-        isCapital
-          ? 'border-brand-primary'
-          : 'border-brand-info'
-      }`}
-    >
+    <div className="h-full rounded-xl border border-brand-border bg-brand-card p-4 shadow-xs">
       <div className="flex items-start gap-4">
         <div
           className={`p-3 rounded-lg ${

@@ -1,32 +1,15 @@
 import type { ReactNode } from "react";
 
-type TrendTone = "positive" | "negative" | "neutral";
-
 type Props = {
   label: string;
   value: ReactNode;
   icon?: ReactNode;
-  trend?: string;
-  trendTone?: TrendTone;
   valueClassName?: string;
 };
 
-const trendColors: Record<TrendTone, string> = {
-  positive: "text-brand-success",
-  negative: "text-brand-danger",
-  neutral: "text-brand-ink-soft",
-};
-
-const StatCard = ({
-  label,
-  value,
-  icon,
-  trend,
-  trendTone = "positive",
-  valueClassName = "",
-}: Props) => {
+const CardStat = ({ label, value, icon, valueClassName = "" }: Props) => {
   return (
-    <div className="h-full border-l-2 border-brand-primary px-4 py-1">
+    <div className="h-full rounded-xl border border-brand-border bg-brand-card p-4 shadow-xs">
       <div className="flex items-start justify-between gap-3">
         <div className="flex flex-col gap-2 min-w-0">
           <h3 className="text-sm font-medium capitalize text-brand-ink-soft">
@@ -37,11 +20,6 @@ const StatCard = ({
           >
             {value}
           </p>
-          {trend && (
-            <p className={`text-xs font-medium ${trendColors[trendTone]}`}>
-              {trend}
-            </p>
-          )}
         </div>
         {icon && (
           <div className="w-10 h-10 shrink-0 rounded-xl bg-brand-primary-soft text-brand-accent flex items-center justify-center">
@@ -53,4 +31,4 @@ const StatCard = ({
   );
 };
 
-export default StatCard;
+export default CardStat;

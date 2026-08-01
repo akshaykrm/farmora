@@ -1,9 +1,12 @@
 import PageHeader from "@components/PageHeader";
+import AddButton from "@components/AddButton";
 import GeneralSalesTable from "./components/table";
 import AddGeneralSales from "./components/add";
 import EditGeneralSales from "./components/edit";
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import { useState } from "react";
+import { Wallet } from "lucide-react";
+import CardStat from "@components/CardStat";
 import FilterGeneralSales from "./components/filter";
 import useGeneralSalesFilter from "./hooks/use-general-sales-filter";
 import useGetGeneralSales from "./hooks/use-general-sales";
@@ -24,9 +27,7 @@ const GeneralSalesPage = () => {
       <PageHeader
         title="General Sales"
         action={
-          <Button variant="contained" onClick={onOpen}>
-            Add General Sales
-          </Button>
+          <AddButton label="General Sales" onClick={onOpen} />
         }
       />
 
@@ -78,11 +79,13 @@ export default GeneralSalesPage;
 
 function TotalAmount({ totalAmount }: { totalAmount: number }) {
   return (
-    <div className="mb-6 flex items-baseline gap-2 border-b border-brand-border pb-5">
-      <span className="text-sm text-brand-ink-soft">Total amount</span>
-      <h5 className="text-xl font-semibold text-brand-ink">
-        {formatCurrency(totalAmount)}
-      </h5>
+    <div className="mb-4">
+      <CardStat
+        label="Total amount"
+        value={formatCurrency(totalAmount)}
+        icon={<Wallet className="w-5 h-5" />}
+        valueClassName="text-brand-ink"
+      />
     </div>
   );
 }

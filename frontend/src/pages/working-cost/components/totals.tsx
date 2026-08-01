@@ -1,5 +1,5 @@
 import { TrendingDown, TrendingUp, Wallet } from "lucide-react";
-import StatCard from "@components/StatCard";
+import CardStat from "@components/CardStat";
 import { formatCurrency } from "@utils/currency";
 import type { WorkingCostSummary } from "../types";
 
@@ -14,19 +14,19 @@ function WorkingCostTotals(props: Props) {
   }
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-3 mb-4">
-      <StatCard
+      <CardStat
         label="Income"
         value={formatCurrency(summary.income)}
         icon={<TrendingUp className="w-5 h-5" />}
         valueClassName="text-brand-success"
       />
-      <StatCard
+      <CardStat
         label="Expense"
         value={formatCurrency(summary.expense)}
         icon={<TrendingDown className="w-5 h-5" />}
         valueClassName="text-brand-danger"
       />
-      <StatCard
+      <CardStat
         label="Balance"
         value={formatCurrency(summary.balance)}
         icon={<Wallet className="w-5 h-5" />}

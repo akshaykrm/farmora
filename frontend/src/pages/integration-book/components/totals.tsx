@@ -1,5 +1,5 @@
 import { HandCoins, TrendingDown, Wallet } from "lucide-react";
-import StatCard from "@components/StatCard";
+import CardStat from "@components/CardStat";
 import { formatCurrency } from "@utils/currency";
 import type { IntegrationBookSummary } from "../types";
 
@@ -14,19 +14,19 @@ function IntegrationBookTotals(props: Props) {
   }
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-3 mb-4">
-      <StatCard
+      <CardStat
         label="Total In"
         value={formatCurrency(summary.credit)}
         icon={<HandCoins className="w-5 h-5" />}
         valueClassName="text-brand-success"
       />
-      <StatCard
+      <CardStat
         label="Total Out"
         value={formatCurrency(summary.paid)}
         icon={<TrendingDown className="w-5 h-5" />}
         valueClassName="text-brand-danger"
       />
-      <StatCard
+      <CardStat
         label="Balance"
         value={formatCurrency(summary.balance)}
         icon={<Wallet className="w-5 h-5" />}

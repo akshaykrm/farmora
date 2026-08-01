@@ -39,9 +39,32 @@ const FilterItemReturns = (props: Props) => {
     props.onFilter(inputData);
   };
 
+  const handleClearAll = () => {
+    methods.reset({
+      return_type: "",
+      item_category_id: "",
+      from_batch: "",
+      to_batch: "",
+      to_vendor: "",
+      status: "",
+      start_date: "",
+      end_date: "",
+    });
+    props.onFilter({
+      return_type: "",
+      item_category_id: "",
+      from_batch: "",
+      to_batch: "",
+      to_vendor: "",
+      status: "",
+      start_date: "",
+      end_date: "",
+    });
+  };
+
   return (
     <form onSubmit={handleSubmit(onFilter)}>
-      <FilterCard>
+      <FilterCard filters={values} onClearAll={handleClearAll}>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
           <TextField
             label="Return Type"

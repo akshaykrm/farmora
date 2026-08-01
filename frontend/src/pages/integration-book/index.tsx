@@ -1,8 +1,8 @@
 import PageHeader from "@components/PageHeader";
+import AddButton from "@components/AddButton";
 import IntegrationBookTable from "./components/table";
 import AddIntegrationBook from "./components/add";
 import FilterIntegrationBook from "./components/filter";
-import { Button } from "@mui/material";
 import { useState } from "react";
 import useGetIntegrationBook from "./hooks/use-get-integration-book";
 import useIntegrationBookFilter from "./hooks/use-integration-book-filter";
@@ -29,9 +29,7 @@ const IntegrationBookPage = () => {
       <PageHeader
         title="Integration Book"
         action={
-          <Button variant="contained" onClick={onOpen}>
-            Add Integration Book Entry
-          </Button>
+          <AddButton label="Integration Book Entry" onClick={onOpen} />
         }
       />
       <FilterIntegrationBook

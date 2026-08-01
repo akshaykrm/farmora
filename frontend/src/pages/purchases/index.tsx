@@ -1,9 +1,10 @@
 import PageHeader from "@components/PageHeader";
+import AddButton from "@components/AddButton";
 import { useState } from "react";
 import AddPurchase from "./components/add";
 import ItemTable from "./components/table";
 import EditItem from "./components/edit";
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import useGetPurchases from "./hooks/use-get-purchases";
 import FilterItems from "./components/filter";
 import usePurchaseFilter from "./hooks/use-purchase-filter";
@@ -24,9 +25,7 @@ function PurchasePage() {
       <PageHeader
         title="Purchase"
         action={
-          <Button variant="contained" onClick={onOpen}>
-            Add Purchase
-          </Button>
+          <AddButton label="Purchase" onClick={onOpen} />
         }
       />
       <div>
