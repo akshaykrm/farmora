@@ -1,4 +1,4 @@
-import PageTitle from "@components/PageTitle";
+import PageHeader from "@components/PageHeader";
 import { useState } from "react";
 import AddSeason from "./components/add";
 import EditSeason from "./components/edit";
@@ -20,12 +20,14 @@ const SeasonsPage = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-6">
-        <PageTitle title="Seasons" />
-        <Button variant="contained" onClick={onOpen}>
-          Add Season
-        </Button>
-      </div>
+      <PageHeader
+        title="Seasons"
+        action={
+          <Button variant="contained" onClick={onOpen}>
+            Add Season
+          </Button>
+        }
+      />
       <div>
         <SeasonTable onEdit={(id) => setSelectedId(id)} seasons={seasonsList.records} />
       </div>

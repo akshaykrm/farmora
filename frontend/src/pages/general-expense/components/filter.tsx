@@ -1,6 +1,7 @@
 import { Button } from "@mui/material";
 import useGetSeasonNames from "@hooks/use-get-season-names";
 import SelectList from "@components/select-list";
+import FilterCard from "@components/FilterCard";
 import { useForm } from "react-hook-form";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
@@ -31,7 +32,7 @@ const FilterGeneralExpense = ({ onFilter, defaultFilter }: Props) => {
   };
 
   return (
-    <div className="w-full bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+    <FilterCard>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         <SelectList
           options={seasonNames.data}
@@ -96,7 +97,7 @@ const FilterGeneralExpense = ({ onFilter, defaultFilter }: Props) => {
           Apply Filters
         </Button>
       </div>
-    </div>
+    </FilterCard>
   );
 };
 export default FilterGeneralExpense;

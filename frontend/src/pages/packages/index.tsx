@@ -1,7 +1,7 @@
-import PageTitle from "@components/PageTitle";
+import PageHeader from "@components/PageHeader";
 
 const PackagesPage = () => {
-  return <PageTitle title="Packages" />;
+  return <PageHeader title="Packages" />;
 };
 
 export default PackagesPage;

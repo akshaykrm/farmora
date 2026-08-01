@@ -1,8 +1,8 @@
-import PageTitle from "@components/PageTitle";
+import PageHeader from "@components/PageHeader";
 import IntegrationBookTable from "./components/table";
 import AddIntegrationBook from "./components/add";
 import FilterIntegrationBook from "./components/filter";
-import { Button } from "@mui/material";
+import { Button, Card } from "@mui/material";
 import { useState } from "react";
 import useGetIntegrationBook from "./hooks/use-get-integration-book";
 import useIntegrationBookFilter from "./hooks/use-integration-book-filter";
@@ -26,12 +26,14 @@ const IntegrationBookPage = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-6">
-        <PageTitle title="Integration Book" />
-        <Button variant="contained" onClick={onOpen}>
-          Add Integration Book Entry
-        </Button>
-      </div>
+      <PageHeader
+        title="Integration Book"
+        action={
+          <Button variant="contained" onClick={onOpen}>
+            Add Integration Book Entry
+          </Button>
+        }
+      />
       <FilterIntegrationBook
         defaultValues={filter}
         onFilter={(f) => updateQueryParams(f)}
@@ -49,7 +51,7 @@ const IntegrationBookPage = () => {
           <>
             <IntegrationBookTotals summary={summary} />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-              <div>
+              <Card className="overflow-hidden">
                 <IntegrationBookTable data={paid.data} title="Paid" />
                 <PaginationWithLimit
                   page={filter.p_page}
@@ -66,8 +68,8 @@ const IntegrationBookPage = () => {
                     updateQueryParams(opts);
                   }}
                 />
-              </div>
-              <div>
+              </Card>
+              <Card className="overflow-hidden">
                 <IntegrationBookTable data={credit.data} title="Credit" />
                 <PaginationWithLimit
                   page={filter.c_page}
@@ -84,7 +86,7 @@ const IntegrationBookPage = () => {
                     updateQueryParams(opts);
                   }}
                 />
-              </div>
+              </Card>
             </div>
           </>
         }

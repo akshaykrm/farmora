@@ -1,4 +1,4 @@
-import PageTitle from "@components/PageTitle";
+import PageHeader from "@components/PageHeader";
 import GeneralExpenseTable from "./components/table";
 import AddGeneralExpense from "./components/add";
 import EditGeneralExpense from "./components/edit";
@@ -22,12 +22,14 @@ const GeneralExpensePage = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-6">
-        <PageTitle title="General Expense" />
-        <Button variant="contained" onClick={onOpen}>
-          Add General Expense
-        </Button>
-      </div>
+      <PageHeader
+        title="General Expense"
+        action={
+          <Button variant="contained" onClick={onOpen}>
+            Add General Expense
+          </Button>
+        }
+      />
 
       <FilterGeneralExpense
         defaultFilter={filter}
@@ -75,8 +77,8 @@ const GeneralExpensePage = () => {
 
 function TotalAmount({ totalAmount }: { totalAmount: number }) {
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-      <h5 className="text-md font-semibold text-gray-800">
+    <div className="bg-brand-card border border-brand-border rounded-lg shadow-sm p-6 mb-6">
+      <h5 className="text-md font-semibold text-brand-ink">
         Total Amount: {formatCurrency(totalAmount)}
       </h5>
     </div>

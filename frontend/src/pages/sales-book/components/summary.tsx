@@ -12,20 +12,26 @@ function Summary({ summary }: Props) {
 
   return (
     <Card className="mb-5">
-      <div className="p-5 mb-3 flex justify-between">
+      <div className="p-5 flex justify-between gap-4 flex-wrap">
         <div>
-          <Typography>Buyer</Typography>
-          <Typography variant="h6">{summary.buyer?.name || "Nil"}</Typography>
+          <Typography className="text-sm text-brand-ink-muted">Buyer</Typography>
+          <Typography variant="h6" className="font-semibold text-brand-ink">
+            {summary.buyer?.name || "Nil"}
+          </Typography>
         </div>
         <div>
-          <Typography>Opening Balance</Typography>
-          <Typography variant="h6">
+          <Typography className="text-sm text-brand-ink-muted">
+            Opening Balance
+          </Typography>
+          <Typography variant="h6" className="font-semibold text-brand-ink">
             {formatCurrency(summary.opening_balance)}
           </Typography>
         </div>
         <div>
-          <Typography>Closing Balance</Typography>
-          <Typography variant="h6">
+          <Typography className="text-sm text-brand-ink-muted">
+            Closing Balance
+          </Typography>
+          <Typography variant="h6" className="font-semibold text-brand-ink">
             {formatCurrency(summary.closing_balance)}
           </Typography>
         </div>

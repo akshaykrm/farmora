@@ -1,4 +1,4 @@
-import PageTitle from "@components/PageTitle";
+import PageHeader from "@components/PageHeader";
 import { useState } from "react";
 import AddItemReturn from "./components/add";
 import ItemReturnTable from "./components/table";
@@ -22,12 +22,14 @@ const ItemReturnPage = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between">
-        <PageTitle title="Item Returns" />
-        <Button variant="contained" onClick={onOpen}>
-          Add Return
-        </Button>
-      </div>
+      <PageHeader
+        title="Item Returns"
+        action={
+          <Button variant="contained" onClick={onOpen}>
+            Add Return
+          </Button>
+        }
+      />
 
       <div className="mt-6">
         <FilterItemReturns

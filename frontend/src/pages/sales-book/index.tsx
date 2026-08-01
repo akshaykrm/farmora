@@ -1,4 +1,4 @@
-import PageTitle from "@components/PageTitle";
+import PageHeader from "@components/PageHeader";
 import SalesBookTable from "./components/table";
 import AddSalesBookEntry from "./components/add";
 import { Box, Button } from "@mui/material";
@@ -19,12 +19,14 @@ const SalesBookPage = () => {
   const { saleBook, refetch } = useGetSalesBook(filter);
   return (
     <>
-      <div className="flex items-center justify-between mb-6">
-        <PageTitle title="Sales Book" />
-        <Button variant="contained" onClick={onOpen}>
-          Add Sales Book Entry
-        </Button>
-      </div>
+      <PageHeader
+        title="Sales Book"
+        action={
+          <Button variant="contained" onClick={onOpen}>
+            Add Sales Book Entry
+          </Button>
+        }
+      />
 
       <FilterSalesBook
         onFilter={(f) => updateQueryParams(f)}

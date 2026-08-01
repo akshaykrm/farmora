@@ -1,4 +1,4 @@
-import PageTitle from "@components/PageTitle";
+import PageHeader from "@components/PageHeader";
 import { useState } from "react";
 import AddBatch from "./components/add";
 import BatchTable from "./components/table";
@@ -20,12 +20,14 @@ const BatchPage = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-6">
-        <PageTitle title="Batch" />
-        <Button variant="contained" onClick={onOpen}>
-          Add Batch
-        </Button>
-      </div>
+      <PageHeader
+        title="Batch"
+        action={
+          <Button variant="contained" onClick={onOpen}>
+            Add Batch
+          </Button>
+        }
+      />
       <div>
         <BatchTable onEdit={(id) => setSelectedId(id)} batches={batches.records} />
       </div>

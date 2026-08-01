@@ -1,4 +1,4 @@
-import PageTitle from "@components/PageTitle";
+import PageHeader from "@components/PageHeader";
 import { Box, Button } from "@mui/material";
 import PurchaseBookTable from "./components/table";
 import { useState } from "react";
@@ -23,12 +23,14 @@ const PurchaseBookPage = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-6">
-        <PageTitle title="Purchase Book" />
-        <Button variant="contained" onClick={onOpen}>
-          Add Payment
-        </Button>
-      </div>
+      <PageHeader
+        title="Purchase Book"
+        action={
+          <Button variant="contained" onClick={onOpen}>
+            Add Payment
+          </Button>
+        }
+      />
       <div className="mb-5">
         <FilterPurchaseBook
           defaultValues={filter}

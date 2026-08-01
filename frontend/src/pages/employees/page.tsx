@@ -1,5 +1,5 @@
 import { useState } from "react";
-import PageTitle from "@components/PageTitle";
+import PageHeader from "@components/PageHeader";
 import AddNewEmployee from "./components/add-new-employee";
 import EditEmployee from "./components/edit-employee";
 import EmployeesTable from "./components/table";
@@ -17,12 +17,14 @@ const EmployeesPage = () => {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <PageTitle title="Employees" />
-        <Button variant="contained" onClick={() => setOpenAdd(true)}>
-          Add Employee
-        </Button>
-      </div>
+      <PageHeader
+        title="Employees"
+        action={
+          <Button variant="contained" onClick={() => setOpenAdd(true)}>
+            Add Employee
+          </Button>
+        }
+      />
       <div>
         <EmployeesTable onEdit={setSelectedId} employees={employees.records} />
       </div>

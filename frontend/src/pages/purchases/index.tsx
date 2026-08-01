@@ -1,4 +1,4 @@
-import PageTitle from "@components/PageTitle";
+import PageHeader from "@components/PageHeader";
 import { useState } from "react";
 import AddPurchase from "./components/add";
 import ItemTable from "./components/table";
@@ -21,12 +21,14 @@ function PurchasePage() {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-6">
-        <PageTitle title="Purchase" />
-        <Button variant="contained" onClick={onOpen}>
-          Add Purchase
-        </Button>
-      </div>
+      <PageHeader
+        title="Purchase"
+        action={
+          <Button variant="contained" onClick={onOpen}>
+            Add Purchase
+          </Button>
+        }
+      />
       <div>
         <div className="mb-5">
           <FilterItems

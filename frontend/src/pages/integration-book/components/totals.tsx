@@ -1,4 +1,5 @@
-import Card from "@mui/material/Card";
+import { HandCoins, TrendingDown, Wallet } from "lucide-react";
+import StatCard from "@components/StatCard";
 import { formatCurrency } from "@utils/currency";
 import type { IntegrationBookSummary } from "../types";
 
@@ -13,42 +14,26 @@ function IntegrationBookTotals(props: Props) {
   }
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-3 mb-4">
-      <Card className="p-6">
-        <div className="flex flex-col gap-3">
-          <h3 className="text-lg font-semibold capitalize text-muted-foreground">
-            Total In
-          </h3>
-
-          <p className="text-3xl font-bold tracking-tight text-green-600">
-            {formatCurrency(summary.credit)}
-          </p>
-        </div>
-      </Card>
-
-      <Card className="p-6">
-        <div className="flex flex-col gap-3">
-          <h3 className="text-lg font-semibold capitalize text-muted-foreground">
-            Total Out
-          </h3>
-
-          <p className="text-3xl font-bold tracking-tight text-red-600">
-            {formatCurrency(summary.paid)}
-          </p>
-        </div>
-      </Card>
-      <Card className="p-6">
-        <div className="flex flex-col gap-3">
-          <h3 className="text-lg font-semibold capitalize text-muted-foreground">
-            Balance
-          </h3>
-
-          <p
-            className={`text-3xl font-bold tracking-tight ${(summary.balance || 0) > 0 ? "text-green-600" : "text-red-600"}`}
-          >
-            {formatCurrency(summary.balance)}
-          </p>
-        </div>
-      </Card>
+      <StatCard
+        label="Total In"
+        value={formatCurrency(summary.credit)}
+        icon={<HandCoins className="w-5 h-5" />}
+        valueClassName="text-brand-success"
+      />
+      <StatCard
+        label="Total Out"
+        value={formatCurrency(summary.paid)}
+        icon={<TrendingDown className="w-5 h-5" />}
+        valueClassName="text-brand-danger"
+      />
+      <StatCard
+        label="Balance"
+        value={formatCurrency(summary.balance)}
+        icon={<Wallet className="w-5 h-5" />}
+        valueClassName={
+          (summary.balance || 0) > 0 ? "text-brand-success" : "text-brand-danger"
+        }
+      />
     </div>
   );
 }

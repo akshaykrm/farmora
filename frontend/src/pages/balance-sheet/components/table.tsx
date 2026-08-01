@@ -1,6 +1,9 @@
 import TableHeaderCell from "@components/TableHeaderCell";
 import TableRow from "@components/TableRow";
 import TableCell from "@components/TableCell";
+import Badge from "@components/Badge";
+import StatCard from "@components/StatCard";
+import { ArrowDownCircle, ArrowUpCircle, Wallet } from "lucide-react";
 import DataLoading from "@components/data-loading";
 import DataNotFound from "@components/data-not-found";
 import Ternary from "@components/ternary";
@@ -58,7 +61,7 @@ const TransactionsTable = ({
   transactions: Transaction[];
 }) => {
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
+    <Card className="overflow-hidden mb-6">
       <table className="min-w-full">
         <thead>
           <tr>
@@ -72,7 +75,7 @@ const TransactionsTable = ({
         <tbody>
           {transactions.length === 0 ? (
             <tr>
-              <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+              <td colSpan={5} className="px-4 py-8 text-center text-brand-ink-muted">
                 No transactions found
               </td>
             </tr>
@@ -84,15 +87,11 @@ const TransactionsTable = ({
                   <TableCell content={t.purpose} />
                   <TableCell
                     content={
-                      <span
-                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          t.type === "in"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
+                      <Badge
+                        variant={t.type === "in" ? "success" : "danger"}
                       >
                         {t.type === "in" ? "IN" : "OUT"}
-                      </span>
+                      </Badge>
                     }
                   />
                   <TableCell
@@ -109,7 +108,7 @@ const TransactionsTable = ({
           )}
         </tbody>
       </table>
-    </div>
+    </Card>
   );
 };
 
@@ -126,7 +125,7 @@ const AllTables = ({
 }) => {
   const { transactions, summary } = data;
 
-  const { total_in, total_out, closing_balance: balance } = summary;
+  const balance = summary.closing_balance;
 
   const totalPages = Math.ceil(transactions.length / limit);
   const startIndex = (page - 1) * limit;
@@ -138,44 +137,26 @@ const AllTables = ({
   return (
     <div>
       <div className="grid grid-cols-1 gap-3 md:grid-cols-3 mb-4">
-        <Card className="p-6">
-          <div className="flex flex-col gap-3">
-            <h3 className="text-lg font-semibold capitalize text-muted-foreground">
-              Total In
-            </h3>
-
-            <p className="text-3xl font-bold tracking-tight text-green-600">
-              {formatCurrency(summary.total_in)}
-            </p>
-          </div>
-        </Card>
-
-        <Card className="p-6">
-          <div className="flex flex-col gap-3">
-            <h3 className="text-lg font-semibold capitalize text-muted-foreground">
-              Total Out
-            </h3>
-
-            <p className="text-3xl font-bold tracking-tight text-red-600">
-              {formatCurrency(summary.total_out)}
-            </p>
-          </div>
-        </Card>
-        <Card className="p-6">
-          <div className="flex flex-col gap-3">
-            <h3 className="text-lg font-semibold capitalize text-muted-foreground">
-              Balance
-            </h3>
-
-            <p
-              className={`text-3xl font-bold tracking-tight ${
-                balance < 0 ? "text-red-600" : "text-green-600"
-              }`}
-            >
-              {formatCurrency(balance)}
-            </p>
-          </div>
-        </Card>
+        <StatCard
+          label="Total In"
+          value={formatCurrency(summary.total_in)}
+          icon={<ArrowDownCircle className="w-5 h-5" />}
+          valueClassName="text-brand-success"
+        />
+        <StatCard
+          label="Total Out"
+          value={formatCurrency(summary.total_out)}
+          icon={<ArrowUpCircle className="w-5 h-5" />}
+          valueClassName="text-brand-danger"
+        />
+        <StatCard
+          label="Balance"
+          value={formatCurrency(balance)}
+          icon={<Wallet className="w-5 h-5" />}
+          valueClassName={
+            balance < 0 ? "text-brand-danger" : "text-brand-success"
+          }
+        />
       </div>
       <TransactionsTable transactions={paginatedTransactions} />
       {totalPages > 1 && (

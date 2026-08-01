@@ -1,4 +1,4 @@
-import PageTitle from "@components/PageTitle";
+import PageHeader from "@components/PageHeader";
 import { useState } from "react";
 import AddSubscription from "./components/add";
 import SubscriptionTable from "./components/table";
@@ -14,12 +14,14 @@ const SubscriptionsPage = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-6">
-        <PageTitle title="Subscriptions" />
-        <Button variant="contained" onClick={onOpen}>
-          Add Subscription
-        </Button>
-      </div>
+      <PageHeader
+        title="Subscriptions"
+        action={
+          <Button variant="contained" onClick={onOpen}>
+            Add Subscription
+          </Button>
+        }
+      />
 
       <div>
         <SubscriptionTable onEdit={(id) => setSelectedId(id)} />

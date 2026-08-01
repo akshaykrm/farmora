@@ -2,6 +2,7 @@ import { TextField, MenuItem, Button } from "@mui/material";
 import useGetVendorNames from "@hooks/use-get-vendor-name-list";
 import useGetItemCategoryNames from "@hooks/item-category/use-get-item-category-names";
 import SelectList from "@components/select-list";
+import FilterCard from "@components/FilterCard";
 import type { ItemReturnFilterRequest } from "@app-types/item-return.types";
 import { useForm } from "react-hook-form";
 import { DatePicker } from "@mui/x-date-pickers";
@@ -40,7 +41,7 @@ const FilterItemReturns = (props: Props) => {
 
   return (
     <form onSubmit={handleSubmit(onFilter)}>
-      <div className="w-full bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+      <FilterCard>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
           <TextField
             label="Return Type"
@@ -152,7 +153,7 @@ const FilterItemReturns = (props: Props) => {
             Apply Filters
           </Button>
         </div>
-      </div>
+      </FilterCard>
     </form>
   );
 };
