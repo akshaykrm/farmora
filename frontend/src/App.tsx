@@ -3,7 +3,7 @@ import { Navigate, Route, Routes } from "react-router";
 import LoginPage from "./pages/login";
 import LandingPage from "./pages/landing";
 import { useAuth } from "@store/authentication/context";
-import type { ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 import Layout from "@components/layout";
 import { paths } from "./paths";
 import BatchesPage from "@pages/batches";
@@ -21,7 +21,9 @@ import ItemsPage from "@pages/items";
 import type { PathItem } from "./types/paths.types";
 import { ThemeProvider } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
-import theme from "./theme";
+import { createAppTheme } from "./theme";
+import ThemeModeProvider from "./store/theme";
+import { useTheme } from "./store/theme/context";
 import Dashboard from "@pages/dashboard";
 import ManagerDashboard from "@pages/dashboard/manager";
 import WorkingCostPage from "@pages/working-cost";
@@ -81,65 +83,78 @@ const flattenPaths = (items: PathItem[]): PathItem[] => {
   return result;
 };
 
+const MuiThemeBridge = ({ children }: { children: ReactNode }) => {
+  const { mode } = useTheme();
+  const theme = useMemo(() => createAppTheme(mode), [mode]);
+
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      {children}
+    </ThemeProvider>
+  );
+};
+
 function App() {
   const flatPaths = flattenPaths(paths);
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <LoginRouteGuard>
-                  <LandingPage />
-                </LoginRouteGuard>
-              }
-            />
-            <Route
-              path="/login"
-              element={
-                <LoginRouteGuard>
-                  <LoginPage />
-                </LoginRouteGuard>
-              }
-            />
-            <Route
-              path="/*"
-              element={
-                <AuthGuard>
-                  <Layout>
-                    <Routes>
-                      <Route
-                        path="/dashboard"
-                        element={<RoleBasedDashboard />}
-                      />
-                      {flatPaths.map((path) => {
-                        const Component = pageComponents[path.link!];
-                        return (
-                          <Route
-                            key={path.link}
-                            path={path.link}
-                            element={
-                              Component ? (
-                                <Component />
-                              ) : (
-                                <h1>{path.pathname}</h1>
-                              )
-                            }
-                          />
-                        );
-                      })}
-                    </Routes>
-                  </Layout>
-                </AuthGuard>
-              }
-            />
-          </Routes>
-        </LocalizationProvider>
-      </ThemeProvider>
+      <ThemeModeProvider>
+        <MuiThemeBridge>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <LoginRouteGuard>
+                    <LandingPage />
+                  </LoginRouteGuard>
+                }
+              />
+              <Route
+                path="/login"
+                element={
+                  <LoginRouteGuard>
+                    <LoginPage />
+                  </LoginRouteGuard>
+                }
+              />
+              <Route
+                path="/*"
+                element={
+                  <AuthGuard>
+                    <Layout>
+                      <Routes>
+                        <Route
+                          path="/dashboard"
+                          element={<RoleBasedDashboard />}
+                        />
+                        {flatPaths.map((path) => {
+                          const Component = pageComponents[path.link!];
+                          return (
+                            <Route
+                              key={path.link}
+                              path={path.link}
+                              element={
+                                Component ? (
+                                  <Component />
+                                ) : (
+                                  <h1>{path.pathname}</h1>
+                                )
+                              }
+                            />
+                          );
+                        })}
+                      </Routes>
+                    </Layout>
+                  </AuthGuard>
+                }
+              />
+            </Routes>
+          </LocalizationProvider>
+        </MuiThemeBridge>
+      </ThemeModeProvider>
     </QueryClientProvider>
   );
 }

@@ -15,7 +15,7 @@ export function OverviewPreview() {
   return (
     <div className="rounded-xl border border-brand-divider bg-white shadow-lg overflow-hidden select-none">
       <WindowChrome />
-      <div className="p-3 bg-brand-surface space-y-2.5">
+      <div className="p-3 bg-brand-mint space-y-2.5">
         <div>
           <div className="h-2 w-24 bg-brand-charcoal/20 rounded" />
           <div className="h-1.5 w-32 bg-brand-muted/30 rounded mt-1.5" />
@@ -88,7 +88,7 @@ export function SeasonOverviewPreview() {
   return (
     <div className="rounded-xl border border-brand-divider bg-white shadow-lg overflow-hidden select-none">
       <WindowChrome />
-      <div className="p-3 bg-brand-surface space-y-2">
+      <div className="p-3 bg-brand-mint space-y-2">
         <div className="flex justify-between items-center">
           <p className="text-[10px] font-semibold text-brand-charcoal">
             Season overview
@@ -133,7 +133,7 @@ export function BatchPLPreview() {
   return (
     <div className="rounded-xl border border-brand-divider bg-white shadow-lg overflow-hidden select-none">
       <WindowChrome />
-      <div className="p-3 bg-brand-surface space-y-2">
+      <div className="p-3 bg-brand-mint space-y-2">
         <p className="text-[10px] font-semibold text-brand-charcoal">
           Batch #104 — P&L
         </p>

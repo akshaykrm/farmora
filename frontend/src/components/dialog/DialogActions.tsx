@@ -6,7 +6,7 @@ type Props = {
 
 const DialogActions = ({ children }: Props) => {
   return (
-    <div className="border-t border-gray-200 px-6 py-4 flex gap-3 justify-end">
+    <div className="flex justify-end gap-3 border-t border-brand-border px-6 py-4">
       {children}
     </div>
   );

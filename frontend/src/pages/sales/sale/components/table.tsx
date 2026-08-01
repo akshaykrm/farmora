@@ -58,8 +58,8 @@ const SalesTable = ({ onEdit, data }: Props) => {
                 <span
                   className={`px-2 py-1 rounded text-xs ${
                     sale.payment_type === "cash"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-yellow-100 text-yellow-800"
+                      ? "bg-brand-success-soft text-brand-success-strong"
+                      : "bg-brand-warning-soft text-brand-warning-strong"
                   }`}
                 >
                   {sale.payment_type.toUpperCase()}
@@ -69,7 +69,7 @@ const SalesTable = ({ onEdit, data }: Props) => {
             <TableCell
               content={
                 <EditIcon
-                  className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer"
+                  className="w-6 h-6 text-brand-ink-muted hover:text-brand-ink-soft cursor-pointer"
                   onClick={() => {
                     onEdit(sale.id);
                   }}

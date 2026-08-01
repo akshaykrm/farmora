@@ -45,8 +45,8 @@ const InvestorManagementTable = ({ onEdit, investors }: Props) => {
                 <span
                   className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${
                     investor.is_active
-                      ? "bg-green-100 text-green-800"
-                      : "bg-red-100 text-red-800"
+                      ? "bg-brand-success-soft text-brand-success-strong"
+                      : "bg-brand-danger-soft text-brand-danger-strong"
                   }`}
                 >
                   {investor.is_active ? "Active" : "Inactive"}
@@ -59,7 +59,7 @@ const InvestorManagementTable = ({ onEdit, investors }: Props) => {
             <TableCell
               content={
                 <EditIcon
-                  className="w-6 h-6 text-gray-600 hover:text-gray-800 cursor-pointer"
+                  className="w-6 h-6 text-brand-ink-muted hover:text-brand-ink-soft cursor-pointer"
                   onClick={() => {
                     onEdit(investor.id);
                   }}

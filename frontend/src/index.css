@@ -66,6 +66,14 @@
   --shadow-brand-xl: var(--brand-shadow-xl);
 }
 
+:root {
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+
 body {
   font-family: var(--font-sans);
 }

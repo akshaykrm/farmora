@@ -26,7 +26,7 @@ const SocialProofSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
           {TESTIMONIALS.map((t, index) => (
             <RevealDiv key={t.author} delay={index * 0.06}>
-              <article className="h-full rounded-2xl bg-brand-surface border border-brand-divider p-6 flex flex-col shadow-sm hover:shadow-md transition-shadow">
+              <article className="h-full rounded-2xl bg-brand-mint border border-brand-divider p-6 flex flex-col shadow-sm hover:shadow-md transition-shadow">
                 <Stars />
                 <p className="text-sm text-brand-slate leading-relaxed mt-4 flex-1">
                   &ldquo;{t.text}&rdquo;

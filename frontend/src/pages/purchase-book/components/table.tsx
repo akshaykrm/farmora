@@ -40,7 +40,7 @@ const PurchaseBookTable = (props: Props) => {
               <TableCell content={formatCurrency(item.price)} />
               <TableCell content={formatCurrency(item.amount)} />
               <TableCell
-                className={`${item.type === "return" ? "text-red-700" : "text-black"} capitalize`}
+                className={`${item.type === "return" ? "text-brand-danger-strong" : "text-brand-ink"} capitalize`}
                 content={item.type || "-"}
               />
               <TableCell content={formatCurrency(item.balance)} />

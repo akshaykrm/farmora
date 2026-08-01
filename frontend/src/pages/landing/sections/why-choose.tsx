@@ -4,7 +4,7 @@ import RevealDiv from "../components/reveal"
 
 const WhyChooseSection = () => {
   return (
-    <section className="landing-section px-6 bg-brand-surface font-sans">
+    <section className="landing-section px-6 bg-brand-mint font-sans">
       <div className="max-w-7xl mx-auto">
         <RevealDiv>
           <SectionHeader

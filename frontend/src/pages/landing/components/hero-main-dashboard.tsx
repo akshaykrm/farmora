@@ -21,7 +21,7 @@ export function HeroMainDashboard() {
               ),
             )}
           </aside>
-          <div className="flex-1 p-3 md:p-5 space-y-3 md:space-y-4 bg-brand-surface">
+          <div className="flex-1 p-3 md:p-5 space-y-3 md:space-y-4 bg-brand-mint">
             <div className="flex flex-wrap gap-2 justify-between items-start">
               <div>
                 <div className="h-2.5 w-28 md:w-36 rounded bg-brand-charcoal/15" />

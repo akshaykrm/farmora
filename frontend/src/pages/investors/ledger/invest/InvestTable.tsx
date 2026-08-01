@@ -20,10 +20,10 @@ const headers = [
 ];
 
 const typeStyles: Record<string, string> = {
-  CAPITAL_IN: "bg-green-100 text-green-800",
-  CAPITAL_OUT: "bg-orange-100 text-orange-800",
-  SETOFF: "bg-amber-100 text-amber-800",
-  REVERSAL: "bg-red-100 text-red-800",
+  CAPITAL_IN: "bg-brand-success-soft text-brand-success-strong",
+  CAPITAL_OUT: "bg-brand-warning-soft text-brand-warning-strong",
+  SETOFF: "bg-brand-warning-soft text-brand-warning-strong",
+  REVERSAL: "bg-brand-danger-soft text-brand-danger-strong",
 };
 
 type Props = {
@@ -51,7 +51,7 @@ const InvestTable = ({ onReverse, transactions }: Props) => {
                 <span
                   className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${
                     typeStyles[transaction.transaction_type?.code ?? ""] ??
-                    "bg-gray-100 text-gray-800"
+                    "bg-brand-card-soft text-brand-ink-soft"
                   }`}
                 >
                   {transaction.transaction_type?.name ?? "-"}
@@ -78,13 +78,13 @@ const InvestTable = ({ onReverse, transactions }: Props) => {
               content={
                 transaction.transaction_type?.code !== "REVERSAL" && !transaction.has_reversal ? (
                   <Undo2
-                    className="w-5 h-5 text-gray-600 hover:text-red-600 cursor-pointer"
+                    className="h-5 w-5 cursor-pointer text-brand-ink-muted hover:text-brand-danger"
                     onClick={() => {
                       onReverse(transaction.id);
                     }}
                   />
                 ) : (
-                  <span className="text-xs text-gray-400">-</span>
+                  <span className="text-xs text-brand-ink-muted">-</span>
                 )
               }
             />

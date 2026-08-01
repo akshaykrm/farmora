@@ -193,7 +193,7 @@ const ContactSection = () => {
               </div>
             </div>
 
-            <div className="rounded-xl overflow-hidden border border-brand-pale-gray h-48 bg-brand-surface flex items-center justify-center">
+            <div className="rounded-xl overflow-hidden border border-brand-pale-gray h-48 bg-brand-mint flex items-center justify-center">
               <div className="text-center text-brand-muted">
                 <MapPin className="w-8 h-8 mx-auto mb-2" />
                 <p className="text-sm">Map integration coming soon</p>

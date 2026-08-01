@@ -41,7 +41,7 @@ const ProductPreviewSection = () => {
                   <p className="text-sm font-semibold text-brand-charcoal mb-3 text-center md:text-left">
                     {item.title}
                   </p>
-                  <div className="rounded-2xl border border-brand-divider bg-brand-surface/50 p-2 shadow-lg shadow-brand-charcoal/5">
+                  <div className="rounded-2xl border border-brand-divider bg-brand-mint/50 p-2 shadow-lg shadow-brand-charcoal/5">
                     <Preview />
                   </div>
                 </div>

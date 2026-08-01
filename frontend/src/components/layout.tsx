@@ -3,6 +3,7 @@ import { useState } from "react";
 import { IconButton } from "@mui/material";
 import { Menu } from "lucide-react";
 import Sidebar from "./sidebar";
+import ThemeToggle from "./ThemeToggle";
 import UserProfile from "./user-profile";
 
 type Props = {
@@ -63,7 +64,8 @@ const Layout = ({ children }: Props) => {
             >
               <Menu className="h-6 w-6" />
             </IconButton>
-            <div className="ml-auto flex items-center">
+            <div className="ml-auto flex items-center gap-1">
+              <ThemeToggle />
               <UserProfile />
             </div>
           </div>

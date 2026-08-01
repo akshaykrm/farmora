@@ -54,8 +54,8 @@ const SalesBookTable = (props: Props) => {
                   <span
                     className={`px-2 py-1 rounded text-xs ${
                       item.type === "cash"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-yellow-100 text-yellow-800"
+                        ? "bg-brand-success-soft text-brand-success-strong"
+                        : "bg-brand-warning-soft text-brand-warning-strong"
                     }`}
                   >
                     {item.type.toUpperCase()}
