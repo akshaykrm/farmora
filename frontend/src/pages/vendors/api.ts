@@ -2,10 +2,11 @@ import fetcherV2 from "@utils/fetcherV2";
 import type {
   VendorDetail,
   VendorFormValues,
-  VendorName,
+  VendorNamesFilter,
   VendorsListResponse,
 } from "./types";
 import type { Filter } from "@utils/filters";
+import fetcher from "@utils/fetcher";
 
 const vendors = {
   fetchAll: (filter?: Filter) => {
@@ -16,7 +17,11 @@ const vendors = {
     return fetcherV2<VendorsListResponse>("vendors", null, opts);
   },
   fetchById: (id: number) => fetcherV2<VendorDetail>(`vendors/${id}`),
-  fetchNames: () => fetcherV2<VendorName[]>("vendors/names"),
+  getNames: (filter?: VendorNamesFilter) =>
+    fetcher("vendors/names", null, {
+      method: "GET",
+      filter: filter,
+    }),
   create: (payload: VendorFormValues) =>
     fetcherV2<unknown>("vendors", JSON.stringify(payload), {
       method: "POST",

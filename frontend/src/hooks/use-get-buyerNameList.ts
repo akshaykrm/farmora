@@ -1,5 +1,5 @@
-import vendors from "@api/vendor.api";
-import type { VendorName } from "@app-types/vendor.types";
+import vendors from "@pages/vendors/api";
+import type { VendorName } from "@pages/vendors/types";
 import { useState, useEffect } from "react";
 
 const useGetBuyerNameList = () => {
