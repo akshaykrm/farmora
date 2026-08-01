@@ -52,7 +52,7 @@ const Layout = ({ children }: Props) => {
         className={`flex min-w-0 flex-1 flex-col transition-[margin-left] duration-300 ease-in-out ${marginClass}`}
       >
         <header
-          className={`fixed top-0 right-0 z-10 flex h-16 items-center border-b border-brand-border bg-brand-card transition-[left] duration-300 ease-in-out ${offsetClass}`}
+          className={`fixed w-full lg:w-auto top-0 right-0 z-10 flex h-16 items-center border-b border-brand-border bg-brand-card transition-[left] duration-300 ease-in-out ${offsetClass}`}
         >
           <div className="flex h-full w-full items-center px-6">
             <IconButton
