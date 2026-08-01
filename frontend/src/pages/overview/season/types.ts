@@ -1,4 +1,4 @@
-import type { OverviewCalculculation } from "@app-types/batch-overview.types";
+import type { BatchOverviewSummary } from "../batch/types";
 
 export type GeneralCostItem = {
   id: number;
@@ -37,7 +37,7 @@ export type BatchOverviewItem = {
     name: string;
     closed_on: string;
   };
-  overviewCalculations: OverviewCalculculation;
+  overviewCalculations: BatchOverviewSummary;
 };
 
 export type SeasonOverviewSlot<T> = {

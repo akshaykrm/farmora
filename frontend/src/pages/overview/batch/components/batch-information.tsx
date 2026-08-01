@@ -1,4 +1,3 @@
-import batchOverview from "@api/batch-overview.api";
 import Badge from "@components/Badge";
 import { Dialog, DialogContent } from "@components/dialog";
 import Ternary from "@components/ternary";
@@ -7,6 +6,7 @@ import { Button } from "@mui/material";
 import dayjs from "dayjs";
 import { useState } from "react";
 import type { BatchOverviewBatch } from "../types";
+import batchOverviewApi from "../api";
 
 type Props = {
   batch?: BatchOverviewBatch;
@@ -20,7 +20,7 @@ function BatchInformation({ batch, refetch }: Props) {
   if (!batch) return null;
 
   const handleConfirmClose = async () => {
-    const response = await batchOverview.closeBatch(
+    const response = await batchOverviewApi.closeBatch(
       batch.id,
       closingStatement || undefined,
     );
@@ -102,7 +102,9 @@ function BatchInformation({ batch, refetch }: Props) {
               className="block text-sm font-medium text-brand-ink-soft mb-1"
             >
               Closing Statement{" "}
-              <span className="text-brand-ink-muted font-normal">(optional)</span>
+              <span className="text-brand-ink-muted font-normal">
+                (optional)
+              </span>
             </label>
             <textarea
               id="closing_statement"

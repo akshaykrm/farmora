@@ -1,12 +1,12 @@
 import { Button } from "@mui/material";
 import SelectList from "@components/select-list";
-import type { BatchOverviewFilterRequest } from "@app-types/batch-overview.types";
 import { useForm } from "react-hook-form";
 import { useEffect } from "react";
 import useGetSeasonNameList from "@hooks/use-get-season-names";
 import useGetBatchNameList from "@hooks/use-get-batch-names";
 import type { Filter } from "@utils/filters";
 import FilterCard from "@components/FilterCard";
+import type { BatchOverviewFilterRequest } from "../types";
 
 type Props = {
   onFilter: (v: Filter) => void;

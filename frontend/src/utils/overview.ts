@@ -1,11 +1,11 @@
+import { roundNumber } from "./number";
 import type {
+  SalesTotals,
   BatchOverviewExpense,
   BatchOverviewReturn,
   BatchOverviewSale,
   ExpenseTotals,
-  SalesTotals,
-} from "@app-types/batch-overview.types";
-import { roundNumber } from "./number";
+} from "@pages/overview/batch/types";
 
 const isInlcudedInExpense = (item: BatchOverviewExpense) => {
   return (
