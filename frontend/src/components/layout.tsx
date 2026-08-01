@@ -1,225 +1,77 @@
 import type { ReactNode } from "react";
-import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router";
-import { paths } from "../paths";
-import {
-  List,
-  ListItemButton,
-  ListItemText,
-  Collapse,
-  Drawer,
-  IconButton,
-  Box,
-} from "@mui/material";
-import { ChevronDown, ChevronUp, Menu } from "lucide-react";
-import type { PathItem } from "../types/paths.types";
+import { useState } from "react";
+import { IconButton } from "@mui/material";
+import { Menu } from "lucide-react";
+import Sidebar from "./sidebar";
 import UserProfile from "./user-profile";
 
 type Props = {
   children: ReactNode;
 };
 
-const DRAWER_WIDTH = 256;
+const STORAGE_KEY = "farmora:sidebar-collapsed";
+
+const getInitialCollapsed = () => {
+  try {
+    return localStorage.getItem(STORAGE_KEY) === "1";
+  } catch {
+    return false;
+  }
+};
 
 const Layout = ({ children }: Props) => {
-  const location = useLocation();
-  const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({});
+  const [collapsed, setCollapsed] = useState(getInitialCollapsed);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
-
-  const handleMenuClick = (pathname: string) => {
-    setOpenMenus((prev) => ({
-      ...prev,
-      [pathname]: !prev[pathname],
-    }));
-  };
-
-  // Auto-expand parent menu if child is active
-  useEffect(() => {
-    paths.forEach((item) => {
-      if (item.children) {
-        const hasActiveChild = item.children.some(
-          (child) => child.link === location.pathname,
-        );
-        if (hasActiveChild) {
-          setOpenMenus((prev) => ({ ...prev, [item.pathname]: true }));
-        }
+  const handleToggleCollapsed = () => {
+    setCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem(STORAGE_KEY, next ? "1" : "0");
+      } catch {
+        // ignore storage errors
       }
+      return next;
     });
-  }, [location.pathname]);
-
-  const isActive = (link: string) => location.pathname === link;
-
-  const renderMenuItem = (item: PathItem) => {
-    const hasChildren = item.children && item.children.length > 0;
-
-    if (hasChildren) {
-      return (
-        <div key={item.pathname}>
-          <ListItemButton
-            onClick={() => handleMenuClick(item.pathname)}
-            className="!px-3 !py-2 !rounded-md hover:!bg-gray-100"
-          >
-            <ListItemText
-              primary={item.pathname}
-              primaryTypographyProps={{
-                className: "!text-sm !text-gray-700",
-              }}
-            />
-            {openMenus[item.pathname] ? (
-              <ChevronUp className="w-5 h-5" />
-            ) : (
-              <ChevronDown className="w-5 h-5" />
-            )}
-          </ListItemButton>
-          <Collapse in={openMenus[item.pathname]} timeout="auto" unmountOnExit>
-            <List component="div" disablePadding>
-              {item.children?.map((child) => {
-                const active = isActive(child.link!);
-                return (
-                  <Link
-                    key={child.link}
-                    to={child.link!}
-                    className="no-underline"
-                  >
-                    <ListItemButton
-                      className={`!pl-8 !py-2 !rounded-md hover:!bg-gray-100 ${
-                        active ? "!bg-green-50" : ""
-                      }`}
-                    >
-                      <ListItemText
-                        primary={child.pathname}
-                        primaryTypographyProps={{
-                          className: `!text-sm ${
-                            active
-                              ? "!text-green-700 !font-medium"
-                              : "!text-gray-700"
-                          }`,
-                        }}
-                      />
-                    </ListItemButton>
-                  </Link>
-                );
-              })}
-            </List>
-          </Collapse>
-        </div>
-      );
-    }
-
-    const active = isActive(item.link!);
-    return (
-      <Link key={item.link} to={item.link!} className="no-underline">
-        <ListItemButton
-          className={`!px-3 !py-2 !rounded-md hover:!bg-gray-100 ${
-            active ? "!bg-green-50" : ""
-          }`}
-        >
-          <ListItemText
-            primary={item.pathname}
-            primaryTypographyProps={{
-              className: `!text-sm ${
-                active ? "!text-green-700 !font-medium" : "!text-gray-700"
-              }`,
-            }}
-          />
-        </ListItemButton>
-      </Link>
-    );
   };
 
-  const drawerContent = (
-    <Box>
-      <Box className="p-4">
-        <div className="text-lg font-semibold text-gray-900 mb-6">Farmora</div>
-      </Box>
-      <List component="nav" disablePadding className="px-4">
-        {paths.map((item) => renderMenuItem(item))}
-      </List>
-    </Box>
-  );
+  const offsetClass = collapsed ? "lg:left-[76px]" : "lg:left-[256px]";
+  const marginClass = collapsed ? "lg:ml-[76px]" : "lg:ml-[256px]";
 
   return (
-    <Box className="flex h-screen bg-gray-50">
-      {/* Mobile drawer */}
-      <Drawer
-        variant="temporary"
-        open={mobileOpen}
-        onClose={handleDrawerToggle}
-        ModalProps={{
-          keepMounted: true, // Better open performance on mobile
-        }}
-        sx={{
-          display: { xs: "block", lg: "none" },
-          "& .MuiDrawer-paper": {
-            boxSizing: "border-box",
-            width: DRAWER_WIDTH,
-          },
-        }}
-      >
-        {drawerContent}
-      </Drawer>
+    <div className="flex h-screen overflow-hidden bg-brand-canvas">
+      <Sidebar
+        collapsed={collapsed}
+        onToggleCollapsed={handleToggleCollapsed}
+        mobileOpen={mobileOpen}
+        onMobileClose={() => setMobileOpen(false)}
+      />
 
-      {/* Desktop drawer */}
-      <Drawer
-        variant="permanent"
-        sx={{
-          display: { xs: "none", lg: "block" },
-          "& .MuiDrawer-paper": {
-            boxSizing: "border-box",
-            width: DRAWER_WIDTH,
-          },
-        }}
-        open
+      <div
+        className={`flex min-w-0 flex-1 flex-col transition-[margin-left] duration-300 ease-in-out ${marginClass}`}
       >
-        {drawerContent}
-      </Drawer>
-
-      {/* Main content area */}
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          width: { xs: "100%", lg: `calc(100% - ${DRAWER_WIDTH}px)` },
-          ml: { xs: 0, lg: `${DRAWER_WIDTH}px` },
-        }}
-        className="flex flex-col"
-      >
-        {/* Header */}
-        <Box
-          component="header"
-          className="h-16 bg-white border-b border-gray-200"
-          sx={{
-            position: "fixed",
-            top: 0,
-            right: 0,
-            left: { xs: 0, lg: `${DRAWER_WIDTH}px` },
-            zIndex: 10,
-          }}
+        <header
+          className={`fixed top-0 right-0 z-10 flex h-16 items-center border-b border-brand-border bg-brand-card transition-[left] duration-300 ease-in-out ${offsetClass}`}
         >
-          <div className="px-6 h-full flex items-center justify-between">
+          <div className="flex h-full w-full items-center px-6">
             <IconButton
               color="inherit"
-              aria-label="open drawer"
+              aria-label="open navigation"
               edge="start"
-              onClick={handleDrawerToggle}
+              onClick={() => setMobileOpen(true)}
               sx={{ display: { lg: "none" } }}
             >
-              <Menu className="w-6 h-6" />
+              <Menu className="h-6 w-6" />
             </IconButton>
-            <div className="flex-1 flex justify-end">
+            <div className="ml-auto flex items-center">
               <UserProfile />
             </div>
           </div>
-        </Box>
+        </header>
 
-        {/* Page content */}
-        <Box className="mt-16 flex-1 overflow-y-auto p-6">{children}</Box>
-      </Box>
-    </Box>
+        <main className="mt-16 flex-1 overflow-y-auto p-6">{children}</main>
+      </div>
+    </div>
   );
 };
 
