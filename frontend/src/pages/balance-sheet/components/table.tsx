@@ -54,10 +54,8 @@ function BalanceSheetTable(props: Props) {
 
 const TransactionsTable = ({
   transactions,
-  pageStartBalance,
 }: {
   transactions: Transaction[];
-  pageStartBalance: number;
 }) => {
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
@@ -80,14 +78,6 @@ const TransactionsTable = ({
             </tr>
           ) : (
             <>
-              <tr className="bg-gray-50">
-                <td colSpan={4} className="px-4 py-2 text-sm text-gray-500">
-                  Balance at start of page
-                </td>
-                <td className="px-4 py-2 text-sm text-right font-medium text-gray-700">
-                  {formatCurrency(pageStartBalance)}
-                </td>
-              </tr>
               {transactions.map((t, index) => (
                 <TableRow key={index}>
                   <TableCell content={formatDate(t.date)} />
@@ -136,9 +126,7 @@ const AllTables = ({
 }) => {
   const { transactions, summary } = data;
 
-  const { total_in, total_out } = summary;
-
-  const balance = total_in - total_out;
+  const { total_in, total_out, closing_balance: balance } = summary;
 
   const totalPages = Math.ceil(transactions.length / limit);
   const startIndex = (page - 1) * limit;
@@ -146,11 +134,6 @@ const AllTables = ({
     startIndex,
     startIndex + limit,
   );
-
-  const pageStartBalance =
-    startIndex === 0
-      ? data.opening_balance
-      : transactions[startIndex - 1].balance;
 
   return (
     <div>
@@ -194,10 +177,7 @@ const AllTables = ({
           </div>
         </Card>
       </div>
-      <TransactionsTable
-        transactions={paginatedTransactions}
-        pageStartBalance={pageStartBalance}
-      />
+      <TransactionsTable transactions={paginatedTransactions} />
       {totalPages > 1 && (
         <Box className="flex justify-end mt-4">
           <PaginationWithLimit
