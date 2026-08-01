@@ -1,11 +1,11 @@
 import { useMutation } from "@tanstack/react-query";
-import auth from "@api/auth.api";
-import type { LoginPayload, UserSession } from "@app-types/auth.types";
 import { useCallback } from "react";
 import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import { useAuthDispatch } from "@store/authentication/context";
 import { createSession } from "@utils/session";
+import auth from "../api";
+import type { LoginPayload, UserSession } from "../types";
 
 const useLogin = () => {
   const dispatch = useAuthDispatch();

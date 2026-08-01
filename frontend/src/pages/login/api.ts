@@ -1,7 +1,4 @@
-import type {
-  LoginPayload,
-  ManagerRegistrationPayload,
-} from "@app-types/auth.types";
+import type { LoginPayload, ManagerRegistrationPayload } from "./types";
 import fetcher from "@utils/fetcher";
 
 const auth = {

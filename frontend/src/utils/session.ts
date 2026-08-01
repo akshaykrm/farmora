@@ -1,4 +1,4 @@
-import type { UserSession } from "@app-types/auth.types";
+import type { UserSession } from "@pages/login/types";
 
 const AUTH_TOKEN_KEY = "x-auth-token";
 const AUTH_USER_KEY = "x-auth-user";

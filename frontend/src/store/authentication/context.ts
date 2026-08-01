@@ -1,8 +1,8 @@
 import type {
+  AuthDispatchContextData,
   AuthActions,
   AuthContextData,
-  AuthDispatchContextData,
-} from "@app-types/auth.types";
+} from "@pages/login/types";
 import { createContext, useContext } from "react";
 
 const noob = (_action: AuthActions) => {};

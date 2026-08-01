@@ -2,10 +2,10 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { Dialog, DialogContent } from "@components/dialog";
-import auth from "@api/auth.api";
-import type { ManagerRegistrationPayload } from "@app-types/auth.types";
 import { Button, CircularProgress } from "@mui/material";
 import { useNavigate } from "react-router";
+import type { ManagerRegistrationPayload } from "@pages/login/types";
+import auth from "@pages/login/api";
 
 type Props = {
   isOpen: boolean;
@@ -88,7 +88,9 @@ const ManagerRegistrationDialog = ({
         <div className="mb-4">
           <p className="text-brand-ink-soft mb-2">
             Complete the registration to get started with the{" "}
-            <span className="font-semibold text-brand-accent">{packageName}</span>{" "}
+            <span className="font-semibold text-brand-accent">
+              {packageName}
+            </span>{" "}
             package.
           </p>
         </div>
@@ -123,7 +125,9 @@ const ManagerRegistrationDialog = ({
               {...register("name", { required: "Full name is required" })}
             />
             {errors.name && (
-              <p className="text-brand-danger text-xs mt-1">{errors.name.message}</p>
+              <p className="text-brand-danger text-xs mt-1">
+                {errors.name.message}
+              </p>
             )}
           </div>
 

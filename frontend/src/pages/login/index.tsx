@@ -1,28 +1,22 @@
-import {
-  BarChart3,
-  CheckCircle2,
-  Cloud,
-  PieChart,
-  Shield,
-} from "lucide-react"
-import useLogin from "@hooks/use-login"
-import { useNavigate } from "react-router"
-import BrandLogo from "@components/brand-logo"
-import LoginBackground from "./components/login-background"
-import LoginFarmShowcase from "./components/login-farm-showcase"
-import LoginFormCard from "./components/login-form-card"
+import { BarChart3, CheckCircle2, Cloud, PieChart, Shield } from "lucide-react";
+import { useNavigate } from "react-router";
+import BrandLogo from "@components/brand-logo";
+import LoginBackground from "./components/login-background";
+import LoginFarmShowcase from "./components/login-farm-showcase";
+import LoginFormCard from "./components/login-form-card";
+import useLogin from "./hooks/use-login";
 
 const FEATURES = [
   { icon: BarChart3, label: "Real-time Analytics" },
   { icon: PieChart, label: "Profit Tracking" },
   { icon: Shield, label: "Secure & Reliable" },
   { icon: Cloud, label: "Cloud Access" },
-] as const
+] as const;
 
 const LoginPage = () => {
-  const { onLogin, methods, isPending } = useLogin()
-  const navigate = useNavigate()
-  const year = new Date().getFullYear()
+  const { onLogin, methods, isPending } = useLogin();
+  const navigate = useNavigate();
+  const year = new Date().getFullYear();
 
   return (
     <div className="relative min-h-screen w-full bg-brand-canvas font-sans text-brand-ink">
@@ -96,7 +90,10 @@ const LoginPage = () => {
 
         <footer className="relative z-10 mt-auto min-h-[3.5rem] px-5 pt-4 pb-6 sm:px-8 lg:px-10">
           <p className="flex items-center justify-center gap-2 text-center text-xs text-brand-ink-soft">
-            <Shield className="h-4 w-4 shrink-0 text-brand-accent" aria-hidden />
+            <Shield
+              className="h-4 w-4 shrink-0 text-brand-accent"
+              aria-hidden
+            />
             <span>Your data is protected with enterprise-grade security</span>
           </p>
           <p className="mt-3 text-center text-xs text-brand-ink-muted sm:absolute sm:right-8 sm:bottom-6 sm:mt-0 sm:text-right lg:right-10">
@@ -105,7 +102,7 @@ const LoginPage = () => {
         </footer>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default LoginPage
+export default LoginPage;

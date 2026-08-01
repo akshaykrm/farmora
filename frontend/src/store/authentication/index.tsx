@@ -1,6 +1,6 @@
 import { useReducer, type ReactNode } from "react";
 import { authDataContext, authDispatchContext } from "./context";
-import type { AuthActions, AuthContextData } from "@app-types/auth.types";
+import type { AuthActions, AuthContextData } from "@pages/login/types";
 import { getSession } from "@utils/session";
 
 const authReducer = (

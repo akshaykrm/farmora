@@ -1,24 +1,17 @@
-import { useState } from "react"
-import {
-  ArrowRight,
-  Eye,
-  EyeOff,
-  Leaf,
-  Lock,
-  User,
-} from "lucide-react"
-import { Button, Checkbox, FormControlLabel } from "@mui/material"
-import type { UseFormReturn } from "react-hook-form"
-import type { LoginPayload } from "@app-types/auth.types"
-import { useNavigate } from "react-router"
-import toast from "react-hot-toast"
-import { gradients as brandGradients } from "../../../theme/tokens"
+import { useState } from "react";
+import { ArrowRight, Eye, EyeOff, Leaf, Lock, User } from "lucide-react";
+import { Button, Checkbox, FormControlLabel } from "@mui/material";
+import type { UseFormReturn } from "react-hook-form";
+import { useNavigate } from "react-router";
+import toast from "react-hot-toast";
+import { gradients as brandGradients } from "../../../theme/tokens";
+import type { LoginPayload } from "../types";
 
 type LoginFormCardProps = {
-  methods: UseFormReturn<LoginPayload>
-  onLogin: (payload: LoginPayload) => void
-  isPending: boolean
-}
+  methods: UseFormReturn<LoginPayload>;
+  onLogin: (payload: LoginPayload) => void;
+  isPending: boolean;
+};
 
 const GoogleIcon = () => (
   <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden>
@@ -39,15 +32,15 @@ const GoogleIcon = () => (
       d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
     />
   </svg>
-)
+);
 
 const fieldClass =
-  "w-full rounded-xl border border-brand-border bg-brand-card py-3 pr-4 pl-11 text-sm text-brand-ink outline-none transition-shadow placeholder:text-brand-ink-muted focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/30"
+  "w-full rounded-xl border border-brand-border bg-brand-card py-3 pr-4 pl-11 text-sm text-brand-ink outline-none transition-shadow placeholder:text-brand-ink-muted focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/30";
 
 const LoginFormCard = ({ methods, onLogin, isPending }: LoginFormCardProps) => {
-  const navigate = useNavigate()
-  const [showPassword, setShowPassword] = useState(false)
-  const [rememberMe, setRememberMe] = useState(false)
+  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   return (
     <div className="w-full max-w-[420px] rounded-3xl border border-brand-border bg-brand-card p-7 shadow-brand-xl md:p-9">
@@ -203,7 +196,9 @@ const LoginFormCard = ({ methods, onLogin, isPending }: LoginFormCardProps) => {
           <Leaf className="h-5 w-5" aria-hidden />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-brand-ink">New to Farmora?</p>
+          <p className="text-sm font-semibold text-brand-ink">
+            New to Farmora?
+          </p>
           <p className="mt-0.5 text-xs leading-relaxed text-brand-ink-soft">
             Create your account and start your journey today
           </p>
@@ -214,7 +209,7 @@ const LoginFormCard = ({ methods, onLogin, isPending }: LoginFormCardProps) => {
         />
       </button>
     </div>
-  )
-}
+  );
+};
 
-export default LoginFormCard
+export default LoginFormCard;
