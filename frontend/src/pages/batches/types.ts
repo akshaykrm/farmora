@@ -1,8 +1,8 @@
 import type { NameResponse } from "@app-types/gen.types";
 import type { ListResponse } from "@app-types/response.types";
-import type { SeasonName } from "@app-types/season.types";
 import type { ValidationError } from "@errors/api.error";
 import type { FarmName } from "@pages/farms/types";
+import type { SeasonName } from "@pages/seasons/types";
 
 export type Batch = {
   id: number;

@@ -1,6 +1,6 @@
-import seasons from "@api/seasons.api";
-import type { SeasonName } from "@app-types/season.types";
 import useGetNames from "@hooks/use-get-names";
+import seasons from "@pages/seasons/api";
+import type { SeasonName } from "@pages/seasons/types";
 
 const useGetSeasonNames = () => {
   const query = useGetNames<SeasonName[]>({
