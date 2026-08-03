@@ -9,9 +9,9 @@ type BrandLogoProps = {
 }
 
 const LOGO_SRC: Record<BrandLogoVariant, string> = {
-  onLight: "/logo.svg",
-  onDark: "/logo-on-dark.svg",
-  mark: "/logo-mark.svg",
+  onLight: "/farmora-logo.png",
+  onDark: "/farmora-mark.png",
+  mark: "/farmora-mark.png",
 }
 
 const BrandLogo = ({
@@ -21,7 +21,6 @@ const BrandLogo = ({
 }: BrandLogoProps) => {
   const { mode } = useTheme()
 
-  // Auto-flip light/dark lockups with the active theme; mark stays the same.
   const effective: BrandLogoVariant =
     variant === "mark"
       ? "mark"
@@ -30,9 +29,9 @@ const BrandLogo = ({
         : "onLight"
 
   const defaultHeights: Record<BrandLogoVariant, string> = {
-    onDark: "h-14 sm:h-16 md:h-[4.5rem] w-auto max-w-[min(100%,220px)]",
-    onLight: "h-16 sm:h-[4.5rem] w-auto max-w-[240px]",
-    mark: "h-12 w-auto max-w-[140px]",
+    onDark: "h-10 sm:h-11 w-auto max-w-[140px]",
+    onLight: "h-14 sm:h-16 md:h-[4.25rem] w-auto max-w-[min(100%,280px)]",
+    mark: "h-10 w-10 sm:h-11 sm:w-11",
   }
 
   return (
