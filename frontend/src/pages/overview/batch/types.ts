@@ -58,6 +58,11 @@ export type BatchOverviewBatch = {
   } | null;
 };
 
+export type BatchLog = {
+  log: string;
+  created_at: string | null;
+};
+
 export type BatchOverviewSummary = {
   total_purchase_feeds: number;
   total_purchase_amount: number;

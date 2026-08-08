@@ -2,7 +2,7 @@ import { Router } from 'express'
 import batchController from '@controllers/configuration.controller'
 import { isAuthenticated, isManagerOrAdmin } from '@middlewares/auth.middleware'
 import validate from '@utils/validate-request'
-import { newBatchSchema, updateBatchSchema } from '@validators/batch.validator'
+import { newBatchSchema, updateBatchSchema, addBatchLogSchema } from '@validators/batch.validator'
 
 const router = Router()
 
@@ -50,6 +50,14 @@ router.put(
   isAuthenticated,
   isManagerOrAdmin,
   batchController.close
+)
+
+router.put(
+  '/:batch_id/logs',
+  isAuthenticated,
+  isManagerOrAdmin,
+  validate(addBatchLogSchema),
+  batchController.addBatchLog
 )
 
 router.delete(

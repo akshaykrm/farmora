@@ -1,7 +1,7 @@
 import { Op } from 'sequelize'
 import dayjs from 'dayjs'
 import BatchModel from '@models/batch'
-import { BatchNotFoundError } from '@errors/batch.errors'
+import { BatchNotFoundError, BatchClosedError } from '@errors/batch.errors'
 import userRoles from '@utils/user-roles'
 import UserModel from '@models/user'
 import FarmModel from '@models/farm'
@@ -162,11 +162,34 @@ const updateById = async (batchId, payload, currentUser) => {
 }
 
 const close = async (batchId, currentUser, closingStatement = null) => {
-  await updateById(
-    batchId,
-    { closed_on: dayjs().toDate(), closing_statement: closingStatement },
-    currentUser
-  )
+  const batchRecord = await getById(batchId, currentUser)
+  const payload = { closed_on: dayjs().toDate() }
+  if (closingStatement !== null) {
+    payload.closing_statement = closingStatement
+  }
+  await batchRecord.update(payload)
+}
+
+const parseLogs = (value) => {
+  if (!value) return []
+  try {
+    const parsed = JSON.parse(value)
+    if (Array.isArray(parsed)) return parsed
+  } catch {
+    // not JSON — fall through to legacy handling
+  }
+  return [{ log: String(value), created_at: null }]
+}
+
+const addLog = async (batchId, currentUser, logText) => {
+  const batchRecord = await getById(batchId, currentUser)
+  if (batchRecord.closed_on) {
+    throw new BatchClosedError()
+  }
+
+  const logs = parseLogs(batchRecord.closing_statement)
+  logs.push({ log: logText, created_at: new Date().toISOString() })
+  await batchRecord.update({ closing_statement: JSON.stringify(logs) })
 }
 
 const deleteById = async (batchId, currentUser) => {
@@ -182,6 +205,7 @@ const batchService = {
   updateById,
   deleteById,
   close,
+  addLog,
   getNames,
   getCount,
 }

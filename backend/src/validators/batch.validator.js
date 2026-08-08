@@ -11,3 +11,7 @@ export const updateBatchSchema = newBatchSchema.fork(
   Object.keys(newBatchSchema.describe().keys),
   (s) => s.optional()
 )
+
+export const addBatchLogSchema = Joi.object({
+  log: Joi.string().trim().min(1).max(500).required(),
+})

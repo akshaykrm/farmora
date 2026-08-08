@@ -77,6 +77,13 @@ const close = async (req, res) => {
   res.success(null, { message: 'Batch closed successfully' })
 }
 
+const addBatchLog = async (req, res) => {
+  const { batch_id } = req.params
+  const { log } = req.body
+  await batchService.addLog(batch_id, req.user, log)
+  res.success(null, { message: 'Log added successfully' })
+}
+
 const deleteById = async (req, res) => {
   const { batch_id } = req.params
   await batchService.deleteById(batch_id, req.user)
@@ -105,6 +112,7 @@ const batchController = {
   deleteById: asyncHandler(deleteById),
   getNames: asyncHandler(getNames),
   close: asyncHandler(close),
+  addBatchLog: asyncHandler(addBatchLog),
   getCount: asyncHandler(getCount),
 }
 

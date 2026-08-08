@@ -25,6 +25,14 @@ const batchOverview = {
       { method: "PUT" },
     );
   },
+
+  addBatchLog: async (batchId: number, log: string) => {
+    return await fetcherV2(
+      `batches/${batchId}/logs`,
+      JSON.stringify({ log }),
+      { method: "PUT" },
+    );
+  },
 };
 
 export default batchOverview;

@@ -12,3 +12,11 @@ export class BatchNotFoundError extends BatchError {
     this.statusCode = 404
   }
 }
+
+export class BatchClosedError extends BatchError {
+  constructor() {
+    super('Batch is already closed. Logs cannot be added.')
+    this.code = 'BATCH_CLOSED'
+    this.statusCode = 400
+  }
+}
