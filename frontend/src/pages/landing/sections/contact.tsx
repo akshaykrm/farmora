@@ -1,10 +1,10 @@
 import { Button, Stack, TextField } from "@mui/material"
-import { Mail, Phone, MapPin, Send, Loader2 } from "lucide-react"
+import { Mail, Phone, MapPin, Send } from "lucide-react"
 import { useState } from "react"
-import toast from "react-hot-toast"
-import fetcherV2 from "@utils/fetcherV2"
 import SectionHeader from "../components/section-header"
 import RevealDiv from "../components/reveal"
+
+const CONTACT_EMAIL = "support@farmora.com"
 
 const ContactSection = () => {
   const [formData, setFormData] = useState({
@@ -13,32 +13,19 @@ const ContactSection = () => {
     phone: "",
     message: "",
   })
-  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    setIsSubmitting(true)
-    try {
-      const payload = JSON.stringify({
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        message: formData.message,
-      })
-      const result = await fetcherV2("contact", payload, {
-        method: "POST",
-      })
-      if (result.status === "success") {
-        toast.success("Message sent successfully! We'll get back to you soon.")
-        setFormData({ name: "", email: "", phone: "", message: "" })
-      } else {
-        toast.error("Failed to send message. Please try again.")
-      }
-    } catch {
-      toast.error("Something went wrong. Please try again later.")
-    } finally {
-      setIsSubmitting(false)
-    }
+    const subject = `Farmora Contact: ${formData.name}`
+    const body = [
+      `Name: ${formData.name}`,
+      `Email: ${formData.email}`,
+      `Phone: ${formData.phone}`,
+      "",
+      formData.message,
+    ].join("\n")
+    const mailtoUrl = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+    window.location.href = mailtoUrl
   }
 
   const handleChange = (
@@ -110,16 +97,9 @@ const ContactSection = () => {
                   variant="contained"
                   size="large"
                   fullWidth
-                  disabled={isSubmitting}
-                  endIcon={
-                    isSubmitting ? (
-                      <Loader2 className="animate-spin" size={18} />
-                    ) : (
-                      <Send size={16} />
-                    )
-                  }
+                  endIcon={<Send size={16} />}
                 >
-                  {isSubmitting ? "Sending..." : "Send Message"}
+                  Send Message
                 </Button>
               </Stack>
             </form>
