@@ -13,6 +13,7 @@ const batches = {
     return fetcherV2<BatchListResponse>("batches", null, opts);
   },
   getNames: () => fetcher("batches/names"),
+  getCount: (farmID: number) => fetcher(`batches/count/${farmID}`),
   getBySeasonId: async (
     seasonId: number,
   ): Promise<FetcherReturnType<ItemName[]>> => {

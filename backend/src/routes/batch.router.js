@@ -23,6 +23,12 @@ router.get(
 )
 
 router.get('/', isAuthenticated, isManagerOrAdmin, batchController.getAll)
+router.get(
+  '/count/:farm_id',
+  isAuthenticated,
+  isManagerOrAdmin,
+  batchController.getCount
+)
 
 router.get(
   '/:batch_id',

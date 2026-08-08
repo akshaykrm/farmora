@@ -6,6 +6,8 @@ import type { BatchFormValues } from "../types";
 import type { ValidationError } from "@errors/api.error";
 import { useEffect } from "react";
 import useGetSeasonNames from "@hooks/use-get-season-names";
+import batches from "../api";
+import toast from "react-hot-toast";
 
 type Props = {
   onSubmit: (payload: any) => void;
@@ -15,7 +17,7 @@ type Props = {
 };
 
 const BatchForm = ({ onSubmit, defaultValues, apiError, onCancel }: Props) => {
-  const seasonNames = useGetSeasonNames({ status: "active" });
+  const seasonNames = useGetSeasonNames();
   const farmNames = useGetFarmNames();
 
   const methods = useForm<BatchFormValues>({
@@ -35,6 +37,24 @@ const BatchForm = ({ onSubmit, defaultValues, apiError, onCancel }: Props) => {
   const values = watch();
 
   useEffect(() => {
+    const selectedFarm = farmNames.data?.find(({ id }) => {
+      return values.farm_id === id;
+    });
+    if (selectedFarm) {
+      batches
+        .getCount(selectedFarm.id)
+        .then((data) => {
+          const batchName = `${selectedFarm.name} - ${data + 1}`;
+          setValue("name", batchName);
+        })
+        .catch((err) => {
+          toast.error("Failed to generate batch name try again later");
+          console.log(err);
+        });
+    }
+  }, [values.farm_id]);
+
+  useEffect(() => {
     if (apiError.length > 0) {
       apiError.forEach(({ name, message }) => {
         setError(name, { message });
@@ -46,15 +66,6 @@ const BatchForm = ({ onSubmit, defaultValues, apiError, onCancel }: Props) => {
     <>
       <form {...methods} onSubmit={handleSubmit(onSubmit)}>
         <div className="grid grid-cols-1 gap-4">
-          <TextField
-            label="Name"
-            {...(register as any)("name")}
-            fullWidth
-            error={Boolean(errors.name)}
-            helperText={errors.name?.message}
-            size="small"
-          />
-
           <SelectList
             options={seasonNames.data}
             value={values.season_id}
@@ -79,6 +90,14 @@ const BatchForm = ({ onSubmit, defaultValues, apiError, onCancel }: Props) => {
             name="farm_id"
             error={Boolean(errors.farm_id)}
             helperText={errors.farm_id?.message}
+          />
+
+          <TextField
+            label="Name"
+            value={values.name}
+            disabled
+            fullWidth
+            size="small"
           />
 
           <TextField

@@ -83,6 +83,20 @@ const deleteById = async (req, res) => {
   res.success(null, { message: 'Batch deleted successfully', statusCode: 204 })
 }
 
+const getCount = async (req, res) => {
+  const { farm_id } = req.params
+
+  const filter = {
+    farm_id,
+  }
+
+  const batchCount = await batchService.getCount(filter, req.user)
+  res.success(batchCount, {
+    message: 'Batch count retrevied success',
+    statusCode: 200,
+  })
+}
+
 const batchController = {
   create: asyncHandler(create),
   getAll: asyncHandler(getAll),
@@ -91,6 +105,7 @@ const batchController = {
   deleteById: asyncHandler(deleteById),
   getNames: asyncHandler(getNames),
   close: asyncHandler(close),
+  getCount: asyncHandler(getCount),
 }
 
 export default batchController
