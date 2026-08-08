@@ -5,15 +5,19 @@ import {
   CardContent,
   CardActions,
   Button,
-  Chip,
   Skeleton,
 } from "@mui/material"
-import { Check, Sparkles } from "lucide-react"
+import { Check } from "lucide-react"
 import fetcher from "@utils/fetcher"
+import { formatCurrency } from "@utils/currency"
 import ManagerRegistrationDialog from "../components/manager-registration-dialog"
 import RevealDiv from "../components/reveal"
 import SectionHeader from "../components/section-header"
-import { PACKAGE_FEATURE_BULLETS } from "../content/landing-content"
+import {
+  BASIC_FEATURES,
+  ENTERPRISE_FEATURES,
+  PREMIUM_FEATURES,
+} from "../content/landing-content"
 
 interface Package {
   id: number
@@ -24,7 +28,11 @@ interface Package {
   status: string
 }
 
-const features = [...PACKAGE_FEATURE_BULLETS]
+const PACKAGE_FEATURES: Record<string, readonly string[]> = {
+  Basic: BASIC_FEATURES,
+  Premium: PREMIUM_FEATURES,
+  Enterprise: ENTERPRISE_FEATURES,
+}
 
 const PackageSkeleton = () => (
   <div className="bg-brand-card rounded-2xl p-6 border border-brand-border shadow-sm">
@@ -52,7 +60,9 @@ const PackagesSection = () => {
     },
   })
 
-  const activePackages = packages?.filter((pkg) => pkg.status === "active")
+  const visiblePackages = packages
+    ?.filter((pkg) => pkg.status !== "disabled")
+    .sort((a, b) => parseFloat(a.price) - parseFloat(b.price))
 
   const handleGetStarted = (pkg: Package) => {
     setSelectedPackage(pkg)
@@ -85,7 +95,7 @@ const PackagesSection = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {activePackages?.map((pkg, index) => (
+              {visiblePackages?.map((pkg, index) => (
                 <RevealDiv key={pkg.id} delay={index * 0.1} className="reveal h-full">
                   <Card
                     sx={{
@@ -96,45 +106,22 @@ const PackagesSection = () => {
                       borderRadius: 4,
                       transition: "box-shadow 0.3s, transform 0.3s",
                       "&:hover": { boxShadow: 8, transform: "translateY(-8px)" },
-                      ...(index === 1 && {
-                        border: "2px solid",
-                        borderColor: "primary.main",
-                      }),
                     }}
                   >
-                    {index === 1 && (
-                      <Chip
-                        icon={<Sparkles size={14} />}
-                        label="Most Popular"
-                        color="success"
-                        size="small"
-                        sx={{
-                          position: "absolute",
-                          top: 16,
-                          right: 16,
-                          fontWeight: "bold",
-                          borderRadius: 2,
-                        }}
-                      />
-                    )}
-
                     <CardContent sx={{ flexGrow: 1, p: 4 }}>
                       <h3 className="text-2xl font-bold text-brand-ink mb-2">
                         {pkg.name}
                       </h3>
                       <div className="mb-4">
                         <span className="text-4xl font-bold text-brand-accent">
-                          ₹{parseFloat(pkg.price).toLocaleString()}
-                        </span>
-                        <span className="text-brand-ink-soft ml-2 text-sm">
-                          / {pkg.duration} days
+                          {formatCurrency(parseFloat(pkg.price))}
                         </span>
                       </div>
                       <p className="text-brand-ink-soft mb-6 text-sm leading-relaxed">
                         {pkg.description}
                       </p>
                       <div className="space-y-3">
-                        {features.map((feature, i) => (
+                        {PACKAGE_FEATURES[pkg.name]?.map((feature, i) => (
                           <div key={i} className="flex items-start gap-3">
                             <div className="w-5 h-5 bg-brand-canvas rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                               <Check className="w-3 h-3 text-brand-accent" />
@@ -149,12 +136,13 @@ const PackagesSection = () => {
 
                     <CardActions sx={{ p: 4, pt: 0 }}>
                       <Button
-                        variant={index === 1 ? "contained" : "outlined"}
+                        variant={pkg.status === "active" ? "contained" : "outlined"}
                         fullWidth
                         size="large"
+                        disabled={pkg.status !== "active"}
                         onClick={() => handleGetStarted(pkg)}
                       >
-                        Get Started
+                        {pkg.status === "active" ? "Get Started" : "Coming Soon"}
                       </Button>
                     </CardActions>
                   </Card>
@@ -164,7 +152,7 @@ const PackagesSection = () => {
           )}
 
           {!isLoading &&
-            (!activePackages || activePackages.length === 0) && (
+            (!visiblePackages || visiblePackages.length === 0) && (
               <div className="text-center py-12">
                 <p className="text-brand-ink-soft text-lg">
                   No packages available at the moment. Please check back later.

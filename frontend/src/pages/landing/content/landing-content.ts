@@ -221,12 +221,21 @@ export const TESTIMONIALS = [
   },
 ] as const
 
-export const PACKAGE_FEATURE_BULLETS = [
+export const BASIC_FEATURES = [
   "Multi-farm dashboard & user access",
   "Batches, seasons & inventory tracking",
   "Batch income, expenses & auto P&L",
+] as const
+
+export const PREMIUM_FEATURES = [
+  ...BASIC_FEATURES,
   "Production cost per kg",
   "Reports, charts & batch analytics",
-  "Investor tracking & profit allocation",
   "Employee & vendor management",
+] as const
+
+export const ENTERPRISE_FEATURES = [
+  ...PREMIUM_FEATURES,
+  "Investor tracking & profit allocation",
+  "Priority support & onboarding",
 ] as const

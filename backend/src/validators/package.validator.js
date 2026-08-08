@@ -5,6 +5,9 @@ export const newPackageSchema = Joi.object({
   description: Joi.string().allow('').optional(),
   price: Joi.number().positive().required(),
   duration: Joi.number().integer().positive().required(), // Duration in days
+  status: Joi.string()
+    .valid('active', 'inactive', 'disabled')
+    .optional(),
 })
 
 export const updatePackageSchema = newPackageSchema.fork(

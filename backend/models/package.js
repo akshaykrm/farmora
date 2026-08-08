@@ -21,7 +21,7 @@ const PackageModel = sequelize.define(
       allowNull: false,
     },
     status: {
-      type: Sequelize.ENUM('active', 'inactive'),
+      type: Sequelize.ENUM('active', 'inactive', 'disabled'),
       defaultValue: 'active',
     },
   },

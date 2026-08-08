@@ -14,7 +14,7 @@ const getAll = async (req, res) => {
   }
 
   if (req.query.status) {
-    filter.status = parseInt(req.query.status)
+    filter.status = req.query.status
   }
   if (req.query.name) {
     filter.name = req.query.name
