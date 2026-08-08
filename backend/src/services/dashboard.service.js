@@ -158,7 +158,7 @@ const getManagerDashboard = async (currentUser) => {
     for (const v of vendors) {
       if (v.vendor_type === 'supplier') {
         supplierBalance += await getSupplierBalance(v, currentUser)
-      } else {
+      } else if (v.vendor_type === 'customer') {
         customerBalance += await getCustomerBalance(v, currentUser)
       }
     }

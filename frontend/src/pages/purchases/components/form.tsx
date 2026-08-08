@@ -43,7 +43,7 @@ const PurchaseForm = ({
     methods.reset(defaultValues);
   }, [defaultValues]);
 
-  const sellerList = useGetVendorNames({ type: "supplier" });
+  const sellerList = useGetVendorNames({ type: ["supplier", "internal"] });
   const values = methods.watch();
   const selectedCategoryId = watch("category_id") as number;
   const { handleGetItemsByVendorID, itemList } = useGetItemsByVendorId();

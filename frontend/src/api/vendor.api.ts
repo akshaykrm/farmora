@@ -8,11 +8,12 @@ import fetcher from "@utils/fetcher";
 
 const vendors = {
   fetchAll: () => fetcher("vendors"),
-  getNames: (filter?: VendorNamesFilter) =>
-    fetcher("vendors/names", null, {
+  getNames: (filter?: VendorNamesFilter) => {
+    return fetcher("vendors/names", null, {
       method: "GET",
       filter: filter,
-    }),
+    });
+  },
   fetchById: (id: number) => fetcher(`vendors/${id}`),
   create: async (payload: NewVendorRequest) =>
     await fetcher("vendors", JSON.stringify(payload), { method: "POST" }),

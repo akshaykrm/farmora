@@ -10,7 +10,7 @@ export type Vendor = {
 };
 
 export type VendorName = NameResponse & {
-  vendor_type: "customer" | "supplier";
+  vendor_type: "customer" | "supplier" | "internal";
 };
 
 export type NewVendorRequest = {

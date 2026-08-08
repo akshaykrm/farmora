@@ -14,7 +14,7 @@ const create = async (payload, currentUser) => {
 const createInternalVendor = async (currentUser) => {
   const newVendor = {
     name: 'Internal',
-    vendor_type: 'supplier',
+    vendor_type: 'internal',
     address: 'nil',
     opening_balance: 0,
     status: 'active',
@@ -23,12 +23,19 @@ const createInternalVendor = async (currentUser) => {
 }
 
 const getNames = async (filter, currentUser) => {
+  const whereClause = {}
   if (currentUser.user_type === userRoles.manager.type) {
-    filter.master_id = currentUser.id
+    whereClause.master_id = currentUser.id
+  }
+
+  if (filter.types) {
+    whereClause.vendor_type = {
+      [Op.in]: Array.isArray(filter.types) ? filter.types : [filter.types],
+    }
   }
 
   const records = await VendorModel.findAll({
-    where: filter,
+    where: whereClause,
     attributes: ['id', 'name', 'vendor_type'],
     limit: 50,
   })

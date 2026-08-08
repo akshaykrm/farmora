@@ -2,9 +2,9 @@ import type { ListResponse } from "@app-types/response.types";
 import type { NameResponse } from "@app-types/gen.types";
 import type { ValidationError } from "@errors/api.error";
 
-export type VendorType = "supplier" | "customer";
+export type VendorType = "supplier" | "customer" | "internal";
 
-export type VendorNamesFilter = { type: "supplier" | "customer" };
+export type VendorNamesFilter = { type: VendorType[] | VendorType };
 export type Vendor = {
   id: number;
   name: string;

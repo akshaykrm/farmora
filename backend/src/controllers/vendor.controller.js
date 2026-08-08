@@ -12,9 +12,11 @@ const create = async (req, res) => {
 const getNames = async (req, res) => {
   const { type } = req.query
 
+  console.log(type.split(','))
+
   const filter = {}
   if (type) {
-    filter.vendor_type = type
+    filter.types = type.split(',')
   }
 
   const records = await vendorService.getNames(filter, req.user)
