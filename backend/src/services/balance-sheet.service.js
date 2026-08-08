@@ -43,6 +43,7 @@ const INVESTOR_CATEGORY_MAP = {
 }
 
 const getMasterId = (currentUser) => {
+  if (!currentUser) return null
   if (currentUser.user_type === userRoles.staff.type) {
     return currentUser.master_id
   }
@@ -52,14 +53,16 @@ const getMasterId = (currentUser) => {
 const buildDateFilter = (startDate, endDate, dateField = 'date') => {
   const filter = {}
 
-  if (startDate && endDate) {
-    filter[dateField] = {
-      [Op.between]: [dayjs(startDate).toDate(), dayjs(endDate).toDate()],
-    }
-  } else if (startDate) {
-    filter[dateField] = { [Op.gte]: dayjs(startDate).toDate() }
-  } else if (endDate) {
-    filter[dateField] = { [Op.lte]: dayjs(endDate).toDate() }
+  const start =
+    startDate && dayjs(startDate).isValid() ? dayjs(startDate).toDate() : null
+  const end = endDate && dayjs(endDate).isValid() ? dayjs(endDate).toDate() : null
+
+  if (start && end) {
+    filter[dateField] = { [Op.between]: [start, end] }
+  } else if (start) {
+    filter[dateField] = { [Op.gte]: start }
+  } else if (end) {
+    filter[dateField] = { [Op.lte]: end }
   }
 
   return filter
@@ -69,7 +72,7 @@ const buildDateFilter = (startDate, endDate, dateField = 'date') => {
 // Helpers
 // ---------------------------------------------------------------------------
 
-const round = (num) => parseFloat(num.toFixed(2))
+const round = (num) => Math.round((parseFloat(num) || 0) * 100) / 100
 
 const sumField = (records, field) => {
   let total = 0
@@ -804,7 +807,42 @@ const getBalanceSheet = async (filter, currentUser) => {
       transactions,
     }
   } catch (err) {
-    console.log('balance sheet error', err)
+    logger.error(
+      {
+        err,
+        actor_id: currentUser?.id,
+        from_date: filter?.from_date,
+        to_date: filter?.to_date,
+        purpose: filter?.purpose,
+      },
+      'Balance sheet failed'
+    )
+    return {
+      opening_balance: 0,
+      from_date: filter?.from_date || null,
+      to_date: filter?.to_date || null,
+      summary: {
+        total_in: 0,
+        total_out: 0,
+        liability: 0,
+        receivable: 0,
+        net: 0,
+        closing_balance: 0,
+      },
+      breakdown: {
+        purchases: { in: 0, out: 0, liability: 0 },
+        sales: { in: 0, out: 0, receivable: 0 },
+        purchase_returns: { in: 0, out: 0, liability_reduction: 0 },
+        working_costs: { in: 0, out: 0 },
+        general_expenses: { in: 0, out: 0 },
+        expense_sales: { in: 0, out: 0 },
+        integration_books: { in: 0, out: 0, liability: 0 },
+        purchase_books: { in: 0, out: 0 },
+        investor_capital: { in: 0, out: 0 },
+        investor_profit: { in: 0, out: 0 },
+      },
+      transactions: [],
+    }
   }
 }
 
