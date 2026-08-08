@@ -1,21 +1,15 @@
-import { TrendingUp } from "lucide-react"
+import { TrendingUp } from "lucide-react";
 
 const KPIs = [
   { label: "Total Revenue", value: "₹24,85,200", delta: "+12.5%" },
   { label: "Total Profit", value: "₹8,45,600", delta: "+8.3%" },
   { label: "Active Farms", value: "12", delta: "+2" },
   { label: "Active Batches", value: "28", delta: "+5" },
-] as const
+] as const;
 
 const LoginFarmShowcase = () => {
   return (
     <div className="relative mt-4 w-full max-w-lg overflow-hidden rounded-2xl border border-brand-border shadow-brand-xl">
-      <img
-        src="https://images.unsplash.com/photo-1500595046743-cd271d694d30?auto=format&fit=crop&w=900&q=80"
-        alt=""
-        className="h-48 w-full object-cover md:h-56"
-        loading="lazy"
-      />
       <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
       <div className="absolute right-3 bottom-3 left-3 md:right-auto md:bottom-4 md:left-4 md:max-w-[320px]">
         <div className="rounded-xl border border-brand-border bg-brand-card/95 p-3 shadow-brand-lg backdrop-blur-sm md:p-4">
@@ -50,7 +44,7 @@ const LoginFarmShowcase = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default LoginFarmShowcase
+export default LoginFarmShowcase;
