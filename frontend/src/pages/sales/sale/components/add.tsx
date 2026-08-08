@@ -11,7 +11,7 @@ const defaultValues: NewSaleRequest = {
   vehicle_no: "",
   weight: 0,
   bird_no: 0,
-  payment_type: null,
+  payment_type: "credit",
   price: 0,
   narration: "",
 };
