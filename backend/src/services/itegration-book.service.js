@@ -54,6 +54,7 @@ const getAll = async (filter, currentUser) => {
   const item = await itemService.getIntegrationItem(currentUser)
   if (item) {
     filter.category_id = item.id
+    purchaseFilter.category_id = item.id
   }
 
   const rawPurchases = await purchaseService.getAll(purchaseFilter, currentUser)

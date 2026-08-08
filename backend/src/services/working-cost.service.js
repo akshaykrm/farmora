@@ -67,6 +67,7 @@ const getAll = async (filter, currentUser) => {
   const item = await itemService.getWorkingItem(currentUser)
   if (item) {
     filter.category_id = item.id
+    purchaseFilter.category_id = item.id
   }
 
   const rawWorkingCost = await purchaseService.getAll(
