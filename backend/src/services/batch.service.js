@@ -142,6 +142,25 @@ const getBySeasonId = async (seasonId, currentUser) => {
   return batchRecord
 }
 
+export async function getAllBySeasonId(seasonId, currentUser) {
+  let filter = {
+    season_id: seasonId,
+  }
+
+  if (currentUser.user_type === userRoles.manager.type) {
+    filter.master_id = currentUser.id
+  } else if (currentUser.user_type === userRoles.staff.type) {
+    filter.master_id = currentUser.master_id
+  }
+
+  const batchRecords = await BatchModel.findAll({
+    where: filter,
+    order: [['id', 'ASC']],
+  })
+
+  return batchRecords
+}
+
 async function getCount(filter, currentUser) {
   if (currentUser.user_type === userRoles.manager.type) {
     filter.master_id = currentUser.id
@@ -202,6 +221,7 @@ const batchService = {
   getAll,
   getById,
   getBySeasonId,
+  getAllBySeasonId,
   updateById,
   deleteById,
   close,

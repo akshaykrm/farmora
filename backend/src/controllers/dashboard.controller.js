@@ -20,9 +20,19 @@ const getAdminDashboard = async (req, res) => {
   })
 }
 
+const getSeasonProfit = async (req, res) => {
+  logger.info({ actor_id: req.user.id }, 'Season profit request received')
+  const data = await dashboardService.getSeasonProfit(req.query, req.user)
+
+  res.success(data, {
+    message: 'Season profit data fetched successfully',
+  })
+}
+
 const dashboardController = {
   getManagerDashboard: asyncHandler(getManagerDashboard),
   getAdminDashboard: asyncHandler(getAdminDashboard),
+  getSeasonProfit: asyncHandler(getSeasonProfit),
 }
 
 export default dashboardController

@@ -2,6 +2,7 @@ import { useAuth } from "@store/authentication/context";
 import { useQuery } from "@tanstack/react-query";
 import MetricCard from "./components/MetricCard";
 import SectionHeader from "./components/SectionHeader";
+import SeasonProfitChart from "./components/SeasonProfitChart";
 import { PurchasesListing, SalesListing } from "./components/DataListings";
 import dashboardApi from "@api/dashboard.api";
 import type { ManagerDashboardData } from "@app-types/dashboard.types";
@@ -33,7 +34,7 @@ const ManagerDashboard = () => {
   }
 
   return (
-    <div className="h-full flex flex-col w-full gap-4 overflow-hidden">
+    <div className="w-full flex flex-col gap-4">
       {/* Welcome Header */}
       <div className="mb-2 shrink-0">
         <h1 className="text-3xl font-bold text-brand-ink mb-1">
@@ -100,9 +101,12 @@ const ManagerDashboard = () => {
         </div>
       </section>
 
+      {/* SEASON PROFIT CHART */}
+      <SeasonProfitChart />
+
       {/* RECENT PURCHASES & SALES */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 flex-1 min-h-0 overflow-hidden">
-        <section className="animate-in fade-in duration-700 flex flex-col min-h-0 overflow-hidden">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        <section className="animate-in fade-in duration-700 flex flex-col">
           <SectionHeader
             title="Recent Purchases"
             icon={
@@ -124,7 +128,7 @@ const ManagerDashboard = () => {
           <PurchasesListing data={data.recentPurchases ?? []} />
         </section>
 
-        <section className="animate-in fade-in duration-700 flex flex-col min-h-0 overflow-hidden">
+        <section className="animate-in fade-in duration-700 flex flex-col">
           <SectionHeader
             title="Recent Sales"
             icon={

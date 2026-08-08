@@ -189,7 +189,7 @@ export const SeasonsListing = ({ data }: { data: Season[] }) => (
 
 export const SalesListing = ({ data }: { data: RecentSale[] }) => (
   <div className="bg-brand-card rounded-xl border border-brand-border shadow-sm overflow-hidden flex-1 flex flex-col min-h-0">
-    <div className="overflow-y-auto flex-1 min-h-0">
+    <div className="overflow-y-auto flex-1 min-h-[240px]">
       <table className="w-full text-sm">
         <thead className="bg-brand-canvas">
           <tr>
@@ -244,7 +244,7 @@ export const SalesListing = ({ data }: { data: RecentSale[] }) => (
 
 export const PurchasesListing = ({ data }: { data: RecentPurchase[] }) => (
   <div className="bg-brand-card rounded-xl border border-brand-border shadow-sm overflow-hidden flex-1 flex flex-col min-h-0">
-    <div className="overflow-y-auto flex-1 min-h-0">
+    <div className="overflow-y-auto flex-1 min-h-[240px]">
       <table className="w-full text-sm">
         <thead className="bg-brand-canvas">
           <tr>

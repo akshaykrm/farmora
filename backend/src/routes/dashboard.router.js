@@ -9,6 +9,13 @@ import dashboardController from '@controllers/dashboard.controller'
 const router = Router()
 
 router.get(
+  '/manager/season-profit',
+  isAuthenticated,
+  isManagerOrAdmin,
+  dashboardController.getSeasonProfit
+)
+
+router.get(
   '/manager',
   isAuthenticated,
   isManagerOrAdmin,
