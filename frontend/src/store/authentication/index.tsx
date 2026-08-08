@@ -13,6 +13,18 @@ const authReducer = (
         token: action.payload.token,
         user: action.payload.user || null,
       };
+    case "UPDATE_PROFILE":
+      return {
+        token: state.token,
+        user: state.user
+          ? {
+              ...state.user,
+              name: action.payload.name,
+              email: action.payload.email,
+              phone: action.payload.phone,
+            }
+          : state.user,
+      };
     case "LOGOUT":
       return { token: null, user: null };
     default:
@@ -35,6 +47,8 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         ? {
             name: userSession.name,
             username: userSession.username,
+            email: userSession.email,
+            phone: userSession.phone,
             role: userSession.role || null,
           }
         : null,

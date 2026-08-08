@@ -3,9 +3,17 @@ import Joi from 'joi'
 export const newManageSchema = Joi.object({
   name: Joi.string().min(3).max(100).required(),
   username: Joi.string().min(3).max(100).required(),
+  email: Joi.string().email().required(),
+  phone: Joi.string().min(7).max(20).required(),
   password: Joi.string().min(3).max(100).required(),
   status: Joi.number().integer().required(),
   package_id: Joi.number().integer().optional(),
+})
+
+export const updateProfileSchema = Joi.object({
+  name: Joi.string().min(3).max(100),
+  email: Joi.string().email(),
+  phone: Joi.string().min(7).max(20),
 })
 
 export const newStaffMemberSchema = Joi.object({
@@ -22,5 +30,10 @@ export const updateNewStaffSchema = newStaffMemberSchema
 
 export const resetPasswordSchema = Joi.object({
   username: Joi.string().min(3).max(100).required(),
+  new_password: Joi.string().min(3).max(100).required(),
+})
+
+export const changePasswordSchema = Joi.object({
+  current_password: Joi.string().min(3).max(100).required(),
   new_password: Joi.string().min(3).max(100).required(),
 })

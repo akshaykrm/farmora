@@ -36,3 +36,11 @@ export class UserNameConflictError extends UserError {
     this.statusCode = 400
   }
 }
+
+export class InvalidCurrentPasswordError extends UserError {
+  constructor() {
+    super('current password is incorrect')
+    this.code = 'INVALID_CURRENT_PASSWORD'
+    this.statusCode = 400
+  }
+}

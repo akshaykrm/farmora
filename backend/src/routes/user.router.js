@@ -4,12 +4,21 @@ import userController from '@controllers/user.controller'
 import {
   newStaffMemberSchema,
   updateNewStaffSchema,
+  updateProfileSchema,
 } from '@validators/user.validator'
 import validate from '@utils/validate-request'
 
 const router = Router()
 
 router.use(isAuthenticated)
+
+router.get('/me', userController.getMe)
+
+router.put(
+  '/me',
+  validate(updateProfileSchema),
+  userController.updateMe
+)
 
 router.post(
   '/',

@@ -1,4 +1,4 @@
-import type { UserSession } from "@app-types/auth.types";
+import type { UpdateProfilePayload, UserSession } from "@app-types/auth.types";
 
 const AUTH_TOKEN_KEY = "x-auth-token";
 const AUTH_USER_KEY = "x-auth-user";
@@ -10,6 +10,8 @@ export const createSession = (session: UserSession) => {
     JSON.stringify({
       name: session.name,
       username: session.username,
+      email: session.email,
+      phone: session.phone,
       role: session.role,
     }),
   );
@@ -26,6 +28,8 @@ export const getSession = (): UserSession => {
         token,
         name: parsedData.name,
         username: parsedData.username,
+        email: parsedData.email,
+        phone: parsedData.phone,
         role: parsedData.role,
       };
     } catch {
@@ -33,6 +37,8 @@ export const getSession = (): UserSession => {
         token,
         name: null,
         username: null,
+        email: null,
+        phone: null,
         role: null,
       };
     }
@@ -42,8 +48,20 @@ export const getSession = (): UserSession => {
     token,
     name: null,
     username: null,
+    email: null,
+    phone: null,
     role: null,
   };
+};
+
+export const updateSessionProfile = (profile: UpdateProfilePayload) => {
+  const session = getSession();
+  createSession({
+    ...session,
+    name: profile.name,
+    email: profile.email,
+    phone: profile.phone,
+  });
 };
 
 export const clearSession = () => {

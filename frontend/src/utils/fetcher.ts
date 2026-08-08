@@ -1,4 +1,4 @@
-import { ValidationError, type ErrorTest } from "@errors/api.error";
+import { ValidationError } from "@errors/api.error";
 import NetworkError from "@errors/network.error";
 import { getSession } from "./session";
 import { BACKEND_URL } from "@config";
@@ -14,10 +14,10 @@ const genURI = (path: string) => {
 
 type Opts = {
   method: "GET" | "POST" | "PUT" | "DELETE";
-  filter?: any;
+  filter?: Record<string, unknown>;
 };
 
-const serailizeFilter = (filter: any) => {
+const serailizeFilter = (filter: Record<string, unknown>) => {
   const params = new URLSearchParams();
   Object.keys(filter).forEach((key) => {
     const value = filter[key];
@@ -53,18 +53,24 @@ const fetcher = async (path: string, payload?: string | null, opts?: Opts) => {
       return json.data;
     }
 
-    const errorList: ErrorTest[] = json.error.error.map((err: any) => {
-      return { name: err.field, message: err.message };
-    });
-    throw new ValidationError({
-      message: "validation error",
-      error: errorList,
-    });
-  } catch (error: any) {
-    if (error instanceof ValidationError) {
+    const errorPayload = json.error || {};
+    const message = errorPayload.message || "Something went wrong";
+
+    if (Array.isArray(errorPayload.error)) {
+      throw new ValidationError({
+        message,
+        error: errorPayload.error.map((err: { field: string; message: string }) => {
+          return { name: err.field, message: err.message };
+        }),
+      });
+    }
+
+    throw new NetworkError(message, errorPayload.code);
+  } catch (error) {
+    if (error instanceof ValidationError || error instanceof NetworkError) {
       throw error;
     }
-    throw new NetworkError(error.message);
+    throw new NetworkError(error instanceof Error ? error.message : "Something went wrong");
   }
 };
 

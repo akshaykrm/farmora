@@ -36,6 +36,7 @@ import BatchOverviewPage from "@pages/overview/batch";
 import BalanceSheetPage from "@pages/balance-sheet";
 // import EmployeesPage from "@pages/employees";
 import VendorPage from "@pages/vendors";
+import ProfilePage from "@pages/profile";
 import InvestorManagementPage from "@pages/investors/management";
 import InvestLedgerPage from "@pages/investors/ledger/invest";
 import ProfitLedgerPage from "@pages/investors/ledger/profit";
@@ -130,6 +131,7 @@ function App() {
                           path="/dashboard"
                           element={<RoleBasedDashboard />}
                         />
+                        <Route path="/profile" element={<ProfilePage />} />
                         {flatPaths.map((path) => {
                           const Component = pageComponents[path.link!];
                           return (

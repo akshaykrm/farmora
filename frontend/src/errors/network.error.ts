@@ -1,9 +1,9 @@
 class NetworkError extends Error {
   code: string;
-  constructor(message: string) {
+  constructor(message: string, code?: string) {
     super(message);
     this.name = "Network Error";
-    this.code = "Network_Error";
+    this.code = code || "Network_Error";
 
     Object.setPrototypeOf(this, NetworkError.prototype);
   }

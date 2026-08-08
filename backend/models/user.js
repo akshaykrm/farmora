@@ -17,6 +17,17 @@ const UserModel = sequelize.define(
       unique: true,
       allowNull: false,
     },
+    email: {
+      type: Sequelize.STRING,
+      unique: true,
+      allowNull: true,
+      field: 'email',
+    },
+    phone: {
+      type: Sequelize.STRING,
+      allowNull: true,
+      field: 'phone',
+    },
     password: {
       type: Sequelize.STRING,
       allowNull: false,
