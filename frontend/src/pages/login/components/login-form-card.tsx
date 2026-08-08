@@ -45,11 +45,18 @@ const GoogleIcon = () => (
 const fieldClass =
   "w-full rounded-xl border border-brand-border bg-brand-card py-3 pr-4 pl-11 text-sm text-brand-ink outline-none transition-shadow placeholder:text-brand-ink-muted focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/30"
 
+const errorFieldClass =
+  "w-full rounded-xl border border-brand-danger bg-brand-card py-3 pr-4 pl-11 text-sm text-brand-ink outline-none transition-shadow placeholder:text-brand-ink-muted focus:border-brand-danger focus:ring-2 focus:ring-brand-danger/30"
+
 const LoginFormCard = ({ methods, onLogin, isPending }: LoginFormCardProps) => {
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
   const [forgotOpen, setForgotOpen] = useState(false)
+  const {
+    register,
+    formState: { errors },
+  } = methods
 
   const handleReset = (username: string) => {
     methods.setValue("username", username)
@@ -81,12 +88,18 @@ const LoginFormCard = ({ methods, onLogin, isPending }: LoginFormCardProps) => {
             />
             <input
               id="username"
-              className={fieldClass}
+              className={errors.username ? errorFieldClass : fieldClass}
               placeholder="Enter your username"
               autoComplete="username"
-              {...methods.register("username")}
+              aria-invalid={Boolean(errors.username)}
+              {...register("username")}
             />
           </div>
+          {errors.username && (
+            <p className="mt-1.5 text-xs font-medium text-brand-danger">
+              {errors.username.message}
+            </p>
+          )}
         </div>
 
         <div>
@@ -103,11 +116,12 @@ const LoginFormCard = ({ methods, onLogin, isPending }: LoginFormCardProps) => {
             />
             <input
               id="password"
-              className={`${fieldClass} pr-11`}
+              className={`${errors.password ? errorFieldClass : fieldClass} pr-11`}
               placeholder="Enter your password"
               type={showPassword ? "text" : "password"}
               autoComplete="current-password"
-              {...methods.register("password")}
+              aria-invalid={Boolean(errors.password)}
+              {...register("password")}
             />
             <button
               type="button"
@@ -122,6 +136,11 @@ const LoginFormCard = ({ methods, onLogin, isPending }: LoginFormCardProps) => {
               )}
             </button>
           </div>
+          {errors.password && (
+            <p className="mt-1.5 text-xs font-medium text-brand-danger">
+              {errors.password.message}
+            </p>
+          )}
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-2">

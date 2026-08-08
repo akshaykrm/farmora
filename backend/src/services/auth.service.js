@@ -101,81 +101,77 @@ const createManager = async (payload) => {
 }
 
 const login = async (username, password) => {
-  try {
-    if (!username) {
-      throw new InvalidUsernameError(username)
-    }
-    const user = await UserModel.findOne({
-      where: {
-        username: username,
+  if (!username) {
+    throw new InvalidUsernameError(username)
+  }
+  const user = await UserModel.findOne({
+    where: {
+      username: username,
+    },
+    include: [
+      {
+        model: SubscriptionModel,
+        as: 'subscriptions',
+        required: false,
       },
-      include: [
-        {
-          model: SubscriptionModel,
-          as: 'subscriptions',
-          required: false,
+      {
+        model: UserModel,
+        as: 'parent',
+        required: false,
+      },
+    ],
+  })
+
+  if (!user) {
+    throw new UserNotFoundError(username)
+  }
+
+  const passwordVerified = await user.comparePassword(password)
+  if (!passwordVerified) {
+    throw new InvalidCredentialError(username)
+  }
+
+  // Only check subscription for non-admin users
+  if (user.user_type === userRoles.manager.type) {
+    const now = dayjs().toDate()
+    const activeSubscription = user.subscriptions.filter(
+      (sub) =>
+        dayjs(sub.valid_from).isBefore(now) &&
+        dayjs(sub.valid_to).isAfter(now) &&
+        !sub.deleted_at
+    )
+
+    if (activeSubscription.length === 0) {
+      throw new SubsriptionInActiveError(user.id)
+    }
+  }
+
+  if (user.user_type === userRoles.staff.type) {
+    const parentUser = user.parent
+    const subscriptions = await SubscriptionModel.findAll({
+      where: {
+        user_id: parentUser.id,
+        deleted_at: {
+          [Op.is]: null,
         },
-        {
-          model: UserModel,
-          as: 'parent',
-          required: false,
+        valid_from: {
+          [Op.lte]: dayjs().toDate(),
         },
-      ],
+        valid_to: {
+          [Op.gte]: dayjs().toDate(),
+        },
+      },
     })
 
-    if (!user) {
-      throw new UserNotFoundError(username)
+    if (subscriptions.length === 0) {
+      throw new SubsriptionInActiveError(parentUser.id)
     }
-
-    const passwordVerified = await user.comparePassword(password)
-    if (!passwordVerified) {
-      throw new InvalidCredentialError(username)
-    }
-
-    // Only check subscription for non-admin users
-    if (user.user_type === userRoles.manager.type) {
-      const now = dayjs().toDate()
-      const activeSubscription = user.subscriptions.filter(
-        (sub) =>
-          dayjs(sub.valid_from).isBefore(now) &&
-          dayjs(sub.valid_to).isAfter(now) &&
-          !sub.deleted_at
-      )
-
-      if (activeSubscription.length === 0) {
-        throw new SubsriptionInActiveError(user.id)
-      }
-    }
-
-    if (user.user_type === userRoles.staff.type) {
-      const parentUser = user.parent
-      const subscriptions = await SubscriptionModel.findAll({
-        where: {
-          user_id: parentUser.id,
-          deleted_at: {
-            [Op.is]: null,
-          },
-          valid_from: {
-            [Op.lte]: dayjs().toDate(),
-          },
-          valid_to: {
-            [Op.gte]: dayjs().toDate(),
-          },
-        },
-      })
-
-      if (subscriptions.length === 0) {
-        throw new SubsriptionInActiveError(parentUser.id)
-      }
-    }
-
-    const date = dayjs().toDate()
-    user.last_login = date
-    user.save()
-    return user
-  } catch (err) {
-    console.log(err)
   }
+
+  const date = dayjs().toDate()
+  user.last_login = date
+  await user.save()
+  return user
 }
 
 const resetPassword = async (username, newPassword) => {
