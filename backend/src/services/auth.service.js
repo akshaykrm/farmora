@@ -2,6 +2,7 @@ import bcryptjs from 'bcryptjs'
 import { SubsriptionInActiveError } from '@errors/subscription.errors'
 import {
   InvalidCredentialError,
+  InvalidCurrentPasswordError,
   InvalidUsernameError,
   UserNameConflictError,
   UserNotFoundError,
@@ -28,11 +29,19 @@ const createManager = async (payload) => {
     throw new UserNameConflictError('username already taken')
   }
 
+  const existingEmailUser = await userService.getUserByEmail(payload.email)
+
+  if (existingEmailUser) {
+    throw new UserNameConflictError('email already taken')
+  }
+
   try {
     const newUser = await UserModel.create(
       {
         name: payload.name,
         username: payload.username,
+        email: payload.email,
+        phone: payload.phone,
         password: payload.password,
         user_type: userRoles.manager.type,
         status: payload.status,
@@ -180,10 +189,27 @@ const resetPassword = async (username, newPassword) => {
   await user.update({ password: hashedPassword })
 }
 
+const changePassword = async (userId, currentPassword, newPassword) => {
+  const user = await UserModel.findByPk(userId)
+
+  if (!user) {
+    throw new UserNotFoundError(userId)
+  }
+
+  const passwordVerified = await user.comparePassword(currentPassword)
+  if (!passwordVerified) {
+    throw new InvalidCurrentPasswordError()
+  }
+
+  const hashedPassword = await bcryptjs.hash(newPassword, 10)
+  await user.update({ password: hashedPassword })
+}
+
 const authService = {
   createManager,
   login,
   resetPassword,
+  changePassword,
 }
 
 export default authService

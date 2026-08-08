@@ -49,12 +49,24 @@ const deleteUserById = async (req, res) => {
   res.success(null, { message: 'user deleted' })
 }
 
+const getMe = async (req, res) => {
+  const userRecord = await userService.getMe(req.user.id)
+  res.success(userRecord, { message: 'profile fetched' })
+}
+
+const updateMe = async (req, res) => {
+  const userRecord = await userService.updateMe(req.user.id, req.body)
+  res.success(userRecord, { message: 'profile updated' })
+}
+
 const userController = {
   createStaff: asyncHandler(createStaff),
   getAllUsers: asyncHandler(getAllUsers),
   getUserById: asyncHandler(getUserById),
   updateUserById: asyncHandler(updateUserById),
   deleteUserById: asyncHandler(deleteUserById),
+  getMe: asyncHandler(getMe),
+  updateMe: asyncHandler(updateMe),
 }
 
 export default userController

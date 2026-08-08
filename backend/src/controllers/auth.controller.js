@@ -16,6 +16,8 @@ const login = async (req, res) => {
     master_id: user.id,
     name: user.name,
     username: user.username,
+    email: user.email,
+    phone: user.phone,
     user_type: user.user_type,
     parent_id: user.parent_id,
   }
@@ -28,10 +30,17 @@ const resetPassword = async (req, res) => {
   res.success(null, { message: 'Password reset successfully' })
 }
 
+const changePassword = async (req, res) => {
+  const { current_password, new_password } = req.body
+  await authService.changePassword(req.user.id, current_password, new_password)
+  res.success(null, { message: 'Password updated successfully' })
+}
+
 const authController = {
   createManager: asyncHandler(createManager),
   login: asyncHandler(login),
   resetPassword: asyncHandler(resetPassword),
+  changePassword: asyncHandler(changePassword),
 }
 
 export default authController

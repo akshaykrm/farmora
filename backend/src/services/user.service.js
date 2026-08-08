@@ -87,6 +87,53 @@ const getUserByUsername = async (username) => {
   return userRecord
 }
 
+const getUserByEmail = async (email) => {
+  const userRecord = await UserModel.findOne({
+    where: { email },
+  })
+  return userRecord
+}
+
+const getMe = async (userId) => {
+  const userRecord = await UserModel.findByPk(userId, {
+    attributes: {
+      exclude: ['password'],
+    },
+  })
+
+  if (!userRecord) {
+    throw new UserNotFoundError(userId)
+  }
+  return userRecord
+}
+
+const updateMe = async (userId, payload) => {
+  const userRecord = await getMe(userId)
+
+  if (payload.email) {
+    const existingEmailUser = await UserModel.findOne({
+      where: {
+        email: payload.email,
+        id: {
+          [Op.ne]: userId,
+        },
+      },
+    })
+
+    if (existingEmailUser) {
+      throw new UserNameConflictError('email already taken')
+    }
+  }
+
+  await userRecord.update({
+    name: payload.name,
+    email: payload.email,
+    phone: payload.phone,
+  })
+
+  return userRecord
+}
+
 const update = async (userId, payload, currentUser) => {
   const userRecord = await userService.getById(userId, currentUser)
   await userRecord.update(payload)
@@ -145,6 +192,9 @@ const userService = {
   getById,
   update,
   getUserByUsername: getUserByUsername,
+  getUserByEmail,
+  getMe,
+  updateMe,
   delete: deleteById,
   getCompanyNameById,
 }

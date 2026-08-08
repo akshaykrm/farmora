@@ -13,6 +13,7 @@ import type { LoginPayload } from "@app-types/auth.types"
 import { useNavigate } from "react-router"
 import toast from "react-hot-toast"
 import { gradients as brandGradients } from "../../../theme/tokens"
+import ForgotPasswordDialog from "./forgot-password-dialog"
 
 type LoginFormCardProps = {
   methods: UseFormReturn<LoginPayload>
@@ -48,6 +49,11 @@ const LoginFormCard = ({ methods, onLogin, isPending }: LoginFormCardProps) => {
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
+  const [forgotOpen, setForgotOpen] = useState(false)
+
+  const handleReset = (username: string) => {
+    methods.setValue("username", username)
+  }
 
   return (
     <div className="w-full max-w-[420px] rounded-3xl border border-brand-border bg-brand-card p-7 shadow-brand-xl md:p-9">
@@ -138,9 +144,7 @@ const LoginFormCard = ({ methods, onLogin, isPending }: LoginFormCardProps) => {
           <button
             type="button"
             className="cursor-pointer border-none bg-transparent text-sm font-medium text-brand-accent hover:text-brand-primary"
-            onClick={() =>
-              toast("Contact support@farmora.com to reset your password.")
-            }
+            onClick={() => setForgotOpen(true)}
           >
             Forgot password?
           </button>
@@ -213,6 +217,13 @@ const LoginFormCard = ({ methods, onLogin, isPending }: LoginFormCardProps) => {
           aria-hidden
         />
       </button>
+
+      <ForgotPasswordDialog
+        isOpen={forgotOpen}
+        onClose={() => setForgotOpen(false)}
+        defaultUsername={methods.getValues("username")}
+        onReset={handleReset}
+      />
     </div>
   )
 }

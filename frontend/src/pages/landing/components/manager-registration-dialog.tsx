@@ -33,6 +33,8 @@ const ManagerRegistrationDialog = ({
     defaultValues: {
       name: "",
       username: "",
+      email: "",
+      phone: "",
       password: "",
       status: 1,
       package_id: packageId,
@@ -144,6 +146,60 @@ const ManagerRegistrationDialog = ({
             {errors.username && (
               <p className="text-brand-danger text-xs mt-1">
                 {errors.username.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-brand-ink-soft mb-2"
+            >
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              placeholder="Enter your email"
+              className="w-full px-4 py-3 border border-brand-border-strong rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all"
+              {...register("email", {
+                required: "Email is required",
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: "Enter a valid email",
+                },
+              })}
+            />
+            {errors.email && (
+              <p className="text-brand-danger text-xs mt-1">
+                {errors.email.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label
+              htmlFor="phone"
+              className="block text-sm font-medium text-brand-ink-soft mb-2"
+            >
+              Phone Number
+            </label>
+            <input
+              id="phone"
+              type="tel"
+              placeholder="Enter your phone number"
+              className="w-full px-4 py-3 border border-brand-border-strong rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all"
+              {...register("phone", {
+                required: "Phone number is required",
+                minLength: {
+                  value: 7,
+                  message: "Enter a valid phone number",
+                },
+              })}
+            />
+            {errors.phone && (
+              <p className="text-brand-danger text-xs mt-1">
+                {errors.phone.message}
               </p>
             )}
           </div>

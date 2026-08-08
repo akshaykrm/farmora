@@ -22,6 +22,8 @@ const useLogin = () => {
       const userSession: UserSession = {
         username: data.username,
         name: data.name,
+        email: data.email,
+        phone: data.phone,
         token: data.token,
         role: data.user_type,
       };
@@ -34,6 +36,8 @@ const useLogin = () => {
           user: {
             name: data.name,
             username: data.username,
+            email: data.email,
+            phone: data.phone,
             role: data.user_type,
           },
         },

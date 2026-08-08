@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Popover } from "@mui/material";
-import { User, LogOut } from "lucide-react";
+import { User, LogOut, UserRound } from "lucide-react";
 import { useAuth, useAuthDispatch } from "@store/authentication/context";
 import { useNavigate } from "react-router";
 import { clearSession } from "@utils/session";
@@ -17,6 +17,11 @@ const UserProfile = () => {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleProfile = () => {
+    handleClose();
+    navigate("/profile");
   };
 
   const handleLogout = () => {
@@ -68,13 +73,22 @@ const UserProfile = () => {
             <p className="mb-1 text-xs text-brand-ink-soft">@{user.username}</p>
             <p className="text-xs capitalize text-brand-ink-muted">{user.role}</p>
           </div>
-          <button
-            onClick={handleLogout}
-            className="flex w-full cursor-pointer items-center gap-2 rounded-lg border-none bg-transparent px-3 py-2 text-sm text-brand-danger transition-colors hover:bg-brand-danger-soft"
-          >
-            <LogOut className="h-4 w-4" />
-            Logout
-          </button>
+          <div className="pt-2">
+            <button
+              onClick={handleProfile}
+              className="flex w-full cursor-pointer items-center gap-2 rounded-lg border-none bg-transparent px-3 py-2 text-sm text-brand-ink transition-colors hover:bg-brand-card-soft"
+            >
+              <UserRound className="h-4 w-4" />
+              Profile
+            </button>
+            <button
+              onClick={handleLogout}
+              className="flex w-full cursor-pointer items-center gap-2 rounded-lg border-none bg-transparent px-3 py-2 text-sm text-brand-danger transition-colors hover:bg-brand-danger-soft"
+            >
+              <LogOut className="h-4 w-4" />
+              Logout
+            </button>
+          </div>
         </div>
       </Popover>
     </>
