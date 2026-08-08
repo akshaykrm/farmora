@@ -34,7 +34,7 @@ import GeneralSalesPage from "@pages/general-sales";
 import SeasonOverviewPage from "@pages/overview/season";
 import BatchOverviewPage from "@pages/overview/batch";
 import BalanceSheetPage from "@pages/balance-sheet";
-import EmployeesPage from "@pages/employees";
+// import EmployeesPage from "@pages/employees";
 import VendorPage from "@pages/vendors";
 import InvestorManagementPage from "@pages/investors/management";
 import InvestLedgerPage from "@pages/investors/ledger/invest";
@@ -45,7 +45,7 @@ const queryClient = new QueryClient();
 const pageComponents: Record<string, React.ComponentType> = {
   "/dashboard": Dashboard,
   "/configuration/batches": BatchesPage,
-  "/configuration/employees": EmployeesPage,
+  // "/configuration/employees": EmployeesPage,
   "/configuration/seasons": SeasonsPage,
   "/configuration/farms": FarmsPage,
   "/configuration/vendors": VendorPage,

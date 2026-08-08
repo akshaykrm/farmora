@@ -39,9 +39,21 @@ export const paths: Paths = [
     children: [
       { pathname: "Purchase", link: "/expense/purchase", icon: ShoppingCart },
       { pathname: "Returns", link: "/expense/returns", icon: Undo2 },
-      { pathname: "Purchase Book", link: "/expense/purchase-book", icon: BookText },
-      { pathname: "Integration Book", link: "/expense/integration-book", icon: NotebookTabs },
-      { pathname: "Working Cost", link: "/expense/working-cost", icon: ClipboardList },
+      {
+        pathname: "Purchase Book",
+        link: "/expense/purchase-book",
+        icon: BookText,
+      },
+      {
+        pathname: "Integration Book",
+        link: "/expense/integration-book",
+        icon: NotebookTabs,
+      },
+      {
+        pathname: "Working Cost",
+        link: "/expense/working-cost",
+        icon: ClipboardList,
+      },
     ],
   },
   {
@@ -49,15 +61,27 @@ export const paths: Paths = [
     icon: TrendingUp,
     children: [
       { pathname: "Sale", link: "/sales/sale", icon: Tag },
-      { pathname: "Sales Book", link: "/sales/sales-book", icon: BookOpenCheck },
+      {
+        pathname: "Sales Book",
+        link: "/sales/sales-book",
+        icon: BookOpenCheck,
+      },
     ],
   },
   {
     pathname: "General",
     icon: Layers,
     children: [
-      { pathname: "General Expense", link: "/general/general-expense", icon: Receipt },
-      { pathname: "General Sales", link: "/general/general-sales", icon: Coins },
+      {
+        pathname: "General Expense",
+        link: "/general/general-expense",
+        icon: Receipt,
+      },
+      {
+        pathname: "General Sales",
+        link: "/general/general-sales",
+        icon: Coins,
+      },
     ],
   },
   { pathname: "Cash Flow", link: "/cash-flow", icon: ArrowLeftRight },
@@ -65,7 +89,11 @@ export const paths: Paths = [
     pathname: "Overview",
     icon: BarChart3,
     children: [
-      { pathname: "Season Overview", link: "/overview/season", icon: CalendarDays },
+      {
+        pathname: "Season Overview",
+        link: "/overview/season",
+        icon: CalendarDays,
+      },
       { pathname: "Batch Overview", link: "/overview/batch", icon: Boxes },
     ],
   },
@@ -74,8 +102,16 @@ export const paths: Paths = [
     icon: PiggyBank,
     children: [
       { pathname: "Management", link: "/investors/management", icon: Users },
-      { pathname: "Investments", link: "/investors/ledger/invest", icon: Banknote },
-      { pathname: "Profits", link: "/investors/ledger/profit", icon: CircleDollarSign },
+      {
+        pathname: "Investments",
+        link: "/investors/ledger/invest",
+        icon: Banknote,
+      },
+      {
+        pathname: "Profits",
+        link: "/investors/ledger/profit",
+        icon: CircleDollarSign,
+      },
     ],
   },
   {
@@ -84,10 +120,14 @@ export const paths: Paths = [
     children: [
       { pathname: "Items", link: "/configuration/items", icon: Package },
       { pathname: "Farms", link: "/configuration/farms", icon: Tractor },
-      { pathname: "Seasons", link: "/configuration/seasons", icon: CalendarRange },
+      {
+        pathname: "Seasons",
+        link: "/configuration/seasons",
+        icon: CalendarRange,
+      },
       { pathname: "Batches", link: "/configuration/batches", icon: Boxes },
       { pathname: "Vendors", link: "/configuration/vendors", icon: Truck },
-      { pathname: "Employees", link: "/configuration/employees", icon: UserRound },
+      // { pathname: "Employees", link: "/configuration/employees", icon: UserRound },
     ],
   },
 ];
