@@ -50,8 +50,8 @@ export const paths: Paths = [
         icon: NotebookTabs,
       },
       {
-        pathname: "Working Cost",
-        link: "/expense/working-cost",
+        pathname: "Working Cost Book",
+        link: "/expense/working-cost-book",
         icon: ClipboardList,
       },
     ],
