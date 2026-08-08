@@ -183,10 +183,14 @@ const fetchInvestorTransactions = async (masterId, startDate, endDate) => {
     ...dateFilter,
     [Op.or]: [
       { transaction_type_id: { [Op.in]: includedTypeIds } },
-      {
-        transaction_type_id: reversalType.id,
-        reference_transaction_id: { [Op.ne]: null },
-      },
+      ...(reversalType
+        ? [
+            {
+              transaction_type_id: reversalType.id,
+              reference_transaction_id: { [Op.ne]: null },
+            },
+          ]
+        : []),
     ],
   }
 
@@ -424,7 +428,9 @@ const investorTransactionToTransactions = (records) => {
 
     const baseDirection = INVESTOR_DIRECTION_MAP[typeCode]
     const direction = isReversal
-      ? (baseDirection === 'in' ? 'out' : 'in')
+      ? baseDirection === 'in'
+        ? 'out'
+        : 'in'
       : baseDirection
 
     const purposeFn = INVESTOR_PURPOSE_MAP[typeCode]
@@ -721,80 +727,84 @@ const formatTransactions = (transactions) => {
 }
 
 const getBalanceSheet = async (filter, currentUser) => {
-  const { from_date, to_date, purpose } = filter
+  try {
+    const { from_date, to_date, purpose } = filter
 
-  logger.debug(
-    { from_date, to_date, purpose, actor_id: currentUser.id },
-    'Fetching balance sheet'
-  )
+    logger.debug(
+      { from_date, to_date, purpose, actor_id: currentUser.id },
+      'Fetching balance sheet'
+    )
 
-  const masterId = getMasterId(currentUser)
+    const masterId = getMasterId(currentUser)
 
-  // -----------------------------------------------------------------------
-  // PHASE 1 — Fetch all raw records in parallel
-  // -----------------------------------------------------------------------
-  const records = await fetchAllRecords(masterId, from_date, to_date)
-  const { openingBalance } = records
+    // -----------------------------------------------------------------------
+    // PHASE 1 — Fetch all raw records in parallel
+    // -----------------------------------------------------------------------
+    const records = await fetchAllRecords(masterId, from_date, to_date)
+    const { openingBalance } = records
 
-  // -----------------------------------------------------------------------
-  // PHASE 2 — Transform each category into unified transactions
-  // -----------------------------------------------------------------------
-  const saleTxns = saleToTransactions(records.sales)
-  const purchaseTxns = purchaseToTransactions(records.purchases)
-  const returnTxns = purchaseReturnToTransactions(records.purchaseReturns)
-  const workingTxns = workingCostToTransactions(records.workingCosts)
-  const expenseTxns = generalExpenseToTransactions(records.generalExpenses)
-  const expenseSaleTxns = expenseSaleToTransactions(records.expenseSales)
-  const integTxns = integrationBookToTransactions(records.integrationBooks)
-  const purchaseBookTxns = purchaseBookToTransactions(records.purchaseBooks)
-  const investorTxns = investorTransactionToTransactions(
-    records.investorTransactions
-  )
+    // -----------------------------------------------------------------------
+    // PHASE 2 — Transform each category into unified transactions
+    // -----------------------------------------------------------------------
+    const saleTxns = saleToTransactions(records.sales)
+    const purchaseTxns = purchaseToTransactions(records.purchases)
+    const returnTxns = purchaseReturnToTransactions(records.purchaseReturns)
+    const workingTxns = workingCostToTransactions(records.workingCosts)
+    const expenseTxns = generalExpenseToTransactions(records.generalExpenses)
+    const expenseSaleTxns = expenseSaleToTransactions(records.expenseSales)
+    const integTxns = integrationBookToTransactions(records.integrationBooks)
+    const purchaseBookTxns = purchaseBookToTransactions(records.purchaseBooks)
+    const investorTxns = investorTransactionToTransactions(
+      records.investorTransactions
+    )
 
-  // -----------------------------------------------------------------------
-  // PHASE 3 — Merge & sort by date
-  // -----------------------------------------------------------------------
-  const sorted = mergeAndSort(
-    saleTxns,
-    purchaseTxns,
-    returnTxns,
-    workingTxns,
-    expenseTxns,
-    expenseSaleTxns,
-    integTxns,
-    purchaseBookTxns,
-    investorTxns
-  )
+    // -----------------------------------------------------------------------
+    // PHASE 3 — Merge & sort by date
+    // -----------------------------------------------------------------------
+    const sorted = mergeAndSort(
+      saleTxns,
+      purchaseTxns,
+      returnTxns,
+      workingTxns,
+      expenseTxns,
+      expenseSaleTxns,
+      integTxns,
+      purchaseBookTxns,
+      investorTxns
+    )
 
-  // -----------------------------------------------------------------------
-  // PHASE 4 — Filter by purpose (before running balance so balance reflects
-  //            the filtered subset)
-  // -----------------------------------------------------------------------
-  const filtered = filterByPurpose(sorted, purpose)
+    // -----------------------------------------------------------------------
+    // PHASE 4 — Filter by purpose (before running balance so balance reflects
+    //            the filtered subset)
+    // -----------------------------------------------------------------------
+    const filtered = filterByPurpose(sorted, purpose)
 
-  // -----------------------------------------------------------------------
-  // PHASE 5 — Running balance starting at openingBalance
-  // -----------------------------------------------------------------------
-  const withBalance = calculateRunningBalance(filtered, openingBalance)
+    // -----------------------------------------------------------------------
+    // PHASE 5 — Running balance starting at openingBalance
+    // -----------------------------------------------------------------------
+    const withBalance = calculateRunningBalance(filtered, openingBalance)
 
-  // -----------------------------------------------------------------------
-  // PHASE 6 — Derive summary + breakdown from raw data
-  // -----------------------------------------------------------------------
-  const summary = deriveSummary(withBalance, records, openingBalance)
-  const breakdown = buildBreakdown(records)
+    // -----------------------------------------------------------------------
+    // PHASE 6 — Derive summary + breakdown from raw data
+    // -----------------------------------------------------------------------
+    const summary = deriveSummary(withBalance, records, openingBalance)
+    const breakdown = buildBreakdown(records)
 
-  // -----------------------------------------------------------------------
-  // FORMAT — Round, format dates, reverse for newest-first output
-  // -----------------------------------------------------------------------
-  const transactions = formatTransactions(withBalance).reverse()
+    // -----------------------------------------------------------------------
+    // FORMAT — Round, format dates, reverse for newest-first output
+    // -----------------------------------------------------------------------
+    const transactions = formatTransactions(withBalance).reverse()
 
-  return {
-    opening_balance: round(openingBalance),
-    from_date: from_date || null,
-    to_date: to_date || null,
-    summary,
-    breakdown,
-    transactions,
+    return {
+      opening_balance: round(openingBalance),
+      from_date: from_date || null,
+      to_date: to_date || null,
+      summary,
+      breakdown,
+      transactions,
+    }
+  } catch (err) {
+    console.log('balance sheet error', err)
   }
 }
 
