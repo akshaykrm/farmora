@@ -9,8 +9,17 @@ const getNames = async () => {
   return records
 }
 
+const create = async (payload) => {
+  const [record] = await BrandModel.findOrCreate({
+    where: { name: payload.name },
+    defaults: { name: payload.name, status: 'active' },
+  })
+  return record
+}
+
 const brandService = {
   getNames,
+  create,
 }
 
 export default brandService

@@ -17,7 +17,16 @@ const useGetBrandNames = () => {
       });
   }, []);
 
-  return { data: state };
+  const addBrand = (brand: NameResponse) => {
+    setState((prev) => {
+      if (prev.some((b) => b.id === brand.id)) return prev;
+      return [...prev, brand].sort((a, b) =>
+        a.name.localeCompare(b.name),
+      );
+    });
+  };
+
+  return { data: state, addBrand };
 };
 
 export default useGetBrandNames;

@@ -7,12 +7,12 @@ import type { ValidationError } from "@errors/api.error";
 import { useEffect } from "react";
 import { itemTypes } from "..";
 import { RHFTextField } from "@components/form/input";
+import BrandSelect from "@components/brand-select";
 import useGetBrandNames from "@hooks/use-get-brand-names";
-import Ternary from "@components/ternary";
 
 type Props = {
   defaultValues: DefaultValues<ItemFormValues>;
-  onSubmit: (payload: any) => void;
+  onSubmit: (payload: ItemFormValues) => void;
   apiError: ValidationError[];
   onCancel?: () => void;
 };
@@ -51,12 +51,13 @@ const ItemForm = ({ onSubmit, defaultValues, apiError, onCancel }: Props) => {
     <>
       <form {...methods} onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={2} className="mt-2">
-          <SelectList
+          <BrandSelect
             label="Choose Brand"
             name="brand_id"
             options={brandNames.data}
             value={watch("brand_id")}
             onChange={(v) => setValue("brand_id", v ? v : "")}
+            onBrandCreated={(brand) => brandNames.addBrand(brand)}
             error={Boolean(errors.brand_id)}
             helperText={errors.brand_id?.message}
           />
