@@ -197,6 +197,18 @@ const getSeasonProfit = async (filter, currentUser) => {
     return row
   })
 
+  const batchProfit = batches.map((b) => {
+    const total = monthKeys.reduce(
+      (sum, key) => sum + (profitByMonth[key][b.id] || 0),
+      0
+    )
+    return {
+      id: b.id,
+      name: b.name,
+      profit: parseFloat(total.toFixed(2)),
+    }
+  })
+
   return {
     season: {
       id: season.id,
@@ -206,6 +218,7 @@ const getSeasonProfit = async (filter, currentUser) => {
     },
     batches: batches.map((b) => ({ id: b.id, name: b.name })),
     series,
+    batchProfit,
   }
 }
 

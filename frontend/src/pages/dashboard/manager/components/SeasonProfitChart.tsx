@@ -7,7 +7,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
 } from "recharts";
 import fetcher from "@utils/fetcher";
@@ -21,11 +20,7 @@ type SeasonName = {
 type SeasonProfitBatch = {
   id: number;
   name: string;
-};
-
-type SeasonProfitSeriesRow = {
-  month: string;
-  [batchId: number]: number;
+  profit: number;
 };
 
 type SeasonProfitData = {
@@ -35,54 +30,36 @@ type SeasonProfitData = {
     from_date: string | null;
     to_date: string | null;
   };
-  batches: SeasonProfitBatch[];
-  series: SeasonProfitSeriesRow[];
+  batches: { id: number; name: string }[];
+  batchProfit: SeasonProfitBatch[];
 };
-
-const CHART_COLORS = [
-  "#16a34a",
-  "#2563eb",
-  "#f59e0b",
-  "#ec4899",
-  "#8b5cf6",
-  "#14b8a6",
-  "#f43f5e",
-  "#84cc16",
-  "#0ea5e9",
-  "#d946ef",
-];
 
 interface CustomTooltipProps {
   active?: boolean;
   payload?: Array<{
-    dataKey: number;
-    name: string;
+    payload: SeasonProfitBatch;
     value: number;
-    color: string;
   }>;
   label?: string;
 }
 
-const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
+const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
+    const entry = payload[0];
+    const value = entry.value ?? entry.payload?.profit ?? 0;
     return (
       <div className="bg-slate-900 text-white p-3 rounded-xl shadow-xl border border-slate-800 text-xs min-w-[180px]">
-        <p className="font-bold mb-2">{label}</p>
-        {payload.map((entry) => (
-          <p
-            key={entry.dataKey}
-            className="flex items-center justify-between gap-4 mb-1"
-          >
-            <span className="flex items-center gap-2">
-              <span
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: entry.color }}
-              />
-              {entry.name}
-            </span>
-            <span>₹{Number(entry.value).toLocaleString()}</span>
-          </p>
-        ))}
+        <p className="font-bold mb-2">{entry.payload?.name}</p>
+        <p className="flex items-center justify-between gap-4">
+          <span className="flex items-center gap-2">
+            <span
+              className="w-2 h-2 rounded-full"
+              style={{ backgroundColor: "#16a34a" }}
+            />
+            Profit
+          </span>
+          <span>₹{Number(value).toLocaleString()}</span>
+        </p>
       </div>
     );
   }
@@ -171,7 +148,7 @@ const SeasonProfitChart = () => {
               Failed to load season profit data
             </p>
           </div>
-        ) : !data || data.series.length === 0 || data.batches.length === 0 ? (
+        ) : !data || data.batchProfit.length === 0 ? (
           <div className="flex items-center justify-center h-72">
             <p className="text-sm text-brand-ink-muted">
               No profit data for this season yet
@@ -180,26 +157,20 @@ const SeasonProfitChart = () => {
         ) : (
           <ResponsiveContainer width="100%" height={320}>
             <AreaChart
-              data={data.series}
+              data={data.batchProfit}
               margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
             >
               <defs>
-                {data.batches.map((batch, idx) => {
-                  const color = CHART_COLORS[idx % CHART_COLORS.length];
-                  return (
-                    <linearGradient
-                      key={batch.id}
-                      id={`seasonProfit-${batch.id}`}
-                      x1="0"
-                      y1="0"
-                      x2="0"
-                      y2="1"
-                    >
-                      <stop offset="5%" stopColor={color} stopOpacity={0.2} />
-                      <stop offset="95%" stopColor={color} stopOpacity={0} />
-                    </linearGradient>
-                  );
-                })}
+                <linearGradient
+                  id="seasonProfit"
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
+                >
+                  <stop offset="5%" stopColor="#16a34a" stopOpacity={0.2} />
+                  <stop offset="95%" stopColor="#16a34a" stopOpacity={0} />
+                </linearGradient>
               </defs>
               <CartesianGrid
                 strokeDasharray="3 3"
@@ -207,11 +178,14 @@ const SeasonProfitChart = () => {
                 stroke="#f1f5f9"
               />
               <XAxis
-                dataKey="month"
+                dataKey="name"
                 tick={{ fontSize: 10, fill: "#94a3b8" }}
                 axisLine={false}
                 tickLine={false}
-                minTickGap={20}
+                interval={0}
+                angle={-20}
+                textAnchor="end"
+                height={45}
               />
               <YAxis
                 tick={{ fontSize: 10, fill: "#94a3b8" }}
@@ -222,29 +196,17 @@ const SeasonProfitChart = () => {
                 }
               />
               <Tooltip content={<CustomTooltip />} />
-              <Legend
-                verticalAlign="top"
-                height={36}
-                iconType="circle"
-                wrapperStyle={{ fontSize: 12 }}
+              <Area
+                type="monotone"
+                dataKey="profit"
+                name="Profit"
+                stroke="#16a34a"
+                strokeWidth={2}
+                fill="url(#seasonProfit)"
+                fillOpacity={1}
+                dot={{ r: 4, fill: "#16a34a", strokeWidth: 0 }}
+                activeDot={{ r: 6, strokeWidth: 0 }}
               />
-              {data.batches.map((batch, idx) => {
-                const color = CHART_COLORS[idx % CHART_COLORS.length];
-                return (
-                  <Area
-                    key={batch.id}
-                    type="monotone"
-                    dataKey={String(batch.id)}
-                    name={batch.name}
-                    stroke={color}
-                    strokeWidth={2}
-                    fill={`url(#seasonProfit-${batch.id})`}
-                    fillOpacity={1}
-                    dot={false}
-                    activeDot={{ r: 4, strokeWidth: 0 }}
-                  />
-                );
-              })}
             </AreaChart>
           </ResponsiveContainer>
         )}
