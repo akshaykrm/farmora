@@ -394,6 +394,10 @@ const getSeasonOverview = async (filter, currentUser) => {
   )
   const gs_totalPages = Math.ceil(gs_count / gs_limit)
 
+  const total_batch_profit = parseFloat(totalBatchProfit)
+  const total_general_cost = parseFloat(totalGeneralCost)
+  const total_general_sales = parseFloat(totalGeneralSales)
+
   return {
     season: { id: season.id, name: season.name, closed_on: season.closed_on },
     batches: {
@@ -421,9 +425,11 @@ const getSeasonOverview = async (filter, currentUser) => {
       profit: totals.totalSaleAmount - totalExpense,
     },
     summary: {
-      total_batch_profit: parseFloat(totalBatchProfit.toFixed(2)),
-      total_general_cost: parseFloat(totalGeneralCost.toFixed(2)),
-      total_general_sales: parseFloat(totalGeneralSales.toFixed(2)),
+      total_batch_profit,
+      total_general_cost,
+      total_general_sales,
+      net_season_profit:
+        total_general_sales + total_batch_profit - total_general_cost,
       investor_profit: parseFloat(investorProfit.toFixed(2)),
     },
   }

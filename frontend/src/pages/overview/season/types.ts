@@ -19,6 +19,7 @@ type SeasonOverviewSummary = {
   total_general_cost: number;
   total_general_sales: number;
   investor_profit: number;
+  net_season_profit: number;
 };
 
 export type Totals = {

@@ -43,7 +43,12 @@ const SeasonOverviewPage = () => {
             otherwise={
               <Ternary
                 when={isEmpty}
-                then={<EmptyContentMessage title="No data found" description="No records available for the selected season" />}
+                then={
+                  <EmptyContentMessage
+                    title="No data found"
+                    description="No records available for the selected season"
+                  />
+                }
                 otherwise={
                   <>
                     <SeasonInformation
@@ -53,6 +58,7 @@ const SeasonOverviewPage = () => {
                       season_id={season?.id || null}
                     />
                     <InvestorProfitSummary
+                      netSeasonProfit={summary?.net_season_profit || 0}
                       totalProfit={summary?.total_batch_profit || 0}
                       totalGeneralCost={summary?.total_general_cost || 0}
                       totalGeneralSale={summary?.total_general_sales || 0}
