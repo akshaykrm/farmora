@@ -7,7 +7,7 @@ import EmptyContentMessage from "@components/EmptyContentMessage";
 import Ternary from "@components/ternary";
 import type { Item } from "../types";
 
-const headers = ["ID", "Name", "Base Price", "Type", "Vendor", "Action"];
+const headers = ["ID", "Brand Name", "Base Price", "Type", "Vendor", "Action"];
 
 type Props = {
   onEdit: (selectedId: number) => void;
