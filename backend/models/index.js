@@ -22,6 +22,7 @@ import PurchaseBookModel from './purchasebook.js'
 import InvestorManagementModel from './investorManagement.js'
 import InvestorTransactionTypeModel from './investorTransactionType.js'
 import InvestorTransactionModel from './investorTransaction.js'
+import BrandModel from './brand.js'
 
 UserModel.hasMany(SubscriptionModel, {
   foreignKey: 'user_id',
@@ -305,4 +306,5 @@ export {
   InvestorManagementModel,
   InvestorTransactionTypeModel,
   InvestorTransactionModel,
+  BrandModel,
 }

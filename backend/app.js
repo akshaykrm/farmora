@@ -26,6 +26,7 @@ import balanceSheetRouter from '@routes/balance-sheet.router'
 import invoiceConfigRouter from '@routes/invoice_config.router'
 import investorManagementRoutes from './src/investors/management/management.routes.js'
 import investorLedgerRoutes from './src/investors/ledger/ledger.routes.js'
+import brandRouter from '@routes/brand.router'
 
 import responseHandler from '@middlewares/response.middleware'
 import globalErrorHandler from '@middlewares/error.middleware'
@@ -63,6 +64,7 @@ app.use('/api/balance-sheet', balanceSheetRouter)
 app.use('/api/invoice', invoiceConfigRouter)
 app.use('/api/investors/ledger', investorLedgerRoutes)
 app.use('/api/investors', investorManagementRoutes)
+app.use('/api/brands', brandRouter)
 
 app.get('/', (_, res) => {
   res.json({ message: 'server is up and running', status: 'ok' })

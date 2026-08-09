@@ -7,6 +7,7 @@ import type { ValidationError } from "@errors/api.error";
 import { useEffect } from "react";
 import { itemTypes } from "..";
 import { RHFTextField } from "@components/form/input";
+import useGetBrandNames from "@hooks/use-get-brand-names";
 
 type Props = {
   defaultValues: DefaultValues<ItemFormValues>;
@@ -33,6 +34,7 @@ const ItemForm = ({ onSubmit, defaultValues, apiError, onCancel }: Props) => {
   useEffect(() => {
     reset(defaultValues);
   }, [defaultValues]);
+  const brandNames = useGetBrandNames();
   const sellerList = useGetVendorNames({ type: "supplier" });
   const vendorID = watch("vendor_id");
 
@@ -47,9 +49,9 @@ const ItemForm = ({ onSubmit, defaultValues, apiError, onCancel }: Props) => {
   return (
     <>
       <form {...methods} onSubmit={handleSubmit(onSubmit)}>
-        <Stack spacing={2}>
+        <Stack spacing={2} className="mt-2">
           <RHFTextField
-            label="Name"
+            label="Brand Name"
             name="name"
             control={control}
             fullWidth
