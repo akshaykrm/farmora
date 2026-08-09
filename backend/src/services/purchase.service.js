@@ -155,7 +155,7 @@ const getPurchaseBook = async (filter, currentUser) => {
       id: p.id,
       date: p.date,
       amount: p.amount,
-      type: 'cached-out',
+      type: 'cash-out',
     }
   })
 
