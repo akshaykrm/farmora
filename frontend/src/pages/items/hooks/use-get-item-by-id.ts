@@ -4,7 +4,8 @@ import employee from "../api";
 
 const defaultValues: ItemFormValues = {
   base_price: "",
-  name: "",
+  name: null,
+  brand_id: "",
   type: "",
   vendor_id: "",
 };
@@ -19,12 +20,13 @@ const useGetItemById = (selectedId: number | null) => {
       const res = await employee.fetchById(id);
       if (res.status === "success") {
         if (res.data) {
-          const { name, type, base_price, vendor_id } = res.data;
+          const { name, type, base_price, vendor_id, brand_id } = res.data;
           setSelectedData({
             name,
             type,
             base_price,
             vendor_id,
+            brand_id: brand_id ?? "",
           });
           setdataLoaded(true);
         }

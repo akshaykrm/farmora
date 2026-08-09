@@ -24,13 +24,19 @@ const items = {
   fetchById: (id: number) =>
     fetcherV2<ItemFormValues>(`items/categories/${id}`),
   create: async (payload: ItemFormValues) => {
-    return await fetcherV2("items/categories", JSON.stringify(payload), {
+    const body = {
+      brand_id: payload.brand_id || null,
+      base_price: payload.base_price,
+      type: payload.type,
+      vendor_id: payload.vendor_id,
+    };
+    return await fetcherV2("items/categories", JSON.stringify(body), {
       method: "POST",
     });
   },
   updateById: async (id: number, updateData: ItemFormValues) => {
     const payload: ItemFormValues = {
-      name: updateData.name,
+      brand_id: updateData.brand_id || null,
       type: updateData.type,
       base_price: updateData.base_price,
       vendor_id: updateData.vendor_id,

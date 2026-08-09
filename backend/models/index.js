@@ -23,7 +23,6 @@ import InvestorManagementModel from './investorManagement.js'
 import InvestorTransactionTypeModel from './investorTransactionType.js'
 import InvestorTransactionModel from './investorTransaction.js'
 import BrandModel from './brand.js'
-
 UserModel.hasMany(SubscriptionModel, {
   foreignKey: 'user_id',
   as: 'subscriptions',
@@ -126,6 +125,12 @@ UserRoleAssignment.belongsTo(UserModel, {
 PurchaseModel.belongsTo(ItemModel, {
   foreignKey: 'category_id',
   as: 'category',
+  targetKey: 'id',
+})
+
+ItemModel.belongsTo(BrandModel, {
+  foreignKey: 'brand_id',
+  as: 'brand',
   targetKey: 'id',
 })
 

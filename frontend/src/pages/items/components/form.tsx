@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { itemTypes } from "..";
 import { RHFTextField } from "@components/form/input";
 import useGetBrandNames from "@hooks/use-get-brand-names";
+import Ternary from "@components/ternary";
 
 type Props = {
   defaultValues: DefaultValues<ItemFormValues>;
@@ -50,12 +51,14 @@ const ItemForm = ({ onSubmit, defaultValues, apiError, onCancel }: Props) => {
     <>
       <form {...methods} onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={2} className="mt-2">
-          <RHFTextField
-            label="Brand Name"
-            name="name"
-            control={control}
-            fullWidth
-            size="small"
+          <SelectList
+            label="Choose Brand"
+            name="brand_id"
+            options={brandNames.data}
+            value={watch("brand_id")}
+            onChange={(v) => setValue("brand_id", v ? v : "")}
+            error={Boolean(errors.brand_id)}
+            helperText={errors.brand_id?.message}
           />
           <RHFTextField
             label="Base Price"

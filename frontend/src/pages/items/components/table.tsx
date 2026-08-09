@@ -28,7 +28,7 @@ const ItemTable = ({ onEdit, data }: Props) => {
         {data.map((item, i) => (
           <TableRow key={item.id}>
             <TableCell content={i + 1} />
-            <TableCell content={item.name} />
+            <TableCell content={item.brand?.name || item.name || "-"} />
             <TableCell content={item.base_price} />
             <TableCell
               content={<span className="capitalize">{item.type}</span>}

@@ -1,5 +1,6 @@
 import { ItemCategoryNotFoundError } from '@errors/item-category.errors'
 import VendorModel from '@models/vendor'
+import BrandModel from '@models/brand'
 import ItemModel from '@models/items.model'
 import userRoles from '@utils/user-roles'
 import { Op } from 'sequelize'
@@ -70,7 +71,10 @@ const getAll = async (payload, currentUser) => {
     limit,
     offset,
     order: [['id', 'DESC']],
-    include: [{ model: VendorModel, as: 'vendor', required: true }],
+    include: [
+      { model: VendorModel, as: 'vendor', required: true },
+      { model: BrandModel, as: 'brand', required: false },
+    ],
   })
 
   const totalPages = Math.ceil(count / limit)
