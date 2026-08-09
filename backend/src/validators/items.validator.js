@@ -8,9 +8,9 @@ export const newItemCategory = Joi.object({
     .valid(
       'chick',
       'medicine',
-      'BF',
-      'BS',
-      'PBS',
+      'FINISHER',
+      'STARTER',
+      'PRE STARTER',
       'integration',
       'working',
       'regular'

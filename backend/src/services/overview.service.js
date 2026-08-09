@@ -14,7 +14,7 @@ import BatchModel from '@models/batch'
 import { calculateOffSet } from '@utils/pagination'
 
 function isFeedType(type) {
-  return type === 'BF' || type === 'BS' || type === 'PBS'
+  return type === 'FINISHER' || type === 'STARTER' || type === 'PRE STARTER'
 }
 
 function calculateTotalFeeds(records = []) {

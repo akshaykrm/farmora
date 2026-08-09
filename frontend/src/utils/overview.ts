@@ -9,9 +9,9 @@ import { roundNumber } from "./number";
 
 const isInlcudedInExpense = (item: BatchOverviewExpense) => {
   return (
-    item.category_type === "BF" ||
-    item.category_type === "BS" ||
-    item.category_type === "PBS"
+    item.category_type === "FINISHER" ||
+    item.category_type === "STARTER" ||
+    item.category_type === "PRE STARTER"
   );
 };
 const batchOverview = {
@@ -22,9 +22,9 @@ const batchOverview = {
       .reduce(
         (acc, item) => {
           console.log(
-            item.category_type === "BF" ||
-              item.category_type === "BS" ||
-              item.category_type === "PBS",
+            item.category_type === "FINISHER" ||
+              item.category_type === "STARTER" ||
+              item.category_type === "PRE STARTER",
           );
           return {
             quantity: acc.quantity + item.quantity,

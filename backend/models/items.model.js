@@ -24,9 +24,9 @@ const ItemModel = sequelize.define(
       type: Sequelize.ENUM(
         'chick',
         'medicine',
-        'BF',
-        'BS',
-        'PBS',
+        'FINISHER',
+        'STARTER',
+        'PRE STARTER',
         'integration',
         'working',
         'regular'

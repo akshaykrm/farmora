@@ -7,9 +7,9 @@ export const itemTypes = [
   { label: "Regular", value: "regular" },
   { label: "Chick", value: "chick" },
   // { label: "Medicine", value: "medicine" },
-  { label: "BF", value: "BF" },
-  { label: "BS", value: "BS" },
-  { label: "PBS", value: "PBS" },
+  { label: "FINISHER", value: "FINISHER" },
+  { label: "STARTER", value: "STARTER" },
+  { label: "PRE STARTER", value: "PRE STARTER" },
   { label: "Integration", value: "integration" },
   { label: "Working", value: "working" },
 ];
