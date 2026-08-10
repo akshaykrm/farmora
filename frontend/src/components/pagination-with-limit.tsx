@@ -52,7 +52,7 @@ function PaginationWithLimit(props: PaginationProps) {
       <LimitSelect
         limit={limit}
         limits={limits}
-        onChange={(l) => onChange({ limit: l })}
+        onChange={(l) => onChange({ limit: l, page: 1 })}
       />
       <Pagination
         count={totalPages}
