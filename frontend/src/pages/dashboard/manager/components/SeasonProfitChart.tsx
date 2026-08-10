@@ -24,14 +24,7 @@ type SeasonProfitBatch = {
 };
 
 type SeasonProfitData = {
-  season: {
-    id: number;
-    name: string;
-    from_date: string | null;
-    to_date: string | null;
-  };
-  batches: { id: number; name: string }[];
-  batchProfit: SeasonProfitBatch[];
+  profits: SeasonProfitBatch[];
 };
 
 interface CustomTooltipProps {
@@ -148,7 +141,7 @@ const SeasonProfitChart = () => {
               Failed to load season profit data
             </p>
           </div>
-        ) : !data || data.batchProfit.length === 0 ? (
+        ) : !data || data.profits.length === 0 ? (
           <div className="flex items-center justify-center h-72">
             <p className="text-sm text-brand-ink-muted">
               No profit data for this season yet
@@ -157,7 +150,7 @@ const SeasonProfitChart = () => {
         ) : (
           <ResponsiveContainer width="100%" height={320}>
             <AreaChart
-              data={data.batchProfit}
+              data={data.profits}
               margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
             >
               <defs>

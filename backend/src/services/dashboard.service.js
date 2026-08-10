@@ -1,7 +1,6 @@
 import BatchModel from '@models/batch'
 import SalesModel from '@models/sales'
 import PurchaseModel from '@models/purchase'
-import PurchaseReturnModel from '@models/purchase-return'
 import UserModel from '@models/user'
 import SubscriptionModel from '@models/subscription'
 import PackageModel from '@models/package'
@@ -9,7 +8,6 @@ import ItemModel from '@models/items.model'
 import userRoles from '@utils/user-roles'
 import { Op } from 'sequelize'
 import logger from '@utils/logger'
-import dayjs from 'dayjs'
 import { getAllPurchaseWithBatchActive } from '@services/purchase.service'
 import {
   getAllClosedBatches,
@@ -81,145 +79,28 @@ async function getAverageProfitFromClosedBatches(
 const getSeasonProfit = async (filter, currentUser) => {
   const { season_id } = filter
 
-  const season = await seasonService.getById(season_id, currentUser)
   const batches = await getAllBySeasonId(season_id, currentUser)
 
-  const batchIds = batches.map((b) => b.id)
-
-  const userWhereClause = {}
-  if (currentUser.user_type === userRoles.staff.type) {
-    userWhereClause.master_id = currentUser.master_id
-  } else if (currentUser.user_type === userRoles.manager.type) {
-    userWhereClause.master_id = currentUser.id
-  }
-
-  const [sales, purchases, reassignedIn, returnsOut] = await Promise.all([
-    SalesModel.findAll({
-      where: {
-        batch_id: { [Op.in]: batchIds },
-        season_id: { [Op.ne]: null },
-        ...userWhereClause,
-      },
-      attributes: ['batch_id', 'amount', 'date'],
-    }),
-    PurchaseModel.findAll({
-      where: {
-        batch_id: { [Op.in]: batchIds },
-        ...userWhereClause,
-      },
-      attributes: ['batch_id', 'net_amount', 'invoice_date'],
-    }),
-    PurchaseReturnModel.findAll({
-      where: {
-        to_batch: { [Op.in]: batchIds },
-        ...userWhereClause,
-      },
-      attributes: ['to_batch', 'total_amount', 'date'],
-    }),
-    PurchaseReturnModel.findAll({
-      where: {
-        from_batch: { [Op.in]: batchIds },
-        ...userWhereClause,
-      },
-      attributes: ['from_batch', 'total_amount', 'date'],
-    }),
-  ])
-
-  const earliestDate = [
-    ...sales.map((s) => s.date),
-    ...purchases.map((p) => p.invoice_date),
-    ...reassignedIn.map((r) => r.date),
-    ...returnsOut.map((r) => r.date),
-    ...batches.map((b) => b.created_at),
-  ]
-    .filter(Boolean)
-    .map((d) => dayjs(d))
-    .sort((a, b) => a.valueOf() - b.valueOf())[0]
-
-  const startDate = (season.from_date
-    ? dayjs(season.from_date)
-    : earliestDate || dayjs()
-  ).startOf('month')
-  const endDate = (season.to_date ? dayjs(season.to_date) : dayjs()).startOf(
-    'month'
+  const batchOverviews = await Promise.all(
+    batches.map((b) =>
+      overviewService.getBatchOverview({ batch_id: b.id }, currentUser)
+    )
   )
 
-  const monthKeys = []
-  let cursor = startDate
-  while (cursor.isSame(endDate) || cursor.isBefore(endDate)) {
-    monthKeys.push(cursor.format('YYYY-MM'))
-    cursor = cursor.add(1, 'month')
-  }
-
-  if (monthKeys.length === 0) {
-    monthKeys.push(dayjs().format('YYYY-MM'))
-  }
-
-  const profitByMonth = {}
-  for (const key of monthKeys) {
-    profitByMonth[key] = {}
-  }
-
-  sales.forEach((s) => {
-    const key = dayjs(s.date).format('YYYY-MM')
-    if (!profitByMonth[key]) return
-    profitByMonth[key][s.batch_id] =
-      (profitByMonth[key][s.batch_id] || 0) + parseFloat(s.amount)
-  })
-
-  purchases.forEach((p) => {
-    const key = dayjs(p.invoice_date).format('YYYY-MM')
-    if (!profitByMonth[key]) return
-    profitByMonth[key][p.batch_id] =
-      (profitByMonth[key][p.batch_id] || 0) - parseFloat(p.net_amount)
-  })
-
-  reassignedIn.forEach((r) => {
-    const key = dayjs(r.date).format('YYYY-MM')
-    if (!profitByMonth[key]) return
-    profitByMonth[key][r.to_batch] =
-      (profitByMonth[key][r.to_batch] || 0) - parseFloat(r.total_amount)
-  })
-
-  returnsOut.forEach((r) => {
-    const key = dayjs(r.date).format('YYYY-MM')
-    if (!profitByMonth[key]) return
-    profitByMonth[key][r.from_batch] =
-      (profitByMonth[key][r.from_batch] || 0) + parseFloat(r.total_amount)
-  })
-
-  const series = monthKeys.map((key) => {
-    const row = { month: dayjs(key).format('MMM YY') }
-    batches.forEach((b) => {
-      const value = profitByMonth[key][b.id] || 0
-      row[b.id] = parseFloat(value.toFixed(2))
-    })
-    return row
-  })
-
-  const batchProfit = batches.map((b) => {
-    const total = monthKeys.reduce(
-      (sum, key) => sum + (profitByMonth[key][b.id] || 0),
-      0
-    )
+  const profits = batchOverviews.map((overview, index) => {
+    const res = overview.overviewCalculations
     return {
-      id: b.id,
-      name: b.name,
-      profit: parseFloat(total.toFixed(2)),
+      id: batches[index].id,
+      name: batches[index].name,
+      profit: parseFloat(
+        (
+          parseFloat(res.total_sale_amount) - parseFloat(res.total_expense)
+        ).toFixed(2)
+      ),
     }
   })
 
-  return {
-    season: {
-      id: season.id,
-      name: season.name,
-      from_date: season.from_date,
-      to_date: season.to_date,
-    },
-    batches: batches.map((b) => ({ id: b.id, name: b.name })),
-    series,
-    batchProfit,
-  }
+  return { profits }
 }
 
 const getManagerDashboard = async (currentUser) => {
