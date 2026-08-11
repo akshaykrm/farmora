@@ -28,8 +28,9 @@ const getNames = async (currentUser, filter) => {
 
   const records = await BatchModel.findAll({
     where: filter,
-    attributes: ['id', 'name'],
+    attributes: ['id', 'name', 'created_at'],
     limit: 50,
+    order: [['created_at', 'DESC']],
   })
   return records
 }
