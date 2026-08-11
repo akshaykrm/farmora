@@ -1,4 +1,9 @@
-import { CircleDollarSign, HandCoins, PiggyBank, TrendingUp } from "lucide-react";
+import {
+  CircleDollarSign,
+  HandCoins,
+  PiggyBank,
+  TrendingUp,
+} from "lucide-react";
 import CardStat from "@components/CardStat";
 import { formatCurrency } from "@utils/currency";
 

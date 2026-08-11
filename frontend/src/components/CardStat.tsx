@@ -16,7 +16,7 @@ const CardStat = ({ label, value, icon, valueClassName = "" }: Props) => {
             {label}
           </h3>
           <p
-            className={`text-3xl font-bold tracking-tight text-brand-ink tabular-nums ${valueClassName}`}
+            className={`text-2xl font-bold tracking-tight text-brand-ink tabular-nums ${valueClassName}`}
           >
             {value}
           </p>

@@ -5,6 +5,7 @@ import TableRow from "@components/TableRow";
 import dayjs from "dayjs";
 import { roundNumber } from "@utils/number";
 import type { BatchOverviewItem, Totals } from "../types";
+import { formatCurrency } from "@utils/currency";
 
 const batchHeaders = [
   "Batch Name",
@@ -14,7 +15,7 @@ const batchHeaders = [
   "CFSR",
   "Avg Cost",
   "Avg Rate",
-  "Profit/Loss %",
+  "Profit/Loss",
   "Profit",
 ];
 
@@ -24,17 +25,7 @@ type BatchOverviewTableProps = {
 };
 
 const BatchOverviewTable = (props: BatchOverviewTableProps) => {
-  const { data, totals } = props;
-
-  const {
-    total_avg_weight,
-    cfcr,
-    fcr,
-    avg_cost,
-    avg_rate,
-    profit,
-    profit_loss_percentage,
-  } = totals;
+  const { data } = props;
 
   return (
     <>
@@ -71,26 +62,15 @@ const BatchOverviewTable = (props: BatchOverviewTableProps) => {
               <TableCell content={roundNumber(avg_weight)} />
               <TableCell content={roundNumber(fcr)} />
               <TableCell content={roundNumber(cfcr)} />
-              <TableCell content={roundNumber(avgCost)} />
-              <TableCell content={roundNumber(avgRate)} />
-              <TableCell content={roundNumber(avgRate - avgCost)} />
+              <TableCell content={formatCurrency(avgCost)} />
+              <TableCell content={formatCurrency(avgRate)} />
+              <TableCell content={formatCurrency(avgRate - avgCost)} />
               <TableCell
-                content={roundNumber(total_sale_amount - total_expense)}
+                content={formatCurrency(total_sale_amount - total_expense)}
               />
             </TableRow>
           );
         })}
-        <TableRow>
-          <TableCell content={"Totals: "} />
-          <TableCell content="-" />
-          <TableCell content={roundNumber(total_avg_weight)} />
-          <TableCell content={roundNumber(fcr)} />
-          <TableCell content={roundNumber(cfcr)} />
-          <TableCell content={roundNumber(avg_cost)} />
-          <TableCell content={roundNumber(avg_rate)} />
-          <TableCell content={roundNumber(profit_loss_percentage)} />
-          <TableCell content={roundNumber(profit)} />
-        </TableRow>
       </Table>
     </>
   );
