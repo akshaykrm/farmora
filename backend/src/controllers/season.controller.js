@@ -14,9 +14,10 @@ const create = async (req, res) => {
 
 const getNames = async (req, res) => {
   const filter = {}
+  const { status } = req.query
 
-  if (req.query.status) {
-    filter.status = req.query.status
+  if (status) {
+    filter.status = status
   }
 
   const records = await seasonService.getNames(req.user, filter)

@@ -1,5 +1,9 @@
 import fetcherV2 from "@utils/fetcherV2";
-import type { SeasonListResponse, SeasonFormValues } from "./types";
+import type {
+  SeasonListResponse,
+  SeasonFormValues,
+  SeasonNameFilter,
+} from "./types";
 import fetcher from "@utils/fetcher";
 import type { Filter } from "@utils/filters";
 
@@ -11,8 +15,11 @@ const seasons = {
     };
     return fetcherV2<SeasonListResponse>("seasons", null, opts);
   },
-  getNames: () => {
-    return fetcher("seasons/names");
+  getNames: (filter?: SeasonNameFilter) => {
+    return fetcher("seasons/names", null, {
+      method: "GET",
+      filter,
+    });
   },
   fetchById: (id: number) => fetcherV2<SeasonFormValues>(`seasons/${id}`),
   create: async (payload: SeasonFormValues) =>

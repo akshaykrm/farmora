@@ -20,6 +20,10 @@ export type SeasonName = {
   name: string;
 };
 
+export type SeasonNameFilter = {
+  status?: "active" | "closed" | null | undefined;
+};
+
 export type SeasonFormValues = {
   name: string;
   from_date: string;

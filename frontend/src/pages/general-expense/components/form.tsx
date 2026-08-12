@@ -18,7 +18,7 @@ type Props = {
 
 const GeneralExpenseForm = (props: Props) => {
   const { onSubmit, defaultValues, apiErros, onCancel } = props;
-  const seasonNames = useGetSeasonNames();
+  const seasonNames = useGetSeasonNames({ status: "active" });
 
   const methods = useForm<GeneralExpanceFormValues>({
     defaultValues: defaultValues,

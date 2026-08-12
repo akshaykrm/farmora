@@ -24,7 +24,7 @@ const FilterGeneralExpense = ({ onFilter, defaultFilter }: Props) => {
     control,
   } = methods;
 
-  const seasonNames = useGetSeasonNames();
+  const seasonNames = useGetSeasonNames({ status: "active" });
   const values = watch();
 
   const handleApplyFilter = () => {
@@ -32,7 +32,12 @@ const FilterGeneralExpense = ({ onFilter, defaultFilter }: Props) => {
   };
 
   const handleClearAll = () => {
-    methods.reset({ season_id: null, purpose: "", start_date: "", end_date: "" });
+    methods.reset({
+      season_id: null,
+      purpose: "",
+      start_date: "",
+      end_date: "",
+    });
     onFilter({ season_id: null, purpose: "", start_date: "", end_date: "" });
   };
 

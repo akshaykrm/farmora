@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import serializeFilter from "@utils/serialie-filter";
-import useGetSeasonNameList from "@hooks/use-get-season-names";
+import useGetSeasonNames from "@hooks/use-get-season-names";
 import useGetBatchNameList from "@hooks/use-get-batch-names";
 import type { Filter } from "@utils/filters";
 
@@ -24,7 +24,7 @@ type Props = {
 };
 
 const SaleFilter = ({ handleFetch, defaultValues }: Props) => {
-  const seasonList = useGetSeasonNameList();
+  const seasonList = useGetSeasonNames({ status: "active" });
   const batchList = useGetBatchNameList({ status: "active" });
 
   const methods = useForm<SaleFilterType>({
@@ -121,7 +121,6 @@ const SaleFilter = ({ handleFetch, defaultValues }: Props) => {
             },
           }}
         />
-
       </div>
 
       <div className="flex justify-end">

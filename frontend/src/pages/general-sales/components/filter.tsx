@@ -16,7 +16,7 @@ const FilterGeneralSales = ({ onFilter, defaultFilter }: Props) => {
   const methods = useForm({
     defaultValues: defaultFilter,
   });
-  const seasonNames = useGetSeasonNames();
+  const seasonNames = useGetSeasonNames({ status: "active" });
 
   const {
     watch,
@@ -31,7 +31,12 @@ const FilterGeneralSales = ({ onFilter, defaultFilter }: Props) => {
   };
 
   const handleClearAll = () => {
-    methods.reset({ season_id: null, purpose: "", start_date: "", end_date: "" });
+    methods.reset({
+      season_id: null,
+      purpose: "",
+      start_date: "",
+      end_date: "",
+    });
     onFilter({ season_id: null, purpose: "", start_date: "", end_date: "" });
   };
 

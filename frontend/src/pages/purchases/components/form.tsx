@@ -1,5 +1,5 @@
 import SelectList from "@components/select-list";
-import useGetSeasonNameList from "@hooks/use-get-season-names";
+import useGetSeasonNames from "@hooks/use-get-season-names";
 import useGetVendorNames from "@hooks/use-get-vendor-name-list";
 import { TextField, Button, MenuItem } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
@@ -48,7 +48,7 @@ const PurchaseForm = ({
   const selectedCategoryId = watch("category_id") as number;
   const { handleGetItemsByVendorID, itemList } = useGetItemsByVendorId();
 
-  const seasonNames = useGetSeasonNameList();
+  const seasonNames = useGetSeasonNames({ status: "active" });
   //TODO: make this get by season id
   const batchList = useGetBatchNameList({
     status: "active",

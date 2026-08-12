@@ -22,6 +22,12 @@ const getNames = async (currentUser, filter) => {
     filter.master_id = currentUser.id
   }
 
+  if (filter.status === 'active') {
+    filter.closed_on = {
+      [Op.is]: null,
+    }
+  }
+
   const records = await SeasonModel.findAll({
     where: filter,
     attributes: ['id', 'name'],

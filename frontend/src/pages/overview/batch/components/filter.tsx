@@ -3,7 +3,7 @@ import SelectList from "@components/select-list";
 import type { BatchOverviewFilterRequest } from "@app-types/batch-overview.types";
 import { useForm } from "react-hook-form";
 import { useEffect } from "react";
-import useGetSeasonNameList from "@hooks/use-get-season-names";
+import useGetSeasonNames from "@hooks/use-get-season-names";
 import useGetBatchNameList from "@hooks/use-get-batch-names";
 import type { Filter } from "@utils/filters";
 import FilterCard from "@components/FilterCard";
@@ -25,7 +25,7 @@ const FilterBatchOverview = ({ onFilter, defaultValues }: Props) => {
   } = methods;
 
   const [seasonId, batchId] = watch(["season_id", "batch_id"]);
-  const seasonsList = useGetSeasonNameList();
+  const seasonsList = useGetSeasonNames();
   const batchList = useGetBatchNameList({
     season_id: seasonId,
   });

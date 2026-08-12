@@ -17,7 +17,7 @@ type Props = {
 };
 
 const BatchForm = ({ onSubmit, defaultValues, apiError, onCancel }: Props) => {
-  const seasonNames = useGetSeasonNames();
+  const seasonNames = useGetSeasonNames({ status: "active" });
   const farmNames = useGetFarmNames();
 
   const methods = useForm<BatchFormValues>({

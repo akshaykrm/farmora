@@ -23,7 +23,7 @@ const SaleForm = ({ methods, onSubmit, onCancel }: Props) => {
 
   const values = methods.watch();
 
-  const seasonNames = useGetSeasonNames();
+  const seasonNames = useGetSeasonNames({ status: "active" });
   const batchNames = useGetBatchNameList({
     status: "active",
   });
