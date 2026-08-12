@@ -23,6 +23,11 @@ export type ManagerRegistrationPayload = {
   password: string;
   status: number;
   package_id: number;
+  state?: string;
+  district?: string;
+  place?: string;
+  pincode?: string;
+  bird_capacity?: string;
 };
 
 export type AuthUser = {

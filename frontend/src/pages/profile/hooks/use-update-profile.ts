@@ -15,6 +15,11 @@ const useUpdateProfile: UseUpdateProfile = (opts) => {
       name: inputData.name,
       email: inputData.email,
       phone: inputData.phone,
+      state: inputData.state,
+      district: inputData.district,
+      place: inputData.place,
+      pincode: inputData.pincode,
+      bird_capacity: inputData.bird_capacity,
     });
     if (res.status === "success") {
       opts.onSuccess(inputData);

@@ -96,6 +96,39 @@ const ProfileForm = ({
             },
           })}
         />
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <TextField
+            label="State"
+            fullWidth
+            size="small"
+            {...register("state")}
+          />
+          <TextField
+            label="District"
+            fullWidth
+            size="small"
+            {...register("district")}
+          />
+          <TextField
+            label="Place"
+            fullWidth
+            size="small"
+            {...register("place")}
+          />
+          <TextField
+            label="Pincode"
+            fullWidth
+            size="small"
+            {...register("pincode")}
+          />
+          <TextField
+            label="Bird capacity"
+            fullWidth
+            size="small"
+            {...register("bird_capacity")}
+          />
+        </div>
       </div>
 
       <div className="flex justify-end mt-6 gap-2">

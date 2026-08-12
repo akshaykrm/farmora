@@ -57,6 +57,26 @@ const UserModel = sequelize.define(
       allowNull: true,
       field: 'last_login',
     },
+    state: {
+      type: Sequelize.STRING,
+      allowNull: true,
+    },
+    district: {
+      type: Sequelize.STRING,
+      allowNull: true,
+    },
+    place: {
+      type: Sequelize.STRING,
+      allowNull: true,
+    },
+    pincode: {
+      type: Sequelize.STRING,
+      allowNull: true,
+    },
+    bird_capacity: {
+      type: Sequelize.STRING,
+      allowNull: true,
+    },
   },
   {
     underscored: true,

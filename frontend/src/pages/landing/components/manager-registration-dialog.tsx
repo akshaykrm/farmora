@@ -38,6 +38,11 @@ const ManagerRegistrationDialog = ({
       password: "",
       status: 1,
       package_id: packageId,
+      state: "",
+      district: "",
+      place: "",
+      pincode: "",
+      bird_capacity: "",
     },
   });
 
@@ -223,6 +228,88 @@ const ManagerRegistrationDialog = ({
                 {errors.password.message}
               </p>
             )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label
+                htmlFor="state"
+                className="block text-sm font-medium text-brand-ink-soft mb-2"
+              >
+                State
+              </label>
+              <input
+                id="state"
+                type="text"
+                placeholder="Enter your state"
+                className="w-full px-4 py-3 border border-brand-border-strong rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all"
+                {...register("state")}
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="district"
+                className="block text-sm font-medium text-brand-ink-soft mb-2"
+              >
+                District
+              </label>
+              <input
+                id="district"
+                type="text"
+                placeholder="Enter your district"
+                className="w-full px-4 py-3 border border-brand-border-strong rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all"
+                {...register("district")}
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="place"
+                className="block text-sm font-medium text-brand-ink-soft mb-2"
+              >
+                Place
+              </label>
+              <input
+                id="place"
+                type="text"
+                placeholder="Enter your place"
+                className="w-full px-4 py-3 border border-brand-border-strong rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all"
+                {...register("place")}
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="pincode"
+                className="block text-sm font-medium text-brand-ink-soft mb-2"
+              >
+                Pincode
+              </label>
+              <input
+                id="pincode"
+                type="text"
+                placeholder="Enter your pincode"
+                className="w-full px-4 py-3 border border-brand-border-strong rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all"
+                {...register("pincode")}
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="bird_capacity"
+                className="block text-sm font-medium text-brand-ink-soft mb-2"
+              >
+                Bird capacity
+              </label>
+              <input
+                id="bird_capacity"
+                type="text"
+                placeholder="Enter bird capacity"
+                className="w-full px-4 py-3 border border-brand-border-strong rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all"
+                {...register("bird_capacity")}
+              />
+            </div>
           </div>
 
           <div className="flex gap-3 pt-4">

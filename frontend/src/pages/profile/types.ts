@@ -5,6 +5,11 @@ export type ProfileFormValues = {
   username: string;
   email: string;
   phone: string;
+  state: string;
+  district: string;
+  place: string;
+  pincode: string;
+  bird_capacity: string;
 };
 
 export type ProfileDetail = {
@@ -14,12 +19,22 @@ export type ProfileDetail = {
   email: string | null;
   phone: string | null;
   user_type: string;
+  state: string | null;
+  district: string | null;
+  place: string | null;
+  pincode: string | null;
+  bird_capacity: string | null;
 };
 
 export type UpdateProfilePayload = {
   name: string;
   email: string;
   phone: string;
+  state: string;
+  district: string;
+  place: string;
+  pincode: string;
+  bird_capacity: string;
 };
 
 export type ChangePasswordFormValues = {

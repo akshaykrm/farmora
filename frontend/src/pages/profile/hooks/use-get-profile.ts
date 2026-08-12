@@ -7,6 +7,11 @@ const defaultProfile: ProfileFormValues = {
   username: "",
   email: "",
   phone: "",
+  state: "",
+  district: "",
+  place: "",
+  pincode: "",
+  bird_capacity: "",
 };
 
 const useGetProfile = () => {
@@ -18,12 +23,27 @@ const useGetProfile = () => {
     const handleFetchProfile = async () => {
       const res = await profile.fetchCurrent();
       if (res.status === "success" && res.data) {
-        const { name, username, email, phone } = res.data;
+        const {
+          name,
+          username,
+          email,
+          phone,
+          state,
+          district,
+          place,
+          pincode,
+          bird_capacity,
+        } = res.data;
         setProfileData({
           name,
           username,
           email: email || "",
           phone: phone || "",
+          state: state || "",
+          district: district || "",
+          place: place || "",
+          pincode: pincode || "",
+          bird_capacity: bird_capacity || "",
         });
         setDataLoaded(true);
       }

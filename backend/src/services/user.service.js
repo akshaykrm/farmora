@@ -129,6 +129,11 @@ const updateMe = async (userId, payload) => {
     name: payload.name,
     email: payload.email,
     phone: payload.phone,
+    state: payload.state ?? userRecord.state,
+    district: payload.district ?? userRecord.district,
+    place: payload.place ?? userRecord.place,
+    pincode: payload.pincode ?? userRecord.pincode,
+    bird_capacity: payload.bird_capacity ?? userRecord.bird_capacity,
   })
 
   return userRecord
