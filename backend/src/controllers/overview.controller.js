@@ -37,6 +37,14 @@ const getSeasonOverview = async (req, res) => {
     gs_limit: parseInt(req.query.gs_limit) || 10,
   }
 
+  if (req.query.gc_purpose) {
+    filter.gc_purpose = req.query.gc_purpose
+  }
+
+  if (req.query.gs_purpose) {
+    filter.gs_purpose = req.query.gs_purpose
+  }
+
   logger.info({ filter }, 'Season overview request received')
   const overviewData = await overviewService.getSeasonOverview(filter, req.user)
 

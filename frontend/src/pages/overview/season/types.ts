@@ -49,6 +49,8 @@ export type SeasonOverviewSlot<T> = {
 
 export type SeasonOverviewFilterRequest = {
   season_id: number | null;
+  gc_purpose?: string;
+  gs_purpose?: string;
 };
 
 export type SeasonOverviewResponse = {

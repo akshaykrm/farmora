@@ -285,7 +285,7 @@ const calculateBatchTotals = (batchOverviews = []) => {
 }
 
 const getSeasonOverview = async (filter, currentUser) => {
-  const { season_id } = filter
+  const { season_id, gc_purpose, gs_purpose } = filter
 
   const userWhereClause = {}
   if (currentUser.user_type === userRoles.staff.type) {
@@ -361,6 +361,18 @@ const getSeasonOverview = async (filter, currentUser) => {
     0
   )
 
+  const filteredGeneralCosts = gc_purpose
+    ? generalCosts.filter((item) =>
+        item.purpose.toLowerCase().includes(gc_purpose.toLowerCase())
+      )
+    : generalCosts
+
+  const filteredGeneralSalesData = gs_purpose
+    ? generalSalesData.filter((item) =>
+        item.purpose.toLowerCase().includes(gs_purpose.toLowerCase())
+      )
+    : generalSalesData
+
   const investorProfit = totalBatchProfit - totalGeneralCost + totalGeneralSales
   const totalExpense = totals.totalPurchaseAmount - totals.totalReturnAmount
 
@@ -377,8 +389,8 @@ const getSeasonOverview = async (filter, currentUser) => {
   const { gc_page, gc_limit } = filter
   const gc_offset = calculateOffSet(gc_page, gc_limit)
 
-  const gc_count = generalCosts.length
-  const paginatedGeneralCosts = generalCosts.slice(
+  const gc_count = filteredGeneralCosts.length
+  const paginatedGeneralCosts = filteredGeneralCosts.slice(
     gc_offset,
     gc_offset + gc_limit
   )
@@ -387,8 +399,8 @@ const getSeasonOverview = async (filter, currentUser) => {
   const { gs_page, gs_limit } = filter
   const gs_offset = calculateOffSet(gs_page, gs_limit)
 
-  const gs_count = generalSalesData.length
-  const paginatedGeneralSales = generalSalesData.slice(
+  const gs_count = filteredGeneralSalesData.length
+  const paginatedGeneralSales = filteredGeneralSalesData.slice(
     gs_offset,
     gs_offset + gs_limit
   )

@@ -4,8 +4,17 @@ import type { SeasonOverviewResponse } from "../types";
 import { useCallback, useEffect, useState } from "react";
 
 function searializeFilter(filter: Filter, override?: Filter) {
-  const { season_id, b_page, b_limit, gc_page, gc_limit, gs_page, gs_limit } =
-    filter;
+  const {
+    season_id,
+    b_page,
+    b_limit,
+    gc_page,
+    gc_limit,
+    gs_page,
+    gs_limit,
+    gc_purpose,
+    gs_purpose,
+  } = filter;
 
   return overrideFilters(
     {
@@ -16,6 +25,8 @@ function searializeFilter(filter: Filter, override?: Filter) {
       gc_limit,
       gs_page,
       gs_limit,
+      gc_purpose,
+      gs_purpose,
     },
     override,
   );
@@ -52,8 +63,17 @@ function useGetSeasonOverview(filter: Filter) {
     summary: null,
   });
 
-  const { season_id, b_page, b_limit, gc_page, gc_limit, gs_page, gs_limit } =
-    filter;
+  const {
+    season_id,
+    b_page,
+    b_limit,
+    gc_page,
+    gc_limit,
+    gs_page,
+    gs_limit,
+    gc_purpose,
+    gs_purpose,
+  } = filter;
 
   const handleGetSeasonOverview = useCallback(
     async (override?: Filter) => {
@@ -79,6 +99,8 @@ function useGetSeasonOverview(filter: Filter) {
       gc_limit,
       gs_page,
       gs_limit,
+      gc_purpose,
+      gs_purpose,
     ],
   );
 

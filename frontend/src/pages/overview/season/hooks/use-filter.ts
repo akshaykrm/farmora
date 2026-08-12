@@ -32,6 +32,9 @@ function useSeasonOverviewFilter() {
     ? parseInt(queryParms.season_id)
     : null;
 
+  const gc_purpose = queryParms.gc_purpose ? queryParms.gc_purpose : "";
+  const gs_purpose = queryParms.gs_purpose ? queryParms.gs_purpose : "";
+
   return {
     filter: {
       ...queryParms,
@@ -42,6 +45,8 @@ function useSeasonOverviewFilter() {
       gs_page,
       gs_limit,
       season_id,
+      gc_purpose,
+      gs_purpose,
     },
     updateQueryParams,
   };

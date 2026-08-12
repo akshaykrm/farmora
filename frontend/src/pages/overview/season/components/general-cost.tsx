@@ -5,19 +5,47 @@ import TableRow from "@components/TableRow";
 import dayjs from "dayjs";
 import type { GeneralCostItem } from "../types";
 import { formatCurrency } from "@utils/currency";
+import { useState, useEffect, useRef } from "react";
+import { TextField } from "@mui/material";
+import useDebounce from "@hooks/use-debounce";
 
 const generalHeaders = ["Date", "Purpose", "Amount"];
 
 type GeneralCostTableProps = {
   data: GeneralCostItem[];
   totalAmount: number;
+  searchValue: string;
+  onSearchChange: (value: string) => void;
 };
 
 const GeneralCostTable = (props: GeneralCostTableProps) => {
-  const { data, totalAmount } = props;
+  const { data, totalAmount, searchValue, onSearchChange } = props;
+  const [inputValue, setInputValue] = useState(searchValue);
+  const debouncedValue = useDebounce(inputValue, 300);
+  const onSearchChangeRef = useRef(onSearchChange);
+  onSearchChangeRef.current = onSearchChange;
+
+  useEffect(() => {
+    setInputValue(searchValue);
+  }, [searchValue]);
+
+  useEffect(() => {
+    if (debouncedValue !== searchValue) {
+      onSearchChangeRef.current(debouncedValue);
+    }
+  }, [debouncedValue, searchValue]);
+
   return (
     <div className="flex-1">
-      <h2 className="text-xl font-semibold mb-3">General Cost</h2>
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-xl font-semibold">General Cost</h2>
+        <TextField
+          size="small"
+          placeholder="Search purpose..."
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+        />
+      </div>
       <Table>
         <TableRow>
           {generalHeaders.map((header) => (
@@ -30,7 +58,9 @@ const GeneralCostTable = (props: GeneralCostTableProps) => {
             <TableCell content={item.purpose} />
             <TableCell
               content={
-                <span className="text-brand-danger">{formatCurrency(item.amount)}</span>
+                <span className="text-brand-danger">
+                  {formatCurrency(item.amount)}
+                </span>
               }
             />
           </TableRow>

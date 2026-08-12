@@ -86,6 +86,13 @@ const SeasonOverviewPage = () => {
                         <GeneralCostTable
                           data={general_costs.data}
                           totalAmount={summary?.total_general_cost || 0}
+                          searchValue={filter.gc_purpose || ""}
+                          onSearchChange={(value) =>
+                            updateQueryParams({
+                              gc_purpose: value,
+                              gc_page: 1,
+                            })
+                          }
                         />
                         <PaginationWithLimit
                           onChange={(f) => {
@@ -107,6 +114,13 @@ const SeasonOverviewPage = () => {
                         <GeneralSalesTable
                           data={general_sales.data}
                           totalAmount={summary?.total_general_sales || 0}
+                          searchValue={filter.gs_purpose || ""}
+                          onSearchChange={(value) =>
+                            updateQueryParams({
+                              gs_purpose: value,
+                              gs_page: 1,
+                            })
+                          }
                         />
                         <PaginationWithLimit
                           onChange={(f) => {
