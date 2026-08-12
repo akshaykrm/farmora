@@ -107,7 +107,16 @@ const getAll = async (payload, currentUser) => {
     },
     include: [
       { model: SeasonModel, as: 'season', required: false },
-      { model: BatchModel, as: 'batch', required: false },
+      {
+        model: BatchModel,
+        as: 'batch',
+        required: true,
+        where: {
+          closed_on: {
+            [Op.is]: null,
+          },
+        },
+      },
       vendorInclude,
     ],
   })

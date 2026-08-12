@@ -112,14 +112,24 @@ const getAll = async (payload, currentUser) => {
       {
         model: BatchModel,
         as: 'from_batch_data',
-        required: false,
+        required: true,
         attributes: ['id', 'name'],
+        where: {
+          closed_on: {
+            [Op.is]: null,
+          },
+        },
       },
       {
         model: BatchModel,
         as: 'to_batch_data',
-        required: false,
+        required: true,
         attributes: ['id', 'name'],
+        where: {
+          closed_on: {
+            [Op.is]: null,
+          },
+        },
       },
       {
         model: VendorModel,

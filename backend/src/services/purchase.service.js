@@ -343,6 +343,11 @@ async function getAll(payload, currentUser) {
         model: BatchModel,
         as: 'batch',
         required: true,
+        where: {
+          closed_on: {
+            [Op.is]: null,
+          },
+        },
       },
       { model: ItemModel, as: 'category', required: false },
       { model: VendorModel, as: 'vendor', required: false },

@@ -52,11 +52,35 @@ const getAll = async (filter, currentUser) => {
       limit,
       offset,
       order: [['date', 'DESC']],
-      include: [{ model: SeasonModel, as: 'season', required: false }],
+      include: [
+        {
+          model: SeasonModel,
+          as: 'season',
+          required: true,
+          where: {
+            closed_on: {
+              [Op.is]: null,
+            },
+          },
+        },
+      ],
     }),
 
     GeneralExpenseModel.sum('amount', {
       where: whereClause,
+      include: [
+        {
+          model: SeasonModel,
+          as: 'season',
+          required: true,
+          attributes: [],
+          where: {
+            closed_on: {
+              [Op.is]: null,
+            },
+          },
+        },
+      ],
     }),
   ])
 

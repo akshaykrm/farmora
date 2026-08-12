@@ -53,15 +53,40 @@ const getAll = async (filter, currentUser) => {
       limit,
       offset,
       order: [['date', 'DESC']],
-      include: [{ model: SeasonModel, as: 'season', required: false }],
+      include: [
+        {
+          model: SeasonModel,
+          as: 'season',
+          required: true,
+          where: {
+            closed_on: {
+              [Op.is]: null,
+            },
+          },
+        },
+      ],
     }),
 
     ExpenseSalesModel.sum('amount', {
       where: whereClause,
+      include: [
+        {
+          model: SeasonModel,
+          as: 'season',
+          required: true,
+          attributes: [],
+          where: {
+            closed_on: {
+              [Op.is]: null,
+            },
+          },
+        },
+      ],
     }),
   ])
 
   const { count, rows } = paginatedData
+  console.log(rows.map((t) => t.toJSON()))
 
   const totalPages = Math.ceil(count / limit)
   return {
