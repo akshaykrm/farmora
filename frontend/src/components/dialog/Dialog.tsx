@@ -5,9 +5,10 @@ type Props = {
   children: ReactNode;
   isOpen: boolean;
   onClose: () => void;
+  className?: string;
 };
 
-const Dialog = ({ headerTitle, children, isOpen, onClose }: Props) => {
+const Dialog = ({ headerTitle, children, isOpen, onClose, className }: Props) => {
   if (!isOpen) return null;
 
   return (
@@ -17,7 +18,7 @@ const Dialog = ({ headerTitle, children, isOpen, onClose }: Props) => {
     >
       <div className="min-h-screen flex items-start justify-center p-4">
         <div
-          className="bg-brand-card rounded-xl border border-brand-border shadow-brand-lg w-full max-w-md max-h-[90vh] flex flex-col"
+          className={`bg-brand-card rounded-xl border border-brand-border shadow-brand-lg w-full ${className ?? "max-w-md"} max-h-[90vh] flex flex-col`}
           onClick={(e) => e.stopPropagation()}
         >
           <div className="border-b border-brand-border px-6 py-4 shrink-0">

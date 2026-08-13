@@ -90,6 +90,7 @@ const ManagerRegistrationDialog = ({
       isOpen={isOpen}
       headerTitle="Register for Farm Management"
       onClose={handleClose}
+      className="max-w-2xl"
     >
       <DialogContent>
         <div className="mb-4">
@@ -114,123 +115,141 @@ const ManagerRegistrationDialog = ({
           </div>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div>
-            <label
-              htmlFor="name"
-              className="block text-sm font-medium text-brand-ink-soft mb-2"
-            >
-              Full Name
-            </label>
-            <input
-              id="name"
-              type="text"
-              placeholder="Enter your full name"
-              className="w-full px-4 py-3 border border-brand-border-strong rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all"
-              {...register("name", { required: "Full name is required" })}
-            />
-            {errors.name && (
-              <p className="text-brand-danger text-xs mt-1">{errors.name.message}</p>
-            )}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-brand-ink-soft mb-2"
+              >
+                Full Name
+              </label>
+              <input
+                id="name"
+                type="text"
+                placeholder="Enter your full name"
+                className="w-full px-4 py-3 border border-brand-border-strong rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all"
+                {...register("name", { required: "Full name is required" })}
+              />
+              {errors.name && (
+                <p className="text-brand-danger text-xs mt-1">{errors.name.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label
+                htmlFor="username"
+                className="block text-sm font-medium text-brand-ink-soft mb-2"
+              >
+                Username
+              </label>
+              <input
+                id="username"
+                type="text"
+                placeholder="Choose a username"
+                className="w-full px-4 py-3 border border-brand-border-strong rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all"
+                {...register("username", { required: "Username is required" })}
+              />
+              {errors.username && (
+                <p className="text-brand-danger text-xs mt-1">
+                  {errors.username.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-brand-ink-soft mb-2"
+              >
+                Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                className="w-full px-4 py-3 border border-brand-border-strong rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all"
+                {...register("email", {
+                  required: "Email is required",
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: "Enter a valid email",
+                  },
+                })}
+              />
+              {errors.email && (
+                <p className="text-brand-danger text-xs mt-1">
+                  {errors.email.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label
+                htmlFor="phone"
+                className="block text-sm font-medium text-brand-ink-soft mb-2"
+              >
+                Phone Number
+              </label>
+              <input
+                id="phone"
+                type="tel"
+                placeholder="Enter your phone number"
+                className="w-full px-4 py-3 border border-brand-border-strong rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all"
+                {...register("phone", {
+                  required: "Phone number is required",
+                  minLength: {
+                    value: 7,
+                    message: "Enter a valid phone number",
+                  },
+                })}
+              />
+              {errors.phone && (
+                <p className="text-brand-danger text-xs mt-1">
+                  {errors.phone.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-brand-ink-soft mb-2"
+              >
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                placeholder="Create a password"
+                className="w-full px-4 py-3 border border-brand-border-strong rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all"
+                {...register("password", { required: "Password is required" })}
+              />
+              {errors.password && (
+                <p className="text-brand-danger text-xs mt-1">
+                  {errors.password.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label
+                htmlFor="bird_capacity"
+                className="block text-sm font-medium text-brand-ink-soft mb-2"
+              >
+                Bird capacity
+              </label>
+              <input
+                id="bird_capacity"
+                type="text"
+                placeholder="Enter bird capacity"
+                className="w-full px-4 py-3 border border-brand-border-strong rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all"
+                {...register("bird_capacity")}
+              />
+            </div>
           </div>
 
-          <div>
-            <label
-              htmlFor="username"
-              className="block text-sm font-medium text-brand-ink-soft mb-2"
-            >
-              Username
-            </label>
-            <input
-              id="username"
-              type="text"
-              placeholder="Choose a username"
-              className="w-full px-4 py-3 border border-brand-border-strong rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all"
-              {...register("username", { required: "Username is required" })}
-            />
-            {errors.username && (
-              <p className="text-brand-danger text-xs mt-1">
-                {errors.username.message}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-brand-ink-soft mb-2"
-            >
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              placeholder="Enter your email"
-              className="w-full px-4 py-3 border border-brand-border-strong rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all"
-              {...register("email", {
-                required: "Email is required",
-                pattern: {
-                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: "Enter a valid email",
-                },
-              })}
-            />
-            {errors.email && (
-              <p className="text-brand-danger text-xs mt-1">
-                {errors.email.message}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="phone"
-              className="block text-sm font-medium text-brand-ink-soft mb-2"
-            >
-              Phone Number
-            </label>
-            <input
-              id="phone"
-              type="tel"
-              placeholder="Enter your phone number"
-              className="w-full px-4 py-3 border border-brand-border-strong rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all"
-              {...register("phone", {
-                required: "Phone number is required",
-                minLength: {
-                  value: 7,
-                  message: "Enter a valid phone number",
-                },
-              })}
-            />
-            {errors.phone && (
-              <p className="text-brand-danger text-xs mt-1">
-                {errors.phone.message}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-brand-ink-soft mb-2"
-            >
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              placeholder="Create a password"
-              className="w-full px-4 py-3 border border-brand-border-strong rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all"
-              {...register("password", { required: "Password is required" })}
-            />
-            {errors.password && (
-              <p className="text-brand-danger text-xs mt-1">
-                {errors.password.message}
-              </p>
-            )}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label
                 htmlFor="state"
@@ -292,22 +311,6 @@ const ManagerRegistrationDialog = ({
                 placeholder="Enter your pincode"
                 className="w-full px-4 py-3 border border-brand-border-strong rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all"
                 {...register("pincode")}
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="bird_capacity"
-                className="block text-sm font-medium text-brand-ink-soft mb-2"
-              >
-                Bird capacity
-              </label>
-              <input
-                id="bird_capacity"
-                type="text"
-                placeholder="Enter bird capacity"
-                className="w-full px-4 py-3 border border-brand-border-strong rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all"
-                {...register("bird_capacity")}
               />
             </div>
           </div>
