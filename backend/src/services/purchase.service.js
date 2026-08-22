@@ -91,7 +91,6 @@ const createPurchaseBook = async (payload, currentUser) => {
 const getPurchaseBook = async (filter, currentUser) => {
   const { limit, page, vendor_id, start_date, end_date } = filter
   const offset = calculateOffSet(page, limit)
-  console.log(vendor_id)
   const whereClause = {
     vendor_id: vendor_id,
   }
@@ -181,7 +180,7 @@ const getPurchaseBook = async (filter, currentUser) => {
       balance = parseFloat(balance) + parseFloat(item.amount)
     } else if (item.type === 'return') {
       balance = parseFloat(balance) - parseFloat(item.amount)
-    } else if (item.type === 'cached-out') {
+    } else if (item.type === 'cash-out') {
       balance = parseFloat(balance) - parseFloat(item.amount)
     }
 
@@ -563,12 +562,10 @@ const updateById = async (id, payload, currentUser) => {
       batch_id: payload.batch_id,
       quantity: payload.assign_quantity,
     }
-    console.log('update data:', updateData)
     const updatedRecord =
       await purchaseBatchAssignmentService.updateByBatchIdAndPurchaseId(
         updateData
       )
-    console.log('updated assignment: ', updatedRecord)
     payload.quantity = calculateNewQty(
       payload.assign_quantity,
       currentAssignment.quantity
