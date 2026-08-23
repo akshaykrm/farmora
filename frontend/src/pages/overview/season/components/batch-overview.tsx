@@ -12,7 +12,7 @@ const batchHeaders = [
   "Close Date",
   "Avg Weight",
   "FCR",
-  "CFSR",
+  "CFCR",
   "Avg Cost",
   "Avg Rate",
   "Profit - Loss Diff",
@@ -64,10 +64,10 @@ const BatchOverviewTable = (props: BatchOverviewTableProps) => {
               <TableCell content={roundNumber(cfcr)} />
               <TableCell content={formatCurrency(avgCost)} />
               <TableCell content={formatCurrency(avgRate)} />
+              <TableCell content={formatCurrency(avgRate - avgCost)} />
               <TableCell
                 content={formatCurrency(total_sale_amount - total_expense)}
               />
-              <TableCell content={formatCurrency(avgRate - avgCost)} />
             </TableRow>
           );
         })}
