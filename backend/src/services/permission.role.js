@@ -1,11 +1,12 @@
 import PermissionModel from '@models/permission'
+import logger from '@utils/logger'
 
 const getAllPermissionRoles = async () => {
   try {
     const permissionRecords = await PermissionModel.findAll({})
     return permissionRecords
   } catch (error) {
-    console.error('Error fetching permission roles:', error)
+    logger.error({ err: error }, 'Error fetching permission roles')
     throw error
   }
 }

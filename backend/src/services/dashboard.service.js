@@ -232,7 +232,7 @@ const getManagerDashboard = async (currentUser) => {
       recentSales: parsedSales,
     }
   } catch (err) {
-    console.log(err)
+    logger.error({ err }, 'Error fetching manager dashboard')
     return {}
   }
 }

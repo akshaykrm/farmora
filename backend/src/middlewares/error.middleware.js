@@ -1,3 +1,5 @@
+import logger from '@utils/logger'
+
 const globalErrorHandler = (err, req, res, next) => {
   const statusCode = err.statusCode || 500
   const message = err.message || 'Internal Server Error'
@@ -9,7 +11,13 @@ const globalErrorHandler = (err, req, res, next) => {
     error.error = err.error
   }
 
-  console.error({ error }, error.message)
+  const logChild = logger.child({ requestId: req.id, method: req.method, path: req.originalUrl, userId: req.user?.id })
+
+  if (statusCode >= 500) {
+    logChild.error({ err, statusCode, code }, message)
+  } else {
+    logChild.warn({ statusCode, code }, message)
+  }
 
   res.status(statusCode).json({
     status: 'failed',

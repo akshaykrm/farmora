@@ -1,6 +1,7 @@
 import RoleModel from '@models/role'
 import { PermissionDeniedError } from '@errors/auth.errors'
 import { sequelize } from '@utils/db'
+import logger from '@utils/logger'
 import { Op, UniqueConstraintError } from 'sequelize'
 import { RoleAlreadyExistsError, RoleNotFoundError } from '@errors/role.errors'
 import RolePermissionModel from '@models/rolepermission'
@@ -8,7 +9,7 @@ import userRoles from '@utils/user-roles'
 import PermissionModel from '@models/permission'
 
 const createRoleService = async (payload, currentUser) => {
-  console.log('Creating role with payload:', payload, 'for user:', currentUser)
+  logger.debug({ role: payload.name }, 'Creating role')
   if (currentUser.user_type === userRoles.staff.type) {
     throw new PermissionDeniedError('Only managers and admins can create roles')
   }
@@ -43,7 +44,7 @@ const createRoleService = async (payload, currentUser) => {
     return newRole
   } catch (error) {
     await transaction.rollback()
-    console.log('Error creating role:', error)
+    logger.error({ err: error }, 'Error creating role')
     throw error
   }
 }

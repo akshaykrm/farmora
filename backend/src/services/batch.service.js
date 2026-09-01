@@ -7,6 +7,7 @@ import UserModel from '@models/user'
 import FarmModel from '@models/farm'
 import SeasonModel from '@models/season'
 import { calculateOffSet } from '@utils/pagination'
+import logger from '@utils/logger'
 
 const create = async (payload, currentUser) => {
   payload.name = payload.name.trim()
@@ -64,7 +65,7 @@ const getAll = async (payload, currentUser) => {
       data: rows,
     }
   } catch (error) {
-    console.error('Error in getAll:', error)
+    logger.error({ err: error }, 'Error in getAll')
     throw error
   }
 }

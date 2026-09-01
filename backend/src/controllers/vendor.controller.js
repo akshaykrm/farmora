@@ -1,5 +1,6 @@
 import vendorService from '@services/vendor.service'
 import asyncHandler from '@utils/async-handler'
+import logger from '@utils/logger'
 
 const create = async (req, res) => {
   const newVendor = await vendorService.create(req.body, req.user)
@@ -12,7 +13,7 @@ const create = async (req, res) => {
 const getNames = async (req, res) => {
   const { type } = req.query
 
-  console.log(type.split(','))
+  logger.debug({ type }, 'Vendor names filter')
 
   const filter = {}
   if (type) {

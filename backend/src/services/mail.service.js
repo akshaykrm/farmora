@@ -2,6 +2,7 @@ import { createTransport } from 'nodemailer'
 import { readFileSync } from 'fs'
 import { join } from 'path'
 import bar from 'handlebars'
+import logger from '@utils/logger'
 
 const { compile } = bar
 
@@ -37,7 +38,7 @@ export async function sendMail(to, subject, templateName, templateData) {
     await transporter.sendMail(mailOptions)
     return { success: true, message: 'Email sent successfully' }
   } catch (error) {
-    console.error('Error sending email:', error)
+    logger.error({ err: error, to }, 'Error sending email')
     return { success: false, error: error.message }
   }
 }
