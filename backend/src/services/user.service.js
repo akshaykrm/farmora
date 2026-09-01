@@ -5,6 +5,7 @@ import { sequelize } from '@utils/db'
 import { Op } from 'sequelize'
 import userRoles from '@utils/user-roles'
 import UserRoleAssignment from '@models/userroleassignment'
+import logger from '@utils/logger'
 import { calculateOffSet } from '@utils/pagination'
 
 const createStaff = async (payload, currentUser) => {
@@ -49,7 +50,7 @@ const createStaff = async (payload, currentUser) => {
     // 	}
     // );
 
-    console.log('calling create invoice config')
+    logger.debug({ user_id: newUser.id }, 'Calling create invoice config')
     await transaction.commit()
     delete newUser.dataValues.password
     return newUser

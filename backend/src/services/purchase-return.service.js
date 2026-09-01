@@ -198,7 +198,7 @@ const getById = async (itemReturnId, currentUser) => {
     'Item return retrieved by id'
   )
 
-  console.log(record.payment_type, record.id)
+  logger.debug({ item_return_id: record.id, payment_type: record.payment_type }, 'Item return fetched')
   return record
 }
 

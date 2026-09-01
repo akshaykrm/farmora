@@ -29,6 +29,7 @@ import investorLedgerRoutes from './src/investors/ledger/ledger.routes.js'
 import brandRouter from '@routes/brand.router'
 
 import responseHandler from '@middlewares/response.middleware'
+import requestLogger from '@middlewares/request.middleware'
 import globalErrorHandler from '@middlewares/error.middleware'
 
 const app = express()
@@ -37,6 +38,8 @@ const { json } = bodyParser
 
 app.use(json())
 app.use(cors())
+
+app.use(requestLogger)
 
 app.use(responseHandler)
 
@@ -68,6 +71,15 @@ app.use('/api/brands', brandRouter)
 
 app.get('/', (_, res) => {
   res.json({ message: 'server is up and running', status: 'ok' })
+})
+
+app.use((req, res) => {
+  res.status(404).json({
+    status: 'failed',
+    data: null,
+    message: `Route ${req.method} ${req.originalUrl} not found`,
+    error: { message: `Route not found`, name: 'NotFoundError', code: 'NOT_FOUND' },
+  })
 })
 
 app.use(globalErrorHandler)

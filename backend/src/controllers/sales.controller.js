@@ -53,7 +53,7 @@ const getAll = async (req, res) => {
     filter.end_date = req.query.end_date
   }
 
-  console.log(filter)
+  logger.debug({ filter }, 'Sales query filter')
   const saleRecords = await salesService.getAll(filter, req.user)
   res.success(saleRecords, {
     message: 'Sales fetched successfully',

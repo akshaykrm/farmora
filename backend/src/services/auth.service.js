@@ -12,6 +12,7 @@ import InvoiceConfig from '@models/invoice_config'
 import UserModel from '@models/user'
 // import { sendMail } from "./mailService.js";
 import { sequelize } from '@utils/db'
+import logger from '@utils/logger'
 import { Op } from 'sequelize'
 import subscriptionService from '@services/subscription.service'
 import vendorService from '@services/vendor.service'
@@ -99,7 +100,7 @@ const createManager = async (payload) => {
 
     return newUser
   } catch (error) {
-    console.log(error)
+    logger.error({ err: error }, 'Manager creation failed')
     await transaction.rollback()
     throw error
   }

@@ -4,6 +4,7 @@ import userRoles from '@utils/user-roles'
 import dayjs from 'dayjs'
 import { Op } from 'sequelize'
 import { calculateOffSet } from '@utils/pagination'
+import logger from '@utils/logger'
 
 const create = async (payload, currentUser) => {
   if (currentUser.user_type === userRoles.staff.type) {
@@ -86,7 +87,7 @@ const getAll = async (filter, currentUser) => {
   ])
 
   const { count, rows } = paginatedData
-  console.log(rows.map((t) => t.toJSON()))
+  logger.debug({ expense_count: count }, 'General sales fetched')
 
   const totalPages = Math.ceil(count / limit)
   return {
