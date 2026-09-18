@@ -12,6 +12,7 @@ import SeasonModel from './season.js'
 import SubscriptionModel from './subscription.js'
 import BatchModel from './batch.js'
 import UserRoleAssignment from './userroleassignment.js'
+import UserPermissionModel from './userpermission.js'
 import VendorModel from './vendor.js'
 import IntegrationBookModel from './integationbook.js'
 import WorkingCostModel from './workingcost.js'
@@ -23,10 +24,53 @@ import InvestorManagementModel from './investorManagement.js'
 import InvestorTransactionTypeModel from './investorTransactionType.js'
 import InvestorTransactionModel from './investorTransaction.js'
 import BrandModel from './brand.js'
+import ReferralPartnerModel from './referralpartner.js'
+import ReferralLedgerTransactionModel from './referralledgertransaction.js'
 UserModel.hasMany(SubscriptionModel, {
   foreignKey: 'user_id',
   as: 'subscriptions',
 })
+
+UserModel.belongsTo(ReferralPartnerModel, {
+  foreignKey: 'referral_partner_id',
+  as: 'referral_partner',
+})
+
+ReferralPartnerModel.hasMany(UserModel, {
+  foreignKey: 'referral_partner_id',
+  as: 'companies',
+})
+
+ReferralPartnerModel.hasMany(ReferralLedgerTransactionModel, {
+  foreignKey: 'referral_partner_id',
+  as: 'ledger_transactions',
+})
+
+ReferralLedgerTransactionModel.belongsTo(ReferralPartnerModel, {
+  foreignKey: 'referral_partner_id',
+  as: 'partner',
+})
+
+ReferralLedgerTransactionModel.belongsTo(UserModel, {
+  foreignKey: 'company_user_id',
+  as: 'company',
+})
+
+ReferralLedgerTransactionModel.belongsTo(SubscriptionModel, {
+  foreignKey: 'subscription_id',
+  as: 'subscription',
+})
+
+ReferralLedgerTransactionModel.belongsTo(PackageModel, {
+  foreignKey: 'package_id',
+  as: 'package',
+})
+
+ReferralLedgerTransactionModel.belongsTo(UserModel, {
+  foreignKey: 'created_by',
+  as: 'created_by_user',
+})
+
 
 UserModel.belongsTo(UserModel, {
   foreignKey: 'parent_id',
@@ -113,6 +157,26 @@ SubscriptionModel.belongsTo(PackageModel, {
 UserModel.hasMany(UserRoleAssignment, {
   foreignKey: 'user_id',
   as: 'role_assignments',
+})
+
+UserModel.hasMany(UserPermissionModel, {
+  foreignKey: 'user_id',
+  as: 'permission_assignments',
+})
+
+UserPermissionModel.belongsTo(UserModel, {
+  foreignKey: 'user_id',
+  as: 'user',
+})
+
+UserPermissionModel.belongsTo(PermissionModel, {
+  foreignKey: 'permission_id',
+  as: 'permission',
+})
+
+PermissionModel.hasMany(UserPermissionModel, {
+  foreignKey: 'permission_id',
+  as: 'user_assignments',
 })
 
 RoleModel.belongsTo(UserModel, { foreignKey: 'manager_id', as: 'manager' })
@@ -303,6 +367,7 @@ export {
   SubscriptionModel,
   BatchModel,
   UserRoleAssignment,
+  UserPermissionModel,
   VendorModel,
   WorkingCostModel,
   SalesModel,
@@ -312,4 +377,6 @@ export {
   InvestorTransactionTypeModel,
   InvestorTransactionModel,
   BrandModel,
+  ReferralPartnerModel,
+  ReferralLedgerTransactionModel,
 }

@@ -1,8 +1,9 @@
 import {
   isAuthenticated,
-  isManagerOrAdmin,
   isSuperAdmin,
+  requirePermission,
 } from '@middlewares/auth.middleware'
+import { PERMISSION_KEYS as P } from '../../config/permissions.js'
 import { Router } from 'express'
 import dashboardController from '@controllers/dashboard.controller'
 
@@ -11,14 +12,14 @@ const router = Router()
 router.get(
   '/manager/season-profit',
   isAuthenticated,
-  isManagerOrAdmin,
+  requirePermission(P.dashboard_read),
   dashboardController.getSeasonProfit
 )
 
 router.get(
   '/manager',
   isAuthenticated,
-  isManagerOrAdmin,
+  requirePermission(P.dashboard_read),
   dashboardController.getManagerDashboard
 )
 

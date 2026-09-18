@@ -3,15 +3,18 @@ import PageHeader from "@components/PageHeader";
 import AddButton from "@components/AddButton";
 import AddNewEmployee from "./components/add-new-employee";
 import EditEmployee from "./components/edit-employee";
+import ChangeUserPassword from "./components/change-user-password";
 import EmployeesTable from "./components/table";
 import { Box } from "@mui/material";
 import useGetEmployees from "./hooks/use-get-employees";
 import useEmployeeFilter from "./hooks/use-employee-filter";
 import PaginationWithLimit from "@components/pagination-with-limit";
+import type { Employee } from "./types";
 
 const EmployeesPage = () => {
   const [isDialogOpen, setOpenAdd] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [passwordUser, setPasswordUser] = useState<Employee | null>(null);
   const { filter, updateQueryParams } = useEmployeeFilter();
 
   const { employees, refetch } = useGetEmployees(filter);
@@ -19,13 +22,17 @@ const EmployeesPage = () => {
   return (
     <div>
       <PageHeader
-        title="Employees"
+        title="Users"
         action={
-          <AddButton label="Employee" onClick={() => setOpenAdd(true)} />
+          <AddButton label="User" onClick={() => setOpenAdd(true)} />
         }
       />
       <div>
-        <EmployeesTable onEdit={setSelectedId} employees={employees.records} />
+        <EmployeesTable
+          onEdit={setSelectedId}
+          onChangePassword={setPasswordUser}
+          employees={employees.records}
+        />
       </div>
       <Box className="flex justify-end mt-6">
         <PaginationWithLimit
@@ -46,6 +53,10 @@ const EmployeesPage = () => {
         refetch={() => refetch()}
         selectedId={selectedId}
         onClose={() => setSelectedId(null)}
+      />
+      <ChangeUserPassword
+        employee={passwordUser}
+        onClose={() => setPasswordUser(null)}
       />
     </div>
   );

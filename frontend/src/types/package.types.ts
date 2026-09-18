@@ -5,6 +5,8 @@ export type Package = {
   price: number;
   duration: number;
   status: string;
+  referral_bonus_type?: "none" | "fixed" | "percentage";
+  referral_bonus_value?: number | null;
 };
 
 export type PackageName = {

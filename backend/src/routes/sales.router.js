@@ -1,4 +1,5 @@
-import { isAuthenticated, isManagerOrAdmin } from '@middlewares/auth.middleware'
+import { isAuthenticated, requirePermission } from '@middlewares/auth.middleware'
+import { PERMISSION_KEYS as P } from '../../config/permissions.js'
 import { Router } from 'express'
 import salesController from '@controllers/sales.controller'
 import validate from '@utils/validate-request'
@@ -14,7 +15,7 @@ router.post(
   '/',
   validate(newSaleSchema),
   isAuthenticated,
-  isManagerOrAdmin,
+  requirePermission(P.sale_write),
   salesController.create
 )
 
@@ -22,33 +23,38 @@ router.post(
   '/ledger',
   validate(addSalesBookEntrySchema),
   isAuthenticated,
-  isManagerOrAdmin,
+  requirePermission(P.sales_book_write),
   salesController.addSalesBookEntry
 )
 router.get(
   '/ledger',
   isAuthenticated,
-  isManagerOrAdmin,
+  requirePermission(P.sales_book_read),
   salesController.getSalesLedger
 )
-router.get('/', isAuthenticated, isManagerOrAdmin, salesController.getAll)
+router.get(
+  '/',
+  isAuthenticated,
+  requirePermission(P.sale_read),
+  salesController.getAll
+)
 router.get(
   '/:sale_id',
   isAuthenticated,
-  isManagerOrAdmin,
+  requirePermission(P.sale_read),
   salesController.getById
 )
 router.put(
   '/:sale_id',
   validate(updateSaleSchema),
   isAuthenticated,
-  isManagerOrAdmin,
+  requirePermission(P.sale_edit),
   salesController.updateById
 )
 router.delete(
   '/:sale_id',
   isAuthenticated,
-  isManagerOrAdmin,
+  requirePermission(P.sale_delete),
   salesController.deleteById
 )
 

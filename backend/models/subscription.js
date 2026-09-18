@@ -24,6 +24,11 @@ const SubscriptionModel = sequelize.define(
       allowNull: false,
       field: 'valid_to',
     },
+    kind: {
+      type: Sequelize.ENUM('initial', 'renewal'),
+      allowNull: false,
+      defaultValue: 'initial',
+    },
   },
   {
     underscored: true,

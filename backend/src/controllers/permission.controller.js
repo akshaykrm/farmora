@@ -1,8 +1,8 @@
-import permissionRoleService from '@services/permission.role'
+import permissionService from '@services/permission.service'
 import asyncHandler from '@utils/async-handler'
 
 const getAllPermissions = async (req, res) => {
-  const permissions = await permissionRoleService.getAllPermissionRoles()
+  const permissions = await permissionService.getAllPermissions(req.user)
   res.success(permissions, { message: 'permissions list' })
 }
 

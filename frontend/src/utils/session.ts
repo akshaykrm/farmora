@@ -3,6 +3,18 @@ import type { UpdateProfilePayload, UserSession } from "@app-types/auth.types";
 const AUTH_TOKEN_KEY = "x-auth-token";
 const AUTH_USER_KEY = "x-auth-user";
 
+const emptyUser = {
+  name: null as string | null,
+  username: null as string | null,
+  email: null as string | null,
+  phone: null as string | null,
+  role: null as string | null,
+  user_type: null as string | null,
+  permissions: [] as string[],
+  master_id: null as number | null,
+  parent_id: null as number | null,
+};
+
 export const createSession = (session: UserSession) => {
   sessionStorage.setItem(AUTH_TOKEN_KEY, session.token || "");
   sessionStorage.setItem(
@@ -12,7 +24,11 @@ export const createSession = (session: UserSession) => {
       username: session.username,
       email: session.email,
       phone: session.phone,
-      role: session.role,
+      role: session.role || session.user_type,
+      user_type: session.user_type || session.role,
+      permissions: session.permissions || [],
+      master_id: session.master_id ?? null,
+      parent_id: session.parent_id ?? null,
     }),
   );
 };
@@ -30,28 +46,18 @@ export const getSession = (): UserSession => {
         username: parsedData.username,
         email: parsedData.email,
         phone: parsedData.phone,
-        role: parsedData.role,
+        role: parsedData.role || parsedData.user_type,
+        user_type: parsedData.user_type || parsedData.role,
+        permissions: parsedData.permissions || [],
+        master_id: parsedData.master_id ?? null,
+        parent_id: parsedData.parent_id ?? null,
       };
     } catch {
-      return {
-        token,
-        name: null,
-        username: null,
-        email: null,
-        phone: null,
-        role: null,
-      };
+      return { token, ...emptyUser };
     }
   }
 
-  return {
-    token,
-    name: null,
-    username: null,
-    email: null,
-    phone: null,
-    role: null,
-  };
+  return { token, ...emptyUser };
 };
 
 export const updateSessionProfile = (profile: UpdateProfilePayload) => {

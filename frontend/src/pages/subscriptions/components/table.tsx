@@ -4,11 +4,9 @@ import Table from "@components/Table";
 import TableCell from "@components/TableCell";
 import TableHeaderCell from "@components/TableHeaderCell";
 import TableRow from "@components/TableRow";
-import useGetAll from "@hooks/use-get-all";
-import { EditIcon } from "lucide-react";
-import { useMemo } from "react";
+import { EditIcon, RefreshCw } from "lucide-react";
+import { useEffect, useState } from "react";
 import EmptyContentMessage from "@components/EmptyContentMessage";
-import LoadingMessage from "@components/LoadingMessage";
 import Ternary from "@components/ternary";
 import dayjs from "dayjs";
 
@@ -18,77 +16,71 @@ const headers = [
   "Package",
   "Valid From",
   "Valid To",
-  "Status",
   "Action",
 ];
 
 type Props = {
   onEdit: (selectedId: number) => void;
+  onRenew: (sub: Subscription) => void;
 };
 
-const SubscriptionTable = ({ onEdit }: Props) => {
-  const subscriptionList = useGetAll<Subscription>({
-    queryFn: () => subscription.fetchAll(),
-    queryKey: ["subscription:all"],
-  });
+const SubscriptionTable = ({ onEdit, onRenew }: Props) => {
+  const [rows, setRows] = useState<Subscription[]>([]);
 
-  const isEmpty = useMemo(() => {
-    return subscriptionList.data?.data?.length === 0;
-  }, [subscriptionList.data]);
-
-  const isFirstLoading = useMemo(() => {
-    return (
-      subscriptionList.isLoading || (isEmpty && !subscriptionList.isFetched)
-    );
-  }, [subscriptionList.isLoading, isEmpty, subscriptionList.isFetched]);
+  useEffect(() => {
+    const load = async () => {
+      const res = await subscription.fetchAll();
+      setRows(res.data || []);
+    };
+    load();
+  }, []);
 
   return (
-    <Ternary
-      when={isFirstLoading}
-      then={<LoadingMessage />}
-      otherwise={
-        <>
-          <Table>
-            <TableRow>
-              {headers.map((header) => (
-                <TableHeaderCell key={header} content={header} />
-              ))}
-            </TableRow>
-            {subscriptionList.data?.data?.map((sub, i) => (
-              <TableRow key={sub.id}>
-                <TableCell content={i + 1} />
-                <TableCell content={sub.user?.name || "-"} />
-                <TableCell content={sub.package?.name || "-"} />
-                <TableCell
-                  content={dayjs(sub.valid_from).format("DD-MM-YYYY")}
-                />
-                <TableCell content={dayjs(sub.valid_to).format("DD-MM-YYYY")} />
-                <TableCell content={sub.status || "-"} />
-                <TableCell
-                  content={
-                    <EditIcon
-                      className="w-6 h-6 text-brand-ink-muted hover:text-brand-ink-soft cursor-pointer"
-                      onClick={() => {
-                        onEdit(sub.id);
-                      }}
-                    />
-                  }
-                />
-              </TableRow>
-            ))}
-          </Table>
-          <Ternary
-            when={isEmpty}
-            then={
-              <EmptyContentMessage
-                title="No subscriptions found"
-                description="Get started by creating a new subscription"
-              />
-            }
+    <>
+      <Table>
+        <TableRow>
+          {headers.map((header) => (
+            <TableHeaderCell key={header} content={header} />
+          ))}
+        </TableRow>
+        {rows.map((sub, i) => (
+          <TableRow key={sub.id}>
+            <TableCell content={i + 1} />
+            <TableCell content={sub.user?.name || "-"} />
+            <TableCell content={sub.package?.name || "-"} />
+            <TableCell content={dayjs(sub.valid_from).format("DD-MM-YYYY")} />
+            <TableCell content={dayjs(sub.valid_to).format("DD-MM-YYYY")} />
+            <TableCell
+              content={
+                <div className="flex items-center gap-3">
+                  <EditIcon
+                    className="h-5 w-5 cursor-pointer text-brand-ink-muted hover:text-brand-ink-soft"
+                    onClick={() => onEdit(sub.id)}
+                  />
+                  <button
+                    type="button"
+                    title="Renew"
+                    onClick={() => onRenew(sub)}
+                    className="rounded-md p-0.5 text-brand-ink-muted hover:text-brand-ink-soft"
+                  >
+                    <RefreshCw className="h-5 w-5" />
+                  </button>
+                </div>
+              }
+            />
+          </TableRow>
+        ))}
+      </Table>
+      <Ternary
+        when={rows.length === 0}
+        then={
+          <EmptyContentMessage
+            title="No subscriptions found"
+            description="Get started by creating a new subscription"
           />
-        </>
-      }
-    />
+        }
+      />
+    </>
   );
 };
 

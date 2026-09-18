@@ -27,6 +27,10 @@ const useLogin = () => {
         phone: data.phone,
         token: data.token,
         role: data.user_type,
+        user_type: data.user_type,
+        permissions: data.permissions || [],
+        master_id: data.master_id ?? null,
+        parent_id: data.parent_id ?? null,
       };
       createSession(userSession);
       toast.success("Login successful!");
@@ -40,6 +44,10 @@ const useLogin = () => {
             email: data.email,
             phone: data.phone,
             role: data.user_type,
+            user_type: data.user_type,
+            permissions: data.permissions || [],
+            master_id: data.master_id ?? null,
+            parent_id: data.parent_id ?? null,
           },
         },
       });

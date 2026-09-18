@@ -4,10 +4,14 @@ export const newPackageSchema = Joi.object({
   name: Joi.string().min(3).max(100).required(),
   description: Joi.string().allow('').optional(),
   price: Joi.number().positive().required(),
-  duration: Joi.number().integer().positive().required(), // Duration in days
+  duration: Joi.number().integer().positive().required(),
   status: Joi.string()
     .valid('active', 'inactive', 'disabled')
     .optional(),
+  referral_bonus_type: Joi.string()
+    .valid('none', 'fixed', 'percentage')
+    .optional(),
+  referral_bonus_value: Joi.number().min(0).allow(null).optional(),
 })
 
 export const updatePackageSchema = newPackageSchema.fork(

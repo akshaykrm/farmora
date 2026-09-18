@@ -77,6 +77,11 @@ const UserModel = sequelize.define(
       type: Sequelize.STRING,
       allowNull: true,
     },
+    referral_partner_id: {
+      type: Sequelize.INTEGER,
+      allowNull: true,
+      field: 'referral_partner_id',
+    },
   },
   {
     underscored: true,

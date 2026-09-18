@@ -1,6 +1,10 @@
 import { Router } from 'express'
 import packageController from '@controllers/package.controller'
-import { isAuthenticated, isSuperAdmin } from '@middlewares/auth.middleware'
+import {
+  isAuthenticated,
+  requirePermission,
+} from '@middlewares/auth.middleware'
+import { PERMISSION_KEYS as P } from '../../config/permissions.js'
 import {
   newPackageSchema,
   updatePackageSchema,
@@ -13,9 +17,11 @@ router.post(
   '/',
   validate(newPackageSchema),
   isAuthenticated,
-  isSuperAdmin,
+  requirePermission(P.package_write),
   packageController.create
 )
+
+router.get('/names', packageController.getNames)
 
 router.get('/', packageController.getAll)
 
@@ -25,10 +31,15 @@ router.put(
   '/:package_id',
   validate(updatePackageSchema),
   isAuthenticated,
-  isSuperAdmin,
+  requirePermission(P.package_edit),
   packageController.updateById
 )
 
-router.delete('/:package_id', packageController.deleteById)
+router.delete(
+  '/:package_id',
+  isAuthenticated,
+  requirePermission(P.package_delete),
+  packageController.deleteById
+)
 
 export default router

@@ -1,6 +1,7 @@
 import { generateToken } from '@utils/jwt'
 import asyncHandler from '@utils/async-handler'
 import authService from '@services/auth.service'
+import permissionService, { getMasterId } from '@services/permission.service'
 
 const createManager = async (req, res) => {
   const user = await authService.createManager(req.body)
@@ -10,16 +11,18 @@ const createManager = async (req, res) => {
 const login = async (req, res) => {
   const { username, password } = req.body
   const user = await authService.login(username, password)
+  const permissions = await permissionService.resolvePermissionKeys(user)
 
   const responseObject = {
     token: generateToken(user),
-    master_id: user.id,
+    master_id: getMasterId(user),
     name: user.name,
     username: user.username,
     email: user.email,
     phone: user.phone,
     user_type: user.user_type,
     parent_id: user.parent_id,
+    permissions,
   }
 
   res.success(responseObject, { message: 'user authenticated' })

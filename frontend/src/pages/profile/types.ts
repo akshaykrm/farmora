@@ -19,6 +19,9 @@ export type ProfileDetail = {
   email: string | null;
   phone: string | null;
   user_type: string;
+  permissions?: string[];
+  master_id?: number | null;
+  parent_id?: number | null;
   state: string | null;
   district: string | null;
   place: string | null;

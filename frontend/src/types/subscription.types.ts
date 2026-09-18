@@ -22,6 +22,7 @@ export type Subscription = {
 
 export type NewSubscriptionRequest = {
   package_id: number;
+  user_id?: number;
 };
 
 export type EditSubscriptionRequest = Partial<NewSubscriptionRequest> & {

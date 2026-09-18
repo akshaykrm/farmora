@@ -1,6 +1,10 @@
 import { Router } from 'express'
+import {
+  isAuthenticated,
+  requirePermission,
+} from '@middlewares/auth.middleware'
+import { PERMISSION_KEYS as P } from '../../config/permissions.js'
 import seasonController from '@controllers/season.controller'
-import { isAuthenticated, isManagerOrAdmin } from '@middlewares/auth.middleware'
 import validate from '@utils/validate-request'
 import {
   newSeasonSchema,
@@ -14,44 +18,39 @@ router.use(isAuthenticated)
 router.post(
   '/',
   validate(newSeasonSchema),
-  isManagerOrAdmin,
+  requirePermission(P.season_write),
   seasonController.create
 )
 
-router.get('/', isAuthenticated, isManagerOrAdmin, seasonController.getAll)
+router.get('/', requirePermission(P.season_read), seasonController.getAll)
 
 router.get(
   '/names',
-  isAuthenticated,
-  isManagerOrAdmin,
+  requirePermission(P.season_read),
   seasonController.getNames
 )
 
 router.get(
   '/:season_id',
-  isAuthenticated,
-  isManagerOrAdmin,
+  requirePermission(P.season_read),
   seasonController.getById
 )
 router.put(
   '/:season_id',
   validate(updateSeasonSchema),
-  isAuthenticated,
-  isManagerOrAdmin,
+  requirePermission(P.season_edit),
   seasonController.updateById
 )
 
 router.put(
   '/:season_id/close',
-  isAuthenticated,
-  isManagerOrAdmin,
+  requirePermission(P.season_edit),
   seasonController.close
 )
 
 router.delete(
   '/:season_id',
-  isAuthenticated,
-  isManagerOrAdmin,
+  requirePermission(P.season_delete),
   seasonController.deleteById
 )
 

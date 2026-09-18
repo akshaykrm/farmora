@@ -1,11 +1,11 @@
 import { FarmNotFoundError } from '@errors/farm.errors'
 import FarmModel from '@models/farm'
-import userRoles from '@utils/user-roles'
 import { Op } from 'sequelize'
 import { calculateOffSet } from '@utils/pagination'
+import { applyTenantMasterId, tenantMasterId } from '@utils/tenant-scope'
 
 const create = async (payload, currentUser) => {
-  payload.master_id = currentUser.id
+  payload.master_id = tenantMasterId(currentUser)
   payload.own = true
   payload.status = 'active'
   const newFarm = await FarmModel.create(payload)
@@ -14,9 +14,7 @@ const create = async (payload, currentUser) => {
 
 const getNames = async (currentUser) => {
   const filter = {}
-  if (currentUser.user_type === userRoles.manager.type) {
-    filter.master_id = currentUser.id
-  }
+  applyTenantMasterId(filter, currentUser)
 
   const records = await FarmModel.findAll({
     where: filter,
@@ -34,9 +32,7 @@ const getAll = async (payload = {}, currentUser) => {
     filter.name = { [Op.iLike]: `%${filter.name}%` }
   }
 
-  if (currentUser.user_type === userRoles.manager.type) {
-    filter.master_id = currentUser.id
-  }
+  applyTenantMasterId(filter, currentUser)
 
   const { rows, count } = await FarmModel.findAndCountAll({
     where: filter,
@@ -54,9 +50,7 @@ const getAll = async (payload = {}, currentUser) => {
 
 const getById = async (farmId, currentUser) => {
   const filter = { id: farmId }
-  if (currentUser.user_type === userRoles.manager.type) {
-    filter.master_id = currentUser.id
-  }
+  applyTenantMasterId(filter, currentUser)
 
   const farmRecord = await FarmModel.findOne({ where: filter })
   if (!farmRecord) {

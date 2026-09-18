@@ -1,8 +1,10 @@
-import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import { Link, useLocation } from "react-router";
 import { ChevronDown, PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
 import { paths } from "../paths";
 import type { PathItem } from "../types/paths.types";
+import usePermissions from "@hooks/use-permissions";
+import { filterPaths } from "@utils/filter-paths";
 
 export const SIDEBAR_WIDTH = 256;
 export const SIDEBAR_COLLAPSED_WIDTH = 76;
@@ -31,6 +33,11 @@ const Sidebar = ({
   onMobileClose,
 }: Props) => {
   const location = useLocation();
+  const { can, isSuperAdmin } = usePermissions();
+  const menuPaths = useMemo(
+    () => filterPaths(paths, { can, isSuperAdmin }),
+    [can, isSuperAdmin],
+  );
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
   const [flyout, setFlyout] = useState<{ item: PathItem; top: number } | null>(
     null,
@@ -60,16 +67,22 @@ const Sidebar = ({
 
   // Auto-expand parent if a child route is active
   useEffect(() => {
-    paths.forEach((item) => {
-      if (!item.children?.length) return;
-      const hasActiveChild = item.children.some(
-        (child) => child.link === location.pathname,
-      );
-      if (hasActiveChild) {
-        setOpenMenus((prev) => ({ ...prev, [item.pathname]: true }));
-      }
+    setOpenMenus((prev) => {
+      let changed = false;
+      const next = { ...prev };
+      menuPaths.forEach((item) => {
+        if (!item.children?.length) return;
+        const hasActiveChild = item.children.some(
+          (child) => child.link === location.pathname,
+        );
+        if (hasActiveChild && !next[item.pathname]) {
+          next[item.pathname] = true;
+          changed = true;
+        }
+      });
+      return changed ? next : prev;
     });
-  }, [location.pathname]);
+  }, [location.pathname, menuPaths]);
 
   // Close collapsed flyout on route change
   useEffect(() => {
@@ -267,7 +280,7 @@ const Sidebar = ({
             onScroll={() => setFlyout(null)}
           >
             <ul className={collapsed ? "space-y-2" : "space-y-1"}>
-              {paths.map((item) =>
+              {menuPaths.map((item) =>
                 collapsed ? renderCollapsedItem(item) : renderFullItem(item),
               )}
             </ul>
@@ -327,7 +340,7 @@ const Sidebar = ({
             {renderBrand(true, true)}
             <nav className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-4">
               <ul className="space-y-1">
-                {paths.map((item) => renderFullItem(item))}
+                {menuPaths.map((item) => renderFullItem(item))}
               </ul>
             </nav>
           </aside>

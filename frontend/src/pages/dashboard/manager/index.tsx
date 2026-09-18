@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import MetricCard from "./components/MetricCard";
 import SectionHeader from "./components/SectionHeader";
 import SeasonProfitChart from "./components/SeasonProfitChart";
+import SubscriptionStatusCard from "./components/SubscriptionStatusCard";
 import { PurchasesListing, SalesListing } from "./components/DataListings";
 import dashboardApi from "@api/dashboard.api";
 import type { ManagerDashboardData } from "@app-types/dashboard.types";
@@ -44,6 +45,8 @@ const ManagerDashboard = () => {
           Welcome back! Here's what's happening with your farm today.
         </p>
       </div>
+
+      <SubscriptionStatusCard subscriptionInfo={data.subscription} />
 
       {/* KEY PERFORMANCE INDICATORS */}
       <section className="animate-in fade-in duration-700 shrink-0">

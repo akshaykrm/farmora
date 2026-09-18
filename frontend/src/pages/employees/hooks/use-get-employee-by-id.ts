@@ -7,6 +7,8 @@ const useGetEmployeeById = (selectedId: number | null) => {
   const [selectedData, setSelectedData] = useState<EmployeeFormValues>({
     name: "",
     username: "",
+    role_ids: [],
+    permission_ids: [],
   });
 
   useEffect(() => {
@@ -14,10 +16,12 @@ const useGetEmployeeById = (selectedId: number | null) => {
       const res = await employee.fetchById(id);
       if (res.status === "success") {
         if (res.data) {
-          const { name, username } = res.data;
+          const { name, username, role_ids, permission_ids } = res.data;
           setSelectedData({
             name,
             username,
+            role_ids: role_ids || [],
+            permission_ids: permission_ids || [],
           });
           setdataLoaded(true);
         }

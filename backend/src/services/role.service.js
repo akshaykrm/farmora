@@ -7,18 +7,32 @@ import { RoleAlreadyExistsError, RoleNotFoundError } from '@errors/role.errors'
 import RolePermissionModel from '@models/rolepermission'
 import userRoles from '@utils/user-roles'
 import PermissionModel from '@models/permission'
+import permissionService from '@services/permission.service'
+import { getMasterId } from '@services/permission.service'
+
+const getRoleOwnerId = (currentUser, payload = {}) => {
+  if (currentUser.user_type === userRoles.admin.type) {
+    return payload.manager_id || null
+  }
+  return getMasterId(currentUser)
+}
 
 const createRoleService = async (payload, currentUser) => {
   logger.debug({ role: payload.name }, 'Creating role')
-  if (currentUser.user_type === userRoles.staff.type) {
-    throw new PermissionDeniedError('Only managers and admins can create roles')
+
+  const managerId = getRoleOwnerId(currentUser, payload)
+  if (!managerId) {
+    throw new PermissionDeniedError('manager_id is required')
   }
+
+  const permissionIds = payload.permission_ids || []
+  await permissionService.assertTenantPermissionIds(permissionIds)
 
   const transaction = await sequelize.transaction()
   try {
     const newRole = await RoleModel.create(
       {
-        manager_id: currentUser.id,
+        manager_id: managerId,
         name: payload.name,
         description: payload.description,
       },
@@ -29,8 +43,6 @@ const createRoleService = async (payload, currentUser) => {
         transaction,
       }
     )
-
-    const permissionIds = payload.permission_ids || []
 
     await RolePermissionModel.bulkCreate(
       permissionIds.map((permissionId) => ({
@@ -57,6 +69,10 @@ const getAllRolesService = async (payload, currentUser) => {
     filter.manager_id = currentUser.id
   }
 
+  if (currentUser.user_type === userRoles.staff.type) {
+    filter.manager_id = currentUser.parent_id
+  }
+
   if (filter.name) {
     filter.name = { [Op.iLike]: `%${filter.name}%` }
   }
@@ -78,10 +94,12 @@ const getAllRolesService = async (payload, currentUser) => {
     },
   })
 
+  const totalPages = Math.ceil(count / limit)
   return {
     page,
     limit,
     total: count,
+    totalPages,
     data: rows,
   }
 }
@@ -92,6 +110,10 @@ const getRoleByIdService = async (roleId, currentUser) => {
 
   if (user_type === userRoles.manager.type) {
     filter.manager_id = id
+  }
+
+  if (user_type === userRoles.staff.type) {
+    filter.manager_id = currentUser.parent_id
   }
 
   const roleRecord = await RoleModel.findOne({
@@ -130,14 +152,16 @@ const getRoleByIdService = async (roleId, currentUser) => {
 
 const updateRoleByIdService = async (roleId, payload, currentUser) => {
   const roleRecord = await getRoleByIdService(roleId, currentUser)
+  const permissionIds = payload.permission_ids || []
+  await permissionService.assertTenantPermissionIds(permissionIds)
   const transaction = await sequelize.transaction()
   try {
-    await roleRecord.update(payload, { transaction })
-    RolePermissionModel.destroy({
+    const { permission_ids, ...roleFields } = payload
+    await roleRecord.update(roleFields, { transaction })
+    await RolePermissionModel.destroy({
       where: { role_id: roleId },
       transaction,
     })
-    const permissionIds = payload.permission_ids || []
     const rolePermissions = permissionIds.map((permissionId) => ({
       role_id: roleId,
       permission_id: permissionId,

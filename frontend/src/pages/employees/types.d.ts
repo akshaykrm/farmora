@@ -1,35 +1,44 @@
 import type { ListResponse } from "@app-types/response.types";
+import type { ValidationError } from "@errors/api.error";
 
-type EmployeeFormValues = {
+export type EmployeeFormValues = {
   name: string;
   username: string;
   password?: string;
+  role_ids: number[];
+  permission_ids: number[];
 };
 
-type Employee = {
+export type Employee = {
   id: number;
   name: string;
   username: string;
   parent_id: number;
-  reset_flag: boolean;
   user_type: string;
+  role_ids?: number[];
+  permission_ids?: number[];
 };
 
-type EmployeesListResponse = ListResponse<Employee>;
+export type EmployeesListResponse = ListResponse<Employee>;
 
-type UseEmployeeReturn = {
+export type UseEmployeeReturn = {
   onSubmit: (inputData: EmployeeFormValues) => void;
   errors: ValidationError[];
   clearError: () => void;
 };
 
-type Opts = {
+export type Opts = {
   onSuccess: () => void;
 };
 
-type UseAddEmployee = (opts: Opts) => UseEmployeeReturn;
+export type UseAddEmployee = (opts: Opts) => UseEmployeeReturn;
 
-type UseEditEmployee = (
+export type UseEditEmployee = (
   selectedId: number | null,
   opts: Opts,
 ) => UseEmployeeReturn;
+
+export type SetUserPasswordValues = {
+  new_password: string;
+  confirm_password: string;
+};

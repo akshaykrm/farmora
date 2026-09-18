@@ -4,6 +4,7 @@ import { User, LogOut, UserRound } from "lucide-react";
 import { useAuth, useAuthDispatch } from "@store/authentication/context";
 import { useNavigate } from "react-router";
 import { clearSession } from "@utils/session";
+import { USER_TYPE_LABELS } from "@utils/user-types";
 
 const UserProfile = () => {
   const { user } = useAuth();
@@ -71,7 +72,10 @@ const UserProfile = () => {
               {user.name}
             </p>
             <p className="mb-1 text-xs text-brand-ink-soft">@{user.username}</p>
-            <p className="text-xs capitalize text-brand-ink-muted">{user.role}</p>
+            <p className="text-xs capitalize text-brand-ink-muted">
+              {USER_TYPE_LABELS[user.user_type || user.role || ""] ||
+                user.role}
+            </p>
           </div>
           <div className="pt-2">
             <button

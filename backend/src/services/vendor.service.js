@@ -1,11 +1,11 @@
 import { VendorNotFoundError } from '@errors/vendor.errors'
 import VendorModel from '@models/vendor'
-import userRoles from '@utils/user-roles'
 import { Op } from 'sequelize'
 import { calculateOffSet } from '@utils/pagination'
+import { applyTenantMasterId, tenantMasterId } from '@utils/tenant-scope'
 
 const create = async (payload, currentUser) => {
-  payload.master_id = currentUser.id
+  payload.master_id = tenantMasterId(currentUser)
   payload.status = 'active'
   const newVendor = await VendorModel.create(payload)
   return newVendor
@@ -24,9 +24,7 @@ const createInternalVendor = async (currentUser) => {
 
 const getNames = async (filter, currentUser) => {
   const whereClause = {}
-  if (currentUser.user_type === userRoles.manager.type) {
-    whereClause.master_id = currentUser.id
-  }
+  applyTenantMasterId(whereClause, currentUser)
 
   if (filter.types) {
     whereClause.vendor_type = {
@@ -50,9 +48,7 @@ const getAll = async (payload, currentUser) => {
     filter.name = { [Op.iLike]: `%${filter.name}%` }
   }
 
-  if (currentUser.user_type === userRoles.manager.type) {
-    filter.master_id = currentUser.id
-  }
+  applyTenantMasterId(filter, currentUser)
 
   const { count, rows } = await VendorModel.findAndCountAll({
     where: filter,
@@ -70,10 +66,7 @@ const getAll = async (payload, currentUser) => {
 
 const getById = async (vendorId, currentUser) => {
   const filter = { id: vendorId }
-
-  if (currentUser.user_type === userRoles.manager.type) {
-    filter.master_id = currentUser.id
-  }
+  applyTenantMasterId(filter, currentUser)
 
   const vendorRecord = await VendorModel.findOne({ where: filter })
   if (!vendorRecord) {

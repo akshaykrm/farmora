@@ -13,14 +13,17 @@ const subscription = {
   },
   fetchById: async (id: number): Promise<EditSubscriptionRequest> => {
     const data = await fetcher(`subscriptions/${id}`);
-    const temp: EditSubscriptionRequest = {
+    return {
       id: data.id,
-      package_id: data.package_id,
+      package_id: data.package_id || data.package?.id,
     };
-    return temp;
   },
   create: async (payload: NewSubscriptionRequest) =>
     await fetcher("subscriptions/subscribe", JSON.stringify(payload), {
+      method: "POST",
+    }),
+  renew: async (payload: NewSubscriptionRequest) =>
+    await fetcher("subscriptions/renew", JSON.stringify(payload), {
       method: "POST",
     }),
   updateById: async (id: number, updateData: EditSubscriptionRequest) => {

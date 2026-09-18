@@ -1,4 +1,5 @@
-import { isAuthenticated, isManagerOrAdmin } from '@middlewares/auth.middleware'
+import { isAuthenticated, requirePermission } from '@middlewares/auth.middleware'
+import { PERMISSION_KEYS as P } from '../../config/permissions.js'
 import { Router } from 'express'
 import overviewController from '@controllers/overview.controller'
 
@@ -7,14 +8,14 @@ const router = Router()
 router.get(
   '/batch',
   isAuthenticated,
-  isManagerOrAdmin,
+  requirePermission(P.batch_overview_read),
   overviewController.getBatchOverview
 )
 
 router.get(
   '/season',
   isAuthenticated,
-  isManagerOrAdmin,
+  requirePermission(P.season_overview_read),
   overviewController.getSeasonOverview
 )
 

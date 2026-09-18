@@ -7,7 +7,7 @@ const createStaff = async (req, res) => {
 }
 
 const getAllUsers = async (req, res) => {
-  const { status, name, parent_id, page, limit } = req.query
+  const { status, name, parent_id, user_type, page, limit } = req.query
   const filter = {
     page: page ? parseInt(req.query.page) : 1,
     limit: limit ? parseInt(req.query.limit) : 10,
@@ -22,7 +22,11 @@ const getAllUsers = async (req, res) => {
   }
 
   if (parent_id) {
-    filter.parent_id = parent_id
+    filter.parent_id = parseInt(parent_id)
+  }
+
+  if (user_type) {
+    filter.user_type = user_type
   }
 
   const result = await userService.getAll(filter, req.user)
@@ -59,6 +63,12 @@ const updateMe = async (req, res) => {
   res.success(userRecord, { message: 'profile updated' })
 }
 
+const setPassword = async (req, res) => {
+  const { user_id } = req.params
+  await userService.setPassword(user_id, req.body.new_password, req.user)
+  res.success(null, { message: 'password updated' })
+}
+
 const userController = {
   createStaff: asyncHandler(createStaff),
   getAllUsers: asyncHandler(getAllUsers),
@@ -67,6 +77,7 @@ const userController = {
   deleteUserById: asyncHandler(deleteUserById),
   getMe: asyncHandler(getMe),
   updateMe: asyncHandler(updateMe),
+  setPassword: asyncHandler(setPassword),
 }
 
 export default userController

@@ -25,6 +25,7 @@ const getAll = async (payload) => {
     page,
     limit,
     total: count,
+    totalPages: Math.ceil(count / limit),
     data: rows,
   }
 }
@@ -47,12 +48,22 @@ const deleteById = async (id) => {
   await packageRecord.destroy()
 }
 
+const getNames = async () => {
+  const records = await PackageModel.findAll({
+    where: { status: 'active' },
+    attributes: ['id', 'name'],
+    order: [['id', 'DESC']],
+  })
+  return records
+}
+
 const packageService = {
   create,
   getAll,
   getById,
   updateById,
   deleteById,
+  getNames,
 }
 
 export default packageService

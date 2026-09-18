@@ -29,7 +29,12 @@ const EditEmployee = (props: Props) => {
 
   return (
     <>
-      <Dialog headerTitle="Edit Employee" isOpen={isShow} onClose={handleClose}>
+      <Dialog
+        headerTitle="Edit User"
+        isOpen={isShow}
+        onClose={handleClose}
+        className="max-w-2xl"
+      >
         <DialogContent>
           <Ternary
             when={dataLoaded}

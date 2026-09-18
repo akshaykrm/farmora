@@ -1,7 +1,24 @@
-import { useReducer, type ReactNode } from "react";
+import { useEffect, useReducer, type ReactNode } from "react";
 import { authDataContext, authDispatchContext } from "./context";
-import type { AuthActions, AuthContextData } from "@app-types/auth.types";
-import { getSession } from "@utils/session";
+import type { AuthActions, AuthContextData, AuthUser } from "@app-types/auth.types";
+import { createSession, getSession } from "@utils/session";
+import profile from "@pages/profile/api";
+
+const sessionToUser = (): AuthUser | null => {
+  const userSession = getSession();
+  if (!userSession.token) return null;
+  return {
+    name: userSession.name,
+    username: userSession.username,
+    email: userSession.email,
+    phone: userSession.phone,
+    role: userSession.role || userSession.user_type || null,
+    user_type: userSession.user_type || userSession.role || null,
+    permissions: userSession.permissions || [],
+    master_id: userSession.master_id ?? null,
+    parent_id: userSession.parent_id ?? null,
+  };
+};
 
 const authReducer = (
   state: AuthContextData,
@@ -43,17 +60,42 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     const userSession = getSession();
     return {
       token: userSession.token || null,
-      user: userSession.token
-        ? {
-            name: userSession.name,
-            username: userSession.username,
-            email: userSession.email,
-            phone: userSession.phone,
-            role: userSession.role || null,
-          }
-        : null,
+      user: sessionToUser(),
     };
   });
+
+  useEffect(() => {
+    if (!value.token) return;
+    const token = value.token;
+    profile.fetchCurrent().then((res) => {
+      if (res.status !== "success" || !res.data) return;
+      const data = res.data;
+      const user: AuthUser = {
+        name: data.name,
+        username: data.username,
+        email: data.email,
+        phone: data.phone,
+        role: data.user_type,
+        user_type: data.user_type,
+        permissions: data.permissions || [],
+        master_id: data.master_id ?? null,
+        parent_id: data.parent_id ?? null,
+      };
+      createSession({
+        token,
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        user_type: user.user_type,
+        permissions: user.permissions,
+        master_id: user.master_id,
+        parent_id: user.parent_id,
+      });
+      dispatch({ type: "LOGIN", payload: { token, user } });
+    });
+  }, [value.token]);
 
   return (
     <>

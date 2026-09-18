@@ -10,6 +10,7 @@ import {
 import SubscriptionModel from '@models/subscription'
 import InvoiceConfig from '@models/invoice_config'
 import UserModel from '@models/user'
+import PackageModel from '@models/package'
 // import { sendMail } from "./mailService.js";
 import { sequelize } from '@utils/db'
 import logger from '@utils/logger'
@@ -20,10 +21,9 @@ import userRoles from '@utils/user-roles'
 import userService from '@services/user.service'
 import dayjs from 'dayjs'
 import itemService from '@services/items.service'
+import referralBonusService from '@services/referral-bonus.service'
 
 const createManager = async (payload) => {
-  const transaction = await sequelize.transaction()
-
   const existsingUser = await userService.getUserByUsername(payload.username)
 
   if (existsingUser) {
@@ -35,6 +35,22 @@ const createManager = async (payload) => {
   if (existingEmailUser) {
     throw new UserNameConflictError('email already taken')
   }
+
+  let referralPartner = null
+  if (payload.referral_code) {
+    referralPartner = await referralBonusService.findActivePartnerByCode(
+      payload.referral_code
+    )
+    if (!referralPartner) {
+      const error = new Error('invalid referral code')
+      error.statusCode = 400
+      error.code = 'INVALID_REFERRAL_CODE'
+      error.name = 'ValidationError'
+      throw error
+    }
+  }
+
+  const transaction = await sequelize.transaction()
 
   try {
     const newUser = await UserModel.create(
@@ -52,14 +68,18 @@ const createManager = async (payload) => {
         user_type: userRoles.manager.type,
         status: payload.status,
         parent_id: 1,
+        referral_partner_id: referralPartner?.id || null,
       },
       { transaction }
     )
 
-    await subscriptionService.create(
+    const newSubscription = await subscriptionService.create(
       newUser.id,
       payload.package_id,
-      transaction
+      {
+        referralPartnerId: referralPartner?.id || null,
+        creditBonus: false,
+      }
     )
 
     const newVendor = await vendorService.createInternalVendor(newUser)
@@ -81,15 +101,6 @@ const createManager = async (payload) => {
       },
       newUser
     )
-    // sendMail(
-    // 	insertData.username,
-    // 	"Your Account Details",
-    // 	"accountCreated",
-    // 	{
-    // 		username: insertData.username,
-    // 		password: hashedPassword,
-    // 	}
-    // );
 
     await transaction.commit()
     await InvoiceConfig.create({
@@ -97,6 +108,18 @@ const createManager = async (payload) => {
       number: 0,
       parent_id: newUser.id,
     })
+
+    if (referralPartner?.id) {
+      const packageRecord = await PackageModel.findByPk(payload.package_id)
+      await referralBonusService.creditForSubscription({
+        partnerId: referralPartner.id,
+        companyUserId: newUser.id,
+        subscription: newSubscription,
+        packageRecord,
+        type: referralBonusService.TYPES.initial_bonus,
+        remarks: 'Initial subscription bonus',
+      })
+    }
 
     return newUser
   } catch (error) {

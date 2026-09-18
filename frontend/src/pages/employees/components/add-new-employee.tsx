@@ -8,6 +8,8 @@ const defaultValues: DefaultValues<EmployeeFormValues> = {
   name: "",
   username: "",
   password: "",
+  role_ids: [],
+  permission_ids: [],
 };
 
 type AddNewEmployeeType = {
@@ -34,9 +36,10 @@ const AddNewEmployee = (props: AddNewEmployeeType) => {
   return (
     <>
       <Dialog
-        headerTitle="Add New Employee"
+        headerTitle="Add User"
         isOpen={isShow}
         onClose={handleClose}
+        className="max-w-2xl"
       >
         <DialogContent>
           <EmployeeForm

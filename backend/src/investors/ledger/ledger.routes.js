@@ -1,4 +1,5 @@
-import { isAuthenticated, isManagerOrAdmin } from '@middlewares/auth.middleware'
+import { isAuthenticated, requirePermission } from '@middlewares/auth.middleware'
+import { PERMISSION_KEYS as P } from '../../../config/permissions.js'
 import { Router } from 'express'
 import LedgerController from './ledger.controller'
 import validate from '@utils/validate-request'
@@ -10,55 +11,56 @@ router.post(
   '/',
   validate(createInvestorTransactionSchema),
   isAuthenticated,
-  isManagerOrAdmin,
+  requirePermission(P.investor_ledger_write),
   LedgerController.createTransaction
 )
 
 router.get(
   '/lookup/investors',
   isAuthenticated,
-  isManagerOrAdmin,
+  requirePermission(P.investor_ledger_read),
   LedgerController.lookupInvestors
 )
 
 router.get(
   '/lookup/transaction-types',
   isAuthenticated,
+  requirePermission(P.investor_ledger_read),
   LedgerController.lookupTransactionTypes
 )
 
 router.get(
   '/balances/capital',
   isAuthenticated,
-  isManagerOrAdmin,
+  requirePermission(P.investor_ledger_read),
   LedgerController.getCapitalBalance
 )
 
 router.get(
   '/balances/profit',
   isAuthenticated,
-  isManagerOrAdmin,
+  requirePermission(P.investor_ledger_read),
   LedgerController.getProfitBalance
 )
 
 router.get(
   '/summary',
   isAuthenticated,
-  isManagerOrAdmin,
+  requirePermission(P.investor_ledger_read),
   LedgerController.getBalanceSummary
 )
 
 router.get(
   '/',
   isAuthenticated,
-  isManagerOrAdmin,
+  requirePermission(P.investor_ledger_read),
   LedgerController.listTransactions
 )
 
 router.get(
   '/:transaction_id',
   isAuthenticated,
-  isManagerOrAdmin,
+  requirePermission(P.investor_ledger_read),
   LedgerController.getTransactionById
 )
 

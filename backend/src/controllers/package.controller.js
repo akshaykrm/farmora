@@ -43,12 +43,18 @@ const deleteById = async (req, res) => {
   res.success(null, { message: 'package deleted' })
 }
 
+const getNames = async (req, res) => {
+  const records = await packageService.getNames()
+  res.success(records, { message: 'package names' })
+}
+
 const packageController = {
   create: asyncHandler(create),
   getAll: asyncHandler(getAll),
   getById: asyncHandler(getById),
   updateById: asyncHandler(update),
   deleteById: asyncHandler(deleteById),
+  getNames: asyncHandler(getNames),
 }
 
 export default packageController

@@ -1,4 +1,5 @@
-import { isAuthenticated, isManagerOrAdmin } from '@middlewares/auth.middleware'
+import { isAuthenticated, requirePermission } from '@middlewares/auth.middleware'
+import { PERMISSION_KEYS as P } from '../../../config/permissions.js'
 import { Router } from 'express'
 import InvestorManagementController from './management.controller'
 import validate from '@utils/validate-request'
@@ -13,21 +14,21 @@ router.post(
   '/',
   validate(createInvestorManagementValidation),
   isAuthenticated,
-  isManagerOrAdmin,
+  requirePermission(P.investor_write),
   InvestorManagementController.createInvestor
 )
 
 router.get(
   '/',
   isAuthenticated,
-  isManagerOrAdmin,
+  requirePermission(P.investor_read),
   InvestorManagementController.getAllInvestors
 )
 
 router.get(
   '/:investor_id',
   isAuthenticated,
-  isManagerOrAdmin,
+  requirePermission(P.investor_read),
   InvestorManagementController.getInvestorById
 )
 
@@ -35,14 +36,14 @@ router.put(
   '/:investor_id',
   validate(updateInvestorManagementValidation),
   isAuthenticated,
-  isManagerOrAdmin,
+  requirePermission(P.investor_edit),
   InvestorManagementController.updateInvestor
 )
 
 router.patch(
   '/:investor_id/toggle-status',
   isAuthenticated,
-  isManagerOrAdmin,
+  requirePermission(P.investor_delete),
   InvestorManagementController.toggleInvestorStatus
 )
 

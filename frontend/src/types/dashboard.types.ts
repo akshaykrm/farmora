@@ -38,6 +38,20 @@ export interface ManagerDashboardData {
   totalDebited: number;
   recentPurchases: RecentPurchase[];
   recentSales: RecentSale[];
+  subscription?: {
+    id: number;
+    kind: string;
+    valid_from: string;
+    valid_to: string;
+    days_remaining: number;
+    expiring_soon: boolean;
+    package: {
+      id: number;
+      name: string;
+      price: number;
+      duration: number;
+    } | null;
+  } | null;
 }
 
 // Admin Dashboard Types

@@ -1,48 +1,54 @@
-import { isAuthenticated, isManagerOrAdmin } from '@middlewares/auth.middleware'
+import { isAuthenticated, requirePermission } from '@middlewares/auth.middleware'
+import { PERMISSION_KEYS as P } from '../../config/permissions.js'
 import { Router } from 'express'
 import vendorController from '@controllers/vendor.controller'
 import validate from '@utils/validate-request'
 import {
-	newVendorSchema,
-	updateVendorSchema,
+  newVendorSchema,
+  updateVendorSchema,
 } from '@validators/vendor.validator'
 
 const router = Router()
 
 router.post(
-	'/',
-	validate(newVendorSchema),
-	isAuthenticated,
-	isManagerOrAdmin,
-	vendorController.create
+  '/',
+  validate(newVendorSchema),
+  isAuthenticated,
+  requirePermission(P.vendor_write),
+  vendorController.create
 )
 
 router.get(
-	'/names',
-	isAuthenticated,
-	isManagerOrAdmin,
-	vendorController.getNames
+  '/names',
+  isAuthenticated,
+  requirePermission(P.vendor_read),
+  vendorController.getNames
 )
 
-router.get('/', isAuthenticated, isManagerOrAdmin, vendorController.getAll)
 router.get(
-	'/:vendor_id',
-	isAuthenticated,
-	isManagerOrAdmin,
-	vendorController.getById
+  '/',
+  isAuthenticated,
+  requirePermission(P.vendor_read),
+  vendorController.getAll
+)
+router.get(
+  '/:vendor_id',
+  isAuthenticated,
+  requirePermission(P.vendor_read),
+  vendorController.getById
 )
 router.put(
-	'/:vendor_id',
-	validate(updateVendorSchema),
-	isAuthenticated,
-	isManagerOrAdmin,
-	vendorController.updateById
+  '/:vendor_id',
+  validate(updateVendorSchema),
+  isAuthenticated,
+  requirePermission(P.vendor_edit),
+  vendorController.updateById
 )
 router.delete(
-	'/:vendor_id',
-	isAuthenticated,
-	isManagerOrAdmin,
-	vendorController.deleteById
+  '/:vendor_id',
+  isAuthenticated,
+  requirePermission(P.vendor_delete),
+  vendorController.deleteById
 )
 
 export default router

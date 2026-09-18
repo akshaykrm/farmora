@@ -18,7 +18,6 @@ import IntegrationBookPage from "@pages/integration-book";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import ItemsPage from "@pages/items";
-import type { PathItem } from "./types/paths.types";
 import { ThemeProvider } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
 import { createAppTheme } from "./theme";
@@ -34,19 +33,26 @@ import GeneralSalesPage from "@pages/general-sales";
 import SeasonOverviewPage from "@pages/overview/season";
 import BatchOverviewPage from "@pages/overview/batch";
 import BalanceSheetPage from "@pages/balance-sheet";
-// import EmployeesPage from "@pages/employees";
+import EmployeesPage from "@pages/employees";
 import VendorPage from "@pages/vendors";
 import ProfilePage from "@pages/profile";
 import InvestorManagementPage from "@pages/investors/management";
 import InvestLedgerPage from "@pages/investors/ledger/invest";
 import ProfitLedgerPage from "@pages/investors/ledger/profit";
+import RolesPage from "@pages/roles";
+import SubscribersPage from "@pages/subscribers";
+import ReferralsPage from "@pages/referrals";
+import ReferralDetailPage from "@pages/referrals/detail";
+import usePermissions from "@hooks/use-permissions";
+import { filterPaths, flattenPaths } from "@utils/filter-paths";
+import type { PathItem } from "./types/paths.types";
 
 const queryClient = new QueryClient();
 
 const pageComponents: Record<string, React.ComponentType> = {
-  "/dashboard": Dashboard,
   "/configuration/batches": BatchesPage,
-  // "/configuration/employees": EmployeesPage,
+  "/configuration/users": EmployeesPage,
+  "/configuration/roles": RolesPage,
   "/configuration/seasons": SeasonsPage,
   "/configuration/farms": FarmsPage,
   "/configuration/vendors": VendorPage,
@@ -68,20 +74,8 @@ const pageComponents: Record<string, React.ComponentType> = {
   "/cash-flow": BalanceSheetPage,
   "/packages": PackagesPage,
   "/subscriptions": SubscriptionsPage,
-};
-
-// Flatten nested paths into a single array
-const flattenPaths = (items: PathItem[]): PathItem[] => {
-  const result: PathItem[] = [];
-  items.forEach((item) => {
-    if (item.link) {
-      result.push(item);
-    }
-    if (item.children) {
-      result.push(...flattenPaths(item.children));
-    }
-  });
-  return result;
+  "/subscribers": SubscribersPage,
+  "/referrals": ReferralsPage,
 };
 
 const MuiThemeBridge = ({ children }: { children: ReactNode }) => {
@@ -96,9 +90,27 @@ const MuiThemeBridge = ({ children }: { children: ReactNode }) => {
   );
 };
 
-function App() {
-  const flatPaths = flattenPaths(paths);
+const PermissionGuard = ({
+  path,
+  children,
+}: {
+  path: PathItem;
+  children: ReactNode;
+}) => {
+  const { can, isSuperAdmin } = usePermissions();
+  if (path.audience === "platform" && !isSuperAdmin) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  if (path.audience === "tenant" && isSuperAdmin) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  if (path.permission && !can(path.permission)) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  return children;
+};
 
+function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeModeProvider>
@@ -126,29 +138,7 @@ function App() {
                 element={
                   <AuthGuard>
                     <Layout>
-                      <Routes>
-                        <Route
-                          path="/dashboard"
-                          element={<RoleBasedDashboard />}
-                        />
-                        <Route path="/profile" element={<ProfilePage />} />
-                        {flatPaths.map((path) => {
-                          const Component = pageComponents[path.link!];
-                          return (
-                            <Route
-                              key={path.link}
-                              path={path.link}
-                              element={
-                                Component ? (
-                                  <Component />
-                                ) : (
-                                  <h1>{path.pathname}</h1>
-                                )
-                              }
-                            />
-                          );
-                        })}
-                      </Routes>
+                      <AppRoutes />
                     </Layout>
                   </AuthGuard>
                 }
@@ -161,14 +151,70 @@ function App() {
   );
 }
 
-const RoleBasedDashboard = () => {
-  const { user } = useAuth();
+const AppRoutes = () => {
+  const { can, isSuperAdmin } = usePermissions();
+  const visiblePaths = filterPaths(paths, { can, isSuperAdmin });
+  const flatPaths = flattenPaths(visiblePaths);
 
-  if (user?.role === "manager") {
+  return (
+    <Routes>
+      <Route path="/dashboard" element={<RoleBasedDashboard />} />
+      <Route path="/profile" element={<ProfilePage />} />
+      <Route
+        path="/referrals/:partnerId"
+        element={
+          <PermissionGuard
+            path={{
+              pathname: "Referral Detail",
+              link: "/referrals",
+              audience: "platform",
+              permission: "referral:read",
+            }}
+          >
+            <ReferralDetailPage />
+          </PermissionGuard>
+        }
+      />
+      {flatPaths
+        .filter((path) => path.link && path.link !== "/dashboard")
+        .map((path) => {
+          const Component = pageComponents[path.link!];
+          return (
+            <Route
+              key={path.link}
+              path={path.link}
+              element={
+                <PermissionGuard path={path}>
+                  {Component ? <Component /> : <h1>{path.pathname}</h1>}
+                </PermissionGuard>
+              }
+            />
+          );
+        })}
+    </Routes>
+  );
+};
+
+const RoleBasedDashboard = () => {
+  const { isSuperAdmin, isSubscriber, can } = usePermissions();
+
+  if (isSuperAdmin) {
+    return <Dashboard />;
+  }
+
+  if (isSubscriber || can("dashboard:read")) {
     return <ManagerDashboard />;
   }
 
-  return <Dashboard />;
+  return (
+    <div className="rounded-lg border border-brand-border bg-brand-card p-8 text-center">
+      <h1 className="text-lg font-semibold text-brand-ink">No modules assigned</h1>
+      <p className="mt-2 text-sm text-brand-ink-soft">
+        You do not have permission to view any menus yet. Ask your subscriber to
+        assign a role or permissions.
+      </p>
+    </div>
+  );
 };
 
 const AuthGuard = ({ children }: { children: ReactNode }) => {

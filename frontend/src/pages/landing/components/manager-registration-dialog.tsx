@@ -234,6 +234,22 @@ const ManagerRegistrationDialog = ({
 
             <div>
               <label
+                htmlFor="referral_code"
+                className="block text-sm font-medium text-brand-ink-soft mb-2"
+              >
+                Referral code (optional)
+              </label>
+              <input
+                id="referral_code"
+                type="text"
+                placeholder="Enter referral code if you have one"
+                className="w-full px-4 py-3 border border-brand-border-strong rounded-lg focus:ring-2 focus:ring-brand-accent focus:border-transparent outline-none transition-all uppercase"
+                {...register("referral_code")}
+              />
+            </div>
+
+            <div>
+              <label
                 htmlFor="bird_capacity"
                 className="block text-sm font-medium text-brand-ink-soft mb-2"
               >

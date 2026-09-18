@@ -28,6 +28,7 @@ export type ManagerRegistrationPayload = {
   place?: string;
   pincode?: string;
   bird_capacity?: string;
+  referral_code?: string;
 };
 
 export type AuthUser = {
@@ -36,6 +37,10 @@ export type AuthUser = {
   email: string | null;
   phone: string | null;
   role: string | null;
+  user_type: string | null;
+  permissions: string[];
+  master_id: number | null;
+  parent_id: number | null;
 };
 
 export type AuthContextData = {
@@ -76,6 +81,10 @@ export type UserSession = {
   phone: string | null;
   token: string | null;
   role?: string | null;
+  user_type?: string | null;
+  permissions?: string[];
+  master_id?: number | null;
+  parent_id?: number | null;
 };
 
 export type UserProfile = {

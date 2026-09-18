@@ -1,8 +1,8 @@
 import { SeasonNotFoundError } from '@errors/season.errors'
 import SeasonModel from '@models/season'
-import userRoles from '@utils/user-roles'
 import dayjs from 'dayjs'
 import { Op } from 'sequelize'
+import { applyTenantMasterId, tenantMasterId } from '@utils/tenant-scope'
 import { calculateOffSet } from '@utils/pagination'
 
 const create = async (payload, currentUser) => {
@@ -10,7 +10,7 @@ const create = async (payload, currentUser) => {
   const endDate = dayjs(payload.endDate).toDate()
   payload.start_date = startDate
   payload.end_date = endDate
-  payload.master_id = currentUser.id
+  payload.master_id = tenantMasterId(currentUser)
   payload.status = 'active'
 
   const newSeason = await SeasonModel.create(payload)
@@ -18,9 +18,7 @@ const create = async (payload, currentUser) => {
 }
 
 const getNames = async (currentUser, filter) => {
-  if (currentUser.user_type === userRoles.manager.type) {
-    filter.master_id = currentUser.id
-  }
+  applyTenantMasterId(filter, currentUser)
 
   if (filter.status === 'active') {
     filter.closed_on = {
@@ -44,9 +42,7 @@ const getAll = async (payload = {}, currentUser) => {
     filter.name = { [Op.iLike]: `%${filter.name}%` }
   }
 
-  if (currentUser.user_type === userRoles.manager.type) {
-    filter.master_id = currentUser.id
-  }
+  applyTenantMasterId(filter, currentUser)
 
   const { count, rows } = await SeasonModel.findAndCountAll({
     where: filter,
@@ -64,11 +60,7 @@ const getAll = async (payload = {}, currentUser) => {
 
 const getById = async (seasonId, currentUser) => {
   const filter = { id: seasonId }
-  if (currentUser.user_type === userRoles.manager.type) {
-    filter.master_id = currentUser.id
-  } else if (currentUser.user_type === userRoles.staff.type) {
-    filter.master_id = currentUser.master_id
-  }
+  applyTenantMasterId(filter, currentUser)
 
   const seasonRecord = await SeasonModel.findOne({ where: filter })
   if (!seasonRecord) {
