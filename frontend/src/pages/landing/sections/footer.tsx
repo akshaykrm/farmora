@@ -112,7 +112,7 @@ const Footer = () => {
                 },
                 {
                   icon: MapPin,
-                  text: "123 Farm Street, City, State - 123456",
+                  text: "NPG FARMS LLP, NPG FARMS LLP, 9-265/B, KOORIMUNDA, AMBALAMUKKU, THAMARASSERY P O, KOZHIKODE",
                 },
               ].map((item, i) => {
                 const Icon = item.icon

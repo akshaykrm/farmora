@@ -126,8 +126,8 @@ const ContactSection = () => {
                     icon: MapPin,
                     label: "Address",
                     values: [
-                      "123 Farm Street, Agricultural District",
-                      "City, State - 123456",
+                      "NPG FARMS LLP, NPG FARMS LLP, 9-265/B, KOORIMUNDA,",
+                      "AMBALAMUKKU, THAMARASSERY P O, KOZHIKODE",
                     ],
                   },
                 ].map((item, i) => {
