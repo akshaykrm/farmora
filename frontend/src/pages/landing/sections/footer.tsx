@@ -108,7 +108,7 @@ const Footer = () => {
                 },
                 {
                   icon: Phone,
-                  text: "+91 (123) 456-7890",
+                  text: "+91 95390 92205",
                 },
                 {
                   icon: MapPin,

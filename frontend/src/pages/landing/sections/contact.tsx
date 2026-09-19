@@ -120,7 +120,7 @@ const ContactSection = () => {
                   {
                     icon: Phone,
                     label: "Phone",
-                    values: ["+91 (123) 456-7890", "+91 (098) 765-4321"],
+                    values: ["+91 95390 92205"],
                   },
                   {
                     icon: MapPin,
