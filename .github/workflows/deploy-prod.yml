@@ -1,0 +1,56 @@
+name: Deploy Production
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-prod-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Build Frontend
+        working-directory: ./frontend
+        run: |
+          bun install --frozen-lockfile
+          bun run build
+
+      - name: Setup SSH Agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Trust Production Host
+        run: |
+          ssh-keyscan -H ${{ secrets.STAGING_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Sync Frontend Static Assets
+        run: rsync -avz --delete --rsync-path="sudo rsync" ./frontend/dist/ ${{ secrets.SERVER_USER }}@${{ secrets.STAGING_HOST }}:/var/www/farmora-prod/
+
+      - name: Sync Backend Source
+        run: rsync -avz --delete --rsync-path="sudo rsync" --exclude='.git' --exclude='node_modules' --exclude='.env' ./backend/ ${{ secrets.SERVER_USER }}@${{ secrets.STAGING_HOST }}:/home/farmora/apps/farmora-prod/backend/
+
+      - name: Deploy Backend on Production Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.STAGING_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            export PATH="$HOME/.bun/bin:$PATH"
+            cd /home/farmora/apps/farmora-prod/backend
+            bun install --production
+            pm2 reload farmora-prod --update-env
+            pm2 save
