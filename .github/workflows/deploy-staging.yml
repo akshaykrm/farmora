@@ -37,10 +37,10 @@ jobs:
           ssh-keyscan -H ${{ secrets.STAGING_HOST }} >> ~/.ssh/known_hosts
 
       - name: Sync Frontend Static Assets
-        run: rsync -avz --delete --rsync-path="sudo rsync" ./frontend/dist/ ${{ secrets.SERVER_USER }}@${{ secrets.STAGING_HOST }}:/var/www/staging/html/
+        run: rsync -avz --delete --rsync-path="sudo rsync" ./frontend/dist/ ${{ secrets.SERVER_USER }}@${{ secrets.STAGING_HOST }}:/var/www/staging-farmora/
 
       - name: Sync Backend Source
-        run: rsync -avz --delete --rsync-path="sudo rsync" --exclude='.git' --exclude='node_modules' --exclude='.env' ./backend/ ${{ secrets.SERVER_USER }}@${{ secrets.STAGING_HOST }}:/var/www/staging/backend/
+        run: rsync -avz --delete --rsync-path="sudo rsync" --exclude='.git' --exclude='node_modules' --exclude='.env' ./backend/ ${{ secrets.SERVER_USER }}@${{ secrets.STAGING_HOST }}:/home/farmora/apps/farmora/backend/
 
       - name: Deploy Backend on Staging Server
         uses: appleboy/ssh-action@v1.0.3
@@ -50,7 +50,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             export PATH="$HOME/.bun/bin:$PATH"
-            cd /var/www/staging/backend
+            cd /home/farmora/apps/farmora/backend
             bun install --production
             pm2 reload farmorastaging --update-env
             pm2 save
