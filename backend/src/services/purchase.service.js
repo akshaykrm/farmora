@@ -367,6 +367,71 @@ async function getAll(payload, currentUser) {
   }
 }
 
+async function getAllEvenIfBatchClosed(payload, currentUser) {
+  const { page, limit, ...filter } = payload
+
+  if (filter.name) {
+    filter.name = { [Op.iLike]: `%${filter.name}%` }
+  }
+
+  if (currentUser.user_type === userRoles.staff.type) {
+    filter.master_id = currentUser.master_id
+  } else if (currentUser.user_type === userRoles.manager.type) {
+    filter.master_id = currentUser.id
+  }
+
+  if (filter.start_date || filter.end_date) {
+    filter.invoice_date = {}
+    if (filter.start_date) {
+      filter.invoice_date[Op.gte] = filter.start_date
+      delete filter.start_date
+    }
+    if (filter.end_date) {
+      filter.invoice_date[Op.lte] = filter.end_date
+      delete filter.end_date
+    }
+  }
+
+  const offset = calculateOffSet(page, limit)
+
+  const opts = {
+    where: filter,
+    offset: offset,
+    limit: limit,
+    order: [['id', 'DESC']],
+    attributes: {
+      exclude: ['category_id', 'vendor_id'],
+    },
+    include: [
+      {
+        model: FarmModel,
+        as: 'farm',
+        required: true,
+      },
+      {
+        model: BatchModel,
+        as: 'batch',
+        required: true,
+      },
+      { model: ItemModel, as: 'category', required: false },
+      { model: VendorModel, as: 'vendor', required: false },
+      {
+        model: PurchaseBatchAssignmentModel,
+        as: 'assignments',
+        required: false,
+        attributes: { exclude: ['item_id', 'createdAt', 'updatedAt'] },
+      },
+    ],
+  }
+  const { rows, count } = await PurchaseModel.findAndCountAll(opts)
+
+  const totalPages = Math.ceil(count / limit)
+  return {
+    data: rows,
+    totalPages: totalPages,
+  }
+}
+
 const getInternalPurchaseTypes = async (filter, type) => {
   const rawPurchases = await PurchaseModel.findAll({
     where: filter,
@@ -603,6 +668,7 @@ const purchaseService = {
   getIntegrationBook,
   getInternalPurchaseTypes,
   createPurchaseBook,
+  getAllEvenIfBatchClosed,
 }
 
 export default purchaseService
