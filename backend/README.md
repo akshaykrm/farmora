@@ -112,13 +112,15 @@ For detailed endpoint documentation, please refer to the [API Documentation](./A
 
 ## Available Scripts
 
-- `npm start` - Start the application
-- `npm run dev` - Start in development mode with nodemon
-- `npm run doc` - Generate JSDoc documentation
-- `npm run db:migrate` - Run database migrations
-- `npm run db:migrate:undo` - Undo last migration
-- `npm run db:seed` - Seed the database
-- `npm run db:seed:undo` - Undo last seed
+- `bun start` - Start the application
+- `bun run dev` - Start in development mode with auto-reload
+- `bun run doc` - Generate JSDoc documentation
+- `bun run db:migrate` - Run database migrations
+- `bun run db:migrate:undo` - Undo last migration
+- `bun run db:migrate:undo:all` - Undo all migrations
+- `bun run db:seed` - Seed the database
+- `bun run db:seed:undo` - Undo last seed
+- `bun run test` - Reset database and run tests (Vitest)
 
 ## Technologies Used
 
