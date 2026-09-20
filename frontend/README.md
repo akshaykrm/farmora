@@ -7,6 +7,15 @@ Currently, two official plugins are available:
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
+## Continuous Deployment
+
+Staging and production are deployed automatically via GitHub Actions:
+
+- `.github/workflows/deploy-staging.yml` — runs on pushes to `development`
+- `.github/workflows/deploy-prod.yml` — runs on pushes to `main`
+
+Each workflow builds this frontend with `bun install --frozen-lockfile && bun run build` and syncs `dist/` to the target environment.
+
 ## React Compiler
 
 The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
