@@ -122,6 +122,15 @@ For detailed endpoint documentation, please refer to the [API Documentation](./A
 - `bun run db:seed:undo` - Undo last seed
 - `bun run test` - Reset database and run tests (Vitest)
 
+## Continuous Deployment
+
+The backend is deployed automatically via the same GitHub Actions workflows as the frontend:
+
+- `.github/workflows/deploy-staging.yml` — runs on pushes to `development`
+- `.github/workflows/deploy-prod.yml` — runs on pushes to `main`
+
+Each workflow syncs this directory to the target server and runs `bun install --production`, then reloads the PM2 process (`farmorastaging` / `farmora-prod`).
+
 ## Technologies Used
 
 - **Express.js** - Web framework
