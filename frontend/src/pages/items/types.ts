@@ -14,7 +14,7 @@ export type Item = {
     id: number;
     name: string;
   };
-  type: "integration" | "working" | "regular";
+  type: "integration" | "working" | "regular" | "general";
 };
 
 export type ItemListResponse = ListResponse<Item>;
@@ -24,12 +24,12 @@ export type ItemFormValues = {
   brand_id: number | "" | null;
   vendor_id: number | "";
   base_price: number | "";
-  type: "integration" | "working" | "regular" | "";
+  type: "integration" | "working" | "regular" | "general" | "";
 };
 
 export type ItemName = NameResponse & {
   id: number;
-  type: "integration" | "working" | "regular";
+  type: "integration" | "working" | "regular" | "general";
   base_price?: number;
 };
 

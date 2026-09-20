@@ -35,6 +35,7 @@ const ItemForm = ({ onSubmit, defaultValues, apiError, onCancel }: Props) => {
   useEffect(() => {
     reset(defaultValues);
   }, [defaultValues]);
+
   const brandNames = useGetBrandNames();
   const sellerList = useGetVendorNames({ type: "supplier" });
   const vendorID = watch("vendor_id");

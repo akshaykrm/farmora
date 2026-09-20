@@ -12,6 +12,7 @@ export const itemTypes = [
   { label: "PRE STARTER", value: "PRE STARTER" },
   { label: "Integration", value: "integration" },
   { label: "Working", value: "working" },
+  { label: "General", value: "general" },
 ];
 
 export default ItemPage;
