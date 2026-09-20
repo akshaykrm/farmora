@@ -16,6 +16,8 @@ Staging and production are deployed automatically via GitHub Actions:
 
 Each workflow builds this frontend with `bun install --frozen-lockfile && bun run build` and syncs `dist/` to the target environment.
 
+Secrets required for both workflows: `SSH_PRIVATE_KEY`, `STAGING_HOST`, and `SERVER_USER`.
+
 ## React Compiler
 
 The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
