@@ -34,7 +34,8 @@ const ItemModel = sequelize.define(
         'PRE STARTER',
         'integration',
         'working',
-        'regular'
+        'regular',
+        'general'
       ),
       defaultValue: 'regular',
       allowNull: false,

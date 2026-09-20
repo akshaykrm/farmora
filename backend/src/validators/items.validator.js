@@ -14,7 +14,8 @@ export const newItemCategory = Joi.object({
       'PRE STARTER',
       'integration',
       'working',
-      'regular'
+      'regular',
+      'general'
     )
     .required(),
 })
