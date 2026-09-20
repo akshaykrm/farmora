@@ -47,6 +47,7 @@ export const newItemSchema = Joi.object({
   invoice_number: Joi.string().required(),
   invoice_date: Joi.date().required(),
   payment_type: Joi.string().valid('credit', 'paid').required(),
+  narration: Joi.string().max(500).optional().allow('', null),
 })
 
 export const assignItemToBatchSchema = Joi.object({

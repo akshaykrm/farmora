@@ -3,6 +3,7 @@ import TableCell from "@components/TableCell";
 import TableHeaderCell from "@components/TableHeaderCell";
 import TableRow from "@components/TableRow";
 import { EditIcon } from "lucide-react";
+import Tooltip from "@mui/material/Tooltip";
 import { useMemo } from "react";
 import EmptyContentMessage from "@components/EmptyContentMessage";
 import Ternary from "@components/ternary";
@@ -18,6 +19,7 @@ const headers = [
   "Quantity",
   "Price",
   "Total Amount",
+  "Narration",
   "Action",
 ];
 
@@ -56,6 +58,20 @@ const ItemTable = ({ onEdit, data }: Props) => {
               <TableCell content={item.quantity || "-"} />
               <TableCell content={formatCurrency(item.price_per_unit)} />
               <TableCell content={formatCurrency(item.total_price)} />
+              <TableCell
+                content={
+                  <Tooltip
+                    title={item.narration}
+                    placement="top"
+                    arrow
+                    disableHoverListener={!item.narration}
+                  >
+                    <span className="block max-w-40 truncate cursor-pointer">
+                      {item.narration || "-"}
+                    </span>
+                  </Tooltip>
+                }
+              />
               <TableCell
                 content={
                   <EditIcon

@@ -22,6 +22,7 @@ export type Purchase = {
   batch_id: number;
   status: string;
   payment_type: "credit" | "paid";
+  narration: string;
   type: "integration" | "working" | null;
 };
 
@@ -79,6 +80,7 @@ export type PurchaseFormValues = {
   batch_id: number | null;
   assign_quantity: number | "";
   payment_type: "credit" | "paid" | null;
+  narration: string;
 };
 
 type UsePurchaseReturn = {
