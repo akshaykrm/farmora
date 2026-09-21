@@ -9,7 +9,8 @@ import {
 } from "@mui/material"
 import { Check } from "lucide-react"
 import fetcher from "@utils/fetcher"
-import { formatCurrency } from "@utils/currency"
+import PackagePriceDisplay from "@components/PackagePriceDisplay"
+import { getEffectivePrice } from "@utils/package-price"
 import ManagerRegistrationDialog from "../components/manager-registration-dialog"
 import RevealDiv from "../components/reveal"
 import SectionHeader from "../components/section-header"
@@ -23,7 +24,9 @@ interface Package {
   id: number
   name: string
   description: string
-  price: string
+  actual_price: string
+  discount_price: string
+  price?: string
   duration: number
   status: string
 }
@@ -62,7 +65,7 @@ const PackagesSection = () => {
 
   const visiblePackages = packages
     ?.filter((pkg) => pkg.status !== "disabled")
-    .sort((a, b) => parseFloat(a.price) - parseFloat(b.price))
+    .sort((a, b) => getEffectivePrice(a) - getEffectivePrice(b))
 
   const handleGetStarted = (pkg: Package) => {
     setSelectedPackage(pkg)
@@ -113,9 +116,7 @@ const PackagesSection = () => {
                         {pkg.name}
                       </h3>
                       <div className="mb-4">
-                        <span className="text-4xl font-bold text-brand-accent">
-                          {formatCurrency(parseFloat(pkg.price))}
-                        </span>
+                        <PackagePriceDisplay pkg={pkg} />
                       </div>
                       <p className="text-brand-ink-soft mb-6 text-sm leading-relaxed">
                         {pkg.description}

@@ -323,7 +323,7 @@ const getAdminDashboard = async (currentUser) => {
           {
             model: PackageModel,
             as: 'package',
-            attributes: ['id', 'name', 'price'],
+            attributes: ['id', 'name', 'actual_price', 'discount_price'],
           },
         ],
         order: [['id', 'DESC']],

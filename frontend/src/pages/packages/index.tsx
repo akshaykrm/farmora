@@ -14,6 +14,7 @@ import EmptyContentMessage from "@components/EmptyContentMessage";
 import Ternary from "@components/ternary";
 import { Dialog, DialogContent } from "@components/dialog";
 import packages, { type PackageFormValues } from "@api/packages.api";
+import PackagePriceDisplay from "@components/PackagePriceDisplay";
 import type { Package } from "@app-types/package.types";
 import type { ValidationError } from "@errors/api.error";
 import { useForm } from "react-hook-form";
@@ -21,7 +22,8 @@ import { useForm } from "react-hook-form";
 const emptyForm: PackageFormValues = {
   name: "",
   description: "",
-  price: 0,
+  actual_price: 0,
+  discount_price: 0,
   duration: 1,
   status: "active",
   referral_bonus_type: "none",
@@ -70,7 +72,8 @@ const PackagesPage = () => {
       reset({
         name: res.data.name,
         description: res.data.description || "",
-        price: Number(res.data.price),
+        actual_price: Number(res.data.actual_price),
+        discount_price: Number(res.data.discount_price ?? 0),
         duration: res.data.duration,
         status: res.data.status,
         referral_bonus_type: res.data.referral_bonus_type || "none",
@@ -112,7 +115,15 @@ const PackagesPage = () => {
       />
       <Table>
         <TableRow>
-          {["ID", "Name", "Price", "Duration", "Referral Bonus", "Status", "Edit"].map(
+          {[
+            "ID",
+            "Name",
+            "Price",
+            "Duration",
+            "Referral Bonus",
+            "Status",
+            "Edit",
+          ].map(
             (header) => (
               <TableHeaderCell key={header} content={header} />
             ),
@@ -122,7 +133,9 @@ const PackagesPage = () => {
           <TableRow key={row.id}>
             <TableCell content={i + 1} />
             <TableCell content={row.name} />
-            <TableCell content={String(row.price)} />
+            <TableCell
+              content={<PackagePriceDisplay pkg={row} size="compact" />}
+            />
             <TableCell content={row.duration} />
             <TableCell
               content={
@@ -182,10 +195,16 @@ const PackagesPage = () => {
               {...register("description")}
             />
             <TextField
-              label="Price"
+              label="Actual price"
               size="small"
               type="number"
-              {...register("price", { valueAsNumber: true })}
+              {...register("actual_price", { valueAsNumber: true })}
+            />
+            <TextField
+              label="Discount price"
+              size="small"
+              type="number"
+              {...register("discount_price", { valueAsNumber: true })}
             />
             <TextField
               label="Duration (months)"

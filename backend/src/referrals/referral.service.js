@@ -15,6 +15,7 @@ import { calculateOffSet } from '@utils/pagination'
 import { Op, UniqueConstraintError } from 'sequelize'
 import { sequelize } from '@utils/db'
 import logger from '@utils/logger'
+import { getEffectivePackagePrice } from '@utils/package-price'
 
 class ReferralPartnerNotFoundError extends Error {
   constructor(id) {
@@ -201,7 +202,7 @@ const getById = async (id, currentUser) => {
             model: PackageModel,
             as: 'package',
             required: false,
-            attributes: ['id', 'name', 'price'],
+            attributes: ['id', 'name', 'actual_price', 'discount_price'],
           },
         ],
       },
@@ -241,7 +242,7 @@ const getById = async (id, currentUser) => {
           ? {
               id: current.package.id,
               name: current.package.name,
-              price: current.package.price,
+              price: getEffectivePackagePrice(current.package),
             }
           : null,
         valid_to: current?.valid_to || null,

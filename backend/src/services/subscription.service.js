@@ -11,6 +11,7 @@ import { PermissionDeniedError } from '@errors/auth.errors'
 import { UserNotFoundError } from '@errors/user.errors'
 import dayjs from 'dayjs'
 import logger from '@utils/logger'
+import { getEffectivePackagePrice } from '@utils/package-price'
 import userRoles from '@utils/user-roles'
 import { Op } from 'sequelize'
 
@@ -54,7 +55,8 @@ const subscriptionInclude = [
     attributes: [
       'id',
       'name',
-      'price',
+      'actual_price',
+      'discount_price',
       'duration',
       'referral_bonus_type',
       'referral_bonus_value',
@@ -115,7 +117,9 @@ const buildSubscriptionSummary = (subscription) => {
       ? {
           id: packageRecord.id,
           name: packageRecord.name,
-          price: Number(packageRecord.price),
+          price: getEffectivePackagePrice(packageRecord),
+          actual_price: Number(packageRecord.actual_price),
+          discount_price: Number(packageRecord.discount_price),
           duration: packageRecord.duration,
         }
       : null,
@@ -153,7 +157,7 @@ const create = async (userID, packageID, options = {}) => {
     userID,
     newSubscription.id,
     'card',
-    packageRecord.price
+    getEffectivePackagePrice(packageRecord)
   )
 
   const user = await UserModel.findByPk(userID)
@@ -203,7 +207,7 @@ const renew = async (userId, packageId, actor = null) => {
     userId,
     renewed.id,
     'card',
-    packageRecord.price
+    getEffectivePackagePrice(packageRecord)
   )
 
   const user = await UserModel.findByPk(userId)
