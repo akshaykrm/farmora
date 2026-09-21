@@ -42,7 +42,7 @@ const LandingPage = () => {
   }, [location])
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen overflow-x-hidden">
       <HeroSection
         onScrollToFeatures={() => scrollToSection(featuresRef)}
         onScrollToPreview={() => scrollToSection(previewRef)}
