@@ -13,7 +13,7 @@ const WhyChooseSection = () => {
             subtitle="Automation, clarity, and tools designed for farms that measure profit batch by batch."
           />
         </RevealDiv>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 md:gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 md:gap-8">
           {WHY_CHOOSE_FARMORA.map((item, index) => {
             const Icon = item.icon
             return (
