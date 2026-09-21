@@ -4,12 +4,13 @@ import ReferralLedgerTransactionModel, {
 } from '@models/referralledgertransaction'
 import ReferralPartnerModel from '@models/referralpartner'
 import logger from '@utils/logger'
+import { getEffectivePackagePrice } from '@utils/package-price'
 import { UniqueConstraintError } from 'sequelize'
 
 export const computeBonus = (packageRecord) => {
   const bonusType = packageRecord.referral_bonus_type || 'none'
   const bonusValue = Number(packageRecord.referral_bonus_value || 0)
-  const packagePrice = Number(packageRecord.price || 0)
+  const packagePrice = getEffectivePackagePrice(packageRecord)
 
   if (bonusType === 'none' || bonusValue <= 0) {
     return {
