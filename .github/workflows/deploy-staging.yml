@@ -46,7 +46,7 @@ jobs:
         run: rsync -avz --delete --rsync-path="sudo rsync" ./frontend/dist/ ${{ secrets.SERVER_USER }}@${{ secrets.STAGING_HOST }}:/var/www/staging-farmora/
 
       - name: Sync Backend Source
-        run: rsync -avz --delete --rsync-path="sudo rsync" --exclude='.git' --exclude='node_modules' --exclude='.env' ./backend/ ${{ secrets.SERVER_USER }}@${{ secrets.STAGING_HOST }}:/home/farmora/apps/farmora/backend/
+        run: rsync -avz --delete --rsync-path="sudo rsync" --exclude='.git' --exclude='node_modules' --exclude='.env' --exclude='logs' ./backend/ ${{ secrets.SERVER_USER }}@${{ secrets.STAGING_HOST }}:/home/farmora/apps/farmora/backend/
 
       - name: Deploy Backend on Staging Server
         uses: appleboy/ssh-action@v1.0.3
@@ -57,6 +57,8 @@ jobs:
           script: |
             export PATH="$HOME/.bun/bin:$PATH"
             cd /home/farmora/apps/farmora/backend
+            sudo mkdir -p logs
+            sudo chown -R "$USER:$USER" .
             bun install --production
             pm2 reload farmorastaging --update-env
             pm2 save
