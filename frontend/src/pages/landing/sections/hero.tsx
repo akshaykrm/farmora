@@ -35,6 +35,17 @@ const HeroSection = ({
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      const prev = document.body.style.overflow
+      document.body.style.overflow = "hidden"
+      return () => {
+        document.body.style.overflow = prev
+      }
+    }
+    return undefined
+  }, [mobileMenuOpen])
+
   const navLinkClass =
     "text-brand-ink-soft hover:text-brand-ink transition-colors text-sm font-medium"
 
@@ -63,7 +74,7 @@ const HeroSection = ({
             className="shrink-0"
             aria-label="Scroll to top"
           >
-            <BrandLogo variant="onLight" priority />
+            <BrandLogo variant="onLight" priority className="h-11 sm:h-12 md:h-[4.25rem]" />
           </button>
 
           <div className="hidden md:flex items-center gap-5 lg:gap-6">
@@ -159,10 +170,12 @@ const HeroSection = ({
             auto-calculate P&amp;L and cost per kg, and share investor profit
             from one dashboard.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up animate-delay-2">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up animate-delay-2 w-full max-w-md sm:max-w-none mx-auto">
             <Button
               variant="contained"
               size="large"
+              fullWidth
+              className="sm:!w-auto"
               onClick={onScrollToPackages}
               endIcon={<ArrowRight size={18} />}
               sx={{
@@ -178,6 +191,8 @@ const HeroSection = ({
               variant="outlined"
               color="primary"
               size="large"
+              fullWidth
+              className="sm:!w-auto"
               onClick={onScrollToPreview}
               startIcon={<Play size={18} className="fill-brand-accent/20" />}
             >
