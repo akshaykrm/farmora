@@ -16,7 +16,11 @@ Staging and production are deployed automatically via GitHub Actions:
 
 Each workflow builds this frontend with `bun install --frozen-lockfile && bun run build` and syncs `dist/` to the target environment.
 
-Secrets required for both workflows: `SSH_PRIVATE_KEY`, `STAGING_HOST`, and `SERVER_USER`.
+`VITE_BACKEND_URL` is inlined at build time (Vite does not read the server `.env` at runtime). Set these GitHub Actions secrets:
+
+- Both workflows: `SSH_PRIVATE_KEY`, `STAGING_HOST`, `SERVER_USER`
+- Production (`deploy-prod.yml`): `PROD_VITE_BACKEND_URL` (e.g. `https://api.farmora.example.com`)
+- Staging (`deploy-staging.yml`): `STAGING_VITE_BACKEND_URL`
 
 ## React Compiler
 

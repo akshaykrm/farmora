@@ -23,7 +23,13 @@ jobs:
 
       - name: Build Frontend
         working-directory: ./frontend
+        env:
+          VITE_BACKEND_URL: ${{ secrets.PROD_VITE_BACKEND_URL }}
         run: |
+          if [ -z "$VITE_BACKEND_URL" ]; then
+            echo "PROD_VITE_BACKEND_URL secret is required (Vite inlines it at build time)."
+            exit 1
+          fi
           bun install --frozen-lockfile
           bun run build
 
