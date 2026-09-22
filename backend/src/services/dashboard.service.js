@@ -7,6 +7,7 @@ import PackageModel from '@models/package'
 import ItemModel from '@models/items.model'
 import userRoles from '@utils/user-roles'
 import { Op } from 'sequelize'
+import dayjs from 'dayjs'
 import logger from '@utils/logger'
 import { getAllPurchaseWithBatchActive } from '@services/purchase.service'
 import {
@@ -51,6 +52,74 @@ function calculateTotalStockValue(purchaseItems, returnedItems) {
     stock: expenseTotal - returnedTotal,
     chicks: totalPurchasedChicks - totalReturnedChicks,
   }
+}
+
+function buildOpenBatchDetails(activeBatches, purchaseItems, returnedItems) {
+  const chickStatsByBatch = new Map()
+
+  for (const p of purchaseItems) {
+    if (p?.category?.type !== 'chick') continue
+    const batchId = p.batch_id
+    if (!batchId) continue
+
+    const existing = chickStatsByBatch.get(batchId) || {
+      purchased: 0,
+      returned: 0,
+      earliestPurchaseDate: null,
+    }
+    existing.purchased += p.quantity
+
+    const invoiceDate = p.invoice_date
+    if (
+      invoiceDate &&
+      (!existing.earliestPurchaseDate ||
+        dayjs(invoiceDate).isBefore(dayjs(existing.earliestPurchaseDate)))
+    ) {
+      existing.earliestPurchaseDate = invoiceDate
+    }
+
+    chickStatsByBatch.set(batchId, existing)
+  }
+
+  for (const r of returnedItems) {
+    if (r?.category?.type !== 'chick') continue
+    const batchId = r.from_batch || r.batch?.id
+    if (!batchId) continue
+
+    const existing = chickStatsByBatch.get(batchId) || {
+      purchased: 0,
+      returned: 0,
+      earliestPurchaseDate: null,
+    }
+    existing.returned += r.quantity
+    chickStatsByBatch.set(batchId, existing)
+  }
+
+  const today = dayjs().startOf('day')
+
+  return activeBatches.map((batch) => {
+    const stats = chickStatsByBatch.get(batch.id) || {
+      purchased: 0,
+      returned: 0,
+      earliestPurchaseDate: null,
+    }
+    const chickPurchaseDate = stats.earliestPurchaseDate
+      ? dayjs(stats.earliestPurchaseDate).format('YYYY-MM-DD')
+      : null
+    const numberOfDays = chickPurchaseDate
+      ? today.diff(dayjs(chickPurchaseDate).startOf('day'), 'day')
+      : null
+
+    return {
+      id: batch.id,
+      name: batch.name,
+      chick_purchase_date: chickPurchaseDate,
+      number_of_chicks: stats.purchased - stats.returned,
+      number_of_days: numberOfDays,
+      season_id: batch.season_id ?? batch.season?.id ?? null,
+      season_name: batch.season?.name || '-',
+    }
+  })
 }
 
 async function getAverageProfitFromClosedBatches(
@@ -224,6 +293,12 @@ const getManagerDashboard = async (currentUser) => {
       }
     })
 
+    const openBatches = buildOpenBatchDetails(
+      activeBatches,
+      activePurchase,
+      activeReturns
+    )
+
     const subscriptionOwnerId =
       currentUser.user_type === userRoles.staff.type
         ? currentUser.parent_id || currentUser.master_id
@@ -240,6 +315,7 @@ const getManagerDashboard = async (currentUser) => {
       supplierBalance: supplierBalance,
       recentPurchases: parsedPurchases,
       recentSales: parsedSales,
+      openBatches,
       subscription:
         subscriptionService.buildSubscriptionSummary(currentSubscription),
     }
