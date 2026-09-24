@@ -1,0 +1,15 @@
+---
+description: Clean up seeded or ad-hoc reference data after testing
+alwaysApply: true
+---
+
+# Test / Seed Data Cleanup
+
+If you create seeded data, fixtures, or ad-hoc DB rows **for your own reference while testing** (partners, users, packages, ledger rows, etc.):
+
+- Remove that data after testing is done
+- Prefer deleting via the same APIs/scripts you used to create it, or a targeted undo
+- Do **not** leave temporary seed/test records in the shared development database
+- Do **not** commit one-off seed files meant only for local debugging unless the user asked for permanent seeds
+
+Official project seeds (`bun run db:seed` / `seed:core`) stay; only temporary reference data you added during a session must be cleaned up.

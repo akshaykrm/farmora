@@ -142,6 +142,15 @@ const ReferralDetailPage = () => {
       <p className="mb-4 text-sm text-brand-ink-soft">
         Code: <span className="font-semibold text-brand-ink">{detail.code}</span>
         {" · "}
+        Bonus:{" "}
+        <span className="font-semibold text-brand-ink">
+          {detail.referral_bonus_type === "fixed"
+            ? formatCurrency(Number(detail.referral_bonus_value || 0))
+            : detail.referral_bonus_type === "percentage"
+              ? `${detail.referral_bonus_value}% of package`
+              : "Uses package bonus"}
+        </span>
+        {" · "}
         <Link to="/referrals" className="text-brand-primary-strong hover:underline">
           Back to list
         </Link>

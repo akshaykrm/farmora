@@ -121,6 +121,11 @@ const create = async (payload, currentUser) => {
       email: payload.email || null,
       code,
       status: payload.status || 'active',
+      referral_bonus_type: payload.referral_bonus_type || 'none',
+      referral_bonus_value:
+        payload.referral_bonus_type && payload.referral_bonus_type !== 'none'
+          ? payload.referral_bonus_value
+          : null,
     })
   } catch (error) {
     if (error instanceof UniqueConstraintError) {
@@ -261,6 +266,9 @@ const updateById = async (id, payload, currentUser) => {
   const updates = { ...payload }
   if (updates.code !== undefined) {
     updates.code = normalizeCode(updates.code)
+  }
+  if (updates.referral_bonus_type === 'none') {
+    updates.referral_bonus_value = null
   }
 
   try {
