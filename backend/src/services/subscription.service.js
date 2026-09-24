@@ -243,8 +243,13 @@ const getAll = async (payload, currentUser) => {
     where,
     limit,
     offset,
-    order: [['id', 'DESC']],
+    order: [
+      ['valid_to', 'DESC'],
+      ['id', 'DESC'],
+    ],
     include: subscriptionInclude,
+    distinct: true,
+    col: 'id',
   })
 
   logger.info({ page, limit, count }, 'Subscriptions fetched')

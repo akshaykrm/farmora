@@ -13,11 +13,14 @@ export type Permission = {
   audience: "tenant" | "platform";
 };
 
+export type RoleKind = "system" | "custom";
+
 export type Role = {
   id: number;
   name: string;
   description: string;
-  manager_id: number;
+  manager_id: number | null;
+  kind?: RoleKind;
   permissions?: Permission[];
   role_permissions?: { permission_id: number }[];
 };
@@ -26,6 +29,7 @@ export type RoleFormValues = {
   name: string;
   description: string;
   permission_ids: number[];
+  kind?: RoleKind;
 };
 
 const permissionsApi = {
@@ -33,7 +37,12 @@ const permissionsApi = {
 };
 
 const rolesApi = {
-  fetchAll: (filter?: { page?: number; limit?: number; name?: string }) =>
+  fetchAll: (filter?: {
+    page?: number;
+    limit?: number;
+    name?: string;
+    kind?: RoleKind;
+  }) =>
     fetcherV2<ListResponse<Role>>("roles", null, {
       method: "GET",
       filter,

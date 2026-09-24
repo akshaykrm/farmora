@@ -14,6 +14,9 @@ import { createFarm } from './helpers/farm'
 
 import '../models/index.js'
 import { login } from './helpers/login.js'
+import { grantAllTenantPermissionsToPackage } from './helpers/entitlements.js'
+import PackageModel from '@models/package'
+import { Op } from 'sequelize'
 
 function randomCase() {
   const totalItemQty = Math.floor(Math.random() * 5000) + 500
@@ -31,6 +34,16 @@ describe('Assign Item to Batch Workflow', () => {
 
   beforeAll(async () => {
     connectDB()
+    const activePackage =
+      (await PackageModel.findOne({
+        where: { status: 'active', name: 'Basic' },
+      })) ||
+      (await PackageModel.findOne({
+        where: { status: 'active', role_id: { [Op.ne]: null } },
+      }))
+    if (activePackage) {
+      await grantAllTenantPermissionsToPackage(activePackage.id)
+    }
     token = await login()
   })
 

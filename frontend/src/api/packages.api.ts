@@ -12,6 +12,7 @@ export type PackageFormValues = {
   status: string;
   referral_bonus_type: "none" | "fixed" | "percentage";
   referral_bonus_value: number | null;
+  role_id: number | null;
 };
 
 const packages = {

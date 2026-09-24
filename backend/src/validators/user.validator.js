@@ -44,6 +44,11 @@ export const updateNewStaffSchema = newStaffMemberSchema
     password: Joi.forbidden(),
     email: Joi.string().email().optional(),
     phone: Joi.string().min(7).max(20).optional(),
+    state: optionalProfileField,
+    district: optionalProfileField,
+    place: optionalProfileField,
+    pincode: optionalProfileField,
+    bird_capacity: optionalProfileField,
   })
   .fork(['name', 'username'], (schema) => schema.optional())
 

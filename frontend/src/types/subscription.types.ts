@@ -6,7 +6,8 @@ export type Subscription = {
   package_id: number;
   valid_from: string;
   valid_to: string;
-  status: string;
+  kind?: "initial" | "renewal";
+  status?: string;
   user?: {
     id: number;
     name: string;

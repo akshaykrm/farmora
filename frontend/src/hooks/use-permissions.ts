@@ -1,6 +1,6 @@
 import type { AuthUser } from "@app-types/auth.types";
 import { useAuth } from "@store/authentication/context";
-import { isPlatformPermission, USER_TYPES } from "@utils/user-types";
+import { USER_TYPES } from "@utils/user-types";
 import { useCallback } from "react";
 
 const EMPTY_PERMISSIONS: string[] = [];
@@ -17,10 +17,9 @@ export const usePermissions = () => {
     (key?: string) => {
       if (!key) return true;
       if (isSuperAdmin) return true;
-      if (isSubscriber) return !isPlatformPermission(key);
       return permissions.includes(key);
     },
-    [isSuperAdmin, isSubscriber, permissions],
+    [isSuperAdmin, permissions],
   );
 
   return {

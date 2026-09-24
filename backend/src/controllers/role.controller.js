@@ -3,19 +3,21 @@ import asyncHandler from '@utils/async-handler'
 import userRoles from '@utils/user-roles'
 
 const createRole = async (req, res) => {
-  const { name, description, permission_ids } = req.body
+  const { name, description, permission_ids, kind, manager_id } = req.body
 
   const payload = {
     name,
     description,
     permission_ids,
+    kind,
+    manager_id,
   }
   const newRole = await roleService.createRoleService(payload, req.user)
   res.success(newRole, { message: 'Role created', statusCode: 201 })
 }
 
 const getAllRoles = async (req, res) => {
-  const { name, page, limit, manager_id } = req.query
+  const { name, page, limit, manager_id, kind } = req.query
   const filter = {
     page: page ? parseInt(req.query.page) : 1,
     limit: limit ? parseInt(req.query.limit) : 10,
@@ -26,6 +28,10 @@ const getAllRoles = async (req, res) => {
 
   if (manager_id) {
     filter.manager_id = manager_id
+  }
+
+  if (kind) {
+    filter.kind = kind
   }
 
   if (req.user.user_type === userRoles.manager.type) {

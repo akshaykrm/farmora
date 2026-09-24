@@ -12,6 +12,7 @@ export const newPackageSchema = Joi.object({
     .valid('none', 'fixed', 'percentage')
     .optional(),
   referral_bonus_value: Joi.number().min(0).allow(null).optional(),
+  role_id: Joi.number().integer().positive().allow(null).optional(),
 })
 
 export const updatePackageSchema = newPackageSchema.fork(

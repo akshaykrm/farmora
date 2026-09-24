@@ -35,6 +35,11 @@ const PackageModel = sequelize.define(
       allowNull: true,
       field: 'referral_bonus_value',
     },
+    role_id: {
+      type: Sequelize.INTEGER,
+      allowNull: true,
+      field: 'role_id',
+    },
   },
   {
     underscored: true,

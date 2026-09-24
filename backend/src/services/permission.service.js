@@ -2,6 +2,9 @@ import PermissionModel from '@models/permission'
 import RolePermissionModel from '@models/rolepermission'
 import UserRoleAssignment from '@models/userroleassignment'
 import UserPermissionModel from '@models/userpermission'
+import SubscriptionModel from '@models/subscription'
+import PackageModel from '@models/package'
+import RoleModel from '@models/role'
 import {
   ACTION_ORDER,
   AUDIENCE,
@@ -9,10 +12,10 @@ import {
   PERMISSIONS,
   getPermissionMeta,
   platformPermissionKeys,
-  tenantPermissionKeys,
 } from '../../config/permissions.js'
 import userRoles from '@utils/user-roles'
 import { Op } from 'sequelize'
+import dayjs from 'dayjs'
 import logger from '@utils/logger'
 
 export const getMasterId = (user) => {
@@ -24,6 +27,100 @@ export const getMasterId = (user) => {
 }
 
 const uniqueKeys = (keys) => [...new Set(keys.filter(Boolean))]
+
+const validationError = (message, code = 'INVALID_PERMISSION', statusCode = 400) => {
+  const error = new Error(message)
+  error.statusCode = statusCode
+  error.code = code
+  error.name =
+    statusCode === 403 ? 'PermissionDeniedError' : 'ValidationError'
+  return error
+}
+
+export const getPermissionKeysForRoleId = async (roleId) => {
+  if (!roleId) return []
+
+  const rolePermissions = await RolePermissionModel.findAll({
+    where: { role_id: roleId },
+    attributes: ['permission_id'],
+  })
+
+  const permissionIds = rolePermissions.map((row) => row.permission_id)
+  if (!permissionIds.length) return []
+
+  const permissions = await PermissionModel.findAll({
+    where: { id: { [Op.in]: permissionIds } },
+    attributes: ['key'],
+  })
+
+  return uniqueKeys(permissions.map((permission) => permission.key))
+}
+
+export const getCurrentPackageRolePermissionKeys = async (masterId) => {
+  if (!masterId) return []
+
+  const now = dayjs().toDate()
+  const subscription = await SubscriptionModel.findOne({
+    where: {
+      user_id: masterId,
+      valid_from: { [Op.lte]: now },
+      valid_to: { [Op.gte]: now },
+    },
+    order: [
+      ['valid_to', 'DESC'],
+      ['id', 'DESC'],
+    ],
+    include: [
+      {
+        model: PackageModel,
+        as: 'package',
+        required: false,
+        include: [
+          {
+            model: RoleModel,
+            as: 'role',
+            required: false,
+          },
+        ],
+      },
+    ],
+  })
+
+  const roleId = subscription?.package?.role_id || subscription?.package?.role?.id
+  if (!roleId) return []
+
+  return getPermissionKeysForRoleId(roleId)
+}
+
+export const intersectWithPackage = async (keys, masterId) => {
+  const packageKeys = await getCurrentPackageRolePermissionKeys(masterId)
+  const packageSet = new Set(packageKeys)
+  return uniqueKeys(keys).filter((key) => packageSet.has(key))
+}
+
+export const assertWithinPackagePermissionIds = async (
+  permissionIds = [],
+  masterId
+) => {
+  if (!permissionIds.length) return []
+
+  const records = await assertTenantPermissionIds(permissionIds)
+  const packageKeys = await getCurrentPackageRolePermissionKeys(masterId)
+  const packageSet = new Set(packageKeys)
+  const outside = records
+    .map((record) => record.key)
+    .filter((key) => !packageSet.has(key))
+
+  if (outside.length > 0) {
+    throw validationError(
+      `permissions not available in current package: ${outside.join(', ')}`,
+      'PACKAGE_PERMISSION_DENIED',
+      403
+    )
+  }
+
+  return records
+}
 
 const loadAssignedPermissionKeys = async (userId) => {
   const [roleAssignments, extraAssignments] = await Promise.all([
@@ -74,10 +171,11 @@ export const resolvePermissionKeys = async (user) => {
   }
 
   if (user.user_type === userRoles.manager.type) {
-    return [...tenantPermissionKeys]
+    return getCurrentPackageRolePermissionKeys(user.id)
   }
 
-  return loadAssignedPermissionKeys(user.id)
+  const assigned = await loadAssignedPermissionKeys(user.id)
+  return intersectWithPackage(assigned, user.parent_id)
 }
 
 const groupIndex = (group) => {
@@ -128,12 +226,16 @@ const getAllPermissions = async (currentUser) => {
       order: [['key', 'ASC']],
     })
 
-    const audience =
-      currentUser?.user_type === userRoles.admin.type
-        ? null
-        : AUDIENCE.tenant
+    if (currentUser?.user_type === userRoles.admin.type) {
+      return enrichPermissionRecords(records, null)
+    }
 
-    return enrichPermissionRecords(records, audience)
+    const masterId = getMasterId(currentUser)
+    const packageKeys = new Set(
+      await getCurrentPackageRolePermissionKeys(masterId)
+    )
+    const allowed = records.filter((record) => packageKeys.has(record.key))
+    return enrichPermissionRecords(allowed, AUDIENCE.tenant)
   } catch (error) {
     logger.error({ err: error }, 'Error fetching permissions')
     throw error
@@ -151,11 +253,7 @@ export const assertTenantPermissionIds = async (permissionIds = []) => {
   if (records.length !== permissionIds.length) {
     const foundIds = new Set(records.map((record) => record.id))
     const missing = permissionIds.filter((id) => !foundIds.has(id))
-    const error = new Error(`unknown permission ids: ${missing.join(', ')}`)
-    error.statusCode = 400
-    error.code = 'INVALID_PERMISSION'
-    error.name = 'ValidationError'
-    throw error
+    throw validationError(`unknown permission ids: ${missing.join(', ')}`)
   }
 
   const platformKeys = records
@@ -163,11 +261,11 @@ export const assertTenantPermissionIds = async (permissionIds = []) => {
     .filter((key) => platformPermissionKeys.includes(key))
 
   if (platformKeys.length > 0) {
-    const error = new Error('platform permissions cannot be assigned')
-    error.statusCode = 403
-    error.code = 'PERMISSION_DENIED'
-    error.name = 'PermissionDeniedError'
-    throw error
+    throw validationError(
+      'platform permissions cannot be assigned',
+      'PERMISSION_DENIED',
+      403
+    )
   }
 
   return records
@@ -178,6 +276,10 @@ const permissionService = {
   resolvePermissionKeys,
   getMasterId,
   assertTenantPermissionIds,
+  assertWithinPackagePermissionIds,
+  getCurrentPackageRolePermissionKeys,
+  getPermissionKeysForRoleId,
+  intersectWithPackage,
 }
 
 export default permissionService

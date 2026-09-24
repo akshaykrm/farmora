@@ -61,11 +61,11 @@ export const paths: Paths = [
     permission: "package:read",
   },
   {
-    pathname: "Subscriptions",
-    link: "/subscriptions",
-    icon: Package,
+    pathname: "System Roles",
+    link: "/system-roles",
+    icon: Shield,
     audience: "platform",
-    permission: "subscription:read",
+    permission: "role:read",
   },
   {
     pathname: "Referrals",

@@ -8,8 +8,12 @@ import type { ListResponse } from "@app-types/response.types";
 import fetcher from "@utils/fetcher";
 
 const subscription = {
-  fetchAll: (): Promise<ListResponse<Subscription>> => {
-    return fetcher("subscriptions", null, { method: "GET" });
+  fetchAll: (filter?: {
+    page?: number;
+    limit?: number;
+    user_id?: number;
+  }): Promise<ListResponse<Subscription>> => {
+    return fetcher("subscriptions", null, { method: "GET", filter });
   },
   fetchById: async (id: number): Promise<EditSubscriptionRequest> => {
     const data = await fetcher(`subscriptions/${id}`);

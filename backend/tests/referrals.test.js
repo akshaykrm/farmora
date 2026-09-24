@@ -9,6 +9,8 @@ import PackageModel from '@models/package'
 import ReferralPartnerModel from '@models/referralpartner'
 import ReferralLedgerTransactionModel from '@models/referralledgertransaction'
 import { connectDB } from '@utils/db'
+import { grantAllTenantPermissionsToPackage } from './helpers/entitlements.js'
+import { Op } from 'sequelize'
 
 const unique = (prefix) =>
   `${prefix}${Date.now()}${Math.floor(Math.random() * 1000)}`
@@ -54,8 +56,15 @@ describe('Referral bonus and renewals', () => {
   beforeAll(async () => {
     await connectDB()
     admin = await loginAs('superadmin', 'admin123')
-    packageRecord = await PackageModel.findOne({ where: { status: 'active' } })
+    packageRecord =
+      (await PackageModel.findOne({
+        where: { status: 'active', name: 'Basic' },
+      })) ||
+      (await PackageModel.findOne({
+        where: { status: 'active', role_id: { [Op.ne]: null } },
+      }))
     expect(packageRecord).toBeTruthy()
+    await grantAllTenantPermissionsToPackage(packageRecord.id)
 
     await packageRecord.update({
       price: 5000,

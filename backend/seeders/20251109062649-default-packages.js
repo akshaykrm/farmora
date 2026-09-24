@@ -14,30 +14,30 @@ export default {
         updated_at: new Date(),
       },
       {
-        name: 'Premium',
+        name: 'Standard',
         price: 999,
         duration: 1,
-        description: 'Premium package for growing operations.',
-        status: 'inactive',
+        description: 'Standard package for growing operations.',
+        status: 'active',
         created_at: new Date(),
         updated_at: new Date(),
       },
       {
-        name: 'Enterprise',
+        name: 'Premium',
         price: 2999,
         duration: 1,
-        description: 'Enterprise package for large-scale operations.',
-        status: 'inactive',
+        description: 'Premium package for large-scale operations.',
+        status: 'active',
         created_at: new Date(),
         updated_at: new Date(),
       },
     ])
   },
 
-  async down(queryInterface, Sequelize) {
+  async down(queryInterface) {
     await queryInterface.bulkDelete(
       'packages',
-      [{ name: 'Basic' }, { name: 'Premium' }, { name: 'Enterprise' }],
+      [{ name: 'Basic' }, { name: 'Standard' }, { name: 'Premium' }],
       {}
     )
   },

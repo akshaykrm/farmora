@@ -5,10 +5,17 @@ import app from '../app.js'
 import '../models/index.js'
 import UserModel from '@models/user'
 import SubscriptionModel from '@models/subscription'
+import PackageModel from '@models/package'
 import PermissionModel from '@models/permission'
+import UserPermissionModel from '@models/userpermission'
 import { connectDB } from '@utils/db'
+import {
+  createSystemRoleWithKeys,
+  grantAllTenantPermissionsToPackage,
+} from './helpers/entitlements.js'
 
-const unique = (prefix) => `${prefix}_${Date.now()}_${Math.floor(Math.random() * 1000)}`
+const unique = (prefix) =>
+  `${prefix}_${Date.now()}_${Math.floor(Math.random() * 1000)}`
 
 const authHeader = (token) => ({ Authorization: `Bearer ${token}` })
 
@@ -36,7 +43,7 @@ const createManager = async (overrides = {}) => {
 
   await SubscriptionModel.create({
     user_id: manager.id,
-    package_id: 1,
+    package_id: overrides.package_id || 1,
     valid_from: dayjs().subtract(1, 'day').toDate(),
     valid_to: dayjs().add(1, 'year').toDate(),
   })
@@ -59,12 +66,18 @@ describe('Roles and permissions', () => {
   let seasonReadId
   let seasonWriteId
   let packageReadId
+  let basicPackageId
 
   beforeAll(async () => {
     await connectDB()
+    const basicPackage = await PackageModel.findOne({ where: { name: 'Basic' } })
+    expect(basicPackage).toBeTruthy()
+    basicPackageId = basicPackage.id
+    await grantAllTenantPermissionsToPackage(basicPackageId)
+
     admin = await loginAs('superadmin', 'admin123')
-    managerA = await createManager()
-    managerB = await createManager()
+    managerA = await createManager({ package_id: basicPackageId })
+    managerB = await createManager({ package_id: basicPackageId })
     managerAToken = (await loginAs(managerA.username, 'root')).token
     managerBToken = (await loginAs(managerB.username, 'root')).token
     seasonReadId = await permissionIdByKey('season:read')
@@ -281,5 +294,233 @@ describe('Roles and permissions', () => {
       .set(authHeader(managerAToken))
       .send({ new_password: 'hacked' })
     expect(crossTenant.status).toBe(404)
+  })
+
+  it('lets admin create a system role and attach it to a package', async () => {
+    const roleRes = await request(app)
+      .post('/api/roles')
+      .set(authHeader(admin.token))
+      .send({
+        name: unique('sysrole'),
+        description: 'Package ceiling',
+        kind: 'system',
+        permission_ids: [seasonReadId],
+      })
+    expect(roleRes.status).toBe(201)
+    expect(roleRes.body.data.kind).toBe('system')
+    expect(roleRes.body.data.manager_id).toBeNull()
+
+    const pkg = await PackageModel.create({
+      name: unique('pkg'),
+      description: 'Test package',
+      price: 10,
+      duration: 1,
+      status: 'active',
+      role_id: roleRes.body.data.id,
+    })
+
+    const fetched = await request(app)
+      .get(`/api/packages/${pkg.id}`)
+      .set(authHeader(admin.token))
+    expect(fetched.status).toBe(200)
+    expect(fetched.body.data.role_id).toBe(roleRes.body.data.id)
+    expect(fetched.body.data.role.name).toBe(roleRes.body.data.name)
+  })
+
+  it('caps manager access to the package system role', async () => {
+    const limitedRole = await createSystemRoleWithKeys(unique('limited'), [
+      'dashboard:read',
+      'season:read',
+    ])
+    const limitedPackage = await PackageModel.create({
+      name: unique('limitedpkg'),
+      description: 'Limited',
+      price: 1,
+      duration: 1,
+      status: 'active',
+      role_id: limitedRole.id,
+    })
+    const manager = await createManager({ package_id: limitedPackage.id })
+    const session = await loginAs(manager.username, 'root')
+    expect(session.permissions).toEqual(
+      expect.arrayContaining(['dashboard:read', 'season:read'])
+    )
+    expect(session.permissions).not.toContain('season:write')
+
+    const seasons = await request(app)
+      .get('/api/seasons')
+      .set(authHeader(session.token))
+    expect(seasons.status).toBe(200)
+
+    const write = await request(app)
+      .post('/api/seasons')
+      .set(authHeader(session.token))
+      .send({
+        name: unique('season'),
+        status: 'active',
+        from_date: dayjs().toISOString(),
+        to_date: dayjs().add(1, 'month').toISOString(),
+      })
+    expect(write.status).toBe(403)
+  })
+
+  it('ignores staff grants outside the current package and restores on upgrade', async () => {
+    const premiumKeys = [
+      'dashboard:read',
+      'user:read',
+      'user:write',
+      'user:edit',
+      'role:read',
+      'role:write',
+      'season:read',
+      'season:write',
+    ]
+    const basicKeys = [
+      'dashboard:read',
+      'user:read',
+      'user:write',
+      'user:edit',
+      'role:read',
+      'role:write',
+      'season:read',
+    ]
+
+    const premiumRole = await createSystemRoleWithKeys(
+      unique('premiumceil'),
+      premiumKeys
+    )
+    const basicRole = await createSystemRoleWithKeys(
+      unique('basicceil'),
+      basicKeys
+    )
+    const premiumPackage = await PackageModel.create({
+      name: unique('premiumpkg'),
+      description: 'Premium ceiling',
+      price: 100,
+      duration: 1,
+      status: 'active',
+      role_id: premiumRole.id,
+    })
+    const basicPackage = await PackageModel.create({
+      name: unique('basicpkg'),
+      description: 'Basic ceiling',
+      price: 50,
+      duration: 1,
+      status: 'active',
+      role_id: basicRole.id,
+    })
+
+    const manager = await createManager({ package_id: premiumPackage.id })
+    const managerToken = (await loginAs(manager.username, 'root')).token
+
+    const username = unique('staffceil')
+    const created = await request(app)
+      .post('/api/users')
+      .set(authHeader(managerToken))
+      .send({
+        name: 'Staff Ceiling',
+        username,
+        password: 'root',
+        permission_ids: [seasonReadId, seasonWriteId],
+      })
+    expect(created.status).toBe(201)
+
+    const staffUserId = created.body.data.id
+    let staffSession = await loginAs(username, 'root')
+    expect(staffSession.permissions).toEqual(
+      expect.arrayContaining(['season:read', 'season:write'])
+    )
+
+    await SubscriptionModel.update(
+      { valid_to: dayjs().subtract(1, 'minute').toDate() },
+      { where: { user_id: manager.id } }
+    )
+    await SubscriptionModel.create({
+      user_id: manager.id,
+      package_id: basicPackage.id,
+      kind: 'renewal',
+      valid_from: dayjs().toDate(),
+      valid_to: dayjs().add(1, 'year').toDate(),
+    })
+
+    staffSession = await loginAs(username, 'root')
+    expect(staffSession.permissions).toContain('season:read')
+    expect(staffSession.permissions).not.toContain('season:write')
+
+    const writeDenied = await request(app)
+      .post('/api/seasons')
+      .set(authHeader(staffSession.token))
+      .send({
+        name: unique('season'),
+        status: 'active',
+        from_date: dayjs().toISOString(),
+        to_date: dayjs().add(1, 'month').toISOString(),
+      })
+    expect(writeDenied.status).toBe(403)
+
+    const stored = await UserPermissionModel.findAll({
+      where: { user_id: staffUserId },
+    })
+    expect(stored.map((row) => row.permission_id).sort()).toEqual(
+      [seasonReadId, seasonWriteId].sort()
+    )
+
+    await SubscriptionModel.update(
+      { valid_to: dayjs().subtract(1, 'minute').toDate() },
+      { where: { user_id: manager.id } }
+    )
+    await SubscriptionModel.create({
+      user_id: manager.id,
+      package_id: premiumPackage.id,
+      kind: 'renewal',
+      valid_from: dayjs().toDate(),
+      valid_to: dayjs().add(2, 'year').toDate(),
+    })
+
+    staffSession = await loginAs(username, 'root')
+    expect(staffSession.permissions).toEqual(
+      expect.arrayContaining(['season:read', 'season:write'])
+    )
+  })
+
+  it('rejects assigning permissions outside the company package', async () => {
+    const limitedRole = await createSystemRoleWithKeys(unique('assigncap'), [
+      'dashboard:read',
+      'user:read',
+      'user:write',
+      'user:edit',
+      'season:read',
+    ])
+    const limitedPackage = await PackageModel.create({
+      name: unique('assignpkg'),
+      description: 'Assign cap',
+      price: 1,
+      duration: 1,
+      status: 'active',
+      role_id: limitedRole.id,
+    })
+    const manager = await createManager({ package_id: limitedPackage.id })
+    const managerToken = (await loginAs(manager.username, 'root')).token
+
+    const roleRes = await request(app)
+      .post('/api/roles')
+      .set(authHeader(managerToken))
+      .send({
+        name: unique('badrole'),
+        description: 'Too many perms',
+        permission_ids: [seasonReadId, seasonWriteId],
+      })
+    expect(roleRes.status).toBe(403)
+
+    const staffRes = await request(app)
+      .post('/api/users')
+      .set(authHeader(managerToken))
+      .send({
+        name: 'Staff Over',
+        username: unique('staffover'),
+        password: 'root',
+        permission_ids: [seasonWriteId],
+      })
+    expect(staffRes.status).toBe(403)
   })
 })

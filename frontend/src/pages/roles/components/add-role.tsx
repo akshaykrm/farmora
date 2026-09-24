@@ -1,7 +1,7 @@
 import { Dialog, DialogContent } from "@components/dialog";
 import RoleForm from "./role-form";
 import type { RoleFormValues } from "../types";
-import { rolesApi } from "@api/roles.api";
+import { rolesApi, type RoleKind } from "@api/roles.api";
 import { useState } from "react";
 import type { ValidationError } from "@errors/api.error";
 
@@ -15,9 +15,10 @@ type Props = {
   isShow: boolean;
   onClose: () => void;
   refetch: () => void;
+  kind?: RoleKind;
 };
 
-const AddRole = ({ isShow, onClose, refetch }: Props) => {
+const AddRole = ({ isShow, onClose, refetch, kind = "custom" }: Props) => {
   const [errors, setErrors] = useState<ValidationError[]>([]);
 
   const handleClose = () => {
@@ -26,7 +27,7 @@ const AddRole = ({ isShow, onClose, refetch }: Props) => {
   };
 
   const onSubmit = async (payload: RoleFormValues) => {
-    const res = await rolesApi.create(payload);
+    const res = await rolesApi.create({ ...payload, kind });
     if (res.status === "success") {
       handleClose();
       refetch();
@@ -38,7 +39,7 @@ const AddRole = ({ isShow, onClose, refetch }: Props) => {
   return (
     <Dialog
       isOpen={isShow}
-      headerTitle="Add Role"
+      headerTitle={kind === "system" ? "Add System Role" : "Add Role"}
       onClose={handleClose}
       className="max-w-2xl"
     >
