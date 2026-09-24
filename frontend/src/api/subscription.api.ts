@@ -20,6 +20,7 @@ const subscription = {
     return {
       id: data.id,
       package_id: data.package_id || data.package?.id,
+      referral_partner_id: data.user?.referral_partner_id ?? null,
     };
   },
   create: async (payload: NewSubscriptionRequest) =>
@@ -33,6 +34,7 @@ const subscription = {
   updateById: async (id: number, updateData: EditSubscriptionRequest) => {
     const payload: EditSubscriptionPayload = {
       package_id: updateData.package_id,
+      referral_partner_id: updateData.referral_partner_id,
     };
     return await fetcher(`subscriptions/${id}`, JSON.stringify(payload), {
       method: "PUT",

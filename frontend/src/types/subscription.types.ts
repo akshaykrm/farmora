@@ -1,5 +1,3 @@
-import type { ListResponse } from "./response.types";
-
 export type Subscription = {
   id: number;
   user_id: number;
@@ -12,6 +10,13 @@ export type Subscription = {
     id: number;
     name: string;
     username: string;
+    referral_partner_id?: number | null;
+    referral_partner?: {
+      id: number;
+      name: string;
+      code: string;
+      status?: string;
+    } | null;
   };
   package?: {
     id: number;
@@ -24,6 +29,7 @@ export type Subscription = {
 export type NewSubscriptionRequest = {
   package_id: number;
   user_id?: number;
+  referral_partner_id?: number | null;
 };
 
 export type EditSubscriptionRequest = Partial<NewSubscriptionRequest> & {
@@ -32,4 +38,10 @@ export type EditSubscriptionRequest = Partial<NewSubscriptionRequest> & {
 
 export type EditSubscriptionPayload = Omit<EditSubscriptionRequest, "id">;
 
-export type SubscriptionsListResponse = ListResponse<Subscription>;
+export type SubscriptionsListResponse = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  data: Subscription[];
+};

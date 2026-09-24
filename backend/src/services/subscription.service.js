@@ -1,6 +1,7 @@
 import SubscriptionModel from '@models/subscription'
 import PackageModel from '@models/package'
 import UserModel from '@models/user'
+import ReferralPartnerModel from '@models/referralpartner'
 import paymentService from '@services/payment.service'
 import referralBonusService from '@services/referral-bonus.service'
 import {
@@ -32,6 +33,81 @@ class NoSubscriptionToRenewError extends Error {
   }
 }
 
+class ReferralAssignmentError extends Error {
+  constructor(message) {
+    super(message)
+    this.name = 'ReferralAssignmentError'
+    this.code = 'REFERRAL_ASSIGNMENT_ERROR'
+    this.statusCode = 400
+  }
+}
+
+const assignReferralPartner = async ({
+  userId,
+  referralPartnerId,
+  subscription,
+  packageRecord,
+  actorId,
+  bonusType,
+  remarks,
+  creditBonus = true,
+}) => {
+  if (!referralPartnerId) return null
+
+  const user = await UserModel.findByPk(userId)
+  if (!user || user.user_type !== userRoles.manager.type) {
+    throw new UserNotFoundError(userId)
+  }
+
+  if (
+    user.referral_partner_id &&
+    Number(user.referral_partner_id) !== Number(referralPartnerId)
+  ) {
+    throw new ReferralAssignmentError(
+      'company is already linked to a different referral partner'
+    )
+  }
+
+  if (Number(user.referral_partner_id) === Number(referralPartnerId)) {
+    return null
+  }
+
+  const partner = await ReferralPartnerModel.findByPk(referralPartnerId)
+  if (!partner) {
+    throw new ReferralAssignmentError('referral partner not found')
+  }
+  if (partner.status !== 'active') {
+    throw new ReferralAssignmentError('referral partner is inactive')
+  }
+
+  await user.update({ referral_partner_id: partner.id })
+
+  if (!creditBonus) {
+    return null
+  }
+
+  const packageForBonus =
+    packageRecord ||
+    subscription?.package ||
+    (subscription?.package_id
+      ? await PackageModel.findByPk(subscription.package_id)
+      : null)
+
+  if (!subscription || !packageForBonus) {
+    return null
+  }
+
+  return referralBonusService.creditForSubscription({
+    partnerId: partner.id,
+    companyUserId: userId,
+    subscription,
+    packageRecord: packageForBonus,
+    type: bonusType,
+    createdBy: actorId || null,
+    remarks,
+  })
+}
+
 const subscriptionInclude = [
   {
     model: UserModel,
@@ -45,6 +121,14 @@ const subscriptionInclude = [
       'user_type',
       'status',
       'referral_partner_id',
+    ],
+    include: [
+      {
+        model: ReferralPartnerModel,
+        as: 'referral_partner',
+        required: false,
+        attributes: ['id', 'name', 'code', 'status'],
+      },
     ],
   },
   {
@@ -173,7 +257,7 @@ const create = async (userID, packageID, options = {}) => {
   return newSubscription
 }
 
-const renew = async (userId, packageId, actor = null) => {
+const renew = async (userId, packageId, actor = null, options = {}) => {
   const latest = await getLatestSubscription(userId)
   if (!latest) {
     throw new NoSubscriptionToRenewError(userId)
@@ -205,6 +289,17 @@ const renew = async (userId, packageId, actor = null) => {
     'card',
     packageRecord.price
   )
+
+  if (options.referral_partner_id) {
+    await assignReferralPartner({
+      userId,
+      referralPartnerId: options.referral_partner_id,
+      subscription: renewed,
+      packageRecord,
+      actorId: actor?.id,
+      creditBonus: false,
+    })
+  }
 
   const user = await UserModel.findByPk(userId)
   if (user?.referral_partner_id) {
@@ -291,9 +386,10 @@ const updateById = async (id, payload, currentUser) => {
 
   const record = await getById(id, currentUser)
   const updates = {}
+  let packageRecord = record.package || null
 
   if (payload.package_id) {
-    const packageRecord = await PackageModel.findByPk(payload.package_id)
+    packageRecord = await PackageModel.findByPk(payload.package_id)
     if (!packageRecord) {
       throw new PackageNotFoundError(payload.package_id)
     }
@@ -313,7 +409,28 @@ const updateById = async (id, payload, currentUser) => {
     updates.valid_to = payload.valid_to
   }
 
-  await record.update(updates)
+  if (Object.keys(updates).length > 0) {
+    await record.update(updates)
+  }
+
+  const updated = await getById(id, currentUser)
+
+  if (payload.referral_partner_id) {
+    await assignReferralPartner({
+      userId: updated.user_id,
+      referralPartnerId: payload.referral_partner_id,
+      subscription: updated,
+      packageRecord:
+        packageRecord ||
+        updated.package ||
+        (await PackageModel.findByPk(updated.package_id)),
+      actorId: currentUser.id,
+      bonusType: referralBonusService.TYPES.manual_link_bonus,
+      remarks: 'Referral assigned on subscription edit by Super Admin',
+      creditBonus: true,
+    })
+  }
+
   return getById(id, currentUser)
 }
 
@@ -365,7 +482,9 @@ const renewForUser = async (payload, currentUser) => {
   ) {
     throw new PermissionDeniedError('subscriptions belong to subscribers')
   }
-  return renew(userId, payload.package_id, currentUser)
+  return renew(userId, payload.package_id, currentUser, {
+    referral_partner_id: payload.referral_partner_id,
+  })
 }
 
 const subscriptionService = {

@@ -8,7 +8,7 @@ import subscription from "@api/subscription.api";
 import type { Subscription } from "@app-types/subscription.types";
 import { Button } from "@mui/material";
 import dayjs from "dayjs";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { EditIcon } from "lucide-react";
 import RenewSubscription from "@pages/subscriptions/components/renew";
 import EditSubscription from "@pages/subscriptions/components/edit";
@@ -51,6 +51,15 @@ const SubscriptionHistoryDialog = ({
     onChanged();
   };
 
+  const referralPartner = useMemo(() => {
+    const fromRows = rows.find((row) => row.user?.referral_partner)?.user
+      ?.referral_partner;
+    if (fromRows) return fromRows;
+    const partnerId = rows.find((row) => row.user?.referral_partner_id)?.user
+      ?.referral_partner_id;
+    return partnerId ? { id: partnerId, name: `Partner #${partnerId}`, code: "" } : null;
+  }, [rows]);
+
   return (
     <>
       <Dialog
@@ -64,7 +73,17 @@ const SubscriptionHistoryDialog = ({
         className="max-w-3xl"
       >
         <DialogContent>
-          <div className="mb-4 flex justify-end">
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <p className="text-sm text-brand-ink-muted">
+              Referral partner:{" "}
+              <span className="text-brand-ink">
+                {referralPartner
+                  ? `${referralPartner.name}${
+                      referralPartner.code ? ` (${referralPartner.code})` : ""
+                    }`
+                  : "Not assigned"}
+              </span>
+            </p>
             <Button
               variant="contained"
               size="small"
@@ -78,6 +97,7 @@ const SubscriptionHistoryDialog = ({
                   valid_from: "",
                   valid_to: "",
                   package: rows[0]?.package,
+                  user: rows[0]?.user,
                 });
               }}
             >
@@ -92,15 +112,11 @@ const SubscriptionHistoryDialog = ({
           ) : (
             <Table>
               <TableRow>
-                {[
-                  "Package",
-                  "Kind",
-                  "Valid From",
-                  "Valid To",
-                  "Edit",
-                ].map((header) => (
-                  <TableHeaderCell key={header} content={header} />
-                ))}
+                {["Package", "Kind", "Valid From", "Valid To", "Edit"].map(
+                  (header) => (
+                    <TableHeaderCell key={header} content={header} />
+                  ),
+                )}
               </TableRow>
               {rows.map((row) => (
                 <TableRow key={row.id}>
@@ -147,6 +163,11 @@ const SubscriptionHistoryDialog = ({
         userId={renewTarget?.user_id ?? null}
         packageId={
           renewTarget?.package_id ?? renewTarget?.package?.id ?? null
+        }
+        referralPartnerId={
+          renewTarget?.user?.referral_partner_id ??
+          referralPartner?.id ??
+          null
         }
         onClose={() => {
           setRenewTarget(null);
