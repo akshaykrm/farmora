@@ -43,14 +43,18 @@ const FinancialSummaryTable = (props: Props) => {
       >
         <p
           className={`text-xs font-medium ${
-            profit >= 0 ? "text-brand-success-strong" : "text-brand-danger-strong"
+            profit >= 0
+              ? "text-brand-success-strong"
+              : "text-brand-danger-strong"
           }`}
         >
-          Total Profit
+          Total&nbsp;Profit&nbsp;/&nbsp;Loss
         </p>
         <p
           className={`text-2xl font-bold tabular-nums ${
-            profit >= 0 ? "text-brand-success-strong" : "text-brand-danger-strong"
+            profit >= 0
+              ? "text-brand-success-strong"
+              : "text-brand-danger-strong"
           }`}
         >
           {formatCurrency(profit)}
