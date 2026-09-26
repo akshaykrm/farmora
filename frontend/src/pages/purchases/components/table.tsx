@@ -9,6 +9,7 @@ import EmptyContentMessage from "@components/EmptyContentMessage";
 import Ternary from "@components/ternary";
 import dayjs from "dayjs";
 import type { Purchase } from "../types";
+import { ClipText } from "@components/narration";
 import { formatCurrency } from "@utils/currency";
 
 const headers = [
@@ -66,9 +67,7 @@ const ItemTable = ({ onEdit, data }: Props) => {
                     arrow
                     disableHoverListener={!item.narration}
                   >
-                    <span className="block max-w-40 truncate cursor-pointer">
-                      {item.narration || "-"}
-                    </span>
+                    <ClipText value={item.narration} />
                   </Tooltip>
                 }
               />
