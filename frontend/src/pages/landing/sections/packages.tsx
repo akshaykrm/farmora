@@ -1,41 +1,41 @@
-import { useState } from "react"
-import { useQuery } from "@tanstack/react-query"
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Card,
   CardContent,
   CardActions,
   Button,
   Skeleton,
-} from "@mui/material"
-import { Check } from "lucide-react"
-import fetcher from "@utils/fetcher"
-import PackagePriceDisplay from "@components/PackagePriceDisplay"
-import { getEffectivePrice } from "@utils/package-price"
-import ManagerRegistrationDialog from "../components/manager-registration-dialog"
-import RevealDiv from "../components/reveal"
-import SectionHeader from "../components/section-header"
+} from "@mui/material";
+import { Check } from "lucide-react";
+import fetcher from "@utils/fetcher";
+import PackagePriceDisplay from "@components/PackagePriceDisplay";
+import { getEffectivePrice } from "@utils/package-price";
+import ManagerRegistrationDialog from "../components/manager-registration-dialog";
+import RevealDiv from "../components/reveal";
+import SectionHeader from "../components/section-header";
 import {
   BASIC_FEATURES,
   ENTERPRISE_FEATURES,
   PREMIUM_FEATURES,
-} from "../content/landing-content"
+} from "../content/landing-content";
 
 interface Package {
-  id: number
-  name: string
-  description: string
-  actual_price: string
-  discount_price: string
-  price?: string
-  duration: number
-  status: string
+  id: number;
+  name: string;
+  description: string;
+  actual_price: string;
+  discount_price: string;
+  price?: string;
+  duration: number;
+  status: string;
 }
 
 const PACKAGE_FEATURES: Record<string, readonly string[]> = {
   Basic: BASIC_FEATURES,
   Premium: PREMIUM_FEATURES,
   Enterprise: ENTERPRISE_FEATURES,
-}
+};
 
 const PackageSkeleton = () => (
   <div className="bg-brand-card rounded-2xl p-6 border border-brand-border shadow-sm">
@@ -49,28 +49,28 @@ const PackageSkeleton = () => (
     </div>
     <Skeleton variant="rounded" height={44} sx={{ mt: 4 }} />
   </div>
-)
+);
 
 const PackagesSection = () => {
-  const [selectedPackage, setSelectedPackage] = useState<Package | null>(null)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const { data: packages, isLoading } = useQuery({
     queryKey: ["public-packages"],
     queryFn: async () => {
-      const response = await fetcher("packages")
-      return response.data as Package[]
+      const response = await fetcher("packages");
+      return response.data as Package[];
     },
-  })
+  });
 
   const visiblePackages = packages
     ?.filter((pkg) => pkg.status !== "disabled")
-    .sort((a, b) => getEffectivePrice(a) - getEffectivePrice(b))
+    .sort((a, b) => getEffectivePrice(a) - getEffectivePrice(b));
 
   const handleGetStarted = (pkg: Package) => {
-    setSelectedPackage(pkg)
-    setIsDialogOpen(true)
-  }
+    setSelectedPackage(pkg);
+    setIsDialogOpen(true);
+  };
 
   return (
     <>
@@ -99,7 +99,11 @@ const PackagesSection = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {visiblePackages?.map((pkg, index) => (
-                <RevealDiv key={pkg.id} delay={index * 0.1} className="reveal h-full">
+                <RevealDiv
+                  key={pkg.id}
+                  delay={index * 0.1}
+                  className="reveal h-full"
+                >
                   <Card
                     sx={{
                       height: "100%",
@@ -108,7 +112,10 @@ const PackagesSection = () => {
                       position: "relative",
                       borderRadius: 4,
                       transition: "box-shadow 0.3s, transform 0.3s",
-                      "&:hover": { boxShadow: 8, transform: "translateY(-8px)" },
+                      "&:hover": {
+                        boxShadow: 8,
+                        transform: "translateY(-8px)",
+                      },
                     }}
                   >
                     <CardContent sx={{ flexGrow: 1, p: 4 }}>
@@ -116,7 +123,10 @@ const PackagesSection = () => {
                         {pkg.name}
                       </h3>
                       <div className="mb-4">
-                        <PackagePriceDisplay pkg={pkg} />
+                        <PackagePriceDisplay
+                          pkg={pkg}
+                          duration={pkg.duration}
+                        />
                       </div>
                       <p className="text-brand-ink-soft mb-6 text-sm leading-relaxed">
                         {pkg.description}
@@ -137,13 +147,17 @@ const PackagesSection = () => {
 
                     <CardActions sx={{ p: 4, pt: 0 }}>
                       <Button
-                        variant={pkg.status === "active" ? "contained" : "outlined"}
+                        variant={
+                          pkg.status === "active" ? "contained" : "outlined"
+                        }
                         fullWidth
                         size="large"
                         disabled={pkg.status !== "active"}
                         onClick={() => handleGetStarted(pkg)}
                       >
-                        {pkg.status === "active" ? "Get Started" : "Coming Soon"}
+                        {pkg.status === "active"
+                          ? "Get Started"
+                          : "Coming Soon"}
                       </Button>
                     </CardActions>
                   </Card>
@@ -152,18 +166,17 @@ const PackagesSection = () => {
             </div>
           )}
 
-          {!isLoading &&
-            (!visiblePackages || visiblePackages.length === 0) && (
-              <div className="text-center py-12">
-                <p className="text-brand-ink-soft text-lg">
-                  No packages available at the moment. Please check back later.
-                </p>
-              </div>
-            )}
+          {!isLoading && (!visiblePackages || visiblePackages.length === 0) && (
+            <div className="text-center py-12">
+              <p className="text-brand-ink-soft text-lg">
+                No packages available at the moment. Please check back later.
+              </p>
+            </div>
+          )}
         </div>
       </section>
     </>
-  )
-}
+  );
+};
 
-export default PackagesSection
+export default PackagesSection;
