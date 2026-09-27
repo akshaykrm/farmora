@@ -5,7 +5,7 @@ import useAddEmployee from "../hooks/use-add-items";
 import type { ItemFormValues } from "../types";
 
 const defaultValues: DefaultValues<ItemFormValues> = {
-  brand_id: "",
+  name: "",
   vendor_id: "",
   base_price: "",
   type: "regular",

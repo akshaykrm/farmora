@@ -1,8 +1,7 @@
 import Joi from 'joi'
 
 export const newItemCategory = Joi.object({
-  name: Joi.string().min(3).max(100).allow(null).optional(),
-  brand_id: Joi.number().integer().allow(null).optional(),
+  name: Joi.string().min(3).max(100).required(),
   base_price: Joi.number().required(),
   vendor_id: Joi.number().required(),
   type: Joi.string()
