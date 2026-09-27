@@ -23,7 +23,7 @@ export default {
         updated_at: updatedAt,
       },
       {
-        name: 'Premium',
+        name: 'Standard',
       }
     )
 
@@ -34,7 +34,7 @@ export default {
         updated_at: updatedAt,
       },
       {
-        name: 'Enterprise',
+        name: 'Premium',
       }
     )
   },
@@ -60,7 +60,7 @@ export default {
         updated_at: updatedAt,
       },
       {
-        name: 'Premium',
+        name: 'Standard',
       }
     )
 
@@ -71,7 +71,7 @@ export default {
         updated_at: updatedAt,
       },
       {
-        name: 'Enterprise',
+        name: 'Premium',
       }
     )
   },

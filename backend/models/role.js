@@ -6,7 +6,7 @@ const RoleModel = sequelize.define(
   {
     manager_id: {
       type: Sequelize.INTEGER,
-      allowNull: false,
+      allowNull: true,
     },
     name: {
       type: Sequelize.STRING,
@@ -15,6 +15,11 @@ const RoleModel = sequelize.define(
     description: {
       type: Sequelize.STRING,
       allowNull: false,
+    },
+    kind: {
+      type: Sequelize.ENUM('system', 'custom'),
+      allowNull: false,
+      defaultValue: 'custom',
     },
   },
   {

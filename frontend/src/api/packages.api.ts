@@ -7,11 +7,13 @@ import type { NameResponse } from "@app-types/gen.types";
 export type PackageFormValues = {
   name: string;
   description: string;
-  price: number;
+  actual_price: number;
+  discount_price: number;
   duration: number;
   status: string;
   referral_bonus_type: "none" | "fixed" | "percentage";
   referral_bonus_value: number | null;
+  role_id: number | null;
 };
 
 const packages = {

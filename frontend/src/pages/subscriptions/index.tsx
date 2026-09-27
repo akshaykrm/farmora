@@ -47,6 +47,7 @@ const SubscriptionsPage = () => {
         isShow={renewTarget !== null}
         userId={renewTarget?.user_id ?? null}
         packageId={renewTarget?.package_id ?? renewTarget?.package?.id ?? null}
+        referralPartnerId={renewTarget?.user?.referral_partner_id ?? null}
         onClose={() => {
           setRenewTarget(null);
           setReload((value) => value + 1);

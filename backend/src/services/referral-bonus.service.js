@@ -4,12 +4,13 @@ import ReferralLedgerTransactionModel, {
 } from '@models/referralledgertransaction'
 import ReferralPartnerModel from '@models/referralpartner'
 import logger from '@utils/logger'
+import { getEffectivePackagePrice } from '@utils/package-price'
 import { UniqueConstraintError } from 'sequelize'
 
 export const computeBonus = (packageRecord) => {
   const bonusType = packageRecord.referral_bonus_type || 'none'
   const bonusValue = Number(packageRecord.referral_bonus_value || 0)
-  const packagePrice = Number(packageRecord.price || 0)
+  const packagePrice = getEffectivePackagePrice(packageRecord)
 
   if (bonusType === 'none' || bonusValue <= 0) {
     return {
@@ -17,6 +18,7 @@ export const computeBonus = (packageRecord) => {
       bonusValue,
       bonusAmount: 0,
       packagePrice,
+      source: source.source,
     }
   }
 
@@ -26,6 +28,7 @@ export const computeBonus = (packageRecord) => {
       bonusValue,
       bonusAmount: Number(bonusValue.toFixed(2)),
       packagePrice,
+      source: source.source,
     }
   }
 
@@ -35,6 +38,7 @@ export const computeBonus = (packageRecord) => {
       bonusValue,
       bonusAmount: Number(((packagePrice * bonusValue) / 100).toFixed(2)),
       packagePrice,
+      source: source.source,
     }
   }
 
@@ -43,6 +47,7 @@ export const computeBonus = (packageRecord) => {
     bonusValue: 0,
     bonusAmount: 0,
     packagePrice,
+    source: source.source,
   }
 }
 
@@ -54,6 +59,7 @@ const creditForSubscription = async ({
   type,
   createdBy = null,
   remarks = null,
+  partnerRecord = null,
 }) => {
   if (!partnerId || !subscription?.id || !packageRecord) {
     return null
@@ -63,8 +69,13 @@ const creditForSubscription = async ({
     throw new Error(`invalid referral bonus type: ${type}`)
   }
 
-  const { bonusType, bonusValue, bonusAmount, packagePrice } =
-    computeBonus(packageRecord)
+  const partner =
+    partnerRecord || (await ReferralPartnerModel.findByPk(partnerId))
+
+  const { bonusType, bonusValue, bonusAmount, packagePrice } = computeBonus(
+    packageRecord,
+    partner
+  )
 
   if (bonusAmount <= 0) {
     logger.debug(

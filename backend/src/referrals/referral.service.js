@@ -15,6 +15,7 @@ import { calculateOffSet } from '@utils/pagination'
 import { Op, UniqueConstraintError } from 'sequelize'
 import { sequelize } from '@utils/db'
 import logger from '@utils/logger'
+import { getEffectivePackagePrice } from '@utils/package-price'
 
 class ReferralPartnerNotFoundError extends Error {
   constructor(id) {
@@ -121,6 +122,11 @@ const create = async (payload, currentUser) => {
       email: payload.email || null,
       code,
       status: payload.status || 'active',
+      referral_bonus_type: payload.referral_bonus_type || 'none',
+      referral_bonus_value:
+        payload.referral_bonus_type && payload.referral_bonus_type !== 'none'
+          ? payload.referral_bonus_value
+          : null,
     })
   } catch (error) {
     if (error instanceof UniqueConstraintError) {
@@ -201,7 +207,7 @@ const getById = async (id, currentUser) => {
             model: PackageModel,
             as: 'package',
             required: false,
-            attributes: ['id', 'name', 'price'],
+            attributes: ['id', 'name', 'actual_price', 'discount_price'],
           },
         ],
       },
@@ -241,7 +247,7 @@ const getById = async (id, currentUser) => {
           ? {
               id: current.package.id,
               name: current.package.name,
-              price: current.package.price,
+              price: getEffectivePackagePrice(current.package),
             }
           : null,
         valid_to: current?.valid_to || null,
@@ -261,6 +267,9 @@ const updateById = async (id, payload, currentUser) => {
   const updates = { ...payload }
   if (updates.code !== undefined) {
     updates.code = normalizeCode(updates.code)
+  }
+  if (updates.referral_bonus_type === 'none') {
+    updates.referral_bonus_value = null
   }
 
   try {

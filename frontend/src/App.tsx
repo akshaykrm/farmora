@@ -12,7 +12,6 @@ import FarmsPage from "@pages/farms";
 import PurchasePage from "@pages/purchases";
 import ItemReturnsPage from "@pages/item-returns";
 import PackagesPage from "@pages/packages";
-import SubscriptionsPage from "@pages/subscriptions";
 import PurchaseBookPage from "@pages/purchase-book";
 import IntegrationBookPage from "@pages/integration-book";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -40,6 +39,7 @@ import InvestorManagementPage from "@pages/investors/management";
 import InvestLedgerPage from "@pages/investors/ledger/invest";
 import ProfitLedgerPage from "@pages/investors/ledger/profit";
 import RolesPage from "@pages/roles";
+import SystemRolesPage from "@pages/system-roles";
 import SubscribersPage from "@pages/subscribers";
 import ReferralsPage from "@pages/referrals";
 import ReferralDetailPage from "@pages/referrals/detail";
@@ -53,6 +53,7 @@ const pageComponents: Record<string, React.ComponentType> = {
   "/configuration/batches": BatchesPage,
   "/configuration/users": EmployeesPage,
   "/configuration/roles": RolesPage,
+  "/system-roles": SystemRolesPage,
   "/configuration/seasons": SeasonsPage,
   "/configuration/farms": FarmsPage,
   "/configuration/vendors": VendorPage,
@@ -73,7 +74,6 @@ const pageComponents: Record<string, React.ComponentType> = {
   "/overview/batch": BatchOverviewPage,
   "/cash-flow": BalanceSheetPage,
   "/packages": PackagesPage,
-  "/subscriptions": SubscriptionsPage,
   "/subscribers": SubscribersPage,
   "/referrals": ReferralsPage,
 };

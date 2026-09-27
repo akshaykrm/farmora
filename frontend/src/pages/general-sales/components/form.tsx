@@ -45,6 +45,24 @@ const GeneralSalesForm = (props: Props) => {
     <>
       <form {...methods} onSubmit={handleSubmit(onSubmit)}>
         <div className="grid grid-cols-1 gap-4">
+          <DatePicker
+            label="Date"
+            value={values.date ? dayjs(values.date) : null}
+            format="DD-MM-YYYY"
+            onChange={(v) => {
+              setValue("date", v ? dayjs(v).toISOString() : "");
+              clearErrors("date");
+            }}
+            slotProps={{
+              textField: {
+                fullWidth: true,
+                size: "small",
+                error: Boolean(errors.date),
+                helperText: errors.date?.message,
+              },
+            }}
+          />
+
           <SelectList
             options={seasonNames.data}
             value={values.season_id}
@@ -74,24 +92,6 @@ const GeneralSalesForm = (props: Props) => {
             error={Boolean(errors.amount)}
             helperText={errors.amount?.message}
             size="small"
-          />
-
-          <DatePicker
-            label="Date"
-            value={values.date ? dayjs(values.date) : null}
-            format="DD-MM-YYYY"
-            onChange={(v) => {
-              setValue("date", v ? dayjs(v).toISOString() : "");
-              clearErrors("date");
-            }}
-            slotProps={{
-              textField: {
-                fullWidth: true,
-                size: "small",
-                error: Boolean(errors.date),
-                helperText: errors.date?.message,
-              },
-            }}
           />
 
           <TextField

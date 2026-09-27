@@ -8,12 +8,7 @@ const ItemModel = sequelize.define(
       type: Sequelize.INTEGER,
       allowNull: false,
     },
-    name: { type: Sequelize.STRING, allowNull: true },
-    brand_id: {
-      type: Sequelize.INTEGER,
-      allowNull: true,
-      field: 'brand_id',
-    },
+    name: { type: Sequelize.STRING, allowNull: false },
     vendor_id: {
       type: Sequelize.INTEGER,
       allowNull: false,
@@ -34,7 +29,8 @@ const ItemModel = sequelize.define(
         'PRE STARTER',
         'integration',
         'working',
-        'regular'
+        'regular',
+        'general'
       ),
       defaultValue: 'regular',
       allowNull: false,

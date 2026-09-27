@@ -8,6 +8,8 @@ export type ReferralPartner = {
   email: string | null;
   code: string;
   status: "active" | "inactive";
+  referral_bonus_type?: "none" | "fixed" | "percentage";
+  referral_bonus_value?: number | null;
   companies_count?: number;
   total_earned?: number;
   total_paid?: number;
@@ -44,6 +46,8 @@ export type ReferralPartnerForm = {
   email: string;
   code: string;
   status: "active" | "inactive";
+  referral_bonus_type: "none" | "fixed" | "percentage";
+  referral_bonus_value: number | null;
 };
 
 const referralsApi = {

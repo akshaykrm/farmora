@@ -9,14 +9,22 @@ type Props = {
   isShow: boolean;
   userId: number | null;
   packageId?: number | null;
+  referralPartnerId?: number | null;
   onClose: () => void;
 };
 
-const RenewSubscription = ({ isShow, userId, packageId, onClose }: Props) => {
+const RenewSubscription = ({
+  isShow,
+  userId,
+  packageId,
+  referralPartnerId,
+  onClose,
+}: Props) => {
   const methods = useForm<NewSubscriptionRequest>({
     defaultValues: {
       package_id: packageId || 0,
       user_id: userId || undefined,
+      referral_partner_id: referralPartnerId || null,
     },
   });
 
@@ -24,8 +32,9 @@ const RenewSubscription = ({ isShow, userId, packageId, onClose }: Props) => {
     methods.reset({
       package_id: packageId || 0,
       user_id: userId || undefined,
+      referral_partner_id: referralPartnerId || null,
     });
-  }, [userId, packageId, methods]);
+  }, [userId, packageId, referralPartnerId, methods]);
 
   const handleClose = () => {
     methods.reset();
@@ -36,6 +45,7 @@ const RenewSubscription = ({ isShow, userId, packageId, onClose }: Props) => {
     await subscription.renew({
       package_id: payload.package_id,
       user_id: userId || undefined,
+      referral_partner_id: payload.referral_partner_id || undefined,
     });
     handleClose();
   };
@@ -48,6 +58,8 @@ const RenewSubscription = ({ isShow, userId, packageId, onClose }: Props) => {
           onSubmit={onSubmit}
           onCancel={handleClose}
           showUserSelect={false}
+          showReferralSelect
+          referralLocked={Boolean(referralPartnerId)}
         />
       </DialogContent>
     </Dialog>

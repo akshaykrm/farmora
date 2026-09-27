@@ -14,6 +14,7 @@ import EmptyContentMessage from "@components/EmptyContentMessage";
 import Ternary from "@components/ternary";
 import { Dialog, DialogContent } from "@components/dialog";
 import packages, { type PackageFormValues } from "@api/packages.api";
+import PackagePriceDisplay from "@components/PackagePriceDisplay";
 import type { Package } from "@app-types/package.types";
 import type { ValidationError } from "@errors/api.error";
 import { useForm } from "react-hook-form";
@@ -21,11 +22,13 @@ import { useForm } from "react-hook-form";
 const emptyForm: PackageFormValues = {
   name: "",
   description: "",
-  price: 0,
+  actual_price: 0,
+  discount_price: 0,
   duration: 1,
   status: "active",
   referral_bonus_type: "none",
   referral_bonus_value: null,
+  role_id: null,
 };
 
 const PackagesPage = () => {
@@ -39,6 +42,7 @@ const PackagesPage = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [apiErrors, setApiErrors] = useState<ValidationError[]>([]);
+  const [systemRoles, setSystemRoles] = useState<Role[]>([]);
 
   const methods = useForm<PackageFormValues>({ defaultValues: emptyForm });
   const { register, handleSubmit, reset, watch, formState } = methods;
@@ -56,6 +60,14 @@ const PackagesPage = () => {
     refetch();
   }, [refetch]);
 
+  useEffect(() => {
+    rolesApi.fetchAll({ kind: "system", limit: 100, page: 1 }).then((res) => {
+      if (res.status === "success" && res.data) {
+        setSystemRoles(res.data.data);
+      }
+    });
+  }, []);
+
   const openCreate = () => {
     setSelectedId(null);
     reset(emptyForm);
@@ -70,7 +82,8 @@ const PackagesPage = () => {
       reset({
         name: res.data.name,
         description: res.data.description || "",
-        price: Number(res.data.price),
+        actual_price: Number(res.data.actual_price),
+        discount_price: Number(res.data.discount_price ?? 0),
         duration: res.data.duration,
         status: res.data.status,
         referral_bonus_type: res.data.referral_bonus_type || "none",
@@ -78,6 +91,7 @@ const PackagesPage = () => {
           res.data.referral_bonus_value == null
             ? null
             : Number(res.data.referral_bonus_value),
+        role_id: res.data.role_id ?? res.data.role?.id ?? null,
       });
     }
     setApiErrors([]);
@@ -85,9 +99,13 @@ const PackagesPage = () => {
   };
 
   const onSubmit = async (payload: PackageFormValues) => {
+    const body = {
+      ...payload,
+      role_id: payload.role_id ? Number(payload.role_id) : null,
+    };
     const res = selectedId
-      ? await packages.updateById(selectedId, payload)
-      : await packages.create(payload);
+      ? await packages.updateById(selectedId, body)
+      : await packages.create(body);
     if (res.status === "success") {
       setIsOpen(false);
       refetch();
@@ -112,7 +130,15 @@ const PackagesPage = () => {
       />
       <Table>
         <TableRow>
-          {["ID", "Name", "Price", "Duration", "Referral Bonus", "Status", "Edit"].map(
+          {[
+            "ID",
+            "Name",
+            "Price",
+            "Duration",
+            "Referral Bonus",
+            "Status",
+            "Edit",
+          ].map(
             (header) => (
               <TableHeaderCell key={header} content={header} />
             ),
@@ -122,8 +148,11 @@ const PackagesPage = () => {
           <TableRow key={row.id}>
             <TableCell content={i + 1} />
             <TableCell content={row.name} />
-            <TableCell content={String(row.price)} />
+            <TableCell
+              content={<PackagePriceDisplay pkg={row} size="compact" />}
+            />
             <TableCell content={row.duration} />
+            <TableCell content={row.role?.name || "—"} />
             <TableCell
               content={
                 row.referral_bonus_type === "fixed"
@@ -182,10 +211,16 @@ const PackagesPage = () => {
               {...register("description")}
             />
             <TextField
-              label="Price"
+              label="Actual price"
               size="small"
               type="number"
-              {...register("price", { valueAsNumber: true })}
+              {...register("actual_price", { valueAsNumber: true })}
+            />
+            <TextField
+              label="Discount price"
+              size="small"
+              type="number"
+              {...register("discount_price", { valueAsNumber: true })}
             />
             <TextField
               label="Duration (months)"
@@ -193,6 +228,25 @@ const PackagesPage = () => {
               type="number"
               {...register("duration", { valueAsNumber: true })}
             />
+            <TextField
+              select
+              label="System Role"
+              size="small"
+              defaultValue=""
+              {...register("role_id", {
+                setValueAs: (value) =>
+                  value === "" || value == null ? null : Number(value),
+              })}
+              error={Boolean(formState.errors.role_id)}
+              helperText={formState.errors.role_id?.message}
+            >
+              <MenuItem value="">None</MenuItem>
+              {systemRoles.map((role) => (
+                <MenuItem key={role.id} value={role.id}>
+                  {role.name}
+                </MenuItem>
+              ))}
+            </TextField>
             <TextField
               select
               label="Status"

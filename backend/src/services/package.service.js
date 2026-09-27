@@ -1,9 +1,34 @@
 import { Op } from 'sequelize'
 import PackageModel from '@models/package'
+import RoleModel from '@models/role'
 import { PackageNotFoundError } from '@errors/package.errors'
+import { PermissionDeniedError } from '@errors/auth.errors'
+
+const roleInclude = {
+  model: RoleModel,
+  as: 'role',
+  required: false,
+  attributes: ['id', 'name', 'description', 'kind'],
+}
+
+const assertSystemRoleId = async (roleId) => {
+  if (roleId == null || roleId === '') return null
+
+  const role = await RoleModel.findOne({
+    where: { id: roleId, kind: 'system' },
+  })
+  if (!role) {
+    throw new PermissionDeniedError('role_id must reference a system role')
+  }
+  return role.id
+}
 
 const create = async (insertData) => {
-  return await PackageModel.create(insertData)
+  const payload = { ...insertData }
+  if (Object.prototype.hasOwnProperty.call(payload, 'role_id')) {
+    payload.role_id = await assertSystemRoleId(payload.role_id)
+  }
+  return await PackageModel.create(payload)
 }
 
 const getAll = async (payload) => {
@@ -19,6 +44,7 @@ const getAll = async (payload) => {
     limit,
     offset,
     order: [['id', 'DESC']],
+    include: [roleInclude],
   })
 
   return {
@@ -31,7 +57,10 @@ const getAll = async (payload) => {
 }
 
 const getById = async (id) => {
-  const packageRecord = await PackageModel.findOne({ where: { id } })
+  const packageRecord = await PackageModel.findOne({
+    where: { id },
+    include: [roleInclude],
+  })
   if (!packageRecord) {
     throw new PackageNotFoundError(id)
   }
@@ -40,7 +69,11 @@ const getById = async (id) => {
 
 const updateById = async (id, data) => {
   const packageRecord = await getById(id)
-  await packageRecord.update(data)
+  const payload = { ...data }
+  if (Object.prototype.hasOwnProperty.call(payload, 'role_id')) {
+    payload.role_id = await assertSystemRoleId(payload.role_id)
+  }
+  await packageRecord.update(payload)
 }
 
 const deleteById = async (id) => {

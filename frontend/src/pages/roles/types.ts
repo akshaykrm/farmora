@@ -4,6 +4,7 @@ export type RoleFormValues = {
   name: string;
   description: string;
   permission_ids: number[];
+  kind?: "system" | "custom";
 };
 
 export type RoleRow = {

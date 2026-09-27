@@ -8,10 +8,20 @@ import { DEFAULT_FIRST_PAGE, DEFAULT_PAGE_LIMIT } from "@config";
 import RoleTable from "./components/table";
 import AddRole from "./components/add-role";
 import EditRole from "./components/edit-role";
-import { rolesApi, type Role } from "@api/roles.api";
+import { rolesApi, type Role, type RoleKind } from "@api/roles.api";
 import { useCallback, useEffect } from "react";
 
-const RolesPage = () => {
+type Props = {
+  kind?: RoleKind;
+  title?: string;
+  addLabel?: string;
+};
+
+const RolesPage = ({
+  kind = "custom",
+  title = "Roles",
+  addLabel = "Role",
+}: Props) => {
   const [isOpen, setOpenAdd] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const { queryParms, updateQueryParams } = useQueryParameters();
@@ -25,14 +35,14 @@ const RolesPage = () => {
   });
 
   const refetch = useCallback(async () => {
-    const res = await rolesApi.fetchAll({ page, limit });
+    const res = await rolesApi.fetchAll({ page, limit, kind });
     if (res.status === "success" && res.data) {
       setRoles({
         records: res.data.data,
         totalPages: res.data.totalPages || 1,
       });
     }
-  }, [page, limit]);
+  }, [page, limit, kind]);
 
   useEffect(() => {
     refetch();
@@ -41,8 +51,8 @@ const RolesPage = () => {
   return (
     <>
       <PageHeader
-        title="Roles"
-        action={<AddButton label="Role" onClick={() => setOpenAdd(true)} />}
+        title={title}
+        action={<AddButton label={addLabel} onClick={() => setOpenAdd(true)} />}
       />
       <RoleTable onEdit={setSelectedId} roles={roles.records} />
       <Box className="mt-6 flex justify-end">
@@ -54,6 +64,7 @@ const RolesPage = () => {
         />
       </Box>
       <AddRole
+        kind={kind}
         isShow={isOpen}
         onClose={() => setOpenAdd(false)}
         refetch={() => {

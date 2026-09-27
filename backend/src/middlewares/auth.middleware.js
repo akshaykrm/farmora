@@ -9,7 +9,6 @@ import userService from '@services/user.service'
 import permissionService, { getMasterId } from '@services/permission.service'
 import asyncHandler from '@utils/async-handler'
 import CONFIG from '../../config.js'
-import { isPlatformPermission } from '../../config/permissions.js'
 
 const { verify } = jwt
 
@@ -63,12 +62,8 @@ export const requirePermission = (...keys) =>
       return next()
     }
 
-    const denied = keys.some((key) => {
-      if (user.user_type === userRoles.manager.type) {
-        return isPlatformPermission(key)
-      }
-      return !(user.permissions || []).includes(key)
-    })
+    const userPermissions = user.permissions || []
+    const denied = keys.some((key) => !userPermissions.includes(key))
 
     if (denied) {
       throw new PermissionDeniedError()

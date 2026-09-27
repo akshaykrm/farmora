@@ -102,6 +102,15 @@ const createManager = async (payload) => {
       newUser
     )
 
+    await itemService.create(
+      {
+        name: 'General',
+        vendor_id: newVendor.id,
+        type: 'general',
+      },
+      newUser
+    )
+
     await transaction.commit()
     await InvoiceConfig.create({
       name: newUser.name,

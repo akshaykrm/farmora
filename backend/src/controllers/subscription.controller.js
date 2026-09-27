@@ -22,7 +22,7 @@ const getAll = async (req, res) => {
   const filter = {
     page: parseInt(req.query.page) || 1,
     limit: parseInt(req.query.limit) || 10,
-    user_id: req.query.user_id,
+    user_id: req.query.user_id ? parseInt(req.query.user_id, 10) : undefined,
   }
 
   const subscriptionRecords = await subscriptionService.getAll(filter, req.user)

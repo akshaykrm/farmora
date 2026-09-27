@@ -70,7 +70,7 @@ const getAll = async (filter, currentUser) => {
     purchaseFilter.category_id = item.id
   }
 
-  const rawWorkingCost = await purchaseService.getAll(
+  const rawWorkingCost = await purchaseService.getAllEvenIfBatchClosed(
     purchaseFilter,
     currentUser
   )
