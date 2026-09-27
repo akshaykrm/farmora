@@ -341,6 +341,18 @@ const PurchaseForm = ({
               <MenuItem value="paid">Paid</MenuItem>
             </TextField>
           </div>
+
+          <div className="min-w-0 md:col-span-2">
+            <RHFTextField
+              label="Narration"
+              name="narration"
+              control={control}
+              fullWidth
+              multiline
+              rows={2}
+              size="small"
+            />
+          </div>
         </div>
 
         <div className="mt-6 flex justify-stretch md:justify-end gap-2">

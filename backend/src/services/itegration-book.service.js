@@ -57,7 +57,10 @@ const getAll = async (filter, currentUser) => {
     purchaseFilter.category_id = item.id
   }
 
-  const rawPurchases = await purchaseService.getAll(purchaseFilter, currentUser)
+  const rawPurchases = await purchaseService.getAllEvenIfBatchClosed(
+    purchaseFilter,
+    currentUser
+  )
 
   const purchases = rawPurchases.data.map((purchase) => purchase.toJSON())
   const credit = purchases

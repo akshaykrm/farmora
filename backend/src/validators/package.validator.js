@@ -3,7 +3,11 @@ import Joi from 'joi'
 export const newPackageSchema = Joi.object({
   name: Joi.string().min(3).max(100).required(),
   description: Joi.string().allow('').optional(),
-  price: Joi.number().positive().required(),
+  actual_price: Joi.number().min(0).required(),
+  discount_price: Joi.number()
+    .min(0)
+    .max(Joi.ref('actual_price'))
+    .required(),
   duration: Joi.number().integer().positive().required(),
   status: Joi.string()
     .valid('active', 'inactive', 'disabled')

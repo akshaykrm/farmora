@@ -72,6 +72,10 @@ const PurchaseModel = sequelize.define(
       defaultValue: 'credit',
       allowNull: false,
     },
+    narration: {
+      type: Sequelize.TEXT,
+      allowNull: true,
+    },
   },
   {
     underscored: true,

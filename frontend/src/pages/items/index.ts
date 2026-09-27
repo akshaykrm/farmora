@@ -6,12 +6,13 @@ export { api as itemsApi };
 export const itemTypes = [
   { label: "Regular", value: "regular" },
   { label: "Chick", value: "chick" },
-  // { label: "Medicine", value: "medicine" },
+  { label: "Medicine", value: "medicine" },
   { label: "FINISHER", value: "FINISHER" },
   { label: "STARTER", value: "STARTER" },
   { label: "PRE STARTER", value: "PRE STARTER" },
   { label: "Integration", value: "integration" },
   { label: "Working", value: "working" },
+  { label: "General", value: "general" },
 ];
 
 export default ItemPage;

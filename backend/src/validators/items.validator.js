@@ -1,8 +1,7 @@
 import Joi from 'joi'
 
 export const newItemCategory = Joi.object({
-  name: Joi.string().min(3).max(100).allow(null).optional(),
-  brand_id: Joi.number().integer().allow(null).optional(),
+  name: Joi.string().min(3).max(100).required(),
   base_price: Joi.number().required(),
   vendor_id: Joi.number().required(),
   type: Joi.string()
@@ -14,7 +13,8 @@ export const newItemCategory = Joi.object({
       'PRE STARTER',
       'integration',
       'working',
-      'regular'
+      'regular',
+      'general'
     )
     .required(),
 })
@@ -46,6 +46,7 @@ export const newItemSchema = Joi.object({
   invoice_number: Joi.string().required(),
   invoice_date: Joi.date().required(),
   payment_type: Joi.string().valid('credit', 'paid').required(),
+  narration: Joi.string().max(500).optional().allow('', null),
 })
 
 export const assignItemToBatchSchema = Joi.object({
