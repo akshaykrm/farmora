@@ -4,11 +4,7 @@ import type { ValidationError } from "@errors/api.error";
 
 export type Item = {
   id: number;
-  name: string | null;
-  brand?: {
-    id: number;
-    name: string;
-  } | null;
+  name: string;
   base_price: number;
   vendor: {
     id: number;
@@ -20,8 +16,7 @@ export type Item = {
 export type ItemListResponse = ListResponse<Item>;
 
 export type ItemFormValues = {
-  name?: string | null;
-  brand_id: number | "" | null;
+  name: string;
   vendor_id: number | "";
   base_price: number | "";
   type: "integration" | "working" | "regular" | "general" | "";
