@@ -75,6 +75,7 @@ async function create(payload, currentUser) {
 
 const getAll = async (payload, currentUser) => {
   const { page, limit, return_type, status, ...filter } = payload
+
   if (currentUser.user_type === userRoles.staff.type) {
     filter.master_id = currentUser.master_id
   } else if (currentUser.user_type === userRoles.manager.type) {
@@ -111,7 +112,7 @@ const getAll = async (payload, currentUser) => {
       {
         model: BatchModel,
         as: 'from_batch_data',
-        required: false,
+        required: true,
         attributes: ['id', 'name'],
         where: {
           closed_on: {
@@ -122,7 +123,7 @@ const getAll = async (payload, currentUser) => {
       {
         model: BatchModel,
         as: 'to_batch_data',
-        required: false,
+        required: true,
         attributes: ['id', 'name'],
         where: {
           closed_on: {
@@ -138,6 +139,7 @@ const getAll = async (payload, currentUser) => {
       },
     ],
   })
+
   const totalPages = Math.ceil(count / limit)
   return {
     data: rows,
@@ -196,10 +198,7 @@ const getById = async (itemReturnId, currentUser) => {
     'Item return retrieved by id'
   )
 
-  logger.debug(
-    { item_return_id: record.id, payment_type: record.payment_type },
-    'Item return fetched'
-  )
+  logger.debug({ item_return_id: record.id, payment_type: record.payment_type }, 'Item return fetched')
   return record
 }
 

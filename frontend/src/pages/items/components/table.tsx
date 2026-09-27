@@ -7,7 +7,7 @@ import EmptyContentMessage from "@components/EmptyContentMessage";
 import Ternary from "@components/ternary";
 import type { Item } from "../types";
 
-const headers = ["ID", "Name", "Base Price", "Type", "Vendor", "Action"];
+const headers = ["ID", "Brand Name", "Base Price", "Type", "Vendor", "Action"];
 
 type Props = {
   onEdit: (selectedId: number) => void;
@@ -28,7 +28,7 @@ const ItemTable = ({ onEdit, data }: Props) => {
         {data.map((item, i) => (
           <TableRow key={item.id}>
             <TableCell content={i + 1} />
-            <TableCell content={item.name} />
+            <TableCell content={item.brand?.name || item.name || "-"} />
             <TableCell content={item.base_price} />
             <TableCell
               content={<span className="capitalize">{item.type}</span>}

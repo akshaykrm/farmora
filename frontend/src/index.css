@@ -203,18 +203,6 @@ body {
   transform: translateX(0);
 }
 
-@media (max-width: 639px) {
-  .reveal-left,
-  .reveal-right {
-    transform: translateY(30px);
-  }
-
-  .reveal-left.revealed,
-  .reveal-right.revealed {
-    transform: translateY(0);
-  }
-}
-
 .reveal-scale {
   opacity: 0;
   transform: scale(0.9);

@@ -6,17 +6,8 @@ import { roundNumber } from "@utils/number";
 import dayjs from "dayjs";
 import type { BatchOverviewExpense, BatchOverviewSummary } from "../types";
 import { formatCurrency } from "@utils/currency";
-import { ClipText } from "@components/narration";
-import Tooltip from "@mui/material/Tooltip";
 
-const expenseHeaders = [
-  "Date",
-  "Purpose",
-  "Narration",
-  "Quantity",
-  "Price",
-  "Amount",
-];
+const expenseHeaders = ["Date", "Purpose", "Quantity", "Price", "Amount"];
 
 type Props = {
   data: BatchOverviewExpense[];
@@ -50,21 +41,9 @@ const ExpenseTable = (props: Props) => {
                   </span>
                 }
               />
-              <TableCell
-                content={
-                  <Tooltip
-                    title={item.narration}
-                    placement="top"
-                    arrow
-                    disableHoverListener={!item.narration}
-                  >
-                    <ClipText value={item.narration} />
-                  </Tooltip>
-                }
-              />
               <TableCell content={item.quantity} />
-              <TableCell content={formatCurrency(item.price_per_unit)} />
-              <TableCell content={formatCurrency(item.net_amount)} />
+              <TableCell content={`₹${item.price_per_unit}`} />
+              <TableCell content={`₹${item.net_amount}`} />
             </TableRow>
           );
         })}

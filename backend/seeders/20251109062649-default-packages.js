@@ -6,8 +6,7 @@ export default {
     await queryInterface.bulkInsert('packages', [
       {
         name: 'Basic',
-        actual_price: 2999,
-        discount_price: 2999,
+        price: 0,
         description: 'Basic package with essential features.',
         duration: 6,
         status: 'active',
@@ -15,9 +14,8 @@ export default {
         updated_at: new Date(),
       },
       {
-        name: 'Premium',
-        actual_price: 5999,
-        discount_price: 0,
+        name: 'Standard',
+        price: 999,
         duration: 1,
         description: 'Standard package for growing operations.',
         status: 'active',
@@ -25,9 +23,8 @@ export default {
         updated_at: new Date(),
       },
       {
-        name: 'Enterprise',
-        actual_price: 7999,
-        discount_price: 0,
+        name: 'Premium',
+        price: 2999,
         duration: 1,
         description: 'Premium package for large-scale operations.',
         status: 'active',

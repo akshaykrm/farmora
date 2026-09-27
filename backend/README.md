@@ -112,24 +112,13 @@ For detailed endpoint documentation, please refer to the [API Documentation](./A
 
 ## Available Scripts
 
-- `bun start` - Start the application
-- `bun run dev` - Start in development mode with auto-reload
-- `bun run doc` - Generate JSDoc documentation
-- `bun run db:migrate` - Run database migrations
-- `bun run db:migrate:undo` - Undo last migration
-- `bun run db:migrate:undo:all` - Undo all migrations
-- `bun run db:seed` - Seed the database
-- `bun run db:seed:undo` - Undo last seed
-- `bun run test` - Reset database and run tests (Vitest)
-
-## Continuous Deployment
-
-The backend is deployed automatically via the same GitHub Actions workflows as the frontend:
-
-- `.github/workflows/deploy-staging.yml` — runs on pushes to `development`
-- `.github/workflows/deploy-prod.yml` — runs on pushes to `main`
-
-Each workflow syncs this directory to the target server and runs `bun install --production`, then reloads the PM2 process (`farmorastaging` / `farmora-prod`).
+- `npm start` - Start the application
+- `npm run dev` - Start in development mode with nodemon
+- `npm run doc` - Generate JSDoc documentation
+- `npm run db:migrate` - Run database migrations
+- `npm run db:migrate:undo` - Undo last migration
+- `npm run db:seed` - Seed the database
+- `npm run db:seed:undo` - Undo last seed
 
 ## Technologies Used
 

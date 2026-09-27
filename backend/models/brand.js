@@ -4,10 +4,6 @@ import { Sequelize } from 'sequelize'
 const BrandModel = sequelize.define(
   'brands',
   {
-    master_id: {
-      type: Sequelize.INTEGER,
-      allowNull: false,
-    },
     name: {
       type: Sequelize.STRING,
       allowNull: false,

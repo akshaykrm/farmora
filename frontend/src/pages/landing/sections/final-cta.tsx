@@ -23,12 +23,10 @@ const FinalCTA = ({ onScrollToPackages }: FinalCTAProps) => {
           Join farm owners who use Farmora to control batches, costs, and investor
           returns from one platform.
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center w-full max-w-md sm:max-w-none mx-auto">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button
             variant="contained"
             size="large"
-            fullWidth
-            className="sm:!w-auto"
             onClick={onScrollToPackages}
             endIcon={<ArrowRight size={18} />}
             sx={{
@@ -42,8 +40,6 @@ const FinalCTA = ({ onScrollToPackages }: FinalCTAProps) => {
           <Button
             variant="outlined"
             size="large"
-            fullWidth
-            className="sm:!w-auto"
             onClick={() => navigate("/login")}
             sx={{
               borderColor: "white",

@@ -67,8 +67,7 @@ describe('Referral bonus and renewals', () => {
     await grantAllTenantPermissionsToPackage(packageRecord.id)
 
     await packageRecord.update({
-      actual_price: 5000,
-      discount_price: 0,
+      price: 5000,
       referral_bonus_type: 'fixed',
       referral_bonus_value: 500,
     })
@@ -261,12 +260,9 @@ describe('Referral bonus and renewals', () => {
     })
     expect(bonus).toBeTruthy()
     expect(bonus.bonus_type).toBe('percentage')
-    await packageRecord.reload()
-    const effectivePrice = Math.max(
-      0,
-      Number(packageRecord.actual_price) - Number(packageRecord.discount_price)
+    const expected = Number(
+      ((Number(packageRecord.price) * 10) / 100).toFixed(2)
     )
-    const expected = Number(((effectivePrice * 10) / 100).toFixed(2))
     expect(Number(bonus.amount)).toBe(expected)
 
     await packageRecord.update({

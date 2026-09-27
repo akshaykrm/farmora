@@ -25,7 +25,7 @@ const items = {
     fetcherV2<ItemFormValues>(`items/categories/${id}`),
   create: async (payload: ItemFormValues) => {
     const body = {
-      name: payload.name,
+      brand_id: payload.brand_id || null,
       base_price: payload.base_price,
       type: payload.type,
       vendor_id: payload.vendor_id,
@@ -36,7 +36,7 @@ const items = {
   },
   updateById: async (id: number, updateData: ItemFormValues) => {
     const payload: ItemFormValues = {
-      name: updateData.name,
+      brand_id: updateData.brand_id || null,
       type: updateData.type,
       base_price: updateData.base_price,
       vendor_id: updateData.vendor_id,

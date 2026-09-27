@@ -3,7 +3,6 @@ import TableCell from "@components/TableCell";
 import TableHeaderCell from "@components/TableHeaderCell";
 import TableRow from "@components/TableRow";
 import { EditIcon } from "lucide-react";
-import Tooltip from "@mui/material/Tooltip";
 import EmptyContentMessage from "@components/EmptyContentMessage";
 import Ternary from "@components/ternary";
 import dayjs from "dayjs";
@@ -21,7 +20,6 @@ const headers = [
   "Avg Weight",
   "Price",
   "Amount",
-  "Narration",
   "Payment",
   "Action",
 ];
@@ -55,20 +53,6 @@ const SalesTable = ({ onEdit, data }: Props) => {
             <TableCell content={sale.avg_weight} />
             <TableCell content={`${sale.price}`} />
             <TableCell content={`${sale.amount}`} />
-            <TableCell
-              content={
-                <Tooltip
-                  title={sale.narration}
-                  placement="top"
-                  arrow
-                  disableHoverListener={!sale.narration}
-                >
-                  <span className="block max-w-40 truncate cursor-pointer">
-                    {sale.narration || "-"}
-                  </span>
-                </Tooltip>
-              }
-            />
             <TableCell
               content={
                 <span

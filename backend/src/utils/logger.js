@@ -3,7 +3,8 @@ import fs from 'fs'
 import path from 'path'
 import CONFIG from '../../config.js'
 
-const logsDir = path.resolve(process.cwd(), process.env.LOG_DIR || 'logs')
+const logsDir = path.resolve(process.cwd(), 'logs')
+fs.mkdirSync(logsDir, { recursive: true })
 
 const isProd = CONFIG.nodeEnv === 'production'
 
@@ -12,22 +13,9 @@ const baseOptions = {
   base: { env: CONFIG.nodeEnv },
 }
 
-const canWriteLogsDir = () => {
-  try {
-    fs.mkdirSync(logsDir, { recursive: true })
-    fs.accessSync(logsDir, fs.constants.W_OK)
-    return true
-  } catch (error) {
-    process.stderr.write(
-      `Unable to write logs directory ${logsDir}: ${error.message}. Falling back to stdout.\n`
-    )
-    return false
-  }
-}
-
 let logger
 
-if (isProd && canWriteLogsDir()) {
+if (isProd) {
   const fileTransport = pino.transport({
     target: 'pino-roll',
     options: {
@@ -42,8 +30,6 @@ if (isProd && canWriteLogsDir()) {
     baseOptions,
     pino.multistream([{ stream: process.stdout }, { stream: fileTransport }])
   )
-} else if (isProd) {
-  logger = pino(baseOptions)
 } else {
   logger = pino({
     ...baseOptions,

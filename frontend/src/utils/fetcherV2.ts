@@ -28,7 +28,10 @@ const serailizeFilter = (filter: any) => {
 };
 
 export type FetcherReturnStatus =
-  "success" | "validation_error" | "failed" | "network_error";
+  | "success"
+  | "validation_error"
+  | "failed"
+  | "network_error";
 
 export type FetcherReturnType<T> = {
   status: FetcherReturnStatus;

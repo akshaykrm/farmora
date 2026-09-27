@@ -18,7 +18,6 @@ const useGetPurchaseById = (selectedId: number | null) => {
     assign_quantity: 0,
     invoice_date: "",
     payment_type: "credit",
-    narration: "",
   });
 
   useEffect(() => {
@@ -40,7 +39,6 @@ const useGetPurchaseById = (selectedId: number | null) => {
             quantity,
             assign_quantity,
             total_price,
-            narration,
           } = res.data;
 
           setSelectedData({
@@ -57,7 +55,6 @@ const useGetPurchaseById = (selectedId: number | null) => {
             quantity,
             assign_quantity,
             total_price,
-            narration: narration || "",
           });
           setdataLoaded(true);
         }

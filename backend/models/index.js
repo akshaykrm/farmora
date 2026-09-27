@@ -202,6 +202,12 @@ PurchaseModel.belongsTo(ItemModel, {
   targetKey: 'id',
 })
 
+ItemModel.belongsTo(BrandModel, {
+  foreignKey: 'brand_id',
+  as: 'brand',
+  targetKey: 'id',
+})
+
 PurchaseModel.belongsTo(VendorModel, {
   foreignKey: 'vendor_id',
   as: 'vendor',

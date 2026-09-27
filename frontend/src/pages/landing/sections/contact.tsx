@@ -158,15 +158,15 @@ const ContactSection = () => {
                 Business Hours
               </h4>
               <div className="space-y-1.5 text-brand-ink-soft text-sm">
-                <div className="flex flex-col gap-1 sm:flex-row sm:justify-between">
+                <div className="flex justify-between">
                   <span>Monday - Friday</span>
                   <span className="font-medium">9:00 AM - 6:00 PM</span>
                 </div>
-                <div className="flex flex-col gap-1 sm:flex-row sm:justify-between">
+                <div className="flex justify-between">
                   <span>Saturday</span>
                   <span className="font-medium">10:00 AM - 4:00 PM</span>
                 </div>
-                <div className="flex flex-col gap-1 sm:flex-row sm:justify-between">
+                <div className="flex justify-between">
                   <span>Sunday</span>
                   <span className="font-medium text-brand-primary">Closed</span>
                 </div>

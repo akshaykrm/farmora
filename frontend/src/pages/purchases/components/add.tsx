@@ -18,7 +18,6 @@ const defaultValues: PurchaseFormValues = {
   batch_id: null,
   assign_quantity: "",
   payment_type: "credit",
-  narration: "",
 };
 
 type Props = {
