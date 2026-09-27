@@ -90,6 +90,9 @@ export async function getAllActiveBatches(filter) {
         [Op.is]: null,
       },
     },
+    include: [
+      { model: SeasonModel, as: 'season', attributes: ['id', 'name'] },
+    ],
   })
   return batchRecords
 }

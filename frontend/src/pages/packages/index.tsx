@@ -28,6 +28,7 @@ const emptyForm: PackageFormValues = {
   status: "active",
   referral_bonus_type: "none",
   referral_bonus_value: null,
+  role_id: null,
 };
 
 const PackagesPage = () => {
@@ -41,6 +42,7 @@ const PackagesPage = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [apiErrors, setApiErrors] = useState<ValidationError[]>([]);
+  const [systemRoles, setSystemRoles] = useState<Role[]>([]);
 
   const methods = useForm<PackageFormValues>({ defaultValues: emptyForm });
   const { register, handleSubmit, reset, watch, formState } = methods;
@@ -57,6 +59,14 @@ const PackagesPage = () => {
   useEffect(() => {
     refetch();
   }, [refetch]);
+
+  useEffect(() => {
+    rolesApi.fetchAll({ kind: "system", limit: 100, page: 1 }).then((res) => {
+      if (res.status === "success" && res.data) {
+        setSystemRoles(res.data.data);
+      }
+    });
+  }, []);
 
   const openCreate = () => {
     setSelectedId(null);
@@ -81,6 +91,7 @@ const PackagesPage = () => {
           res.data.referral_bonus_value == null
             ? null
             : Number(res.data.referral_bonus_value),
+        role_id: res.data.role_id ?? res.data.role?.id ?? null,
       });
     }
     setApiErrors([]);
@@ -88,9 +99,13 @@ const PackagesPage = () => {
   };
 
   const onSubmit = async (payload: PackageFormValues) => {
+    const body = {
+      ...payload,
+      role_id: payload.role_id ? Number(payload.role_id) : null,
+    };
     const res = selectedId
-      ? await packages.updateById(selectedId, payload)
-      : await packages.create(payload);
+      ? await packages.updateById(selectedId, body)
+      : await packages.create(body);
     if (res.status === "success") {
       setIsOpen(false);
       refetch();
@@ -137,6 +152,7 @@ const PackagesPage = () => {
               content={<PackagePriceDisplay pkg={row} size="compact" />}
             />
             <TableCell content={row.duration} />
+            <TableCell content={row.role?.name || "—"} />
             <TableCell
               content={
                 row.referral_bonus_type === "fixed"
@@ -212,6 +228,25 @@ const PackagesPage = () => {
               type="number"
               {...register("duration", { valueAsNumber: true })}
             />
+            <TextField
+              select
+              label="System Role"
+              size="small"
+              defaultValue=""
+              {...register("role_id", {
+                setValueAs: (value) =>
+                  value === "" || value == null ? null : Number(value),
+              })}
+              error={Boolean(formState.errors.role_id)}
+              helperText={formState.errors.role_id?.message}
+            >
+              <MenuItem value="">None</MenuItem>
+              {systemRoles.map((role) => (
+                <MenuItem key={role.id} value={role.id}>
+                  {role.name}
+                </MenuItem>
+              ))}
+            </TextField>
             <TextField
               select
               label="Status"

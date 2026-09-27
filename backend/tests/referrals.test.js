@@ -9,6 +9,8 @@ import PackageModel from '@models/package'
 import ReferralPartnerModel from '@models/referralpartner'
 import ReferralLedgerTransactionModel from '@models/referralledgertransaction'
 import { connectDB } from '@utils/db'
+import { grantAllTenantPermissionsToPackage } from './helpers/entitlements.js'
+import { Op } from 'sequelize'
 
 const unique = (prefix) =>
   `${prefix}${Date.now()}${Math.floor(Math.random() * 1000)}`
@@ -54,8 +56,15 @@ describe('Referral bonus and renewals', () => {
   beforeAll(async () => {
     await connectDB()
     admin = await loginAs('superadmin', 'admin123')
-    packageRecord = await PackageModel.findOne({ where: { status: 'active' } })
+    packageRecord =
+      (await PackageModel.findOne({
+        where: { status: 'active', name: 'Basic' },
+      })) ||
+      (await PackageModel.findOne({
+        where: { status: 'active', role_id: { [Op.ne]: null } },
+      }))
     expect(packageRecord).toBeTruthy()
+    await grantAllTenantPermissionsToPackage(packageRecord.id)
 
     await packageRecord.update({
       actual_price: 5000,
@@ -264,5 +273,83 @@ describe('Referral bonus and renewals', () => {
       referral_bonus_type: 'fixed',
       referral_bonus_value: 500,
     })
+  })
+
+  it('prefers partner bonus over package bonus on signup', async () => {
+    await packageRecord.update({
+      referral_bonus_type: 'fixed',
+      referral_bonus_value: 500,
+    })
+
+    const partnerWithBonus = await ReferralPartnerModel.create({
+      name: unique('partnerBonus'),
+      code: unique('RFB').toUpperCase().slice(0, 20),
+      status: 'active',
+      referral_bonus_type: 'fixed',
+      referral_bonus_value: 250,
+    })
+
+    const { res: signup, username } = await signupManager({
+      package_id: packageRecord.id,
+      referral_code: partnerWithBonus.code,
+      name: 'Partner Bonus Manager',
+    })
+    expect(signup.status).toBe(201)
+
+    const manager = await UserModel.findOne({ where: { username } })
+    const bonus = await ReferralLedgerTransactionModel.findOne({
+      where: {
+        referral_partner_id: partnerWithBonus.id,
+        company_user_id: manager.id,
+        type: 'initial_bonus',
+      },
+    })
+    expect(bonus).toBeTruthy()
+    expect(Number(bonus.amount)).toBe(250)
+  })
+
+  it('credits partner bonus when Super Admin assigns referral on renew', async () => {
+    const { res: signup, username } = await signupManager({
+      package_id: packageRecord.id,
+      name: 'Assign On Renew',
+    })
+    expect(signup.status).toBe(201)
+
+    const manager = await UserModel.findOne({ where: { username } })
+    expect(manager.referral_partner_id).toBeNull()
+
+    const assignPartner = await ReferralPartnerModel.create({
+      name: unique('assignPartner'),
+      code: unique('RFA').toUpperCase().slice(0, 20),
+      status: 'active',
+      referral_bonus_type: 'percentage',
+      referral_bonus_value: 8,
+    })
+
+    const renew = await request(app)
+      .post('/api/subscriptions/renew')
+      .set(authHeader(admin.token))
+      .send({
+        user_id: manager.id,
+        package_id: packageRecord.id,
+        referral_partner_id: assignPartner.id,
+      })
+    expect(renew.status).toBe(201)
+
+    await manager.reload()
+    expect(manager.referral_partner_id).toBe(assignPartner.id)
+
+    const bonus = await ReferralLedgerTransactionModel.findOne({
+      where: {
+        referral_partner_id: assignPartner.id,
+        company_user_id: manager.id,
+        type: 'renewal_bonus',
+      },
+    })
+    expect(bonus).toBeTruthy()
+    const expected = Number(
+      ((Number(packageRecord.price) * 8) / 100).toFixed(2)
+    )
+    expect(Number(bonus.amount)).toBe(expected)
   })
 })

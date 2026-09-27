@@ -29,6 +29,16 @@ export interface RecentSale {
   payment_type: string;
 }
 
+export interface OpenBatchDetail {
+  id: number;
+  name: string;
+  chick_purchase_date: string | null;
+  number_of_chicks: number;
+  number_of_days: number | null;
+  season_id: number | null;
+  season_name: string;
+}
+
 export interface ManagerDashboardData {
   metrics: MetricData[];
   balanceInHand: number;
@@ -38,6 +48,7 @@ export interface ManagerDashboardData {
   totalDebited: number;
   recentPurchases: RecentPurchase[];
   recentSales: RecentSale[];
+  openBatches: OpenBatchDetail[];
   subscription?: {
     id: number;
     kind: string;

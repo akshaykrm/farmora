@@ -26,6 +26,18 @@ const emptyForm: ReferralPartnerForm = {
   email: "",
   code: "",
   status: "active",
+  referral_bonus_type: "fixed",
+  referral_bonus_value: null,
+};
+
+const formatBonus = (row: ReferralPartner) => {
+  if (row.referral_bonus_type === "fixed") {
+    return formatCurrency(Number(row.referral_bonus_value || 0));
+  }
+  if (row.referral_bonus_type === "percentage") {
+    return `${row.referral_bonus_value}%`;
+  }
+  return "—";
 };
 
 const ReferralsPage = () => {
@@ -38,7 +50,8 @@ const ReferralsPage = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const methods = useForm<ReferralPartnerForm>({ defaultValues: emptyForm });
-  const { register, handleSubmit, reset, formState } = methods;
+  const { register, handleSubmit, reset, watch, formState } = methods;
+  const bonusType = watch("referral_bonus_type");
 
   const refetch = useCallback(async () => {
     const res = await referralsApi.fetchAll({ page, limit });
@@ -56,6 +69,10 @@ const ReferralsPage = () => {
     const res = await referralsApi.create({
       ...payload,
       code: payload.code.trim().toUpperCase(),
+      referral_bonus_value:
+        payload.referral_bonus_type === "none"
+          ? null
+          : Number(payload.referral_bonus_value),
     });
     if (res.status === "success") {
       setIsOpen(false);
@@ -88,6 +105,7 @@ const ReferralsPage = () => {
             "ID",
             "Name",
             "Code",
+            "Bonus",
             "Companies",
             "Earned",
             "Paid",
@@ -103,6 +121,7 @@ const ReferralsPage = () => {
             <TableCell content={i + 1} />
             <TableCell content={row.name} />
             <TableCell content={row.code} />
+            <TableCell content={formatBonus(row)} />
             <TableCell content={row.companies_count ?? 0} />
             <TableCell content={formatCurrency(Number(row.total_earned || 0))} />
             <TableCell content={formatCurrency(Number(row.total_paid || 0))} />
@@ -166,9 +185,37 @@ const ReferralsPage = () => {
             />
             <TextField
               select
+              label="Referral Bonus Type"
+              size="small"
+              {...register("referral_bonus_type", { required: true })}
+            >
+              <MenuItem value="fixed">Fixed amount</MenuItem>
+              <MenuItem value="percentage">Percentage</MenuItem>
+              <MenuItem value="none">None</MenuItem>
+            </TextField>
+            {bonusType !== "none" && (
+              <TextField
+                label={
+                  bonusType === "percentage"
+                    ? "Referral Bonus (%)"
+                    : "Referral Bonus (₹)"
+                }
+                size="small"
+                type="number"
+                {...register("referral_bonus_value", {
+                  valueAsNumber: true,
+                  required: "Bonus value is required",
+                  validate: (value) =>
+                    Number(value) > 0 || "Enter a positive bonus value",
+                })}
+                error={Boolean(formState.errors.referral_bonus_value)}
+                helperText={formState.errors.referral_bonus_value?.message}
+              />
+            )}
+            <TextField
+              select
               label="Status"
               size="small"
-              defaultValue="active"
               {...register("status")}
             >
               <MenuItem value="active">Active</MenuItem>

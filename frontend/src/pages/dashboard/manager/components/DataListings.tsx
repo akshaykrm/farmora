@@ -1,11 +1,14 @@
-import type { ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
+import { Link } from "react-router";
 import type {
   Farm,
   Batch,
   Season,
   Transaction,
 } from "../types";
-import type { RecentPurchase, RecentSale } from "@app-types/dashboard.types";
+import type { RecentPurchase, RecentSale, OpenBatchDetail } from "@app-types/dashboard.types";
+import PaginationWithLimit from "@components/pagination-with-limit";
+import { DEFAULT_FIRST_PAGE, DEFAULT_PAGE_LIMIT } from "@config";
 import dayjs from "dayjs";
 
 const TableHeader = ({ children }: { children: ReactNode }) => (
@@ -293,6 +296,93 @@ export const PurchasesListing = ({ data }: { data: RecentPurchase[] }) => (
   </div>
 );
 
+export const OpenBatchesListing = ({ data }: { data: OpenBatchDetail[] }) => {
+  const [page, setPage] = useState(DEFAULT_FIRST_PAGE);
+  const [limit, setLimit] = useState(DEFAULT_PAGE_LIMIT);
+
+  const totalPages = Math.max(1, Math.ceil(data.length / limit));
+  const currentPage = Math.min(page, totalPages);
+
+  const paginatedData = useMemo(() => {
+    const startIndex = (currentPage - 1) * limit;
+    return data.slice(startIndex, startIndex + limit);
+  }, [data, currentPage, limit]);
+
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="bg-brand-card rounded-xl border border-brand-border shadow-sm overflow-hidden flex-1 flex flex-col min-h-0">
+        <div className="overflow-x-auto flex-1">
+          <table className="w-full text-sm">
+            <thead className="bg-brand-canvas">
+              <tr>
+                <TableHeader>Batch Name</TableHeader>
+                <TableHeader>Chick Purchase Date</TableHeader>
+                <TableHeader>Chicks</TableHeader>
+                <TableHeader>Days</TableHeader>
+                <TableHeader>Season</TableHeader>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-brand-border">
+              {paginatedData.map((batch) => {
+                const overviewParams = new URLSearchParams();
+                if (batch.season_id != null) {
+                  overviewParams.set("season_id", String(batch.season_id));
+                }
+                overviewParams.set("batch_id", String(batch.id));
+                const overviewHref = `/overview/batch?${overviewParams.toString()}`;
+
+                return (
+                  <tr
+                    key={batch.id}
+                    className="hover:bg-brand-canvas transition-colors"
+                  >
+                    <td className="px-4 py-2.5 font-bold text-brand-ink">
+                      <Link
+                        to={overviewHref}
+                        className="text-brand-primary-strong hover:underline"
+                      >
+                        {batch.name}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-2.5 text-brand-ink-muted text-xs">
+                      {batch.chick_purchase_date
+                        ? dayjs(batch.chick_purchase_date).format("DD MMM YYYY")
+                        : "-"}
+                    </td>
+                    <td className="px-4 py-2.5 text-brand-ink-soft font-medium text-xs">
+                      {batch.number_of_chicks.toLocaleString()}
+                    </td>
+                    <td className="px-4 py-2.5 text-brand-ink-soft font-medium text-xs">
+                      {batch.number_of_days != null ? batch.number_of_days : "-"}
+                    </td>
+                    <td className="px-4 py-2.5 text-brand-ink-muted text-xs">
+                      {batch.season_name}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+        {data.length === 0 && (
+          <div className="p-4 pt-8 text-center text-brand-ink-muted flex items-start justify-center flex-1">
+            No open batches found
+          </div>
+        )}
+      </div>
+      <PaginationWithLimit
+        totalPages={totalPages}
+        page={currentPage}
+        limit={limit}
+        onChange={({ page: nextPage, limit: nextLimit }) => {
+          if (nextLimit != null) setLimit(nextLimit);
+          if (nextPage != null) setPage(nextPage);
+        }}
+      />
+    </div>
+  );
+};
+
 export const TransactionsListing = ({ data }: { data: Transaction[] }) => (
   <div className="bg-brand-card rounded-xl border border-brand-border shadow-sm overflow-hidden">
     <div className="overflow-x-auto">
@@ -385,6 +475,7 @@ const DataListings = {
   SeasonsListing,
   SalesListing,
   PurchasesListing,
+  OpenBatchesListing,
   TransactionsListing,
 };
 

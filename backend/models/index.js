@@ -154,6 +154,16 @@ SubscriptionModel.belongsTo(PackageModel, {
   as: 'package',
 })
 
+PackageModel.belongsTo(RoleModel, {
+  foreignKey: 'role_id',
+  as: 'role',
+})
+
+RoleModel.hasMany(PackageModel, {
+  foreignKey: 'role_id',
+  as: 'packages',
+})
+
 UserModel.hasMany(UserRoleAssignment, {
   foreignKey: 'user_id',
   as: 'role_assignments',

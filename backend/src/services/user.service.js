@@ -1,13 +1,16 @@
 import { UserNameConflictError, UserNotFoundError } from '@errors/user.errors'
 import { PermissionDeniedError } from '@errors/auth.errors'
 import SubscriptionModel from '@models/subscription'
+import PackageModel from '@models/package'
 import UserModel from '@models/user'
 import RoleModel from '@models/role'
 import UserRoleAssignment from '@models/userroleassignment'
 import UserPermissionModel from '@models/userpermission'
+import RolePermissionModel from '@models/rolepermission'
 import { sequelize } from '@utils/db'
 import { Op } from 'sequelize'
 import bcryptjs from 'bcryptjs'
+import dayjs from 'dayjs'
 import userRoles from '@utils/user-roles'
 import logger from '@utils/logger'
 import { calculateOffSet } from '@utils/pagination'
@@ -30,12 +33,25 @@ const assertAssignableRoles = async (roleIds, managerId) => {
     where: {
       id: { [Op.in]: roleIds },
       manager_id: managerId,
+      kind: 'custom',
     },
   })
 
   if (roles.length !== roleIds.length) {
     throw new PermissionDeniedError('roles must belong to this account')
   }
+
+  const rolePermissionRows = await RolePermissionModel.findAll({
+    where: { role_id: { [Op.in]: roleIds } },
+    attributes: ['permission_id'],
+  })
+  const permissionIds = [
+    ...new Set(rolePermissionRows.map((row) => row.permission_id)),
+  ]
+  await permissionService.assertWithinPackagePermissionIds(
+    permissionIds,
+    managerId
+  )
 }
 
 const replaceUserAccess = async (userId, payload, managerId, transaction) => {
@@ -43,7 +59,10 @@ const replaceUserAccess = async (userId, payload, managerId, transaction) => {
   const permissionIds = payload.permission_ids || []
 
   await assertAssignableRoles(roleIds, managerId)
-  await permissionService.assertTenantPermissionIds(permissionIds)
+  await permissionService.assertWithinPackagePermissionIds(
+    permissionIds,
+    managerId
+  )
 
   await UserRoleAssignment.destroy({ where: { user_id: userId }, transaction })
   await UserPermissionModel.destroy({
@@ -283,7 +302,12 @@ const setPassword = async (userId, newPassword, currentUser) => {
 
   const userRecord = await userService.getById(userId, currentUser)
 
-  if (userRecord.user_type !== userRoles.staff.type) {
+  const isStaffTarget = userRecord.user_type === userRoles.staff.type
+  const isAdminResettingManager =
+    currentUser.user_type === userRoles.admin.type &&
+    userRecord.user_type === userRoles.manager.type
+
+  if (!isStaffTarget && !isAdminResettingManager) {
     throw new PermissionDeniedError('can only change password for users')
   }
 
@@ -299,6 +323,47 @@ const setPassword = async (userId, newPassword, currentUser) => {
 const deleteById = async (userId, currentUser) => {
   const userRecord = await userService.getById(userId, currentUser)
   await userRecord.destroy()
+}
+
+const pickCurrentSubscription = (subscriptions = []) => {
+  const now = dayjs()
+  const active = subscriptions.find((subscription) => {
+    const from = dayjs(subscription.valid_from)
+    const to = dayjs(subscription.valid_to)
+    return (
+      (from.isBefore(now) || from.isSame(now)) &&
+      (to.isAfter(now) || to.isSame(now))
+    )
+  })
+  return active || subscriptions[0] || null
+}
+
+const toSubscriberPayload = (userRecord) => {
+  const json = userRecord.toJSON()
+  const subscriptions = json.subscriptions || []
+  return {
+    ...json,
+    subscriptions,
+    current_subscription: pickCurrentSubscription(subscriptions),
+  }
+}
+
+const subscriptionListInclude = {
+  model: SubscriptionModel,
+  as: 'subscriptions',
+  separate: true,
+  order: [
+    ['valid_to', 'DESC'],
+    ['id', 'DESC'],
+  ],
+  include: [
+    {
+      model: PackageModel,
+      as: 'package',
+      required: false,
+      attributes: ['id', 'name', 'price', 'duration'],
+    },
+  ],
 }
 
 const getAll = async (payload = {}, currentUser) => {
@@ -321,10 +386,7 @@ const getAll = async (payload = {}, currentUser) => {
   }
 
   const { count, rows } = await UserModel.findAndCountAll({
-    include: {
-      model: SubscriptionModel,
-      as: 'subscriptions',
-    },
+    include: [subscriptionListInclude],
     where: filter,
     limit,
     offset,
@@ -332,7 +394,11 @@ const getAll = async (payload = {}, currentUser) => {
     attributes: {
       exclude: ['password'],
     },
+    distinct: true,
+    col: 'id',
   })
+
+  const data = rows.map((row) => toSubscriberPayload(row))
 
   const totalPages = Math.ceil(count / limit)
   return {
@@ -340,7 +406,7 @@ const getAll = async (payload = {}, currentUser) => {
     page,
     limit,
     count,
-    data: rows,
+    data,
   }
 }
 
