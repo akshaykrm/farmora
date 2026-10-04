@@ -1,7 +1,9 @@
 import expenseSalesController from '@controllers/expense-sales.controller'
 import { isAuthenticated, requirePermission } from '@middlewares/auth.middleware'
 import { PERMISSION_KEYS as P } from '../../config/permissions.js'
-import validate from '@utils/validate-request'
+import validate, { validateQuery } from '@utils/validate-request'
+import salesExportController from '@controllers/sales-export.controller'
+import { exportQuerySchema } from '@validators/export.validator'
 import { newExpenseSalesSchema } from '@validators/expense-sales.validator'
 import { Router } from 'express'
 
@@ -12,6 +14,14 @@ router.get(
   isAuthenticated,
   requirePermission(P.general_sales_read),
   expenseSalesController.getAll
+)
+
+router.get(
+  '/export',
+  isAuthenticated,
+  requirePermission(P.general_sales_read, P.general_sales_export),
+  validateQuery(exportQuerySchema),
+  salesExportController.generalSales
 )
 
 router.get(

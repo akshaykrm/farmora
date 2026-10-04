@@ -2,7 +2,9 @@ import { isAuthenticated, requirePermission } from '@middlewares/auth.middleware
 import { PERMISSION_KEYS as P } from '../../../config/permissions.js'
 import { Router } from 'express'
 import InvestorManagementController from './management.controller'
-import validate from '@utils/validate-request'
+import validate, { validateQuery } from '@utils/validate-request'
+import overviewExportController from '@controllers/overview-export.controller'
+import { exportQuerySchema } from '@validators/export.validator'
 import {
   createInvestorManagementValidation,
   updateInvestorManagementValidation,
@@ -23,6 +25,14 @@ router.get(
   isAuthenticated,
   requirePermission(P.investor_read),
   InvestorManagementController.getAllInvestors
+)
+
+router.get(
+  '/export',
+  isAuthenticated,
+  requirePermission(P.investor_read, P.investor_export),
+  validateQuery(exportQuerySchema),
+  overviewExportController.investors
 )
 
 router.get(

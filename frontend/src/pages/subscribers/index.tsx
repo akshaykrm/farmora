@@ -1,5 +1,6 @@
 import PageHeader from "@components/PageHeader";
 import AddButton from "@components/AddButton";
+import ExportMenu from "@components/ExportMenu";
 import { useCallback, useEffect, useState } from "react";
 import { Box, Button, MenuItem, TextField } from "@mui/material";
 import PaginationWithLimit from "@components/pagination-with-limit";
@@ -215,7 +216,17 @@ const SubscribersPage = () => {
     <>
       <PageHeader
         title="Subscribers"
-        action={<AddButton label="Subscriber" onClick={() => setIsOpen(true)} />}
+        action={
+          <div className="flex gap-2">
+            <ExportMenu
+              permission="subscriber:export"
+              endpoint="users/subscribers/export"
+              filter={{}}
+              filename="subscribers"
+            />
+            <AddButton label="Subscriber" onClick={() => setIsOpen(true)} />
+          </div>
+        }
       />
       <Table>
         <TableRow>

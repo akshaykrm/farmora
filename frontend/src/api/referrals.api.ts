@@ -22,7 +22,7 @@ export type ReferralLedgerTxn = {
   amount: number | string;
   package_name?: string | null;
   remarks?: string | null;
-  created_at: string;
+  createdAt: string;
   company?: { id: number; name: string; username: string } | null;
 };
 

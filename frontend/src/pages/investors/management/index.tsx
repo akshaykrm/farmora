@@ -1,5 +1,6 @@
 import PageTitle from "@components/PageTitle";
 import AddButton from "@components/AddButton";
+import ExportMenu from "@components/ExportMenu";
 import { useState } from "react";
 import AddInvestor from "./components/AddInvestor";
 import InvestorManagementTable from "./components/InvestorManagementTable";
@@ -23,7 +24,15 @@ const InvestorManagementPage = () => {
     <>
       <div className="flex items-center justify-between mb-6">
         <PageTitle title="Investors" />
-        <AddButton label="Investor" onClick={onOpen} />
+        <div className="flex gap-2">
+          <ExportMenu
+            permission="investor:export"
+            endpoint="investors/export"
+            filter={filter}
+            filename="investors"
+          />
+          <AddButton label="Investor" onClick={onOpen} />
+        </div>
       </div>
       <InvestorManagementFilter
         defaultFilter={filter}

@@ -1,7 +1,9 @@
 import purchaseReturnController from '@controllers/purchase-return.controller'
 import { isAuthenticated, requirePermission } from '@middlewares/auth.middleware'
 import { PERMISSION_KEYS as P } from '../../config/permissions.js'
-import validate from '@utils/validate-request'
+import validate, { validateQuery } from '@utils/validate-request'
+import expenseExportController from '@controllers/expense-export.controller'
+import { exportQuerySchema } from '@validators/export.validator'
 import {
   newItemReturnSchema,
   updateItemReturnSchema,
@@ -22,6 +24,13 @@ router.get(
   '/',
   requirePermission(P.item_return_read),
   purchaseReturnController.getAll
+)
+
+router.get(
+  '/export',
+  requirePermission(P.item_return_read, P.item_return_export),
+  validateQuery(exportQuerySchema),
+  expenseExportController.itemReturns
 )
 
 router.get(

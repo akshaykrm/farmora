@@ -1,4 +1,5 @@
 import PageTitle from "@components/PageTitle";
+import ExportMenu from "@components/ExportMenu";
 import useSeasonOverviewFilter from "./hooks/use-filter";
 import useGetSeasonOverview from "./hooks/use-get-season-overview";
 import FilterSeasonOverview from "./components/filter";
@@ -26,6 +27,14 @@ const SeasonOverviewPage = () => {
     <>
       <div className="flex items-center justify-between mb-6">
         <PageTitle title="Season Overview" />
+        <ExportMenu
+          permission="season_overview:export"
+          endpoint="overview/season/export"
+          filter={filter}
+          filename="season-overview"
+          disabled={!filter.season_id}
+          disabledReason="Select a season to export"
+        />
       </div>
       <FilterSeasonOverview
         defaultValues={filter}

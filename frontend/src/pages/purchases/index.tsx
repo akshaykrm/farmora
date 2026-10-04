@@ -1,5 +1,6 @@
 import PageHeader from "@components/PageHeader";
 import AddButton from "@components/AddButton";
+import ExportMenu from "@components/ExportMenu";
 import { useState } from "react";
 import AddPurchase from "./components/add";
 import ItemTable from "./components/table";
@@ -25,7 +26,15 @@ function PurchasePage() {
       <PageHeader
         title="Purchase"
         action={
-          <AddButton label="Purchase" onClick={onOpen} />
+          <div className="flex gap-2">
+            <ExportMenu
+              permission="purchase:export"
+              endpoint="purchases/export"
+              filter={filter}
+              filename="purchases"
+            />
+            <AddButton label="Purchase" onClick={onOpen} />
+          </div>
         }
       />
       <div>

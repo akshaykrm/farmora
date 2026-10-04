@@ -127,7 +127,7 @@ const getIntegrationItem = async (currentUser) => {
     where: filter,
   })
 
-  return itemCategoryRecord.toJSON()
+  return itemCategoryRecord ? itemCategoryRecord.toJSON() : null
 }
 
 const getWorkingItem = async (currentUser) => {
@@ -145,7 +145,7 @@ const getWorkingItem = async (currentUser) => {
     where: filter,
   })
 
-  return itemCategoryRecord.toJSON()
+  return itemCategoryRecord ? itemCategoryRecord.toJSON() : null
 }
 
 const itemService = {

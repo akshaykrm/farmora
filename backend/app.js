@@ -38,7 +38,7 @@ const app = express()
 const { json } = bodyParser
 
 app.use(json())
-app.use(cors())
+app.use(cors({ exposedHeaders: ['Content-Disposition'] }))
 
 app.use(requestLogger)
 

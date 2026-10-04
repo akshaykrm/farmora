@@ -1,5 +1,6 @@
 import PageHeader from "@components/PageHeader";
 import AddButton from "@components/AddButton";
+import ExportMenu from "@components/ExportMenu";
 import { useState } from "react";
 import AddBatch from "./components/add";
 import BatchTable from "./components/table";
@@ -24,7 +25,15 @@ const BatchPage = () => {
       <PageHeader
         title="Batch"
         action={
-          <AddButton label="Batch" onClick={onOpen} />
+          <div className="flex gap-2">
+            <ExportMenu
+              permission="batch:export"
+              endpoint="batches/export"
+              filter={filter}
+              filename="batches"
+            />
+            <AddButton label="Batch" onClick={onOpen} />
+          </div>
         }
       />
       <div>

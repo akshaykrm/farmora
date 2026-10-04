@@ -1,6 +1,7 @@
 import salesService from '@services/sales.service'
 import asyncHandler from '@utils/async-handler'
 import logger from '@utils/logger'
+import { parseSaleFilter, parseSalesBookFilter } from '@utils/list-filters'
 
 const create = async (req, res) => {
   const payload = req.body
@@ -18,39 +19,7 @@ const getAll = async (req, res) => {
   const filter = {
     page: parseInt(req.query.page) || 1,
     limit: parseInt(req.query.limit) || 10,
-  }
-
-  if (req.query.page) {
-    filter.page = parseInt(req.query.page)
-  }
-
-  if (req.query.limit) {
-    filter.limit = parseInt(req.query.limit)
-  }
-
-  if (req.query.master_id) {
-    filter.master_id = req.query.master_id
-  }
-  if (req.query.status) {
-    filter.status = req.query.status
-  }
-  if (req.query.season_id) {
-    filter.season_id = req.query.season_id
-  }
-  if (req.query.batch_id) {
-    filter.batch_id = req.query.batch_id
-  }
-  if (req.query.buyer_name) {
-    filter.buyer_name = req.query.buyer_name
-  }
-  if (req.query.payment_type) {
-    filter.payment_type = req.query.payment_type
-  }
-  if (req.query.start_date) {
-    filter.start_date = req.query.start_date
-  }
-  if (req.query.end_date) {
-    filter.end_date = req.query.end_date
+    ...parseSaleFilter(req.query),
   }
 
   logger.debug({ filter }, 'Sales query filter')
@@ -92,18 +61,7 @@ const getSalesLedger = async (req, res) => {
   const filter = {
     page: parseInt(req.query.page) || 1,
     limit: parseInt(req.query.limit) || 10,
-  }
-
-  if (req.query.buyer_id) {
-    filter.buyer_id = req.query.buyer_id
-  }
-
-  if (req.query.from_date) {
-    filter.from_date = req.query.from_date
-  }
-
-  if (req.query.end_date) {
-    filter.end_date = req.query.end_date
+    ...parseSalesBookFilter(req.query),
   }
 
   const ledgerData = await salesService.getSalesLedger(filter, req.user)

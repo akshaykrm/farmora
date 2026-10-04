@@ -1,10 +1,14 @@
 import overviewService from '@services/overview.service'
 import asyncHandler from '@utils/async-handler'
 import logger from '@utils/logger'
+import {
+  parseBatchOverviewFilter,
+  parseSeasonOverviewFilter,
+} from '@utils/list-filters'
 
 const getBatchOverview = async (req, res) => {
   const filter = {
-    batch_id: parseInt(req.query.batch_id),
+    ...parseBatchOverviewFilter(req.query),
 
     e_page: parseInt(req.query.e_page) || 1,
     e_limit: parseInt(req.query.e_limit) || 10,
@@ -25,7 +29,7 @@ const getBatchOverview = async (req, res) => {
 
 const getSeasonOverview = async (req, res) => {
   const filter = {
-    season_id: parseInt(req.query.season_id),
+    ...parseSeasonOverviewFilter(req.query),
 
     b_page: parseInt(req.query.b_page) || 1,
     b_limit: parseInt(req.query.b_limit) || 10,
@@ -35,14 +39,6 @@ const getSeasonOverview = async (req, res) => {
 
     gs_page: parseInt(req.query.gs_page) || 1,
     gs_limit: parseInt(req.query.gs_limit) || 10,
-  }
-
-  if (req.query.gc_purpose) {
-    filter.gc_purpose = req.query.gc_purpose
-  }
-
-  if (req.query.gs_purpose) {
-    filter.gs_purpose = req.query.gs_purpose
   }
 
   logger.info({ filter }, 'Season overview request received')

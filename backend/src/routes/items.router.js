@@ -2,7 +2,13 @@ import itemController from '@controllers/items.controller'
 import purchaseController from '@controllers/purchase.controller'
 import { isAuthenticated, requirePermission } from '@middlewares/auth.middleware'
 import { PERMISSION_KEYS as P } from '../../config/permissions.js'
-import validate from '@utils/validate-request'
+import validate, { validateQuery } from '@utils/validate-request'
+import expenseExportController from '@controllers/expense-export.controller'
+import configExportController from '@controllers/config-export.controller'
+import {
+  exportQuerySchema,
+  purchaseBookExportQuerySchema,
+} from '@validators/export.validator'
 import {
   newItemSchema,
   updateItemsCategory,
@@ -21,6 +27,12 @@ router.get(
   '/categories',
   requirePermission(P.item_read),
   itemController.getAll
+)
+router.get(
+  '/categories/export',
+  requirePermission(P.item_read, P.item_export),
+  validateQuery(exportQuerySchema),
+  configExportController.items
 )
 router.post(
   '/categories',
@@ -69,6 +81,12 @@ router.get(
   '/purchase-book',
   requirePermission(P.purchase_book_read),
   purchaseController.getPurchaseBook
+)
+router.get(
+  '/purchase-book/export',
+  requirePermission(P.purchase_book_read, P.purchase_book_export),
+  validateQuery(purchaseBookExportQuerySchema),
+  expenseExportController.purchaseBook
 )
 
 router.post(

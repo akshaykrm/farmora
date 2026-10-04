@@ -1,5 +1,6 @@
 import PageTitle from "@components/PageTitle";
 import AddButton from "@components/AddButton";
+import ExportMenu from "@components/ExportMenu";
 import { useState } from "react";
 import AddItem from "./components/add";
 import ItemTable from "./components/table";
@@ -24,7 +25,15 @@ const ItemsPage = () => {
     <>
       <div className="flex items-center justify-between mb-6">
         <PageTitle title="Items" />
-        <AddButton label="Item" onClick={onOpen} />
+        <div className="flex gap-2">
+          <ExportMenu
+            permission="item:export"
+            endpoint="items/categories/export"
+            filter={filter}
+            filename="items"
+          />
+          <AddButton label="Item" onClick={onOpen} />
+        </div>
       </div>
       <div>
         <ItemTable onEdit={(id) => setSelectedId(id)} data={items.records} />

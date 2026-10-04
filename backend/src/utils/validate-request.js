@@ -20,4 +20,14 @@ const validate = (schema) => (req, res, next) => {
   next()
 }
 
+export const validateQuery = (schema) => (req, res, next) => {
+  const { error } = schema
+    .prefs({ errors: { wrap: { label: false } } })
+    .validate(req.query, { abortEarly: false })
+  if (error) {
+    throw new ValidationError(error)
+  }
+  next()
+}
+
 export default validate

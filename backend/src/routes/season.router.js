@@ -5,7 +5,9 @@ import {
 } from '@middlewares/auth.middleware'
 import { PERMISSION_KEYS as P } from '../../config/permissions.js'
 import seasonController from '@controllers/season.controller'
-import validate from '@utils/validate-request'
+import validate, { validateQuery } from '@utils/validate-request'
+import configExportController from '@controllers/config-export.controller'
+import { exportQuerySchema } from '@validators/export.validator'
 import {
   newSeasonSchema,
   updateSeasonSchema,
@@ -23,6 +25,13 @@ router.post(
 )
 
 router.get('/', requirePermission(P.season_read), seasonController.getAll)
+
+router.get(
+  '/export',
+  requirePermission(P.season_read, P.season_export),
+  validateQuery(exportQuerySchema),
+  configExportController.seasons
+)
 
 router.get(
   '/names',

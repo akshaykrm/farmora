@@ -3,6 +3,7 @@ import itemService from '@services/items.service'
 import IntegrationBookModel from '@models/integationbook'
 import userRoles from '@utils/user-roles'
 import { Op } from 'sequelize'
+import dayjs from 'dayjs'
 import FarmModel from '@models/farm'
 import { calculateOffSet } from '@utils/pagination'
 
@@ -17,9 +18,12 @@ const create = async (payload, currentUser) => {
   return record
 }
 
-const getAll = async (filter, currentUser) => {
-  const { c_page, c_limit, p_page, p_limit, farm_id, start_date, end_date } =
-    filter
+/**
+ * Builds the full (unpaginated) credit and paid lists with totals.
+ * Used by the paginated list and by exports.
+ */
+const buildIntegrationBook = async (filter, currentUser) => {
+  const { farm_id, start_date, end_date } = filter
 
   const whereClause = {}
   const purchaseFilter = {}
@@ -36,33 +40,28 @@ const getAll = async (filter, currentUser) => {
   }
 
   if (start_date && end_date) {
-    const obj = {
+    whereClause.date = {
       [Op.between]: [dayjs(start_date).toDate(), dayjs(end_date).toDate()],
     }
-    whereClause.date = obj
-    purchaseFilter.date = obj
   } else if (start_date) {
-    const obj = { [Op.gte]: dayjs(start_date).toDate() }
-    whereClause.date = obj
-    purchaseFilter.date = obj
+    whereClause.date = { [Op.gte]: dayjs(start_date).toDate() }
   } else if (end_date) {
-    const opts = { [Op.lte]: dayjs(end_date).toDate() }
-    whereClause.date = opts
-    purchaseFilter.date = opts
+    whereClause.date = { [Op.lte]: dayjs(end_date).toDate() }
   }
+  if (start_date) purchaseFilter.start_date = dayjs(start_date).toDate()
+  if (end_date) purchaseFilter.end_date = dayjs(end_date).toDate()
 
   const item = await itemService.getIntegrationItem(currentUser)
+  let purchases = []
   if (item) {
-    filter.category_id = item.id
     purchaseFilter.category_id = item.id
+    const rawPurchases = await purchaseService.getAllEvenIfBatchClosed(
+      purchaseFilter,
+      currentUser
+    )
+    purchases = rawPurchases.data.map((purchase) => purchase.toJSON())
   }
 
-  const rawPurchases = await purchaseService.getAllEvenIfBatchClosed(
-    purchaseFilter,
-    currentUser
-  )
-
-  const purchases = rawPurchases.data.map((purchase) => purchase.toJSON())
   const credit = purchases
     .filter(({ payment_type }) => payment_type === 'credit')
     ?.map((item) => {
@@ -106,6 +105,24 @@ const getAll = async (filter, currentUser) => {
     return parsedAmount + acc
   }, 0)
 
+  return {
+    credit,
+    paid,
+    summary: {
+      credit: totalCredit,
+      paid: totalPaid,
+      balance: totalCredit - totalPaid,
+    },
+  }
+}
+
+const getAll = async (filter, currentUser) => {
+  const { c_page, c_limit, p_page, p_limit } = filter
+  const { credit, paid, summary } = await buildIntegrationBook(
+    filter,
+    currentUser
+  )
+
   const c_offset = calculateOffSet(c_page, c_limit)
   const p_offset = calculateOffSet(p_page, p_limit)
 
@@ -128,17 +145,14 @@ const getAll = async (filter, currentUser) => {
       count: p_count,
       data: paginatedPaid,
     },
-    summary: {
-      credit: totalCredit,
-      paid: totalPaid,
-      balance: totalCredit - totalPaid,
-    },
+    summary,
   }
 }
 
 const integrationService = {
   create,
   getAll,
+  buildIntegrationBook,
 }
 
 export default integrationService

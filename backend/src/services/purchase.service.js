@@ -88,43 +88,39 @@ const createPurchaseBook = async (payload, currentUser) => {
   return newRecord
 }
 
-const getPurchaseBook = async (filter, currentUser) => {
-  const { limit, page, vendor_id, start_date, end_date } = filter
-  const offset = calculateOffSet(page, limit)
-  const whereClause = {
-    vendor_id: vendor_id,
+/**
+ * Builds the full vendor ledger in chronological order, each row carrying
+ * the running balance. Used by the paginated list and by exports.
+ */
+const buildPurchaseBookLedger = async (filter, currentUser) => {
+  const { vendor_id, start_date, end_date } = filter
+  const scope = {}
+  if (currentUser.user_type === userRoles.staff.type) {
+    scope.master_id = currentUser.master_id
+  } else if (currentUser.user_type === userRoles.manager.type) {
+    scope.master_id = currentUser.id
   }
 
-  const returnWhereClause = {
-    to_vendor: vendor_id,
-  }
+  const purchaseWhere = { ...scope, vendor_id }
+  const paidWhere = { ...scope, vendor_id }
+  const returnWhere = { ...scope, to_vendor: vendor_id }
 
   if (start_date && end_date) {
-    const start = dayjs(start_date).startOf('day').toDate()
-    const end = dayjs(end_date).endOf('day').toDate()
-
-    whereClause.invoice_date = {
-      [Op.between]: [start, end],
+    const range = {
+      [Op.between]: [
+        dayjs(start_date).startOf('day').toDate(),
+        dayjs(end_date).endOf('day').toDate(),
+      ],
     }
-
-    returnWhereClause.invoice_date = {
-      [Op.between]: [start, end],
-    }
-  }
-  if (currentUser.user_type === userRoles.staff.type) {
-    whereClause.master_id = currentUser.master_id
-    returnWhereClause.master_id = currentUser.master_id
-  } else if (currentUser.user_type === userRoles.manager.type) {
-    whereClause.master_id = currentUser.id
-    returnWhereClause.master_id = currentUser.id
+    purchaseWhere.invoice_date = range
+    paidWhere.date = range
+    returnWhere.date = range
   }
 
   const vendor = await vendorService.getById(vendor_id, currentUser)
 
   const purchases = await PurchaseModel.findAll({
-    where: {
-      ...whereClause,
-    },
+    where: purchaseWhere,
     order: [['invoice_date', 'DESC']],
     include: [
       { model: VendorModel, as: 'vendor', required: true },
@@ -133,11 +129,11 @@ const getPurchaseBook = async (filter, currentUser) => {
   })
 
   const returnedRecords = await PurchaseReturnModel.findAll({
-    where: { ...returnWhereClause, payment_type: 'paid' },
+    where: { ...returnWhere, payment_type: 'paid' },
   })
 
   const paidRecords = await PurchaseBookModel.findAll({
-    where: whereClause,
+    where: paidWhere,
   })
 
   const returnList = returnedRecords.map((p) => {
@@ -191,11 +187,6 @@ const getPurchaseBook = async (filter, currentUser) => {
     return newObj
   })
 
-  let temp = 0
-  creditList.forEach((c) => {
-    temp += parseFloat(c.amount)
-  })
-
   const totalCredit = creditList.reduce((acc, curr) => {
     return acc + parseFloat(curr.amount)
   }, 0)
@@ -207,23 +198,31 @@ const getPurchaseBook = async (filter, currentUser) => {
     0
   )
 
-  const reversedPurchaseWithBalance = purchasesWithBalance.reverse()
-
-  const count = reversedPurchaseWithBalance.length
-  const paginatedTransactions = reversedPurchaseWithBalance.slice(
-    offset,
-    offset + limit
-  )
-  const totalPages = Math.ceil(count / limit)
-
   return {
-    totalPages,
-    data: paginatedTransactions,
+    vendor,
+    rows: purchasesWithBalance,
     summary: {
       credit: totalCredit,
       paid: totalPaid,
       balance: balance,
     },
+  }
+}
+
+const getPurchaseBook = async (filter, currentUser) => {
+  const { limit, page } = filter
+  const offset = calculateOffSet(page, limit)
+  const { rows, summary } = await buildPurchaseBookLedger(filter, currentUser)
+
+  const newestFirst = [...rows].reverse()
+  const count = newestFirst.length
+  const paginatedTransactions = newestFirst.slice(offset, offset + limit)
+  const totalPages = Math.ceil(count / limit)
+
+  return {
+    totalPages,
+    data: paginatedTransactions,
+    summary,
   }
 }
 
@@ -665,6 +664,7 @@ const purchaseService = {
   assignItemToBatch,
   reassignToAnotherBatch,
   getPurchaseBook,
+  buildPurchaseBookLedger,
   getIntegrationBook,
   getInternalPurchaseTypes,
   createPurchaseBook,

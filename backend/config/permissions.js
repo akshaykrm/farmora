@@ -32,9 +32,10 @@ export const ACTION_LABELS = {
   write: 'Create',
   edit: 'Edit',
   delete: 'Delete',
+  export: 'Export',
 }
 
-export const ACTION_ORDER = ['read', 'write', 'edit', 'delete']
+export const ACTION_ORDER = ['read', 'write', 'edit', 'delete', 'export']
 
 const actionFromKey = (key) => {
   const action = key.includes(':') ? key.split(':')[1] : key
@@ -69,6 +70,7 @@ export const PERMISSIONS = [
   tenant('purchase:write', 'Create purchases', GROUPS.expense, 'Purchase'),
   tenant('purchase:edit', 'Edit purchases', GROUPS.expense, 'Purchase'),
   tenant('purchase:delete', 'Delete purchases', GROUPS.expense, 'Purchase'),
+  tenant('purchase:export', 'Export purchases', GROUPS.expense, 'Purchase'),
 
   tenant('item_return:read', 'View item returns', GROUPS.expense, 'Returns'),
   tenant(
@@ -81,6 +83,12 @@ export const PERMISSIONS = [
   tenant(
     'item_return:delete',
     'Delete item returns',
+    GROUPS.expense,
+    'Returns'
+  ),
+  tenant(
+    'item_return:export',
+    'Export item returns',
     GROUPS.expense,
     'Returns'
   ),
@@ -97,6 +105,12 @@ export const PERMISSIONS = [
     GROUPS.expense,
     'Purchase Book'
   ),
+  tenant(
+    'purchase_book:export',
+    'Export purchase book',
+    GROUPS.expense,
+    'Purchase Book'
+  ),
 
   tenant(
     'integration_book:read',
@@ -107,6 +121,12 @@ export const PERMISSIONS = [
   tenant(
     'integration_book:write',
     'Add integration book entries',
+    GROUPS.expense,
+    'Integration Book'
+  ),
+  tenant(
+    'integration_book:export',
+    'Export integration book',
     GROUPS.expense,
     'Integration Book'
   ),
@@ -123,11 +143,18 @@ export const PERMISSIONS = [
     GROUPS.expense,
     'Working Cost Book'
   ),
+  tenant(
+    'working_cost:export',
+    'Export working cost book',
+    GROUPS.expense,
+    'Working Cost Book'
+  ),
 
   tenant('sale:read', 'View sales', GROUPS.sales, 'Sale'),
   tenant('sale:write', 'Create sales', GROUPS.sales, 'Sale'),
   tenant('sale:edit', 'Edit sales', GROUPS.sales, 'Sale'),
   tenant('sale:delete', 'Delete sales', GROUPS.sales, 'Sale'),
+  tenant('sale:export', 'Export sales', GROUPS.sales, 'Sale'),
 
   tenant('sales_book:read', 'View sales book', GROUPS.sales, 'Sales Book'),
   tenant(
@@ -136,6 +163,7 @@ export const PERMISSIONS = [
     GROUPS.sales,
     'Sales Book'
   ),
+  tenant('sales_book:export', 'Export sales book', GROUPS.sales, 'Sales Book'),
 
   tenant(
     'general_expense:read',
@@ -158,6 +186,12 @@ export const PERMISSIONS = [
   tenant(
     'general_expense:delete',
     'Delete general expenses',
+    GROUPS.general,
+    'General Expense'
+  ),
+  tenant(
+    'general_expense:export',
+    'Export general expenses',
     GROUPS.general,
     'General Expense'
   ),
@@ -186,8 +220,15 @@ export const PERMISSIONS = [
     GROUPS.general,
     'General Sales'
   ),
+  tenant(
+    'general_sales:export',
+    'Export general sales',
+    GROUPS.general,
+    'General Sales'
+  ),
 
   tenant('cash_flow:read', 'View cash flow', GROUPS.cashFlow),
+  tenant('cash_flow:export', 'Export cash flow', GROUPS.cashFlow),
 
   tenant(
     'season_overview:read',
@@ -196,8 +237,20 @@ export const PERMISSIONS = [
     'Season Overview'
   ),
   tenant(
+    'season_overview:export',
+    'Export season overview',
+    GROUPS.overview,
+    'Season Overview'
+  ),
+  tenant(
     'batch_overview:read',
     'View batch overview',
+    GROUPS.overview,
+    'Batch Overview'
+  ),
+  tenant(
+    'batch_overview:export',
+    'Export batch overview',
     GROUPS.overview,
     'Batch Overview'
   ),
@@ -211,6 +264,7 @@ export const PERMISSIONS = [
     GROUPS.investors,
     'Management'
   ),
+  tenant('investor:export', 'Export investors', GROUPS.investors, 'Management'),
 
   tenant(
     'investor_ledger:read',
@@ -224,36 +278,48 @@ export const PERMISSIONS = [
     GROUPS.investors,
     'Ledger'
   ),
+  tenant(
+    'investor_ledger:export',
+    'Export investor ledger',
+    GROUPS.investors,
+    'Ledger'
+  ),
 
   tenant('item:read', 'View items', GROUPS.configuration, 'Items'),
   tenant('item:write', 'Create items', GROUPS.configuration, 'Items'),
   tenant('item:edit', 'Edit items', GROUPS.configuration, 'Items'),
   tenant('item:delete', 'Delete items', GROUPS.configuration, 'Items'),
+  tenant('item:export', 'Export items', GROUPS.configuration, 'Items'),
 
   tenant('farm:read', 'View farms', GROUPS.configuration, 'Farms'),
   tenant('farm:write', 'Create farms', GROUPS.configuration, 'Farms'),
   tenant('farm:edit', 'Edit farms', GROUPS.configuration, 'Farms'),
   tenant('farm:delete', 'Delete farms', GROUPS.configuration, 'Farms'),
+  tenant('farm:export', 'Export farms', GROUPS.configuration, 'Farms'),
 
   tenant('season:read', 'View seasons', GROUPS.configuration, 'Seasons'),
   tenant('season:write', 'Create seasons', GROUPS.configuration, 'Seasons'),
   tenant('season:edit', 'Edit seasons', GROUPS.configuration, 'Seasons'),
   tenant('season:delete', 'Delete seasons', GROUPS.configuration, 'Seasons'),
+  tenant('season:export', 'Export seasons', GROUPS.configuration, 'Seasons'),
 
   tenant('batch:read', 'View batches', GROUPS.configuration, 'Batches'),
   tenant('batch:write', 'Create batches', GROUPS.configuration, 'Batches'),
   tenant('batch:edit', 'Edit batches', GROUPS.configuration, 'Batches'),
   tenant('batch:delete', 'Delete batches', GROUPS.configuration, 'Batches'),
+  tenant('batch:export', 'Export batches', GROUPS.configuration, 'Batches'),
 
   tenant('vendor:read', 'View vendors', GROUPS.configuration, 'Vendors'),
   tenant('vendor:write', 'Create vendors', GROUPS.configuration, 'Vendors'),
   tenant('vendor:edit', 'Edit vendors', GROUPS.configuration, 'Vendors'),
   tenant('vendor:delete', 'Delete vendors', GROUPS.configuration, 'Vendors'),
+  tenant('vendor:export', 'Export vendors', GROUPS.configuration, 'Vendors'),
 
   tenant('user:read', 'View users', GROUPS.configuration, 'Users'),
   tenant('user:write', 'Create users', GROUPS.configuration, 'Users'),
   tenant('user:edit', 'Edit users', GROUPS.configuration, 'Users'),
   tenant('user:delete', 'Delete users', GROUPS.configuration, 'Users'),
+  tenant('user:export', 'Export users', GROUPS.configuration, 'Users'),
 
   tenant('role:read', 'View roles', GROUPS.configuration, 'Roles'),
   tenant('role:write', 'Create roles', GROUPS.configuration, 'Roles'),
@@ -291,11 +357,18 @@ export const PERMISSIONS = [
     GROUPS.platform,
     'Subscribers'
   ),
+  platform(
+    'subscriber:export',
+    'Export subscribers',
+    GROUPS.platform,
+    'Subscribers'
+  ),
 
   platform('package:read', 'View packages', GROUPS.platform, 'Packages'),
   platform('package:write', 'Create packages', GROUPS.platform, 'Packages'),
   platform('package:edit', 'Edit packages', GROUPS.platform, 'Packages'),
   platform('package:delete', 'Delete packages', GROUPS.platform, 'Packages'),
+  platform('package:export', 'Export packages', GROUPS.platform, 'Packages'),
 
   platform(
     'subscription:read',
@@ -342,6 +415,12 @@ export const PERMISSIONS = [
     'Referrals'
   ),
   platform(
+    'referral:export',
+    'Export referral partners',
+    GROUPS.platform,
+    'Referrals'
+  ),
+  platform(
     'referral_ledger:read',
     'View referral ledger',
     GROUPS.platform,
@@ -350,6 +429,12 @@ export const PERMISSIONS = [
   platform(
     'referral_ledger:write',
     'Record referral payments',
+    GROUPS.platform,
+    'Referrals'
+  ),
+  platform(
+    'referral_ledger:export',
+    'Export referral ledger',
     GROUPS.platform,
     'Referrals'
   ),

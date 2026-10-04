@@ -1,5 +1,6 @@
 import InvestorManagementService from './management.service'
 import asyncHandler from '@utils/async-handler'
+import { parseInvestorFilter } from '@utils/list-filters'
 
 async function createInvestor(req, res) {
   const newInvestor = await InvestorManagementService.createInvestor(
@@ -16,19 +17,7 @@ async function getAllInvestors(req, res) {
   const filter = {
     page: parseInt(req.query.page) || 1,
     limit: parseInt(req.query.limit) || 10,
-  }
-
-  if (req.query.search) {
-    filter.search = req.query.search
-  }
-  if (req.query.is_active !== undefined) {
-    filter.is_active = req.query.is_active === 'true'
-  }
-  if (req.query.start_date) {
-    filter.start_date = req.query.start_date
-  }
-  if (req.query.end_date) {
-    filter.end_date = req.query.end_date
+    ...parseInvestorFilter(req.query),
   }
 
   const investorRecords = await InvestorManagementService.getAllInvestors(

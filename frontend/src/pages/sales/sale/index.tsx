@@ -1,5 +1,6 @@
 import PageTitle from "@components/PageTitle";
 import AddButton from "@components/AddButton";
+import ExportMenu from "@components/ExportMenu";
 import { useState } from "react";
 import AddSale from "./components/add";
 import SalesTable from "./components/table";
@@ -25,7 +26,15 @@ const SalesPage = () => {
     <>
       <div className="flex items-center justify-between mb-6">
         <PageTitle title="Sales" />
-        <AddButton label="Sale" onClick={onOpen} />
+        <div className="flex gap-2">
+          <ExportMenu
+            permission="sale:export"
+            endpoint="sales/export"
+            filter={filter}
+            filename="sales"
+          />
+          <AddButton label="Sale" onClick={onOpen} />
+        </div>
       </div>
 
       <SaleFilter

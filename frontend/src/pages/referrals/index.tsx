@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { Box, Button, MenuItem, TextField } from "@mui/material";
 import PageHeader from "@components/PageHeader";
 import AddButton from "@components/AddButton";
+import ExportMenu from "@components/ExportMenu";
 import PaginationWithLimit from "@components/pagination-with-limit";
 import Table from "@components/Table";
 import TableCell from "@components/TableCell";
@@ -90,13 +91,21 @@ const ReferralsPage = () => {
       <PageHeader
         title="Referrals"
         action={
-          <AddButton
-            label="Partner"
-            onClick={() => {
-              reset(emptyForm);
-              setIsOpen(true);
-            }}
-          />
+          <div className="flex gap-2">
+            <ExportMenu
+              permission="referral:export"
+              endpoint="referrals/export"
+              filter={{}}
+              filename="referral-partners"
+            />
+            <AddButton
+              label="Partner"
+              onClick={() => {
+                reset(emptyForm);
+                setIsOpen(true);
+              }}
+            />
+          </div>
         }
       />
       <Table>

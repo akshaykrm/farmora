@@ -1,5 +1,6 @@
 import PageHeader from "@components/PageHeader";
 import AddButton from "@components/AddButton";
+import ExportMenu from "@components/ExportMenu";
 import SalesBookTable from "./components/table";
 import AddSalesBookEntry from "./components/add";
 import { Box } from "@mui/material";
@@ -27,7 +28,17 @@ const SalesBookPage = () => {
       <PageHeader
         title="Sales Book"
         action={
-          <AddButton label="Sales Book Entry" onClick={onOpen} />
+          <div className="flex gap-2">
+            <ExportMenu
+              permission="sales_book:export"
+              endpoint="sales/ledger/export"
+              filter={filter}
+              filename="sales-book"
+              disabled={!filter.buyer_id}
+              disabledReason="Select a buyer to export"
+            />
+            <AddButton label="Sales Book Entry" onClick={onOpen} />
+          </div>
         }
       />
 

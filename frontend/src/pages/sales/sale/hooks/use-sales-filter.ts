@@ -15,9 +15,7 @@ function useSalesFilter() {
 
   const batch_id = queryParms.batch_id ? parseInt(queryParms.batch_id) : null;
 
-  const buyer_name = queryParms.buyer_name
-    ? parseInt(queryParms.buyer_name)
-    : "";
+  const buyer_name = queryParms.buyer_name || "";
 
   return {
     filter: {

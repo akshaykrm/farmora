@@ -1,5 +1,6 @@
 import PageHeader from "@components/PageHeader";
 import AddButton from "@components/AddButton";
+import ExportMenu from "@components/ExportMenu";
 import { useState } from "react";
 import AddItemReturn from "./components/add";
 import ItemReturnTable from "./components/table";
@@ -26,7 +27,15 @@ const ItemReturnPage = () => {
       <PageHeader
         title="Item Returns"
         action={
-          <AddButton label="Return" onClick={onOpen} />
+          <div className="flex gap-2">
+            <ExportMenu
+              permission="item_return:export"
+              endpoint="item-returns/export"
+              filter={filter}
+              filename="returns"
+            />
+            <AddButton label="Return" onClick={onOpen} />
+          </div>
         }
       />
 

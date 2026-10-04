@@ -1,6 +1,10 @@
 import purchaseService from '@services/purchase.service'
 import asyncHandler from '@utils/async-handler'
-import CONFIG from '../../config/config.js'
+import CONFIG from '../../config.js'
+import {
+  parsePurchaseBookFilter,
+  parsePurchaseFilter,
+} from '@utils/expense-filters'
 
 const create = async (req, res) => {
   const payload = req.body
@@ -50,17 +54,7 @@ const getPurchaseBook = async (req, res) => {
   const filter = {
     page: parseInt(req.query.page) || 1,
     limit: parseInt(req.query.limit) || 10,
-  }
-
-  if (req.query.vendor_id) {
-    filter.vendor_id = req.query.vendor_id
-  }
-
-  if (req.query.start_date) {
-    filter.start_date = req.query.start_date
-  }
-  if (req.query.end_date) {
-    filter.end_date = req.query.end_date
+    ...parsePurchaseBookFilter(req.query),
   }
 
   const purchaseBookRecords = await purchaseService.getPurchaseBook(
@@ -93,37 +87,7 @@ const getAll = async (req, res) => {
   const filter = {
     page: parseInt(req.query.page) || CONFIG.default_page,
     limit: parseInt(req.query.limit) || CONFIG.default_limit,
-  }
-
-  if (req.query.master_id) {
-    filter.master_id = req.query.master_id
-  }
-
-  if (req.query.status) {
-    filter.status = req.query.status
-  }
-
-  if (req.query.name) {
-    filter.name = req.query.name
-  }
-
-  if (req.query.category_id) {
-    filter.category_id = req.query.category_id
-  }
-
-  if (req.query.vendor_id) {
-    filter.vendor_id = req.query.vendor_id
-  }
-  if (req.query.batch_id) {
-    filter.batch_id = req.query.batch_id
-  }
-
-  if (req.query.start_date) {
-    filter.start_date = req.query.start_date
-  }
-
-  if (req.query.end_date) {
-    filter.end_date = req.query.end_date
+    ...parsePurchaseFilter(req.query),
   }
 
   const itemRecords = await purchaseService.getAll(filter, req.user)

@@ -1,5 +1,6 @@
 import PageHeader from "@components/PageHeader";
 import AddButton from "@components/AddButton";
+import ExportMenu from "@components/ExportMenu";
 import { useState } from "react";
 import AddFarm from "./components/add-farm";
 import EditFarm from "./components/edit-farm";
@@ -23,7 +24,17 @@ const FarmsPage = () => {
     <>
       <PageHeader
         title="Farms"
-        action={<AddButton label="Farm" onClick={onOpen} />}
+        action={
+          <div className="flex gap-2">
+            <ExportMenu
+              permission="farm:export"
+              endpoint="farms/export"
+              filter={filter}
+              filename="farms"
+            />
+            <AddButton label="Farm" onClick={onOpen} />
+          </div>
+        }
       />
       <div>
         <FarmTable onEdit={(id) => setSelectedId(id)} farms={farms.records} />

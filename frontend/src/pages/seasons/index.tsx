@@ -1,5 +1,6 @@
 import PageHeader from "@components/PageHeader";
 import AddButton from "@components/AddButton";
+import ExportMenu from "@components/ExportMenu";
 import { useState } from "react";
 import AddSeason from "./components/add";
 import EditSeason from "./components/edit";
@@ -24,7 +25,15 @@ const SeasonsPage = () => {
       <PageHeader
         title="Seasons"
         action={
-          <AddButton label="Season" onClick={onOpen} />
+          <div className="flex gap-2">
+            <ExportMenu
+              permission="season:export"
+              endpoint="seasons/export"
+              filter={filter}
+              filename="seasons"
+            />
+            <AddButton label="Season" onClick={onOpen} />
+          </div>
         }
       />
       <div>

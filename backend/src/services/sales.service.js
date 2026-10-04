@@ -214,9 +214,12 @@ const deleteById = async (id, currentUser) => {
   logger.info({ sale_id: id, actor_id: currentUser.id }, 'Sale Deleted')
 }
 
-const getSalesLedger = async (filter, currentUser) => {
-  const { limit, page, buyer_id, from_date, end_date } = filter
-  const offset = calculateOffSet(page, limit)
+/**
+ * Builds the full buyer ledger, newest first, each row carrying the running
+ * balance. Used by the paginated list and by exports.
+ */
+const buildSalesLedger = async (filter, currentUser) => {
+  const { buyer_id, from_date, end_date } = filter
 
   const whereClause = {}
   if (buyer_id) {
@@ -240,19 +243,16 @@ const getSalesLedger = async (filter, currentUser) => {
     whereClause.master_id = currentUser.id
   }
 
-  // Fetch buyer to get opening balance
+  const buyerWhere = { id: buyer_id }
+  if (whereClause.master_id) buyerWhere.master_id = whereClause.master_id
+
   const buyer = await VendorModel.findOne({
-    where: { id: buyer_id },
+    where: buyerWhere,
     attributes: ['id', 'name', 'opening_balance'],
   })
 
   if (!buyer) {
-    return {
-      buyer: null,
-      opening_balance: 0,
-      transactions: [],
-      closing_balance: 0,
-    }
+    return { buyer: null, transactions: [], closing_balance: 0 }
   }
 
   // Fetch all sales for the buyer in date range
@@ -292,6 +292,26 @@ const getSalesLedger = async (filter, currentUser) => {
     })
   }
 
+  return { buyer, transactions, closing_balance: balance }
+}
+
+const getSalesLedger = async (filter, currentUser) => {
+  const { limit, page } = filter
+  const offset = calculateOffSet(page, limit)
+  const { buyer, transactions, closing_balance } = await buildSalesLedger(
+    filter,
+    currentUser
+  )
+
+  if (!buyer) {
+    return {
+      buyer: null,
+      opening_balance: 0,
+      transactions: [],
+      closing_balance: 0,
+    }
+  }
+
   const count = transactions.length
   const paginatedTransactions = transactions.slice(offset, offset + limit)
   const totalPages = Math.ceil(count / limit)
@@ -305,7 +325,7 @@ const getSalesLedger = async (filter, currentUser) => {
         name: buyer.name,
       },
       opening_balance: parseFloat(buyer.opening_balance),
-      closing_balance: balance,
+      closing_balance,
       totals: calculateTotals(transactions),
     },
     data: paginatedTransactions,
@@ -348,6 +368,8 @@ const salesService = {
   updateById,
   deleteById,
   getSalesLedger,
+  buildSalesLedger,
+  calculateTotals,
   addSalesBookEntry,
 }
 

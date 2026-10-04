@@ -1,4 +1,5 @@
 import PageTitle from "@components/PageTitle";
+import ExportMenu from "@components/ExportMenu";
 import useBatchOverviewFilter from "./hooks/use-filter";
 import useGetBatchOverview from "./hooks/use-get-batch-overview";
 import FilterBatchOverview from "./components/filter";
@@ -38,6 +39,14 @@ const BatchOverviewPage = () => {
     <>
       <div className="flex items-center justify-between mb-6">
         <PageTitle title="Batch Overview" />
+        <ExportMenu
+          permission="batch_overview:export"
+          endpoint="overview/batch/export"
+          filter={filter}
+          filename="batch-overview"
+          disabled={!filter.batch_id}
+          disabledReason="Select a batch to export"
+        />
       </div>
       <FilterBatchOverview
         defaultValues={filter}

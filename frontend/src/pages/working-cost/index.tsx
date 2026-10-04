@@ -1,5 +1,6 @@
 import PageHeader from "@components/PageHeader";
 import AddButton from "@components/AddButton";
+import ExportMenu from "@components/ExportMenu";
 import WorkingCostTable from "./components/table";
 import AddWorkingCost from "./components/add";
 import FilterWorkingCost from "./components/filter";
@@ -30,7 +31,17 @@ const WorkingCostPage = () => {
       <PageHeader
         title="Working Cost"
         action={
-          <AddButton label="Working Cost Entry" onClick={onOpen} />
+          <div className="flex gap-2">
+            <ExportMenu
+              permission="working_cost:export"
+              endpoint="working-costs/export"
+              filter={filter}
+              filename="working-cost-book"
+              disabled={!filter.season_id}
+              disabledReason="Select a season to export"
+            />
+            <AddButton label="Working Cost Entry" onClick={onOpen} />
+          </div>
         }
       />
       <FilterWorkingCost

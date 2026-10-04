@@ -1,5 +1,6 @@
 import PageHeader from "@components/PageHeader";
 import AddButton from "@components/AddButton";
+import ExportMenu from "@components/ExportMenu";
 import IntegrationBookTable from "./components/table";
 import AddIntegrationBook from "./components/add";
 import FilterIntegrationBook from "./components/filter";
@@ -31,7 +32,17 @@ const IntegrationBookPage = () => {
       <PageHeader
         title="Integration Book"
         action={
-          <AddButton label="Integration Book Entry" onClick={onOpen} />
+          <div className="flex gap-2">
+            <ExportMenu
+              permission="integration_book:export"
+              endpoint="integration-book/export"
+              filter={filter}
+              filename="integration-book"
+              disabled={!filter.farm_id}
+              disabledReason="Select a farm to export"
+            />
+            <AddButton label="Integration Book Entry" onClick={onOpen} />
+          </div>
         }
       />
       <FilterIntegrationBook

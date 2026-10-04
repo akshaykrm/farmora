@@ -12,7 +12,7 @@ function useGeneralSalesFilter() {
     ? parseInt(queryParms.season_id)
     : null;
 
-  const purpose = queryParms.purpose ? parseInt(queryParms.purpose) : "";
+  const purpose = queryParms.purpose || "";
 
   return {
     filter: {

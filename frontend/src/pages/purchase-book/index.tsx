@@ -1,5 +1,6 @@
 import PageHeader from "@components/PageHeader";
 import AddButton from "@components/AddButton";
+import ExportMenu from "@components/ExportMenu";
 import { Box } from "@mui/material";
 import PurchaseBookTable from "./components/table";
 import { useState } from "react";
@@ -31,7 +32,17 @@ const PurchaseBookPage = () => {
       <PageHeader
         title="Purchase Book"
         action={
-          <AddButton label="Payment" onClick={onOpen} />
+          <div className="flex gap-2">
+            <ExportMenu
+              permission="purchase_book:export"
+              endpoint="items/purchase-book/export"
+              filter={filter}
+              filename="purchase-book"
+              disabled={!filter.vendor_id}
+              disabledReason="Select a vendor to export"
+            />
+            <AddButton label="Payment" onClick={onOpen} />
+          </div>
         }
       />
       <div className="mb-5">

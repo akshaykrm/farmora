@@ -1,5 +1,6 @@
 import PageTitle from "@components/PageTitle";
 import AddButton from "@components/AddButton";
+import ExportMenu from "@components/ExportMenu";
 import { useState } from "react";
 import AddVendor from "./components/add";
 import VendorTable from "./components/table";
@@ -22,7 +23,15 @@ const VendorPage = () => {
     <>
       <div className="flex items-center justify-between mb-6">
         <PageTitle title="Vendor" />
-        <AddButton label="Vendor" onClick={onOpen} />
+        <div className="flex gap-2">
+          <ExportMenu
+            permission="vendor:export"
+            endpoint="vendors/export"
+            filter={filter}
+            filename="vendors"
+          />
+          <AddButton label="Vendor" onClick={onOpen} />
+        </div>
       </div>
       <div>
         <VendorTable onEdit={(id) => setSelectedId(id)} vendors={vendorsList.records} />
