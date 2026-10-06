@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@mui/material";
 import { Lock, Plus, Trash2 } from "lucide-react";
 import setup from "@api/setup.api";
+import vendors from "@api/vendor.api";
 import type {
   SetupExtraItemType,
   SetupSystemItem,
@@ -68,10 +69,45 @@ const ItemsStep = ({ status, onNext, onBack, onSaved, supplierId }: Props) => {
     [status.systemItems, status.defaults.items],
   );
 
-  const { data: suppliers = [], isLoading } = useQuery({
+  const [supplierName, setSupplierName] = useState("");
+  const [supplierError, setSupplierError] = useState<string | null>(null);
+  const [creatingSupplier, setCreatingSupplier] = useState(false);
+
+  const {
+    data: suppliers = [],
+    isLoading,
+    refetch: refetchSuppliers,
+  } = useQuery({
     queryKey: ["setup-supplier-names", supplierId],
     queryFn: setup.fetchSuppliers,
   });
+
+  const createSupplier = async () => {
+    const name = supplierName.trim();
+    if (name.length < 3) {
+      setSupplierError("Enter a supplier name (3+ characters).");
+      return;
+    }
+    setSupplierError(null);
+    setCreatingSupplier(true);
+    try {
+      await vendors.create({
+        name,
+        address: "-",
+        opening_balance: "0.00",
+        vendor_type: "supplier",
+      });
+      onSaved(`Supplier "${name}"`);
+      setSupplierName("");
+      await refetchSuppliers();
+    } catch (error) {
+      setSupplierError(
+        error instanceof Error ? error.message : "Could not add the supplier.",
+      );
+    } finally {
+      setCreatingSupplier(false);
+    }
+  };
 
   const defaultSupplier: number | "" =
     supplierId ?? status.existing?.supplier?.id ?? suppliers.at(0)?.id ?? "";
@@ -211,95 +247,120 @@ const ItemsStep = ({ status, onNext, onBack, onSaved, supplierId }: Props) => {
           <span className="font-normal text-brand-ink-muted">(optional)</span>
         </legend>
 
-        {noSupplier ? (
-          <p className="rounded-xl border border-brand-border bg-brand-canvas px-4 py-3 text-sm text-brand-ink-soft">
-            Other items are bought from a supplier. Go back to the Vendors step
-            to add one, or add these later from the Items page.
-          </p>
-        ) : (
-          <>
-            {fields.map((field, index) => (
-              <div
-                key={field.id}
-                className="relative grid grid-cols-1 sm:grid-cols-2 items-start gap-3 rounded-xl border border-brand-border-strong p-3 pr-12"
-              >
-                <button
-                  type="button"
-                  onClick={() => remove(index)}
-                  aria-label={`Remove ${field.name || "item"}`}
-                  className="absolute right-2 top-2 flex h-9 w-9 items-center justify-center rounded-lg text-brand-ink-muted hover:bg-brand-danger-soft hover:text-brand-danger focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-accent/25"
-                >
-                  <Trash2 size={16} aria-hidden="true" />
-                </button>
-                <SetupInput
-                  label="Name"
-                  error={errors.extra?.[index]?.name?.message}
-                  {...register(`extra.${index}.name`, { validate: nameRule })}
-                />
-                <TypeSelect
-                  label="Type"
-                  error={errors.extra?.[index]?.type?.message}
-                  {...register(`extra.${index}.type`, {
-                    validate: (v) => v !== "" || "Choose a type.",
-                  })}
-                />
-                <Controller
-                  name={`extra.${index}.vendor_id`}
-                  control={control}
-                  rules={{ validate: (v) => v !== "" || "Choose a supplier." }}
-                  render={({ field: f }) => (
-                    <SetupSelect
-                      label="Supplier"
-                      ref={f.ref}
-                      value={f.value}
-                      onChange={f.onChange}
-                      onBlur={f.onBlur}
-                      options={suppliers}
-                      error={errors.extra?.[index]?.vendor_id?.message}
-                    />
-                  )}
-                />
-                <SetupInput
-                  label="Base price"
-                  type="number"
-                  inputMode="decimal"
-                  min={0}
-                  step="0.01"
-                  error={errors.extra?.[index]?.base_price?.message}
-                  {...register(`extra.${index}.base_price`, {
-                    validate: priceRule,
-                  })}
-                />
-              </div>
-            ))}
-
-            <div className="flex flex-wrap items-center gap-2">
+        {noSupplier && (
+          <div className="flex flex-col gap-3 rounded-xl border border-brand-border bg-brand-canvas p-3">
+            <p className="text-sm text-brand-ink-soft">
+              Other items are bought from a supplier. Add one here to link your
+              items to it.
+            </p>
+            <div className="flex flex-col sm:flex-row sm:items-start gap-3">
+              <SetupInput
+                label="Supplier name"
+                placeholder="e.g. General Supplier"
+                className="flex-1"
+                value={supplierName}
+                error={supplierError ?? undefined}
+                onChange={(e) => setSupplierName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    void createSupplier();
+                  }
+                }}
+              />
               <Button
                 type="button"
                 variant="outlined"
-                size="small"
-                startIcon={<Plus size={16} aria-hidden="true" />}
-                onClick={() => addRow()}
+                onClick={() => void createSupplier()}
+                disabled={creatingSupplier}
+                sx={{ mt: { sm: "1.75rem" }, minHeight: 44 }}
               >
-                Add item
+                {creatingSupplier ? "Adding…" : "Add supplier"}
               </Button>
-              {QUICK_ADD.map((preset) => {
-                const added = extraNames.includes(preset.name.toLowerCase());
-                return (
-                  <button
-                    key={preset.name}
-                    type="button"
-                    disabled={added}
-                    onClick={() => addRow(preset)}
-                    className="rounded-full border border-brand-border-strong px-3 py-1.5 text-xs font-medium text-brand-ink-soft hover:border-brand-accent hover:text-brand-accent disabled:opacity-50 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-accent/25"
-                  >
-                    + {preset.name}
-                  </button>
-                );
-              })}
             </div>
-          </>
+          </div>
         )}
+
+        {fields.map((field, index) => (
+          <div
+            key={field.id}
+            className="relative grid grid-cols-1 sm:grid-cols-2 items-start gap-3 rounded-xl border border-brand-border-strong p-3 pr-12"
+          >
+            <button
+              type="button"
+              onClick={() => remove(index)}
+              aria-label={`Remove ${field.name || "item"}`}
+              className="absolute right-2 top-2 flex h-9 w-9 items-center justify-center rounded-lg text-brand-ink-muted hover:bg-brand-danger-soft hover:text-brand-danger focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-accent/25"
+            >
+              <Trash2 size={16} aria-hidden="true" />
+            </button>
+            <SetupInput
+              label="Name"
+              error={errors.extra?.[index]?.name?.message}
+              {...register(`extra.${index}.name`, { validate: nameRule })}
+            />
+            <TypeSelect
+              label="Type"
+              error={errors.extra?.[index]?.type?.message}
+              {...register(`extra.${index}.type`, {
+                validate: (v) => v !== "" || "Choose a type.",
+              })}
+            />
+            <Controller
+              name={`extra.${index}.vendor_id`}
+              control={control}
+              rules={{ validate: (v) => v !== "" || "Choose a supplier." }}
+              render={({ field: f }) => (
+                <SetupSelect
+                  label="Supplier"
+                  ref={f.ref}
+                  value={f.value}
+                  onChange={f.onChange}
+                  onBlur={f.onBlur}
+                  options={suppliers}
+                  error={errors.extra?.[index]?.vendor_id?.message}
+                />
+              )}
+            />
+            <SetupInput
+              label="Base price"
+              type="number"
+              inputMode="decimal"
+              min={0}
+              step="0.01"
+              error={errors.extra?.[index]?.base_price?.message}
+              {...register(`extra.${index}.base_price`, {
+                validate: priceRule,
+              })}
+            />
+          </div>
+        ))}
+
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            type="button"
+            variant="outlined"
+            size="small"
+            startIcon={<Plus size={16} aria-hidden="true" />}
+            onClick={() => addRow()}
+          >
+            Add item
+          </Button>
+          {QUICK_ADD.map((preset) => {
+            const added = extraNames.includes(preset.name.toLowerCase());
+            return (
+              <button
+                key={preset.name}
+                type="button"
+                disabled={added}
+                onClick={() => addRow(preset)}
+                className="rounded-full border border-brand-border-strong px-3 py-1.5 text-xs font-medium text-brand-ink-soft hover:border-brand-accent hover:text-brand-accent disabled:opacity-50 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-accent/25"
+              >
+                + {preset.name}
+              </button>
+            );
+          })}
+        </div>
       </fieldset>
     </StepLayout>
   );

@@ -83,11 +83,11 @@ const SetupWizard = ({ status, onClose }: Props) => {
       isOpen
       headerTitle="Set up your farm"
       onClose={onClose}
-      className="max-w-2xl"
+      className="max-w-4xl"
     >
       <DialogContent>
         <ol
-          className="flex items-center gap-2 mb-6 overflow-x-auto pb-1"
+          className="flex flex-wrap items-center gap-x-2 gap-y-3 mb-6"
           aria-label="Setup progress"
         >
           {STEPS.map((item, index) => {
