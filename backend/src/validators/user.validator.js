@@ -19,7 +19,7 @@ export const newManageSchema = Joi.object({
 })
 
 export const updateProfileSchema = Joi.object({
-  name: Joi.string().min(3).max(100),
+  name: Joi.string().min(2).max(100),
   email: Joi.string().email(),
   phone: Joi.string().min(7).max(20),
   state: optionalProfileField,
