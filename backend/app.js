@@ -28,6 +28,7 @@ import investorManagementRoutes from './src/investors/management/management.rout
 import investorLedgerRoutes from './src/investors/ledger/ledger.routes.js'
 import brandRouter from '@routes/brand.router'
 import referralRoutes from './src/referrals/referral.routes.js'
+import setupRouter from '@routes/setup.router'
 
 import responseHandler from '@middlewares/response.middleware'
 import requestLogger from '@middlewares/request.middleware'
@@ -70,6 +71,7 @@ app.use('/api/investors/ledger', investorLedgerRoutes)
 app.use('/api/investors', investorManagementRoutes)
 app.use('/api/brands', brandRouter)
 app.use('/api/referrals', referralRoutes)
+app.use('/api/setup', setupRouter)
 
 app.get('/', (_, res) => {
   res.json({ message: 'server is up and running', status: 'ok' })
