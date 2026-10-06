@@ -254,6 +254,36 @@ export const PERMISSIONS = [
     GROUPS.overview,
     'Batch Overview'
   ),
+  tenant(
+    'batch_daily_log:read',
+    'View batch daily log',
+    GROUPS.overview,
+    'Batch Daily Log'
+  ),
+  tenant(
+    'batch_daily_log:write',
+    'Add batch daily log entries',
+    GROUPS.overview,
+    'Batch Daily Log'
+  ),
+  tenant(
+    'batch_daily_log:edit',
+    'Edit batch daily log entries',
+    GROUPS.overview,
+    'Batch Daily Log'
+  ),
+  tenant(
+    'batch_daily_log:delete',
+    'Delete batch daily log entries',
+    GROUPS.overview,
+    'Batch Daily Log'
+  ),
+  tenant(
+    'batch_daily_log:export',
+    'Export batch daily log',
+    GROUPS.overview,
+    'Batch Daily Log'
+  ),
 
   tenant('investor:read', 'View investors', GROUPS.investors, 'Management'),
   tenant('investor:write', 'Create investors', GROUPS.investors, 'Management'),

@@ -1,4 +1,5 @@
 import overviewService from '@services/overview.service'
+import batchDailyLogService from '@services/batch-daily-log.service'
 import InvestorManagementService from '../../investors/management/management.service'
 import LedgerService from '../../investors/ledger/ledger.service'
 import { TRANSACTION_CATEGORIES } from '../../investors/ledger/ledger.constants'
@@ -407,7 +408,76 @@ const investorLedger = async (filter, currentUser) => {
   }
 }
 
+const dailyLog = async (filter, currentUser) => {
+  const { header, logs, summary } = await batchDailyLogService.list(
+    filter.batch_id,
+    currentUser
+  )
+
+  const sections = [
+    {
+      title: 'Daily Log',
+      columns: [
+        { key: 'date', header: 'Date', type: 'date' },
+        { key: 'age', header: 'Age', type: 'number' },
+        { key: 'mortality', header: 'Mort', type: 'number' },
+        { key: 'cum_mortality', header: 'Cum Mort', type: 'number' },
+        { key: 'issued_feed', header: 'Issued Feed', type: 'number' },
+        { key: 'consumed_feed', header: 'Cons Feed', type: 'number' },
+        { key: 'total_consumption', header: 'Total Cons', type: 'number' },
+        { key: 'feed_stock', header: 'Feed Stock', type: 'number' },
+        { key: 'avg_body_weight', header: 'Avg Wt (kg)', type: 'number' },
+        { key: 'remarks', header: 'Remarks', width: 2 },
+      ],
+      rows: logs,
+    },
+  ]
+
+  return {
+    title: 'Batch Daily Log',
+    filename: `daily-log-${header.batch_name || filter.batch_id}`
+      .replace(/[^a-zA-Z0-9-_]+/g, '-')
+      .toLowerCase(),
+    meta: compactMeta([
+      { label: 'Farmer', value: header.farm_name },
+      { label: 'Place', value: header.place },
+      { label: 'Batch', value: header.batch_name },
+      { label: 'Season', value: header.season_name },
+      { label: 'Chicks Qty', value: header.total_chicks, type: 'number' },
+      { label: 'Company', value: header.companies.join(', ') },
+      { label: 'Start Date', value: header.log_start_date, type: 'date' },
+    ]),
+    sections,
+    summary: [
+      { label: 'Total Chicks', value: summary.total_chicks, type: 'number' },
+      {
+        label: 'Total Mortality',
+        value: summary.total_mortality,
+        type: 'number',
+      },
+      { label: 'Mortality %', value: summary.mortality_pct, type: 'number' },
+      { label: 'Birds Alive', value: summary.birds_alive, type: 'number' },
+      {
+        label: 'Total Feed Issued (bags)',
+        value: summary.total_issued,
+        type: 'number',
+      },
+      {
+        label: 'Total Feed Consumed (bags)',
+        value: summary.total_consumed,
+        type: 'number',
+      },
+      {
+        label: 'Feed Stock (bags)',
+        value: summary.feed_stock,
+        type: 'number',
+      },
+    ],
+  }
+}
+
 const overviewExportService = {
+  dailyLog,
   batchOverview,
   seasonOverview,
   investors,

@@ -12,10 +12,7 @@ import { Op } from 'sequelize'
 import VendorModel from '@models/vendor'
 import BatchModel from '@models/batch'
 import { calculateOffSet } from '@utils/pagination'
-
-function isFeedType(type) {
-  return type === 'FINISHER' || type === 'STARTER' || type === 'PRE STARTER'
-}
+import { isFeedType } from '@utils/feed'
 
 function calculateTotalFeeds(records = []) {
   return records

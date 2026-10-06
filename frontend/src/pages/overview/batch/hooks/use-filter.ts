@@ -34,6 +34,8 @@ function useBatchOverviewFilter() {
 
   const batch_id = queryParms.batch_id ? parseInt(queryParms.batch_id) : null;
 
+  const tab = queryParms.tab || null;
+
   return {
     filter: {
       ...queryParms,
@@ -45,6 +47,7 @@ function useBatchOverviewFilter() {
       r_page,
       season_id,
       batch_id,
+      tab,
     },
     updateQueryParams,
   };

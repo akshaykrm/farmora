@@ -14,10 +14,20 @@ import PaginationWithLimit from "@components/pagination-with-limit";
 import LoadingMessage from "@components/LoadingMessage";
 import ApplyFilterMessage from "@components/ApplyFilterMessage";
 import EmptyContentMessage from "@components/EmptyContentMessage";
+import usePermissions from "@hooks/use-permissions";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import DailyLogSection from "./daily-log";
+
+const DAILY_LOG_TAB = "daily-log";
 
 const BatchOverviewPage = () => {
   const { updateQueryParams, filter } = useBatchOverviewFilter();
   const { batchOverview, refetch, isLoading } = useGetBatchOverview(filter);
+  const { can } = usePermissions();
+  const canViewDailyLog = can("batch_daily_log:read");
+  const showDailyLog =
+    canViewDailyLog && Boolean(filter.batch_id) && filter.tab === DAILY_LOG_TAB;
 
   const { expenses, sales, returns, batch, overviewCalculations } =
     batchOverview;
@@ -39,19 +49,36 @@ const BatchOverviewPage = () => {
     <>
       <div className="flex items-center justify-between mb-6">
         <PageTitle title="Batch Overview" />
-        <ExportMenu
-          permission="batch_overview:export"
-          endpoint="overview/batch/export"
-          filter={filter}
-          filename="batch-overview"
-          disabled={!filter.batch_id}
-          disabledReason="Select a batch to export"
-        />
+        {!showDailyLog && (
+          <ExportMenu
+            permission="batch_overview:export"
+            endpoint="overview/batch/export"
+            filter={filter}
+            filename="batch-overview"
+            disabled={!filter.batch_id}
+            disabledReason="Select a batch to export"
+          />
+        )}
       </div>
       <FilterBatchOverview
         defaultValues={filter}
         onFilter={(f) => updateQueryParams(f)}
       />
+      {canViewDailyLog && filter.batch_id && (
+        <Tabs
+          value={showDailyLog ? DAILY_LOG_TAB : "overview"}
+          onChange={(_, value) =>
+            updateQueryParams({ tab: value === DAILY_LOG_TAB ? value : null })
+          }
+          className="mb-6 border-b border-brand-border"
+        >
+          <Tab value="overview" label="Overview" />
+          <Tab value={DAILY_LOG_TAB} label="Daily Log" />
+        </Tabs>
+      )}
+      {showDailyLog && filter.batch_id ? (
+        <DailyLogSection batchId={filter.batch_id} />
+      ) : (
       <Ternary
         when={isLoading}
         then={<LoadingMessage />}
@@ -162,6 +189,7 @@ const BatchOverviewPage = () => {
           />
         }
       />
+      )}
     </>
   );
 };
