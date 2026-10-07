@@ -146,19 +146,31 @@ const PackagesSection = () => {
                     </CardContent>
 
                     <CardActions sx={{ p: 4, pt: 0 }}>
-                      <Button
-                        variant={
-                          pkg.status === "active" ? "contained" : "outlined"
-                        }
-                        fullWidth
-                        size="large"
-                        disabled={pkg.status !== "active"}
-                        onClick={() => handleGetStarted(pkg)}
-                      >
-                        {pkg.status === "active"
-                          ? "Get Started"
-                          : "Coming Soon"}
-                      </Button>
+                      {pkg.name === "Basic" && pkg.status === "active" ? (
+                        <Button
+                          variant="contained"
+                          fullWidth
+                          size="large"
+                          onClick={() => handleGetStarted(pkg)}
+                        >
+                          Get Started
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="contained"
+                          fullWidth
+                          size="large"
+                          disabled
+                          sx={{
+                            "&.Mui-disabled": {
+                              bgcolor: "#ffffff",
+                              color: "#111111",
+                            },
+                          }}
+                        >
+                          Coming Soon
+                        </Button>
+                      )}
                     </CardActions>
                   </Card>
                 </RevealDiv>
