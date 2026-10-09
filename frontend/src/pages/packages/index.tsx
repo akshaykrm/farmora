@@ -14,6 +14,7 @@ import EmptyContentMessage from "@components/EmptyContentMessage";
 import Ternary from "@components/ternary";
 import { Dialog, DialogContent } from "@components/dialog";
 import packages, { type PackageFormValues } from "@api/packages.api";
+import { rolesApi, type Role } from "@api/roles.api";
 import PackagePriceDisplay from "@components/PackagePriceDisplay";
 import type { Package } from "@app-types/package.types";
 import type { ValidationError } from "@errors/api.error";
@@ -149,7 +150,7 @@ const PackagesPage = () => {
             <TableCell content={i + 1} />
             <TableCell content={row.name} />
             <TableCell
-              content={<PackagePriceDisplay pkg={row} size="compact" />}
+              content={<PackagePriceDisplay pkg={row} duration={row.duration} size="compact" />}
             />
             <TableCell content={row.duration} />
             <TableCell content={row.role?.name || "—"} />

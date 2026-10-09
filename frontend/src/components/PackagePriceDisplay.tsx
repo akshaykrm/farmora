@@ -9,7 +9,7 @@ import {
 type Props = {
   pkg: PackagePricingFields;
   size?: "landing" | "compact";
-  duration: numb;
+  duration: number;
 };
 
 //TODO: This needs to calculate duration and automatically calculate the valid
