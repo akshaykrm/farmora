@@ -1,6 +1,7 @@
 import { useState } from "react";
 import PageHeader from "@components/PageHeader";
 import AddButton from "@components/AddButton";
+import ExportMenu from "@components/ExportMenu";
 import AddNewEmployee from "./components/add-new-employee";
 import EditEmployee from "./components/edit-employee";
 import ChangeUserPassword from "./components/change-user-password";
@@ -24,7 +25,15 @@ const EmployeesPage = () => {
       <PageHeader
         title="Users"
         action={
-          <AddButton label="User" onClick={() => setOpenAdd(true)} />
+          <div className="flex gap-2">
+            <ExportMenu
+              permission="user:export"
+              endpoint="users/export"
+              filter={filter}
+              filename="users"
+            />
+            <AddButton label="User" onClick={() => setOpenAdd(true)} />
+          </div>
         }
       />
       <div>
@@ -46,6 +55,7 @@ const EmployeesPage = () => {
         isShow={isDialogOpen}
         onClose={() => setOpenAdd(false)}
         refetch={() => {
+          refetch({ page: 1 });
           updateQueryParams({ page: 1 });
         }}
       />

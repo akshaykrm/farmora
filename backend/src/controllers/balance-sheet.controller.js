@@ -1,19 +1,10 @@
 import balanceSheetService from '@services/balance-sheet.service'
 import asyncHandler from '@utils/async-handler'
 import logger from '@utils/logger'
+import { parseCashFlowFilter } from '@utils/list-filters'
 
 const getBalanceSheet = async (req, res) => {
-  const filter = {}
-
-  if (req.query.from_date) {
-    filter.from_date = req.query.from_date
-  }
-  if (req.query.to_date) {
-    filter.to_date = req.query.to_date
-  }
-  if (req.query.purpose) {
-    filter.purpose = req.query.purpose
-  }
+  const filter = parseCashFlowFilter(req.query)
 
   logger.info(
     { filter, actor_id: req.user.id },

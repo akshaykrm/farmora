@@ -44,10 +44,19 @@ export default {
 
     if (!permissionRows.length) return
 
+    const [existingRows] = await queryInterface.sequelize.query(
+      `SELECT role_id, permission_id FROM role_permissions WHERE role_id IN (:roleIds)`,
+      { replacements: { roleIds: systemRoles.map((role) => role.id) } }
+    )
+    const existing = new Set(
+      existingRows.map((row) => `${row.role_id}:${row.permission_id}`)
+    )
+
     const now = new Date()
     const rows = []
     for (const role of systemRoles) {
       for (const permission of permissionRows) {
+        if (existing.has(`${role.id}:${permission.id}`)) continue
         rows.push({
           role_id: role.id,
           permission_id: permission.id,

@@ -14,7 +14,7 @@ function useGetSalesBook(filter: Filter) {
     totalPages: 0,
   });
 
-  const { buyer_id, start_date, end_date, page, limit } = filter;
+  const { buyer_id, from_date, end_date, page, limit } = filter;
 
   const handlefetchAllSales = useCallback(
     async (override?: Filter) => {
@@ -37,7 +37,7 @@ function useGetSalesBook(filter: Filter) {
       }
       setIsLoading(false);
     },
-    [start_date, end_date, page, limit, buyer_id],
+    [from_date, end_date, page, limit, buyer_id],
   );
 
   useEffect(() => {

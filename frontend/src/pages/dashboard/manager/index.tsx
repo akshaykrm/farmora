@@ -16,16 +16,17 @@ import dashboardApi from "@api/dashboard.api";
 import type { ManagerDashboardData } from "@app-types/dashboard.types";
 import { CircularProgress, Box } from "@mui/material";
 import { formatCurrency } from "@utils/currency";
+import DashboardDailyLog from "./components/daily-log";
 
 const ManagerDashboard = () => {
   const { user } = useAuth();
+  const { can, isSubscriber } = usePermissions();
 
   const { data, isLoading, error } = useQuery<ManagerDashboardData>({
     queryKey: ["manager-dashboard"],
     queryFn: dashboardApi.fetchManagerDashboard,
   });
 
-  const { isSubscriber } = usePermissions();
   const { data: setupStatus } = useQuery({
     queryKey: ["setup-status"],
     queryFn: setupApi.fetchStatus,
@@ -123,35 +124,39 @@ const ManagerDashboard = () => {
       {/* SEASON PROFIT CHART */}
       <SeasonProfitChart />
 
-      {/* OPEN BATCH DETAILS */}
-      <section className="animate-in fade-in duration-700 flex flex-col">
-        <SectionHeader
-          title="Open Batch Details"
-          icon={
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-              />
-            </svg>
-          }
-        />
-        <OpenBatchesListing
-          data={data.openBatches ?? []}
-          emptyMessage={
-            setupStatus && !setupStatus.items.batch
-              ? "No batches yet. Use \u201cSet up your farm\u201d above to create your first batch."
-              : undefined
-          }
-        />
-      </section>
+      {/* DAILY LOG / OPEN BATCH DETAILS */}
+      {can("batch_daily_log:read") ? (
+        <DashboardDailyLog />
+      ) : (
+        <section className="animate-in fade-in duration-700 flex flex-col">
+          <SectionHeader
+            title="Open Batch Details"
+            icon={
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                />
+              </svg>
+            }
+          />
+          <OpenBatchesListing
+            data={data.openBatches ?? []}
+            emptyMessage={
+              setupStatus && !setupStatus.items.batch
+                ? "No batches yet. Use \u201cSet up your farm\u201d above to create your first batch."
+                : undefined
+            }
+          />
+        </section>
+      )}
 
       {/* RECENT PURCHASES & SALES */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">

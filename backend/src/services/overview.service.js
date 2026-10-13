@@ -12,10 +12,7 @@ import { Op } from 'sequelize'
 import VendorModel from '@models/vendor'
 import BatchModel from '@models/batch'
 import { calculateOffSet } from '@utils/pagination'
-
-function isFeedType(type) {
-  return type === 'FINISHER' || type === 'STARTER' || type === 'PRE STARTER'
-}
+import { isFeedType } from '@utils/feed'
 
 function calculateTotalFeeds(records = []) {
   return records
@@ -51,7 +48,15 @@ async function getBatchOverview(filter, currentUser) {
       batch_id: batch_id,
       ...userWhereClause,
     },
-    include: [{ model: ItemModel, as: 'category', required: false }],
+    include: [
+      { model: ItemModel, as: 'category', required: false },
+      {
+        model: VendorModel,
+        as: 'vendor',
+        required: false,
+        attributes: ['id', 'name'],
+      },
+    ],
     order: [['invoice_date', 'ASC']],
   })
 

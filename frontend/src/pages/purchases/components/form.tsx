@@ -4,9 +4,10 @@ import useGetVendorNames from "@hooks/use-get-vendor-name-list";
 import { TextField, Button, MenuItem } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useForm, type DefaultValues } from "react-hook-form";
-import type { PurchaseFormValues } from "../types";
+import type { DuplicateInvoice, PurchaseFormValues } from "../types";
+import { Dialog, DialogActions, DialogContent } from "@components/dialog";
 import type { ValidationError } from "@errors/api.error";
 import useGetItemsByVendorId from "@pages/items/hooks/use-get-items-by-vendor-id";
 import purchase from "../api";
@@ -19,15 +20,52 @@ type Props = {
   onSubmit: (payload: any) => void;
   apiError: ValidationError[];
   onCancel?: () => void;
+  duplicateInvoice?: DuplicateInvoice | null;
 };
+
+const sectionColumns = {
+  3: "lg:grid-cols-3",
+  4: "lg:grid-cols-4",
+};
+
+const FormSection = ({
+  title,
+  description,
+  columns = 4,
+  children,
+}: {
+  title: string;
+  description?: string;
+  columns?: 3 | 4;
+  children: ReactNode;
+}) => (
+  <section className="rounded-lg border border-brand-border p-4">
+    <div className="mb-4">
+      <h3 className="text-sm font-semibold text-brand-ink">{title}</h3>
+      {description && (
+        <p className="text-xs text-brand-ink-muted">{description}</p>
+      )}
+    </div>
+    <div
+      className={`grid grid-cols-1 gap-4 md:grid-cols-2 ${sectionColumns[columns]} [&>*]:min-w-0`}
+    >
+      {children}
+    </div>
+  </section>
+);
 
 const PurchaseForm = ({
   onSubmit,
   defaultValues,
   apiError,
   onCancel,
+  duplicateInvoice,
 }: Props) => {
   const methods = useForm({ defaultValues });
+  const [dismissedDuplicate, setDismissedDuplicate] =
+    useState<DuplicateInvoice | null>(null);
+  const showDuplicate =
+    !!duplicateInvoice && duplicateInvoice !== dismissedDuplicate;
   const {
     handleSubmit,
     register,
@@ -143,23 +181,17 @@ const PurchaseForm = ({
   return (
     <>
       <form {...methods} onSubmit={handleSubmit(onSubmit)}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 w-full">
-          <div className="min-w-0">
-            <SelectList
-              options={seasonNames.data}
-              value={values.season_id}
-              onChange={(val) => {
-                clearErrors("season_id");
-                setValue("season_id", val);
-              }}
-              label="Season"
-              name="season_id"
-              error={Boolean(errors.season_id)}
-              helperText={errors.season_id?.message}
+        <div className="flex flex-col gap-5">
+          <FormSection title="Invoice" description="Supplier bill details">
+            <RHFTextField
+              label="Invoice Number"
+              control={control}
+              name="invoice_number"
+              disabled
+              fullWidth
+              size="small"
             />
-          </div>
 
-          <div className="min-w-0">
             <DatePicker
               label="Invoice Date"
               name="invoice_date"
@@ -178,20 +210,7 @@ const PurchaseForm = ({
                 },
               }}
             />
-          </div>
 
-          <div className="min-w-0">
-            <RHFTextField
-              label="Invoice Number"
-              control={control}
-              name="invoice_number"
-              disabled
-              fullWidth
-              size="small"
-            />
-          </div>
-
-          <div className="min-w-0">
             <SelectList
               options={sellerList.data}
               value={values.vendor_id}
@@ -204,126 +223,7 @@ const PurchaseForm = ({
               error={Boolean(errors.vendor_id)}
               helperText={errors.vendor_id?.message}
             />
-          </div>
 
-          <div className="min-w-0">
-            <SelectList
-              options={itemList}
-              value={values.category_id}
-              disabled={itemList.length === 0}
-              onChange={(val) => {
-                clearErrors("category_id");
-                setValue("category_id", val);
-              }}
-              label="Type"
-              name="category_id"
-              error={Boolean(errors.category_id)}
-              helperText={errors.category_id?.message}
-            />
-          </div>
-
-          <div className="min-w-0">
-            <SelectList
-              options={batchList.data}
-              disabled={!values.season_id}
-              value={values.batch_id}
-              onChange={(val) => {
-                clearErrors("batch_id");
-                setValue("batch_id", val);
-              }}
-              label="Batch"
-              name="batch_id"
-              error={Boolean(errors.batch_id)}
-              helperText={errors.batch_id?.message}
-            />
-          </div>
-
-          <div className="min-w-0">
-            <RHFTextField
-              label="Quantity (Nos)"
-              name="quantity"
-              control={control}
-              type="number"
-              fullWidth
-              disabled={
-                selectedType === "working" || selectedType === "integration"
-              }
-              size="small"
-            />
-          </div>
-
-          <div className="min-w-0">
-            <RHFTextField
-              label="Rate / Number"
-              name="price_per_unit"
-              control={control}
-              type="number"
-              fullWidth
-              size="small"
-              onChange={(e) => {
-                const { value } = e.target;
-                setValue("price_per_unit", value);
-                const totalPrice = parsedQty * parseFloat(value || 0);
-                setValue("total_price", totalPrice.toString());
-              }}
-            />
-          </div>
-
-          <div className="min-w-0">
-            <RHFTextField
-              label="Total Amount"
-              name="total_price"
-              control={control}
-              type="number"
-              fullWidth
-              size="small"
-              onChange={(e) => {
-                const { value } = e.target;
-                setValue("total_price", value);
-                const pricePerUnit = parsedQty
-                  ? parseFloat(value || 0) / parsedQty
-                  : 0;
-                setValue("price_per_unit", pricePerUnit.toString());
-              }}
-            />
-          </div>
-
-          {/*          <div className="min-w-0">
-            <RHFTextField
-              label="Discount / Round Off"
-              name="discount_price"
-              control={control}
-              type="number"
-              fullWidth
-              size="small"
-            />
-          </div>
-	  */}
-
-          <div className="min-w-0">
-            <RHFTextField
-              label="Net amount"
-              name="net_amount"
-              control={control}
-              fullWidth
-              disabled
-              size="small"
-            />
-          </div>
-
-          {/*
-          <div className="min-w-0">
-            <RHFTextField
-              label="Assign Quantity"
-              name="assign_quantity"
-              control={control}
-              fullWidth
-              size="small"
-            />
-          </div>
-
-	 */}
-          <div className="min-w-0">
             <TextField
               select
               label="Payment Type"
@@ -340,19 +240,151 @@ const PurchaseForm = ({
               <MenuItem value="credit">Credit</MenuItem>
               <MenuItem value="paid">Paid</MenuItem>
             </TextField>
-          </div>
+          </FormSection>
 
-          <div className="min-w-0 md:col-span-2">
+          <FormSection
+            title="Item & Batch"
+            description="What was purchased and where it goes"
+            columns={3}
+          >
+            <SelectList
+              options={itemList}
+              value={values.category_id}
+              disabled={itemList.length === 0}
+              onChange={(val) => {
+                clearErrors("category_id");
+                setValue("category_id", val);
+              }}
+              label="Item"
+              name="category_id"
+              error={Boolean(errors.category_id)}
+              helperText={
+                errors.category_id?.message ||
+                (values.vendor_id ? undefined : "Select a supplier first")
+              }
+            />
+
+            <SelectList
+              options={seasonNames.data}
+              value={values.season_id}
+              onChange={(val) => {
+                clearErrors("season_id");
+                setValue("season_id", val);
+              }}
+              label="Season"
+              name="season_id"
+              error={Boolean(errors.season_id)}
+              helperText={errors.season_id?.message}
+            />
+
+            <SelectList
+              options={batchList.data}
+              disabled={!values.season_id}
+              value={values.batch_id}
+              onChange={(val) => {
+                clearErrors("batch_id");
+                setValue("batch_id", val);
+              }}
+              label="Batch"
+              name="batch_id"
+              error={Boolean(errors.batch_id)}
+              helperText={
+                errors.batch_id?.message ||
+                (values.season_id ? undefined : "Select a season first")
+              }
+            />
+          </FormSection>
+
+          <FormSection
+            title="Quantity & Amount"
+            description="Enter the rate or the total; the other is calculated"
+          >
             <RHFTextField
-              label="Narration"
-              name="narration"
+              label="Quantity (Nos)"
+              name="quantity"
               control={control}
+              type="number"
               fullWidth
-              multiline
-              rows={2}
+              disabled={
+                selectedType === "working" || selectedType === "integration"
+              }
               size="small"
             />
-          </div>
+
+            <RHFTextField
+              label="Rate / Number"
+              name="price_per_unit"
+              control={control}
+              type="number"
+              fullWidth
+              size="small"
+              onChange={(e) => {
+                const { value } = e.target;
+                setValue("price_per_unit", value);
+                const totalPrice = parsedQty * parseFloat(value || 0);
+                setValue("total_price", totalPrice.toString());
+              }}
+            />
+
+            <RHFTextField
+              label="Total Amount"
+              name="total_price"
+              control={control}
+              type="number"
+              fullWidth
+              size="small"
+              onChange={(e) => {
+                const { value } = e.target;
+                setValue("total_price", value);
+                const pricePerUnit = parsedQty
+                  ? parseFloat(value || 0) / parsedQty
+                  : 0;
+                setValue("price_per_unit", pricePerUnit.toString());
+              }}
+            />
+
+            {/*
+            <RHFTextField
+              label="Discount / Round Off"
+              name="discount_price"
+              control={control}
+              type="number"
+              fullWidth
+              size="small"
+            />
+
+            <RHFTextField
+              label="Assign Quantity"
+              name="assign_quantity"
+              control={control}
+              fullWidth
+              size="small"
+            />
+            */}
+
+            <RHFTextField
+              label="Net Amount"
+              name="net_amount"
+              control={control}
+              fullWidth
+              disabled
+              size="small"
+            />
+          </FormSection>
+
+          <FormSection title="Notes">
+            <div className="col-span-full">
+              <RHFTextField
+                label="Narration"
+                name="narration"
+                control={control}
+                fullWidth
+                multiline
+                rows={2}
+                size="small"
+              />
+            </div>
+          </FormSection>
         </div>
 
         <div className="mt-6 flex justify-stretch md:justify-end gap-2">
@@ -375,6 +407,45 @@ const PurchaseForm = ({
           </Button>
         </div>
       </form>
+
+      <Dialog
+        isOpen={showDuplicate}
+        headerTitle="Invoice Number Already Exists"
+        onClose={() => setDismissedDuplicate(duplicateInvoice ?? null)}
+      >
+        <DialogContent>
+          <p className="text-sm text-brand-ink-soft">
+            Invoice number{" "}
+            <span className="font-semibold text-brand-ink">
+              {duplicateInvoice?.invoice_number}
+            </span>{" "}
+            already exists. Do you want to change it to{" "}
+            <span className="font-semibold text-brand-ink">
+              {duplicateInvoice?.next_invoice_number}
+            </span>{" "}
+            and save?
+          </p>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="outlined"
+            onClick={() => setDismissedDuplicate(duplicateInvoice ?? null)}
+          >
+            No
+          </Button>
+          <Button
+            variant="contained"
+            onClick={() => {
+              if (!duplicateInvoice) return;
+              setDismissedDuplicate(duplicateInvoice);
+              setValue("invoice_number", duplicateInvoice.next_invoice_number);
+              handleSubmit(onSubmit)();
+            }}
+          >
+            Yes, change it
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

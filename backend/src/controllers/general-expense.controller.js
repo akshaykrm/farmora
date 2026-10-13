@@ -1,5 +1,6 @@
 import generalExpenseService from '@services/general-expense.service'
 import asyncHandler from '@utils/async-handler'
+import { parseGeneralEntryFilter } from '@utils/list-filters'
 
 const create = async (req, res) => {
   const payload = req.body
@@ -15,23 +16,9 @@ const getAll = async (req, res) => {
   const filter = {
     page: parseInt(req.query.page) || 1,
     limit: parseInt(req.query.limit) || 10,
+    ...parseGeneralEntryFilter(req.query),
   }
   const user = req.user
-
-  if (req.query.season_id) {
-    filter.season_id = req.query.season_id
-  }
-
-  if (req.query.purpose) {
-    filter.purpose = req.query.purpose
-  }
-
-  if (req.query.start_date) {
-    filter.start_date = req.query.start_date
-  }
-  if (req.query.end_date) {
-    filter.end_date = req.query.end_date
-  }
 
   const records = await generalExpenseService.getAll(filter, user)
   res.success(records, {

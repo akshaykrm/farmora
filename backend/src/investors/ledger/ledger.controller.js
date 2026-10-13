@@ -1,5 +1,6 @@
 import LedgerService from './ledger.service'
 import asyncHandler from '@utils/async-handler'
+import { parseInvestorLedgerFilter } from '@utils/list-filters'
 
 async function createTransaction(req, res) {
   const transaction = await LedgerService.createInvestorTransaction(
@@ -27,22 +28,7 @@ async function listTransactions(req, res) {
   const filter = {
     page: parseInt(req.query.page) || 1,
     limit: parseInt(req.query.limit) || 10,
-  }
-
-  if (req.query.investor_id) {
-    filter.investor_id = req.query.investor_id
-  }
-  if (req.query.transaction_type_id) {
-    filter.transaction_type_id = req.query.transaction_type_id
-  }
-  if (req.query.category) {
-    filter.category = req.query.category
-  }
-  if (req.query.start_date) {
-    filter.start_date = req.query.start_date
-  }
-  if (req.query.end_date) {
-    filter.end_date = req.query.end_date
+    ...parseInvestorLedgerFilter(req.query),
   }
 
   const transactions = await LedgerService.listInvestorTransactions(

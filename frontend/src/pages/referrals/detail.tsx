@@ -7,6 +7,7 @@ import {
   TextField,
 } from "@mui/material";
 import PageHeader from "@components/PageHeader";
+import ExportMenu from "@components/ExportMenu";
 import Table from "@components/Table";
 import TableCell from "@components/TableCell";
 import TableHeaderCell from "@components/TableHeaderCell";
@@ -130,6 +131,12 @@ const ReferralDetailPage = () => {
         title={detail.name}
         action={
           <div className="flex items-center gap-2">
+            <ExportMenu
+              permission="referral_ledger:export"
+              endpoint={`referrals/${id}/ledger/export`}
+              filter={{}}
+              filename="referral-ledger"
+            />
             <Button variant="outlined" onClick={() => setLinkOpen(true)}>
               Link Company
             </Button>
@@ -218,7 +225,7 @@ const ReferralDetailPage = () => {
             <TableCell content={txnLabel(txn.type)} />
             <TableCell content={formatCurrency(Number(txn.amount))} />
             <TableCell
-              content={dayjs(txn.created_at).format("DD-MM-YYYY HH:mm")}
+              content={dayjs(txn.createdAt).format("DD-MM-YYYY HH:mm")}
             />
           </TableRow>
         ))}

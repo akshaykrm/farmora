@@ -4,7 +4,9 @@ import {
   requirePermission,
 } from '@middlewares/auth.middleware'
 import { PERMISSION_KEYS as P } from '../../config/permissions.js'
-import validate from '@utils/validate-request'
+import validate, { validateQuery } from '@utils/validate-request'
+import platformExportController from '@controllers/platform-export.controller'
+import { exportQuerySchema } from '@validators/export.validator'
 import referralController from './referral.controller.js'
 import {
   createReferralPartnerSchema,
@@ -27,6 +29,13 @@ router.post(
 router.get('/', requirePermission(P.referral_read), referralController.getAll)
 
 router.get(
+  '/export',
+  requirePermission(P.referral_read, P.referral_export),
+  validateQuery(exportQuerySchema),
+  platformExportController.referrals
+)
+
+router.get(
   '/:partner_id',
   requirePermission(P.referral_read),
   referralController.getById
@@ -43,6 +52,13 @@ router.get(
   '/:partner_id/ledger',
   requirePermission(P.referral_ledger_read),
   referralController.getLedger
+)
+
+router.get(
+  '/:partner_id/ledger/export',
+  requirePermission(P.referral_ledger_read, P.referral_ledger_export),
+  validateQuery(exportQuerySchema),
+  platformExportController.referralLedger
 )
 
 router.post(

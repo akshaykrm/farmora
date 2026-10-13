@@ -5,7 +5,9 @@ import {
   requirePermission,
 } from '@middlewares/auth.middleware'
 import { PERMISSION_KEYS as P } from '../../config/permissions.js'
-import validate from '@utils/validate-request'
+import validate, { validateQuery } from '@utils/validate-request'
+import configExportController from '@controllers/config-export.controller'
+import { exportQuerySchema } from '@validators/export.validator'
 import {
   newBatchSchema,
   updateBatchSchema,
@@ -34,6 +36,13 @@ router.get(
   isAuthenticated,
   requirePermission(P.batch_read),
   batchController.getAll
+)
+router.get(
+  '/export',
+  isAuthenticated,
+  requirePermission(P.batch_read, P.batch_export),
+  validateQuery(exportQuerySchema),
+  configExportController.batches
 )
 router.get(
   '/count/:farm_id',

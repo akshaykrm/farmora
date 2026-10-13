@@ -17,7 +17,7 @@ export type ModuleNode = {
   submenus: SubmenuNode[];
 };
 
-const ACTION_ORDER = ["read", "write", "edit", "delete"];
+const ACTION_ORDER = ["read", "write", "edit", "delete", "export"];
 
 const actionIndex = (action?: string) => {
   const index = ACTION_ORDER.indexOf(action || "");

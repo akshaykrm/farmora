@@ -6,7 +6,9 @@ import {
 import { PERMISSION_KEYS as P } from '../../config/permissions.js'
 import farmController from '@controllers/farm.controller'
 import { newFarmSchema, updateFarmSchema } from '@validators/farm.validator'
-import validate from '@utils/validate-request'
+import validate, { validateQuery } from '@utils/validate-request'
+import configExportController from '@controllers/config-export.controller'
+import { exportQuerySchema } from '@validators/export.validator'
 
 const router = Router()
 
@@ -22,6 +24,14 @@ router.get(
   isAuthenticated,
   requirePermission(P.farm_read),
   farmController.getAll
+)
+
+router.get(
+  '/export',
+  isAuthenticated,
+  requirePermission(P.farm_read, P.farm_export),
+  validateQuery(exportQuerySchema),
+  configExportController.farms
 )
 
 router.get(

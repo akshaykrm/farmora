@@ -14,6 +14,8 @@ import EmptyContentMessage from "@components/EmptyContentMessage";
 import Ternary from "@components/ternary";
 import { Dialog, DialogContent } from "@components/dialog";
 import packages, { type PackageFormValues } from "@api/packages.api";
+import { rolesApi, type Role } from "@api/roles.api";
+import ExportMenu from "@components/ExportMenu";
 import PackagePriceDisplay from "@components/PackagePriceDisplay";
 import type { Package } from "@app-types/package.types";
 import type { ValidationError } from "@errors/api.error";
@@ -126,7 +128,17 @@ const PackagesPage = () => {
     <>
       <PageHeader
         title="Packages"
-        action={<AddButton label="Package" onClick={openCreate} />}
+        action={
+          <div className="flex gap-2">
+            <ExportMenu
+              permission="package:export"
+              endpoint="packages/export"
+              filter={{}}
+              filename="packages"
+            />
+            <AddButton label="Package" onClick={openCreate} />
+          </div>
+        }
       />
       <Table>
         <TableRow>
@@ -135,6 +147,7 @@ const PackagesPage = () => {
             "Name",
             "Price",
             "Duration",
+            "System Role",
             "Referral Bonus",
             "Status",
             "Edit",

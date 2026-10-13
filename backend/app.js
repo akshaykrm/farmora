@@ -11,6 +11,8 @@ import perimssionRouter from '@routes/permission.routes'
 import rolesRouter from '@routes/role.router'
 import seasonRouter from '@routes/season.router'
 import batchRouter from '@routes/batch.router'
+import batchDailyLogRouter from '@routes/batch-daily-log.router'
+import dailyLogDashboardRouter from '@routes/daily-log-dashboard.router'
 import vendorRouter from '@routes/vendor.router'
 import itemsRouter from '@routes/items.router'
 import purchaseRouter from '@routes/purchase.router'
@@ -39,7 +41,7 @@ const app = express()
 const { json } = bodyParser
 
 app.use(json())
-app.use(cors())
+app.use(cors({ exposedHeaders: ['Content-Disposition'] }))
 
 app.use(requestLogger)
 
@@ -53,6 +55,8 @@ app.use('/api/subscriptions', subscriptionRouter)
 app.use('/api/permissions', perimssionRouter)
 app.use('/api/roles', rolesRouter)
 app.use('/api/seasons', seasonRouter)
+app.use('/api/batches/:batch_id/daily-logs', batchDailyLogRouter)
+app.use('/api/daily-logs', dailyLogDashboardRouter)
 app.use('/api/batches', batchRouter)
 app.use('/api/vendors', vendorRouter)
 app.use('/api/items', itemsRouter)

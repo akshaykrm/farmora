@@ -2,7 +2,12 @@ import { isAuthenticated, requirePermission } from '@middlewares/auth.middleware
 import { PERMISSION_KEYS as P } from '../../config/permissions.js'
 import { Router } from 'express'
 import salesController from '@controllers/sales.controller'
-import validate from '@utils/validate-request'
+import validate, { validateQuery } from '@utils/validate-request'
+import salesExportController from '@controllers/sales-export.controller'
+import {
+  exportQuerySchema,
+  salesBookExportQuerySchema,
+} from '@validators/export.validator'
 import {
   newSaleSchema,
   updateSaleSchema,
@@ -33,10 +38,24 @@ router.get(
   salesController.getSalesLedger
 )
 router.get(
+  '/ledger/export',
+  isAuthenticated,
+  requirePermission(P.sales_book_read, P.sales_book_export),
+  validateQuery(salesBookExportQuerySchema),
+  salesExportController.salesBook
+)
+router.get(
   '/',
   isAuthenticated,
   requirePermission(P.sale_read),
   salesController.getAll
+)
+router.get(
+  '/export',
+  isAuthenticated,
+  requirePermission(P.sale_read, P.sale_export),
+  validateQuery(exportQuerySchema),
+  salesExportController.sales
 )
 router.get(
   '/:sale_id',

@@ -17,9 +17,12 @@ const create = async (payload, currentUser) => {
   return record
 }
 
-const getAll = async (filter, currentUser) => {
-  const { e_page, i_page, e_limit, i_limit, season_id, start_date, end_date } =
-    filter
+/**
+ * Builds the full (unpaginated) income and expense lists with totals.
+ * Used by the paginated list and by exports.
+ */
+const buildWorkingCost = async (filter, currentUser) => {
+  const { season_id, start_date, end_date } = filter
 
   const whereClause = {}
   const purchaseFilter = {}
@@ -30,20 +33,16 @@ const getAll = async (filter, currentUser) => {
   }
 
   if (start_date && end_date) {
-    const obj = {
+    whereClause.date = {
       [Op.between]: [dayjs(start_date).toDate(), dayjs(end_date).toDate()],
     }
-    whereClause.date = obj
-    purchaseFilter.date = obj
   } else if (start_date) {
-    const obj = { [Op.gte]: dayjs(start_date).toDate() }
-    whereClause.date = obj
-    purchaseFilter.date = obj
+    whereClause.date = { [Op.gte]: dayjs(start_date).toDate() }
   } else if (end_date) {
-    const opts = { [Op.lte]: dayjs(end_date).toDate() }
-    whereClause.date = opts
-    purchaseFilter.date = opts
+    whereClause.date = { [Op.lte]: dayjs(end_date).toDate() }
   }
+  if (start_date) purchaseFilter.start_date = dayjs(start_date).toDate()
+  if (end_date) purchaseFilter.end_date = dayjs(end_date).toDate()
 
   if (currentUser.user_type === userRoles.staff.type) {
     whereClause.master_id = currentUser.master_id
@@ -54,6 +53,7 @@ const getAll = async (filter, currentUser) => {
   const workingCostRecords = await WorkingCostModel.findAll({
     where: whereClause,
     attributes: ['id', 'date', 'purpose', 'amount', 'payment_type'],
+    order: [['date', 'DESC']],
   })
 
   const expense = workingCostRecords.filter(
@@ -65,17 +65,17 @@ const getAll = async (filter, currentUser) => {
   )
 
   const item = await itemService.getWorkingItem(currentUser)
+  let workingCostPurchases = []
   if (item) {
-    filter.category_id = item.id
     purchaseFilter.category_id = item.id
+    const rawWorkingCost = await purchaseService.getAllEvenIfBatchClosed(
+      purchaseFilter,
+      currentUser
+    )
+    workingCostPurchases = rawWorkingCost.data
   }
 
-  const rawWorkingCost = await purchaseService.getAllEvenIfBatchClosed(
-    purchaseFilter,
-    currentUser
-  )
-
-  const parsedWorkingCost = rawWorkingCost.data.map((item) => {
+  const parsedWorkingCost = workingCostPurchases.map((item) => {
     return {
       id: item.id,
       date: item.invoice_date,
@@ -122,6 +122,25 @@ const getAll = async (filter, currentUser) => {
     return parsedAmount + acc
   }, 0)
 
+  return {
+    income: sortedCombinedIncome,
+    expense: parsedExpense,
+    summary: {
+      income: totalIncome,
+      expense: totalExpense,
+      balance: totalIncome - totalExpense,
+    },
+  }
+}
+
+const getAll = async (filter, currentUser) => {
+  const { e_page, i_page, e_limit, i_limit } = filter
+  const {
+    income: sortedCombinedIncome,
+    expense: parsedExpense,
+    summary,
+  } = await buildWorkingCost(filter, currentUser)
+
   const e_offset = calculateOffSet(e_page, e_limit)
   const i_offset = calculateOffSet(i_page, i_limit)
 
@@ -147,17 +166,14 @@ const getAll = async (filter, currentUser) => {
       count: e_count,
       data: paginatedExpense,
     },
-    summary: {
-      income: totalIncome,
-      expense: totalExpense,
-      balance: totalIncome - totalExpense,
-    },
+    summary,
   }
 }
 
 const workingCostService = {
   create,
   getAll,
+  buildWorkingCost,
 }
 
 export default workingCostService

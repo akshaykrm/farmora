@@ -29,6 +29,10 @@ const BatchModel = sequelize.define(
       type: Sequelize.TEXT,
       allowNull: true,
     },
+    log_start_date: {
+      type: Sequelize.DATEONLY,
+      allowNull: true,
+    },
     status: {
       type: Sequelize.ENUM('active', 'inactive'),
       defaultValue: 'active',

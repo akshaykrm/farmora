@@ -1,5 +1,6 @@
 import workingCostService from '@services/working-cost.service'
 import asyncHandler from '@utils/async-handler'
+import { parseWorkingCostFilter } from '@utils/expense-filters'
 
 const create = async (req, res) => {
   const payload = req.body
@@ -17,19 +18,10 @@ const getAll = async (req, res) => {
     e_limit: parseInt(req.query.e_limit) || 10,
     i_page: parseInt(req.query.i_page) || 1,
     i_limit: parseInt(req.query.i_limit) || 10,
+    ...parseWorkingCostFilter(req.query),
   }
 
   const user = req.user
-
-  if (req.query.season_id) {
-    filter.season_id = req.query.season_id
-  }
-  if (req.query.start_date) {
-    filter.start_date = req.query.start_date
-  }
-  if (req.query.end_date) {
-    filter.end_date = req.query.end_date
-  }
 
   const records = await workingCostService.getAll(filter, user)
   res.success(records, {

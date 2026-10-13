@@ -1,5 +1,6 @@
 import PageHeader from "@components/PageHeader";
 import AddButton from "@components/AddButton";
+import ExportMenu from "@components/ExportMenu";
 import GeneralExpenseTable from "./components/table";
 import AddGeneralExpense from "./components/add";
 import EditGeneralExpense from "./components/edit";
@@ -28,7 +29,15 @@ const GeneralExpensePage = () => {
       <PageHeader
         title="General Expense"
         action={
-          <AddButton label="General Expense" onClick={onOpen} />
+          <div className="flex gap-2">
+            <ExportMenu
+              permission="general_expense:export"
+              endpoint="general-expenses/export"
+              filter={filter}
+              filename="general-expenses"
+            />
+            <AddButton label="General Expense" onClick={onOpen} />
+          </div>
         }
       />
 
