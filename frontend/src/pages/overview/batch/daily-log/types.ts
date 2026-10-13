@@ -63,6 +63,24 @@ export type DailyLogPayload = {
   remarks?: string | null;
 };
 
+export type OpenBatchLogStatus = {
+  id: number;
+  name: string;
+  season_id: number | null;
+  season_name: string | null;
+  farm_name: string | null;
+  log_start_date: string | null;
+  current_age: number | null;
+  total_chicks: number;
+  birds_alive: number;
+  total_mortality: number;
+  mortality_pct: number;
+  feed_stock: number;
+  last_log_date: string | null;
+  today: { mortality: number; consumed_feed: number } | null;
+  missed_days: number;
+};
+
 export type DailyLogPrefill = {
   date: string;
   age: number | null;

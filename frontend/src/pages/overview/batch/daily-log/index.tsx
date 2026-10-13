@@ -16,11 +16,16 @@ import type { DailyLogRow } from "./types";
 
 type Props = {
   batchId: number;
+  onChange?: () => void;
 };
 
-const DailyLogSection = ({ batchId }: Props) => {
+const DailyLogSection = ({ batchId, onChange }: Props) => {
   const { can } = usePermissions();
-  const { data, isLoading, refetch } = useDailyLogs(batchId);
+  const { data, isLoading, refetch: reload } = useDailyLogs(batchId);
+  const refetch = () => {
+    reload();
+    onChange?.();
+  };
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<DailyLogRow | null>(null);
 

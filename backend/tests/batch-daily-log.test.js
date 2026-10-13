@@ -16,6 +16,7 @@ import BatchModel from '@models/batch'
 import BatchDailyLogModel from '@models/batchdailylog'
 import PurchaseModel from '@models/purchase'
 import ItemModel from '@models/items.model'
+import UserRoleAssignment from '@models/userroleassignment'
 import { connectDB } from '@utils/db'
 import { createSystemRoleWithKeys } from './helpers/entitlements.js'
 
@@ -98,6 +99,7 @@ describe('Batch daily log', () => {
   let pkg
   let owner
   let other
+  let staff
   let batch
   let base
 
@@ -159,6 +161,10 @@ describe('Batch daily log', () => {
   })
 
   afterAll(async () => {
+    if (staff) {
+      await UserRoleAssignment.destroy({ where: { user_id: staff.id } })
+      await UserModel.destroy({ where: { id: staff.id }, force: true })
+    }
     for (const { manager } of [owner, other].filter(Boolean)) {
       const masterScope = { where: { master_id: manager.id }, force: true }
       await BatchDailyLogModel.destroy({ where: { master_id: manager.id } })
@@ -269,7 +275,7 @@ describe('Batch daily log', () => {
     ])
   })
 
-  it('rejects duplicate, early and future dates', async () => {
+  it('rejects duplicate and early dates but allows future dates', async () => {
     const duplicate = await api('post', '/').send({ date: '2025-09-22' })
     expect(duplicate.status).toBe(409)
 
@@ -279,7 +285,45 @@ describe('Batch daily log', () => {
     const future = await api('post', '/').send({
       date: dayjs().add(2, 'day').format('YYYY-MM-DD'),
     })
-    expect(future.status).toBe(400)
+    expect(future.status).toBe(201)
+    const removed = await api('delete', `/${future.body.data.id}`)
+    expect(removed.status).toBe(200)
+  })
+
+  it('lets staff record past and future dates', async () => {
+    const username = unique('dailylogstaff')
+    staff = await UserModel.create({
+      name: 'Daily Log Staff',
+      username,
+      email: `${username}@farmora.test`,
+      phone: '9999999999',
+      password: 'root',
+      user_type: 'staff',
+      status: 1,
+      parent_id: owner.manager.id,
+    })
+    await UserRoleAssignment.create({ user_id: staff.id, role_id: role.id })
+    const staffToken = await loginAs(username, 'root')
+
+    const past = await api('post', '/', staffToken).send({
+      date: '2025-09-26',
+      mortality: 1,
+    })
+    expect(past.status).toBe(201)
+    const future = await api('post', '/', staffToken).send({
+      date: dayjs().add(3, 'day').format('YYYY-MM-DD'),
+    })
+    expect(future.status).toBe(201)
+
+    const edited = await api('put', `/${past.body.data.id}`, staffToken).send({
+      mortality: 2,
+    })
+    expect(edited.status).toBe(200)
+
+    for (const res of [past, future]) {
+      const removed = await api('delete', `/${res.body.data.id}`, staffToken)
+      expect(removed.status).toBe(200)
+    }
   })
 
   it('guards start date changes against existing logs', async () => {
@@ -349,6 +393,33 @@ describe('Batch daily log', () => {
     expect(write.status).toBe(404)
   })
 
+  it('lists open batches with their daily log status', async () => {
+    const res = await request(app)
+      .get('/api/daily-logs/open-batches')
+      .set(authHeader(owner.token))
+    expect(res.status).toBe(200)
+    const row = res.body.data.find((entry) => entry.id === batch.id)
+    expect(row).toBeTruthy()
+    expect(row.log_start_date).toBe('2025-09-21')
+    expect(row.total_chicks).toBe(3876)
+    expect(row.total_mortality).toBe(10)
+    expect(row.birds_alive).toBe(3866)
+    expect(row.feed_stock).toBe(6)
+    expect(row.last_log_date).toBe('2025-09-23')
+    expect(row.today).toBeNull()
+    expect(row.missed_days).toBe(
+      dayjs().startOf('day').diff(dayjs('2025-09-21'), 'day') - 3
+    )
+
+    const otherRes = await request(app)
+      .get('/api/daily-logs/open-batches')
+      .set(authHeader(other.token))
+    expect(otherRes.status).toBe(200)
+    expect(otherRes.body.data.some((entry) => entry.id === batch.id)).toBe(
+      false
+    )
+  })
+
   it('blocks changes once the batch is closed', async () => {
     await batch.update({ closed_on: new Date() })
     const res = await api('post', '/').send({ date: '2025-09-25' })
@@ -359,5 +430,10 @@ describe('Batch daily log', () => {
     expect(startDate.status).toBe(400)
     const read = await api('get', '/')
     expect(read.status).toBe(200)
+
+    const open = await request(app)
+      .get('/api/daily-logs/open-batches')
+      .set(authHeader(owner.token))
+    expect(open.body.data.some((entry) => entry.id === batch.id)).toBe(false)
   })
 })

@@ -57,8 +57,14 @@ const setStartDate = async (req, res) => {
   res.success(data, { message: 'Start date updated successfully' })
 }
 
+const openBatches = async (req, res) => {
+  const data = await batchDailyLogService.openBatchesStatus(req.user)
+  res.success(data, { message: 'Open batch daily logs fetched successfully' })
+}
+
 const batchDailyLogController = {
   list: asyncHandler(list),
+  openBatches: asyncHandler(openBatches),
   prefill: asyncHandler(prefill),
   create: asyncHandler(create),
   update: asyncHandler(update),

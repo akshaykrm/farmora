@@ -3,11 +3,15 @@ import type {
   DailyLogPayload,
   DailyLogPrefill,
   DailyLogResponse,
+  OpenBatchLogStatus,
 } from "./types";
 
 const base = (batchId: number) => `batches/${batchId}/daily-logs`;
 
 const dailyLogApi = {
+  fetchOpenBatches: () =>
+    fetcherV2<OpenBatchLogStatus[]>("daily-logs/open-batches"),
+
   fetch: (batchId: number) => fetcherV2<DailyLogResponse>(base(batchId)),
 
   prefill: (batchId: number, date: string) =>

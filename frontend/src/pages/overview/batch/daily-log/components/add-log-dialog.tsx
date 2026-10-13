@@ -35,12 +35,10 @@ const toNumber = (value: string) => {
 const round = (value: number) => Math.round(value * 100) / 100;
 
 const nextDate = (rows: DailyLogRow[], startDate: string) => {
-  const today = dayjs().format(DATE_FORMAT);
   if (rows.length === 0) return startDate;
-  const next = dayjs(rows[rows.length - 1].date)
+  return dayjs(rows[rows.length - 1].date)
     .add(1, "day")
     .format(DATE_FORMAT);
-  return next > today ? today : next;
 };
 
 const PreviewItem = ({
@@ -169,13 +167,17 @@ const AddLogDialog = ({
     }
   };
 
+  const isFuture =
+    Boolean(form.date) && form.date > dayjs().format(DATE_FORMAT);
+  const ageText = age !== null ? `Age: ${age} day${age === 1 ? "" : "s"}` : " ";
+
   const dateHelper = duplicate
     ? "A log already exists for this date"
     : form.date && form.date < startDate
       ? "Date cannot be before the start date"
-      : age !== null
-        ? `Age: ${age} day${age === 1 ? "" : "s"}`
-        : " ";
+      : isFuture
+        ? `${ageText} · This date is in the future`
+        : ageText;
 
   return (
     <Dialog
@@ -197,7 +199,7 @@ const AddLogDialog = ({
             helperText={dateHelper}
             slotProps={{
               inputLabel: { shrink: true },
-              htmlInput: { min: startDate, max: dayjs().format(DATE_FORMAT) },
+              htmlInput: { min: startDate },
             }}
           />
           <TextField

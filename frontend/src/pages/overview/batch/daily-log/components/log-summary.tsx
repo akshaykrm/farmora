@@ -49,11 +49,18 @@ const LogSummary = ({ header, summary }: Props) => (
       hint={header.companies.join(", ") || undefined}
       tone={header.total_chicks ? undefined : "warning"}
     />
-    <Stat label="Birds Alive" value={summary.birds_alive.toLocaleString()} />
+    <Stat
+      label="Birds Alive"
+      value={header.total_chicks ? summary.birds_alive.toLocaleString() : "-"}
+    />
     <Stat
       label="Mortality"
       value={summary.total_mortality.toLocaleString()}
-      hint={`${summary.mortality_pct.toFixed(2)}% of chicks`}
+      hint={
+        header.total_chicks
+          ? `${summary.mortality_pct.toFixed(2)}% of chicks`
+          : undefined
+      }
     />
     <Stat
       label="Feed Issued"

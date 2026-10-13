@@ -2,6 +2,8 @@ import dayjs from 'dayjs'
 import { Op } from 'sequelize'
 import batchService from '@services/batch.service'
 import BatchDailyLogModel from '@models/batchdailylog'
+import BatchModel from '@models/batch'
+import { applyTenantMasterId } from '@utils/tenant-scope'
 import FarmModel from '@models/farm'
 import SeasonModel from '@models/season'
 import VendorModel from '@models/vendor'
@@ -229,14 +231,19 @@ const buildSummary = (rows, header) => {
   }
 }
 
-const list = async (batchId, currentUser) => {
-  const batch = await loadBatch(batchId, currentUser)
+const buildBatchLog = async (batch) => {
   const [chickEntries, logs] = await Promise.all([
     findChickEntries(batch),
     findLogs(batch.id),
   ])
   const header = buildHeader(batch, chickEntries)
   const rows = computeLogRows(logs, chickEntries, header.log_start_date)
+  return { header, rows, summary: buildSummary(rows, header) }
+}
+
+const list = async (batchId, currentUser) => {
+  const batch = await loadBatch(batchId, currentUser)
+  const { header, rows, summary } = await buildBatchLog(batch)
 
   return {
     batch: {
@@ -248,8 +255,58 @@ const list = async (batchId, currentUser) => {
     },
     header,
     logs: rows,
-    summary: buildSummary(rows, header),
+    summary,
   }
+}
+
+const countMissedDays = (rows, startDate) => {
+  const todayDate = today()
+  if (!startDate || startDate >= todayDate) return 0
+  const loggedBeforeToday = rows.filter(
+    (row) => row.date >= startDate && row.date < todayDate
+  ).length
+  return Math.max(0, daysBetween(startDate, todayDate) - loggedBeforeToday)
+}
+
+const openBatchesStatus = async (currentUser) => {
+  const batches = await BatchModel.findAll({
+    where: applyTenantMasterId({ closed_on: { [Op.is]: null } }, currentUser),
+    include: [
+      { model: FarmModel, as: 'farm', required: false },
+      { model: SeasonModel, as: 'season', required: false },
+    ],
+    order: [['name', 'ASC']],
+  })
+
+  const todayDate = today()
+  return Promise.all(
+    batches.map(async (batch) => {
+      const { header, rows, summary } = await buildBatchLog(batch)
+      const todayRow = rows.find((row) => row.date === todayDate)
+      return {
+        id: batch.id,
+        name: batch.name,
+        season_id: batch.season?.id ?? batch.season_id ?? null,
+        season_name: batch.season?.name || null,
+        farm_name: batch.farm?.name || null,
+        log_start_date: header.log_start_date,
+        current_age: summary.current_age,
+        total_chicks: summary.total_chicks,
+        birds_alive: summary.birds_alive,
+        total_mortality: summary.total_mortality,
+        mortality_pct: summary.mortality_pct,
+        feed_stock: summary.feed_stock,
+        last_log_date: rows[rows.length - 1]?.date || null,
+        today: todayRow
+          ? {
+              mortality: todayRow.mortality,
+              consumed_feed: todayRow.consumed_feed,
+            }
+          : null,
+        missed_days: countMissedDays(rows, header.log_start_date),
+      }
+    })
+  )
 }
 
 const assertLogDate = async (batch, date) => {
@@ -262,7 +319,6 @@ const assertLogDate = async (batch, date) => {
       `Log date cannot be before the start date (${startDate})`
     )
   }
-  assertNotFuture(date, 'Log date')
 }
 
 const assertDateFree = async (batchId, date, exceptId = null) => {
@@ -414,6 +470,7 @@ const batchDailyLogService = {
   remove,
   prefill,
   setStartDate,
+  openBatchesStatus,
 }
 
 export default batchDailyLogService

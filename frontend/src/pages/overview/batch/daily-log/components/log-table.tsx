@@ -67,7 +67,7 @@ const LogTable = ({ rows, canEdit, canDelete, onEdit, onDelete }: Props) => {
           />
           <TableCell content={row.cum_mortality} />
           <TableCell
-            content={row.birds_alive.toLocaleString()}
+            content={row.chicks_placed ? row.birds_alive.toLocaleString() : "-"}
             className="font-semibold !text-brand-ink"
           />
           <TableCell
