@@ -44,7 +44,7 @@ const purchases = async (filter, currentUser) => {
     meta: compactMeta([
       { label: 'Supplier', value: vendor },
       { label: 'Batch', value: batch },
-      { label: 'Category', value: category },
+      { label: 'Item', value: category },
       dateMeta(filter),
     ]),
     sections: [

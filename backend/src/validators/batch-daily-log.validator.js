@@ -25,7 +25,7 @@ export const updateDailyLogSchema = Joi.object({
 })
 
 export const logStartDateSchema = Joi.object({
-  log_start_date: isoDate.required(),
+  log_start_date: isoDate.allow(null).required(),
 })
 
 export const prefillQuerySchema = Joi.object({

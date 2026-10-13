@@ -26,7 +26,7 @@ const defaultFormValues: InvestorTransactionFormValues = {
 
 const InvestPage = () => {
   const { filter, updateQueryParams } = useLedgerFilter()
-  const { transactions } =
+  const { transactions, refetch } =
     useGetInvestorLedgerTransactions({ ...filter, category: 'CAPITAL' })
   const [isOpen, setOpenAdd] = useState(false)
   const [isReversalOpen, setReversalOpen] = useState(false)
@@ -48,6 +48,7 @@ const InvestPage = () => {
     onSuccess: () => {
       onClose()
       handleClose()
+      refetch({ page: 1 })
       updateQueryParams({ page: 1 })
       refetchBalance()
     },

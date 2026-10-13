@@ -61,6 +61,7 @@ function PurchasePage() {
         isShow={isOpen}
         onClose={onClose}
         refetch={(filter) => {
+          refetch(filter);
           updateQueryParams(filter);
         }}
       />

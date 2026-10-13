@@ -170,11 +170,30 @@ export const computeLogRows = (logs, chickEntries, startDate) => {
   })
 }
 
+/**
+ * The manually set start date wins; otherwise the sheet starts on the first
+ * chick purchase for the batch.
+ */
+const startDateFrom = (batch, chickEntries) => {
+  const defaultDate = chickEntries.find((entry) => entry.qty > 0)?.date || null
+  if (batch.log_start_date) {
+    return { date: batch.log_start_date, source: 'manual', defaultDate }
+  }
+  return {
+    date: defaultDate,
+    source: defaultDate ? 'chick_purchase' : null,
+    defaultDate,
+  }
+}
+
+const resolveStartDate = async (batch) =>
+  startDateFrom(batch, await findChickEntries(batch))
+
 const buildHeader = (batch, chickEntries) => {
   const companies = [
     ...new Set(chickEntries.map((entry) => entry.company).filter(Boolean)),
   ]
-  const firstPurchase = chickEntries.find((entry) => entry.qty > 0)
+  const startDate = startDateFrom(batch, chickEntries)
   return {
     farm_name: batch.farm?.name || null,
     place: batch.farm?.place || null,
@@ -182,8 +201,9 @@ const buildHeader = (batch, chickEntries) => {
     season_name: batch.season?.name || null,
     total_chicks: chickEntries.reduce((sum, entry) => sum + entry.qty, 0),
     companies,
-    log_start_date: batch.log_start_date || null,
-    suggested_start_date: firstPurchase?.date || null,
+    log_start_date: startDate.date,
+    start_date_source: startDate.source,
+    default_start_date: startDate.defaultDate,
   }
 }
 
@@ -232,13 +252,14 @@ const list = async (batchId, currentUser) => {
   }
 }
 
-const assertLogDate = (batch, date) => {
-  if (!batch.log_start_date) {
+const assertLogDate = async (batch, date) => {
+  const { date: startDate } = await resolveStartDate(batch)
+  if (!startDate) {
     throw new DailyLogStartDateMissingError()
   }
-  if (date < batch.log_start_date) {
+  if (date < startDate) {
     throw new DailyLogDateError(
-      `Log date cannot be before the start date (${batch.log_start_date})`
+      `Log date cannot be before the start date (${startDate})`
     )
   }
   assertNotFuture(date, 'Log date')
@@ -264,7 +285,7 @@ const findLog = async (batchId, logId) => {
 const create = async (batchId, payload, currentUser) => {
   const batch = await loadBatch(batchId, currentUser)
   assertOpen(batch)
-  assertLogDate(batch, payload.date)
+  await assertLogDate(batch, payload.date)
   await assertDateFree(batch.id, payload.date)
 
   const record = await BatchDailyLogModel.create({
@@ -286,7 +307,7 @@ const update = async (batchId, logId, payload, currentUser) => {
   const record = await findLog(batch.id, logId)
 
   if (payload.date && payload.date !== record.date) {
-    assertLogDate(batch, payload.date)
+    await assertLogDate(batch, payload.date)
     await assertDateFree(batch.id, payload.date, record.id)
   }
 
@@ -317,7 +338,7 @@ const prefill = async (batchId, date, currentUser) => {
     attributes: ['id', 'type'],
   }
 
-  const [purchases, reassigned] = await Promise.all([
+  const [purchases, reassigned, startDate] = await Promise.all([
     PurchaseModel.findAll({
       where: {
         batch_id: batch.id,
@@ -336,34 +357,54 @@ const prefill = async (batchId, date, currentUser) => {
       attributes: ['id', 'quantity'],
       include: [categoryInclude],
     }),
+    resolveStartDate(batch),
   ])
 
   return {
     date,
-    age: batch.log_start_date ? daysBetween(batch.log_start_date, date) : null,
+    age: startDate.date ? daysBetween(startDate.date, date) : null,
     issued_feed: round(
       sumFeedQuantity(purchases) + sumFeedQuantity(reassigned)
     ),
   }
 }
 
+/**
+ * Sets the manual start date. Passing null clears it so the sheet falls back
+ * to the first chick purchase date.
+ */
 const setStartDate = async (batchId, startDate, currentUser) => {
   const batch = await loadBatch(batchId, currentUser)
   assertOpen(batch)
-  assertNotFuture(startDate, 'Start date')
+  if (startDate) assertNotFuture(startDate, 'Start date')
+
+  const { defaultDate } = await resolveStartDate(batch)
+  const effectiveDate = startDate || defaultDate
 
   const firstLog = await BatchDailyLogModel.findOne({
     where: { batch_id: batch.id },
     order: [['date', 'ASC']],
   })
-  if (firstLog && firstLog.date < startDate) {
+  if (firstLog && !effectiveDate) {
+    throw new DailyLogDateError(
+      'There is no chick purchase to use as the start date'
+    )
+  }
+  if (firstLog && firstLog.date < effectiveDate) {
     throw new DailyLogDateError(
       `Start date cannot be after the first daily log (${firstLog.date})`
     )
   }
 
-  await batch.update({ log_start_date: startDate })
-  return { log_start_date: startDate }
+  await batch.update({ log_start_date: startDate || null })
+  return {
+    log_start_date: effectiveDate,
+    start_date_source: startDate
+      ? 'manual'
+      : effectiveDate
+        ? 'chick_purchase'
+        : null,
+  }
 }
 
 const batchDailyLogService = {

@@ -1,53 +1,75 @@
-import CardStat from "@components/CardStat";
-import { Bird, CalendarDays, Package, Skull, Wheat } from "lucide-react";
-import type { DailyLogSummary } from "../types";
+import type { ReactNode } from "react";
+import type { DailyLogHeader, DailyLogSummary } from "../types";
 
 type Props = {
+  header: DailyLogHeader;
   summary: DailyLogSummary;
 };
 
 const formatBags = (value: number) =>
   Number.isInteger(value) ? String(value) : value.toFixed(2);
 
-const LogSummary = ({ summary }: Props) => (
-  <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-6">
-    <CardStat
-      label="Birds Alive"
-      value={summary.birds_alive}
-      icon={<Bird className="h-5 w-5" />}
+const Stat = ({
+  label,
+  value,
+  hint,
+  tone,
+}: {
+  label: string;
+  value: ReactNode;
+  hint?: ReactNode;
+  tone?: "danger" | "warning";
+}) => (
+  <div className="min-w-0 px-4 py-3">
+    <p className="text-xs text-brand-ink-muted">{label}</p>
+    <p
+      className={`mt-0.5 text-lg font-semibold ${
+        tone === "danger"
+          ? "text-red-600"
+          : tone === "warning"
+            ? "text-amber-600"
+            : "text-brand-ink"
+      }`}
+    >
+      {value}
+    </p>
+    {hint && (
+      <p className="truncate text-xs text-brand-ink-muted" title={String(hint)}>
+        {hint}
+      </p>
+    )}
+  </div>
+);
+
+const LogSummary = ({ header, summary }: Props) => (
+  <div className="grid grid-cols-2 divide-brand-border border-b border-brand-border sm:grid-cols-3 lg:grid-cols-6 lg:divide-x">
+    <Stat
+      label="Chicks Placed"
+      value={header.total_chicks ? header.total_chicks.toLocaleString() : "0"}
+      hint={header.companies.join(", ") || undefined}
+      tone={header.total_chicks ? undefined : "warning"}
     />
-    <CardStat
-      label="Total Mortality"
-      value={
-        <span>
-          {summary.total_mortality}
-          <span className="ml-1 text-sm font-medium text-brand-ink-soft">
-            ({summary.mortality_pct.toFixed(2)}%)
-          </span>
-        </span>
-      }
-      icon={<Skull className="h-5 w-5" />}
+    <Stat label="Birds Alive" value={summary.birds_alive.toLocaleString()} />
+    <Stat
+      label="Mortality"
+      value={summary.total_mortality.toLocaleString()}
+      hint={`${summary.mortality_pct.toFixed(2)}% of chicks`}
     />
-    <CardStat
-      label="Feed Issued (bags)"
+    <Stat
+      label="Feed Issued"
       value={formatBags(summary.total_issued)}
-      icon={<Package className="h-5 w-5" />}
+      hint="bags"
     />
-    <CardStat
-      label="Feed Consumed (bags)"
+    <Stat
+      label="Feed Consumed"
       value={formatBags(summary.total_consumed)}
-      icon={<Wheat className="h-5 w-5" />}
+      hint="bags"
     />
-    <CardStat
-      label="Feed Stock (bags)"
+    <Stat
+      label="Feed Stock"
       value={formatBags(summary.feed_stock)}
-      valueClassName={summary.feed_stock < 0 ? "text-red-600" : ""}
-      icon={<Package className="h-5 w-5" />}
-    />
-    <CardStat
-      label="Current Age"
-      value={summary.current_age ?? "-"}
-      icon={<CalendarDays className="h-5 w-5" />}
+      hint="bags"
+      tone={summary.feed_stock < 0 ? "danger" : undefined}
     />
   </div>
 );

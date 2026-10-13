@@ -27,13 +27,12 @@ const dailyLogApi = {
   remove: (batchId: number, id: number) =>
     fetcherV2(`${base(batchId)}/${id}`, null, { method: "DELETE" }),
 
-  setStartDate: (batchId: number, logStartDate: string) =>
+  setStartDate: (batchId: number, logStartDate: string | null) =>
     fetcherV2(
       `${base(batchId)}/start-date`,
       JSON.stringify({ log_start_date: logStartDate }),
       { method: "PUT" },
     ),
-
 };
 
 export const responseError = (

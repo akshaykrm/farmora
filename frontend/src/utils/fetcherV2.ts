@@ -77,7 +77,7 @@ const fetcherV2 = async <T>(
         error: errorList,
       };
     }
-    return { status: "failed", data: json.error.message };
+    return { status: "failed", data: json.error.message, error: json.error };
   } catch (error: any) {
     // console.log(error);
     return {

@@ -28,7 +28,7 @@ type Props = {
 };
 
 const AddPurchase = ({ isShow, onClose, refetch }: Props) => {
-  const { errors, clearError, onSubmit } = useAddPurchase({
+  const { errors, clearError, onSubmit, duplicateInvoice } = useAddPurchase({
     onSuccess: () => {
       handleClose();
       refetch({ page: 1 });
@@ -45,6 +45,7 @@ const AddPurchase = ({ isShow, onClose, refetch }: Props) => {
       isOpen={isShow}
       headerTitle="Add New Purchase"
       onClose={handleClose}
+      className="max-w-5xl"
     >
       <DialogContent>
         <PurchaseForm
@@ -52,6 +53,7 @@ const AddPurchase = ({ isShow, onClose, refetch }: Props) => {
           defaultValues={defaultValues}
           apiError={errors}
           onCancel={handleClose}
+          duplicateInvoice={duplicateInvoice}
         />
       </DialogContent>
     </Dialog>

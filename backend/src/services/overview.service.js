@@ -48,7 +48,15 @@ async function getBatchOverview(filter, currentUser) {
       batch_id: batch_id,
       ...userWhereClause,
     },
-    include: [{ model: ItemModel, as: 'category', required: false }],
+    include: [
+      { model: ItemModel, as: 'category', required: false },
+      {
+        model: VendorModel,
+        as: 'vendor',
+        required: false,
+        attributes: ['id', 'name'],
+      },
+    ],
     order: [['invoice_date', 'ASC']],
   })
 

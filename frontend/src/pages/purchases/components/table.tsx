@@ -3,24 +3,22 @@ import TableCell from "@components/TableCell";
 import TableHeaderCell from "@components/TableHeaderCell";
 import TableRow from "@components/TableRow";
 import { EditIcon } from "lucide-react";
-import Tooltip from "@mui/material/Tooltip";
 import { useMemo } from "react";
 import EmptyContentMessage from "@components/EmptyContentMessage";
 import Ternary from "@components/ternary";
 import dayjs from "dayjs";
 import type { Purchase } from "../types";
-import { ClipText } from "@components/narration";
 import { formatCurrency } from "@utils/currency";
 
 const headers = [
   "Invoice Number",
   "Invoice Date",
   "Supplier Name",
-  "Type",
+  "Item",
+  "Batch",
   "Quantity",
   "Price",
   "Total Amount",
-  "Narration",
   "Action",
 ];
 
@@ -52,25 +50,22 @@ const ItemTable = ({ onEdit, data }: Props) => {
               <TableCell content={item.vendor?.name} />
               <TableCell
                 content={
-                  <span className="capitalize">{item.category.type}</span>
+                  item.category ? (
+                    <div>
+                      <p>{item.category.name}</p>
+                      <p className="text-xs capitalize text-brand-ink-muted">
+                        {item.category.type}
+                      </p>
+                    </div>
+                  ) : (
+                    "-"
+                  )
                 }
               />
-
+              <TableCell content={item.batch?.name || "-"} />
               <TableCell content={item.quantity || "-"} />
               <TableCell content={formatCurrency(item.price_per_unit)} />
               <TableCell content={formatCurrency(item.total_price)} />
-              <TableCell
-                content={
-                  <Tooltip
-                    title={item.narration}
-                    placement="top"
-                    arrow
-                    disableHoverListener={!item.narration}
-                  >
-                    <ClipText value={item.narration} />
-                  </Tooltip>
-                }
-              />
               <TableCell
                 content={
                   <EditIcon

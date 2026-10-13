@@ -18,7 +18,7 @@ const WorkingCostPage = () => {
   const [isOpen, setOpenAdd] = useState(false);
 
   const { updateQueryParams, filter } = useWorkingCostFilter();
-  const { workingCostList, isLoading } = useGetWorkingCost(filter);
+  const { workingCostList, isLoading, refetch } = useGetWorkingCost(filter);
 
   const onOpen = () => setOpenAdd(true);
   const onClose = () => setOpenAdd(false);
@@ -120,7 +120,7 @@ const WorkingCostPage = () => {
         isShow={isOpen}
         onClose={onClose}
         refetch={() => {
-          updateQueryParams({ page: 1 });
+          refetch();
         }}
       />
     </>

@@ -55,6 +55,7 @@ const EmployeesPage = () => {
         isShow={isDialogOpen}
         onClose={() => setOpenAdd(false)}
         refetch={() => {
+          refetch({ page: 1 });
           updateQueryParams({ page: 1 });
         }}
       />

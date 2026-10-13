@@ -18,7 +18,7 @@ const IntegrationBookPage = () => {
   const [isOpen, setOpenAdd] = useState(false);
 
   const { updateQueryParams, filter } = useIntegrationBookFilter();
-  const { integrationBookList, isLoading } = useGetIntegrationBook(filter);
+  const { integrationBookList, isLoading, refetch } = useGetIntegrationBook(filter);
 
   const onOpen = () => setOpenAdd(true);
   const onClose = () => setOpenAdd(false);
@@ -121,7 +121,7 @@ const IntegrationBookPage = () => {
         isShow={isOpen}
         onClose={onClose}
         refetch={() => {
-          updateQueryParams({ page: 1 });
+          refetch();
         }}
       />
     </>

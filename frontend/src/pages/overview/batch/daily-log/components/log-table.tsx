@@ -16,18 +16,20 @@ type Props = {
   onDelete: (row: DailyLogRow) => void;
 };
 
-const headers = [
-  "Date",
-  "Age",
-  "Mort",
-  "Cum Mort",
-  "Issued Feed",
-  "Cons Feed",
-  "Total Cons",
-  "Feed Stock",
-  "Birds Alive",
-  "Avg Wt (kg)",
-  "Remarks",
+const feedHeader = "bg-brand-canvas";
+
+const headers: { label: string; className?: string }[] = [
+  { label: "Date" },
+  { label: "Age" },
+  { label: "Mortality" },
+  { label: "Cum. Mortality" },
+  { label: "Birds Alive" },
+  { label: "Feed Issued", className: feedHeader },
+  { label: "Feed Consumed", className: feedHeader },
+  { label: "Total Consumed", className: feedHeader },
+  { label: "Feed Stock", className: feedHeader },
+  { label: "Avg Wt (kg)" },
+  { label: "Remarks" },
 ];
 
 const num = (value: number | null) =>
@@ -41,61 +43,76 @@ const LogTable = ({ rows, canEdit, canDelete, onEdit, onDelete }: Props) => {
   const showActions = canEdit || canDelete;
 
   return (
-    <>
-      <Table>
-        <TableRow>
-          {headers.map((header) => (
-            <TableHeaderCell key={header} content={header} />
-          ))}
-          {showActions && <TableHeaderCell content="" />}
-        </TableRow>
-        {rows.map((row) => (
-          <TableRow key={row.id}>
-            <TableCell content={dayjs(row.date).format("DD-MM-YYYY")} />
-            <TableCell content={row.age ?? "-"} />
-            <TableCell content={row.mortality} />
-            <TableCell content={row.cum_mortality} />
-            <TableCell content={row.issued_feed ? num(row.issued_feed) : "-"} />
-            <TableCell content={num(row.consumed_feed)} />
-            <TableCell content={num(row.total_consumption)} />
-            <TableCell
-              content={num(row.feed_stock)}
-              className={row.feed_stock < 0 ? "!text-red-600" : ""}
-            />
-            <TableCell content={row.birds_alive} />
-            <TableCell content={num(row.avg_body_weight)} />
-            <TableCell content={<ClipText value={row.remarks || "-"} />} />
-            {showActions && (
-              <TableCell
-                content={
-                  <div className="flex justify-end gap-1">
-                    {canEdit && (
-                      <Tooltip title="Edit" arrow>
-                        <IconButton size="small" onClick={() => onEdit(row)}>
-                          <Pencil className="h-4 w-4" />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                    {canDelete && (
-                      <Tooltip title="Delete" arrow>
-                        <IconButton size="small" onClick={() => onDelete(row)}>
-                          <Trash2 className="h-4 w-4" />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                  </div>
-                }
-              />
-            )}
-          </TableRow>
+    <Table>
+      <TableRow>
+        {headers.map((header) => (
+          <TableHeaderCell
+            key={header.label}
+            content={header.label}
+            className={header.className}
+          />
         ))}
-      </Table>
-      {rows.length === 0 && (
-        <div className="bg-brand-canvas p-6 text-center text-brand-ink-muted">
-          No daily logs recorded yet
-        </div>
-      )}
-    </>
+        {showActions && <TableHeaderCell content="" />}
+      </TableRow>
+      {rows.map((row) => (
+        <TableRow key={row.id}>
+          <TableCell
+            content={dayjs(row.date).format("DD-MM-YYYY")}
+            className="font-medium !text-brand-ink"
+          />
+          <TableCell content={row.age === null ? "-" : `Day ${row.age}`} />
+          <TableCell
+            content={row.mortality}
+            className={row.mortality > 0 ? "font-semibold !text-red-600" : ""}
+          />
+          <TableCell content={row.cum_mortality} />
+          <TableCell
+            content={row.birds_alive.toLocaleString()}
+            className="font-semibold !text-brand-ink"
+          />
+          <TableCell
+            content={row.issued_feed ? num(row.issued_feed) : "-"}
+            className="bg-brand-canvas/40"
+          />
+          <TableCell
+            content={num(row.consumed_feed)}
+            className="bg-brand-canvas/40"
+          />
+          <TableCell
+            content={num(row.total_consumption)}
+            className="bg-brand-canvas/40"
+          />
+          <TableCell
+            content={num(row.feed_stock)}
+            className={`bg-brand-canvas/40 font-semibold ${row.feed_stock < 0 ? "!text-red-600" : "!text-brand-ink"}`}
+          />
+          <TableCell content={num(row.avg_body_weight)} />
+          <TableCell content={<ClipText value={row.remarks || "-"} />} />
+          {showActions && (
+            <TableCell
+              content={
+                <div className="flex justify-end gap-1">
+                  {canEdit && (
+                    <Tooltip title="Edit" arrow>
+                      <IconButton size="small" onClick={() => onEdit(row)}>
+                        <Pencil className="h-4 w-4" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                  {canDelete && (
+                    <Tooltip title="Delete" arrow>
+                      <IconButton size="small" onClick={() => onDelete(row)}>
+                        <Trash2 className="h-4 w-4" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                </div>
+              }
+            />
+          )}
+        </TableRow>
+      ))}
+    </Table>
   );
 };
 

@@ -21,6 +21,7 @@ import batchService from '@services/batch.service'
 import vendorService from './vendor.service'
 import FarmModel from '@models/farm'
 import IntegrationBookModel from '@models/integationbook'
+import invoiceService from '@services/invoice_config.service'
 
 export async function getAllPurchaseWithBatchActive(where) {
   const purchases = await PurchaseModel.findAll({
@@ -59,6 +60,11 @@ const create = async (payload, currentUser) => {
   } else {
     payload.master_id = currentUser.id
   }
+
+  await invoiceService.assertInvoiceNumberAvailable(
+    { masterId: payload.master_id, invoiceNumber: payload.invoice_number },
+    currentUser
+  )
 
   payload.name = 'test'
 
@@ -604,6 +610,20 @@ const updateById = async (id, payload, currentUser) => {
   }
 
   const purchaseRecord = await getById(id, currentUser)
+
+  if (
+    payload.invoice_number &&
+    payload.invoice_number !== purchaseRecord.invoice_number
+  ) {
+    await invoiceService.assertInvoiceNumberAvailable(
+      {
+        masterId: purchaseRecord.master_id,
+        invoiceNumber: payload.invoice_number,
+        excludeId: purchaseRecord.id,
+      },
+      currentUser
+    )
+  }
 
   const currentAssignment =
     await purchaseBatchAssignmentService.getOneByBatchAndPurchaseId(

@@ -14,8 +14,13 @@ export type BatchOverviewExpense = {
   net_amount: number;
   category: {
     id: number;
+    name: string;
     type: string;
-  };
+  } | null;
+  vendor?: {
+    id: number;
+    name: string;
+  } | null;
 };
 
 export type BatchOverviewSale = {

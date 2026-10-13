@@ -24,7 +24,8 @@ export type DailyLogHeader = {
   total_chicks: number;
   companies: string[];
   log_start_date: string | null;
-  suggested_start_date: string | null;
+  start_date_source: "manual" | "chick_purchase" | null;
+  default_start_date: string | null;
 };
 
 export type DailyLogSummary = {

@@ -43,7 +43,13 @@ const nextDate = (rows: DailyLogRow[], startDate: string) => {
   return next > today ? today : next;
 };
 
-const PreviewItem = ({ label, value }: { label: string; value: string | number }) => (
+const PreviewItem = ({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | number;
+}) => (
   <div>
     <p className="text-xs text-brand-ink-muted">{label}</p>
     <p className="text-sm font-semibold text-brand-ink tabular-nums">{value}</p>
@@ -248,7 +254,11 @@ const AddLogDialog = ({
         <Button variant="outlined" onClick={onClose}>
           Cancel
         </Button>
-        <Button variant="contained" onClick={save} disabled={saving || !isValid}>
+        <Button
+          variant="contained"
+          onClick={save}
+          disabled={saving || !isValid}
+        >
           {saving ? "Saving..." : "Save"}
         </Button>
       </DialogActions>

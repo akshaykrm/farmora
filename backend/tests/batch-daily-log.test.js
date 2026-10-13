@@ -186,23 +186,52 @@ describe('Batch daily log', () => {
     expect(res.status).toBe(200)
     expect(res.body.data.header.total_chicks).toBe(3876)
     expect(res.body.data.header.companies).toEqual(['COMARLA', 'VENKYS'])
-    expect(res.body.data.header.suggested_start_date).toBe('2025-09-21')
-    expect(res.body.data.header.log_start_date).toBeNull()
   })
 
-  it('requires a start date before logs can be added', async () => {
-    const res = await api('post', '/').send({ date: '2025-09-21' })
-    expect(res.status).toBe(400)
+  it('defaults the start date to the first chick purchase', async () => {
+    const { body } = await api('get', '/')
+    expect(body.data.header.log_start_date).toBe('2025-09-21')
+    expect(body.data.header.start_date_source).toBe('chick_purchase')
+    expect(body.data.header.default_start_date).toBe('2025-09-21')
+  })
 
+  it('lets a manual start date override the default and reset back', async () => {
     const future = await api('put', '/start-date').send({
       log_start_date: dayjs().add(2, 'day').format('YYYY-MM-DD'),
     })
     expect(future.status).toBe(400)
 
-    const set = await api('put', '/start-date').send({
-      log_start_date: '2025-09-21',
+    const manual = await api('put', '/start-date').send({
+      log_start_date: '2025-09-19',
     })
-    expect(set.status).toBe(200)
+    expect(manual.status).toBe(200)
+    let { body } = await api('get', '/')
+    expect(body.data.header.log_start_date).toBe('2025-09-19')
+    expect(body.data.header.start_date_source).toBe('manual')
+
+    const reset = await api('put', '/start-date').send({
+      log_start_date: null,
+    })
+    expect(reset.status).toBe(200)
+    ;({ body } = await api('get', '/'))
+    expect(body.data.header.log_start_date).toBe('2025-09-21')
+    expect(body.data.header.start_date_source).toBe('chick_purchase')
+  })
+
+  it('requires a start date when the batch has no chick purchase', async () => {
+    const emptyBatch = await createBatchFor(owner.manager.id)
+    const emptyBase = `/api/batches/${emptyBatch.id}/daily-logs`
+    const add = await request(app)
+      .post(emptyBase)
+      .set(authHeader(owner.token))
+      .send({ date: '2025-09-21' })
+    expect(add.status).toBe(400)
+
+    const { body } = await request(app)
+      .get(emptyBase)
+      .set(authHeader(owner.token))
+    expect(body.data.header.log_start_date).toBeNull()
+    expect(body.data.header.start_date_source).toBeNull()
   })
 
   it('computes age, cumulative mortality, consumption and stock like the sheet', async () => {
@@ -266,7 +295,8 @@ describe('Batch daily log', () => {
     const { body } = await api('get', '/')
     expect(body.data.logs[0].age).toBe(1)
 
-    await api('put', '/start-date').send({ log_start_date: '2025-09-21' })
+    const reset = await api('put', '/start-date').send({ log_start_date: null })
+    expect(reset.status).toBe(200)
   })
 
   it('prefills the age and feed purchased for a date', async () => {

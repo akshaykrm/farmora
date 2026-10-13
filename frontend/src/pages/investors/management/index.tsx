@@ -56,6 +56,7 @@ const InvestorManagementPage = () => {
         isShow={isOpen}
         onClose={onClose}
         refetch={() => {
+          refetch({ page: 1 });
           updateQueryParams({ page: 1 });
         }}
       />

@@ -26,7 +26,7 @@ const defaultFormValues: InvestorTransactionFormValues = {
 
 const ProfitPage = () => {
   const { filter, updateQueryParams } = useLedgerFilter()
-  const { transactions } =
+  const { transactions, refetch } =
     useGetInvestorLedgerTransactions({ ...filter, category: 'PROFIT' })
   const [isOpen, setOpenAdd] = useState(false)
   const [isReversalOpen, setReversalOpen] = useState(false)
@@ -48,6 +48,7 @@ const ProfitPage = () => {
     onSuccess: () => {
       onClose()
       handleClose()
+      refetch({ page: 1 })
       updateQueryParams({ page: 1 })
       refetchBalance()
     },
