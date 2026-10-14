@@ -173,6 +173,10 @@ const ReportFilters = ({
         label={label}
         value={draft[field] || (field === "days" ? "30" : "")}
         onChange={(event) => set(field, event.target.value)}
+        slotProps={{
+          select: { displayEmpty: true },
+          inputLabel: { shrink: true },
+        }}
       >
         {(CHOICES[field] || []).map((choice) => (
           <MenuItem key={choice.value} value={choice.value}>
