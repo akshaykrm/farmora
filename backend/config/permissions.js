@@ -12,6 +12,7 @@ export const GROUPS = {
   overview: 'Overview',
   investors: 'Invest',
   configuration: 'Configuration',
+  reports: 'Reports',
   platform: 'Platform',
 }
 
@@ -24,6 +25,7 @@ export const GROUP_ORDER = [
   GROUPS.overview,
   GROUPS.investors,
   GROUPS.configuration,
+  GROUPS.reports,
   GROUPS.platform,
 ]
 
@@ -63,6 +65,32 @@ const platform = (key, description, group, submenu = null) => ({
   audience: AUDIENCE.platform,
 })
 
+export const TENANT_REPORTS = {
+  batch_financial: 'Batch Performance (Financial)',
+  batch_daily_log: 'Batch Performance (Daily Log)',
+  farm_comparison: 'Farm Comparison',
+  daily_production: 'Daily Production',
+  sales_register: 'Sales Register',
+  buyer_sales: 'Buyer-wise Sales',
+  purchase_register: 'Purchase Register',
+  supplier_outstanding: 'Supplier Outstanding',
+  profit_loss: 'Profit and Loss',
+  expense_breakdown: 'Expense Breakdown',
+}
+
+export const PLATFORM_REPORTS = {
+  subscription_revenue: 'Subscription Revenue',
+  expiring_subscriptions: 'Expiring Subscriptions',
+  tenant_usage: 'Tenant Usage',
+  referral_payouts: 'Referral Payouts',
+}
+
+const reportPermissions = (reports, define, group) =>
+  Object.entries(reports).flatMap(([name, title]) => [
+    define(`report_${name}:read`, `View ${title} report`, group, title),
+    define(`report_${name}:export`, `Export ${title} report`, group, title),
+  ])
+
 export const PERMISSIONS = [
   tenant('dashboard:read', 'View farm dashboard', GROUPS.dashboard),
 
@@ -73,12 +101,7 @@ export const PERMISSIONS = [
   tenant('purchase:export', 'Export purchases', GROUPS.expense, 'Purchase'),
 
   tenant('item_return:read', 'View item returns', GROUPS.expense, 'Returns'),
-  tenant(
-    'item_return:write',
-    'Create item returns',
-    GROUPS.expense,
-    'Returns'
-  ),
+  tenant('item_return:write', 'Create item returns', GROUPS.expense, 'Returns'),
   tenant('item_return:edit', 'Edit item returns', GROUPS.expense, 'Returns'),
   tenant(
     'item_return:delete',
@@ -425,7 +448,12 @@ export const PERMISSIONS = [
     'Subscriptions'
   ),
 
-  platform('referral:read', 'View referral partners', GROUPS.platform, 'Referrals'),
+  platform(
+    'referral:read',
+    'View referral partners',
+    GROUPS.platform,
+    'Referrals'
+  ),
   platform(
     'referral:write',
     'Create referral partners',
@@ -468,6 +496,9 @@ export const PERMISSIONS = [
     GROUPS.platform,
     'Referrals'
   ),
+
+  ...reportPermissions(TENANT_REPORTS, tenant, GROUPS.reports),
+  ...reportPermissions(PLATFORM_REPORTS, platform, GROUPS.platform),
 ]
 
 export const PERMISSION_KEYS = Object.fromEntries(

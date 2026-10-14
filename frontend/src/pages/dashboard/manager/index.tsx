@@ -7,11 +7,8 @@ import SubscriptionStatusCard from "./components/SubscriptionStatusCard";
 import SetupChecklistCard from "./components/SetupChecklistCard";
 import setupApi from "@api/setup.api";
 import usePermissions from "@hooks/use-permissions";
-import {
-  PurchasesListing,
-  SalesListing,
-  OpenBatchesListing,
-} from "./components/DataListings";
+// import { PurchasesListing, SalesListing } from "./components/DataListings";
+import { OpenBatchesListing } from "./components/DataListings";
 import dashboardApi from "@api/dashboard.api";
 import type { ManagerDashboardData } from "@app-types/dashboard.types";
 import { CircularProgress, Box } from "@mui/material";
@@ -158,7 +155,7 @@ const ManagerDashboard = () => {
         </section>
       )}
 
-      {/* RECENT PURCHASES & SALES */}
+      {/* RECENT PURCHASES & SALES — hidden for now
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         <section className="animate-in fade-in duration-700 flex flex-col">
           <SectionHeader
@@ -204,6 +201,7 @@ const ManagerDashboard = () => {
           <SalesListing data={data.recentSales ?? []} />
         </section>
       </div>
+      */}
     </div>
   );
 };

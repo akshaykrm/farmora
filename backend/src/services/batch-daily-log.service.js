@@ -26,6 +26,8 @@ const today = () => dayjs().format(DATE_FORMAT)
 
 const daysBetween = (from, to) => dayjs(to).diff(dayjs(from), 'day')
 
+const ageOn = (startDate, date) => daysBetween(startDate, date) + 1
+
 const round = (value, digits = 2) => {
   const factor = 10 ** digits
   return Math.round((Number(value) || 0) * factor) / factor
@@ -128,6 +130,8 @@ const chicksPlacedBy = (chickEntries, date) =>
     .filter((entry) => entry.date <= date)
     .reduce((sum, entry) => sum + entry.qty, 0)
 
+const avgWeight = (birds, weight) => (birds ? round(weight / birds, 3) : 0)
+
 /**
  * Builds the sheet rows. Age, cumulative values and stock are always derived
  * from the stored daily entries so edits to earlier days ripple forward.
@@ -136,23 +140,29 @@ export const computeLogRows = (logs, chickEntries, startDate) => {
   let cumMortality = 0
   let totalIssued = 0
   let totalConsumed = 0
+  let cumSoldBirds = 0
+  let cumSoldWeight = 0
 
   return logs.map((record) => {
     const log = plain(record)
     const mortality = log.mortality || 0
     const issued = toNumber(log.issued_feed)
     const consumed = toNumber(log.consumed_feed)
+    const soldBirds = log.sold_birds || 0
+    const soldWeight = toNumber(log.sold_weight)
 
     cumMortality += mortality
     totalIssued += issued
     totalConsumed += consumed
+    cumSoldBirds += soldBirds
+    cumSoldWeight += soldWeight
 
     const placed = chicksPlacedBy(chickEntries, log.date)
 
     return {
       id: log.id,
       date: log.date,
-      age: startDate ? daysBetween(startDate, log.date) : null,
+      age: startDate ? ageOn(startDate, log.date) : null,
       mortality,
       cum_mortality: cumMortality,
       issued_feed: round(issued),
@@ -160,8 +170,12 @@ export const computeLogRows = (logs, chickEntries, startDate) => {
       total_consumption: round(totalConsumed),
       feed_stock: round(totalIssued - totalConsumed),
       total_issued: round(totalIssued),
+      sold_birds: soldBirds,
+      sold_weight: round(soldWeight),
+      cum_sold_birds: cumSoldBirds,
+      cum_sold_weight: round(cumSoldWeight),
       chicks_placed: placed,
-      birds_alive: placed - cumMortality,
+      birds_alive: placed - cumMortality - cumSoldBirds,
       mortality_pct: placed ? round((cumMortality / placed) * 100) : 0,
       avg_body_weight:
         log.avg_body_weight === null || log.avg_body_weight === undefined
@@ -213,19 +227,25 @@ const buildSummary = (rows, header) => {
   const last = rows[rows.length - 1]
   const totalMortality = last?.cum_mortality || 0
   const totalChicks = header.total_chicks
+  const soldBirds = last?.cum_sold_birds || 0
+  const soldWeight = last?.cum_sold_weight || 0
   return {
     total_chicks: totalChicks,
     total_mortality: totalMortality,
     mortality_pct: totalChicks
       ? round((totalMortality / totalChicks) * 100)
       : 0,
-    birds_alive: totalChicks - totalMortality,
+    birds_alive: totalChicks - totalMortality - soldBirds,
+    total_sold_birds: soldBirds,
+    total_sold_weight: soldWeight,
+    avg_sale_weight: avgWeight(soldBirds, soldWeight),
+    sold_pct: totalChicks ? round((soldBirds / totalChicks) * 100) : 0,
     total_issued: last?.total_issued || 0,
     total_consumed: last?.total_consumption || 0,
     feed_stock: last?.feed_stock || 0,
     last_age: last?.age ?? null,
     current_age: header.log_start_date
-      ? daysBetween(header.log_start_date, today())
+      ? ageOn(header.log_start_date, today())
       : null,
     log_count: rows.length,
   }
@@ -418,7 +438,7 @@ const prefill = async (batchId, date, currentUser) => {
 
   return {
     date,
-    age: startDate.date ? daysBetween(startDate.date, date) : null,
+    age: startDate.date ? ageOn(startDate.date, date) : null,
     issued_feed: round(
       sumFeedQuantity(purchases) + sumFeedQuantity(reassigned)
     ),

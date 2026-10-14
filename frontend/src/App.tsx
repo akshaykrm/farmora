@@ -43,8 +43,11 @@ import SystemRolesPage from "@pages/system-roles";
 import SubscribersPage from "@pages/subscribers";
 import ReferralsPage from "@pages/referrals";
 import ReferralDetailPage from "@pages/referrals/detail";
+import ReportsPage from "@pages/reports";
+import ReportViewPage from "@pages/reports/report-view";
+import { TENANT_REPORT_READ_PERMISSIONS } from "@pages/reports/config";
 import usePermissions from "@hooks/use-permissions";
-import { filterPaths, flattenPaths } from "@utils/filter-paths";
+import { canSee, filterPaths, flattenPaths } from "@utils/filter-paths";
 import type { PathItem } from "./types/paths.types";
 
 const queryClient = new QueryClient();
@@ -76,6 +79,8 @@ const pageComponents: Record<string, React.ComponentType> = {
   "/packages": PackagesPage,
   "/subscribers": SubscribersPage,
   "/referrals": ReferralsPage,
+  "/reports": ReportsPage,
+  "/platform/reports": ReportsPage,
 };
 
 const MuiThemeBridge = ({ children }: { children: ReactNode }) => {
@@ -104,7 +109,7 @@ const PermissionGuard = ({
   if (path.audience === "tenant" && isSuperAdmin) {
     return <Navigate to="/dashboard" replace />;
   }
-  if (path.permission && !can(path.permission)) {
+  if (!canSee(path, can)) {
     return <Navigate to="/dashboard" replace />;
   }
   return children;
@@ -172,6 +177,31 @@ const AppRoutes = () => {
             }}
           >
             <ReferralDetailPage />
+          </PermissionGuard>
+        }
+      />
+      <Route
+        path="/reports/:reportKey"
+        element={
+          <PermissionGuard
+            path={{
+              pathname: "Report",
+              link: "/reports",
+              audience: "tenant",
+              anyPermission: TENANT_REPORT_READ_PERMISSIONS,
+            }}
+          >
+            <ReportViewPage />
+          </PermissionGuard>
+        }
+      />
+      <Route
+        path="/platform/reports/:reportKey"
+        element={
+          <PermissionGuard
+            path={{ pathname: "Report", link: "/platform/reports", audience: "platform" }}
+          >
+            <ReportViewPage />
           </PermissionGuard>
         }
       />

@@ -11,6 +11,7 @@ import {
   ClipboardList,
   Coins,
   CreditCard,
+  FileChartColumn,
   Gift,
   Layers,
   LayoutDashboard,
@@ -31,6 +32,7 @@ import {
   Wallet,
 } from "lucide-react";
 import type { Paths } from "./types/paths.types";
+import { TENANT_REPORT_READ_PERMISSIONS } from "@pages/reports/config";
 
 export const paths: Paths = [
   {
@@ -73,6 +75,12 @@ export const paths: Paths = [
     icon: Gift,
     audience: "platform",
     permission: "referral:read",
+  },
+  {
+    pathname: "Reports",
+    link: "/platform/reports",
+    icon: FileChartColumn,
+    audience: "platform",
   },
   {
     pathname: "Expense",
@@ -185,6 +193,13 @@ export const paths: Paths = [
         audience: "tenant",
       },
     ],
+  },
+  {
+    pathname: "Reports",
+    link: "/reports",
+    icon: FileChartColumn,
+    audience: "tenant",
+    anyPermission: TENANT_REPORT_READ_PERMISSIONS,
   },
   {
     pathname: "Invest",

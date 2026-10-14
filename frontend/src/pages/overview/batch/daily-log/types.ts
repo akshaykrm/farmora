@@ -9,6 +9,10 @@ export type DailyLogRow = {
   total_consumption: number;
   feed_stock: number;
   total_issued: number;
+  sold_birds: number;
+  sold_weight: number;
+  cum_sold_birds: number;
+  cum_sold_weight: number;
   chicks_placed: number;
   birds_alive: number;
   mortality_pct: number;
@@ -33,6 +37,10 @@ export type DailyLogSummary = {
   total_mortality: number;
   mortality_pct: number;
   birds_alive: number;
+  total_sold_birds: number;
+  total_sold_weight: number;
+  avg_sale_weight: number;
+  sold_pct: number;
   total_issued: number;
   total_consumed: number;
   feed_stock: number;
@@ -59,6 +67,8 @@ export type DailyLogPayload = {
   mortality: number;
   issued_feed: number;
   consumed_feed: number;
+  sold_birds: number;
+  sold_weight: number;
   avg_body_weight?: number | null;
   remarks?: string | null;
 };

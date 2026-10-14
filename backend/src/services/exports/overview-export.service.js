@@ -426,6 +426,9 @@ const dailyLog = async (filter, currentUser) => {
         { key: 'consumed_feed', header: 'Cons Feed', type: 'number' },
         { key: 'total_consumption', header: 'Total Cons', type: 'number' },
         { key: 'feed_stock', header: 'Feed Stock', type: 'number' },
+        { key: 'sold_birds', header: 'Birds Sold', type: 'number' },
+        { key: 'sold_weight', header: 'Wt Sold (kg)', type: 'number' },
+        { key: 'birds_alive', header: 'On Farm', type: 'number' },
         { key: 'avg_body_weight', header: 'Avg Wt (kg)', type: 'number' },
         { key: 'remarks', header: 'Remarks', width: 2 },
       ],
@@ -456,7 +459,22 @@ const dailyLog = async (filter, currentUser) => {
         type: 'number',
       },
       { label: 'Mortality %', value: summary.mortality_pct, type: 'number' },
-      { label: 'Birds Alive', value: summary.birds_alive, type: 'number' },
+      {
+        label: 'Birds Sold',
+        value: summary.total_sold_birds,
+        type: 'number',
+      },
+      {
+        label: 'Weight Sold (kg)',
+        value: summary.total_sold_weight,
+        type: 'number',
+      },
+      {
+        label: 'Avg Sale Weight (kg)',
+        value: summary.avg_sale_weight,
+        type: 'number',
+      },
+      { label: 'Birds on Farm', value: summary.birds_alive, type: 'number' },
       {
         label: 'Total Feed Issued (bags)',
         value: summary.total_issued,

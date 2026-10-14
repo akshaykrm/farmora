@@ -11,6 +11,14 @@ const matchesAudience = (item: PathItem, isSuperAdmin: boolean) => {
   return true;
 };
 
+export const canSee = (item: PathItem, can: FilterOpts["can"]) => {
+  if (item.permission && !can(item.permission)) return false;
+  if (item.anyPermission && !item.anyPermission.some((key) => can(key))) {
+    return false;
+  }
+  return true;
+};
+
 export const filterPaths = (items: Paths, opts: FilterOpts): Paths => {
   return items.flatMap((item) => {
     if (!matchesAudience(item, opts.isSuperAdmin)) {
@@ -25,7 +33,7 @@ export const filterPaths = (items: Paths, opts: FilterOpts): Paths => {
       return [{ ...item, children }];
     }
 
-    if (item.permission && !opts.can(item.permission)) {
+    if (!canSee(item, opts.can)) {
       return [];
     }
 

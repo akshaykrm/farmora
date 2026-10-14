@@ -31,6 +31,16 @@ const BatchDailyLogModel = sequelize.define(
       allowNull: false,
       defaultValue: 0,
     },
+    sold_birds: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    sold_weight: {
+      type: Sequelize.DECIMAL(10, 2),
+      allowNull: false,
+      defaultValue: 0,
+    },
     avg_body_weight: {
       type: Sequelize.DECIMAL(10, 3),
       allowNull: true,

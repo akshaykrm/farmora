@@ -12,7 +12,7 @@ import { Op } from 'sequelize'
 import VendorModel from '@models/vendor'
 import BatchModel from '@models/batch'
 import { calculateOffSet } from '@utils/pagination'
-import { isFeedType } from '@utils/feed'
+import { FEED_BAG_KG, isFeedType } from '@utils/feed'
 
 function calculateTotalFeeds(records = []) {
   return records
@@ -128,7 +128,7 @@ async function getBatchOverview(filter, currentUser) {
 
   const netFeedBags = totalPurchasedFeeds - totalReturnedFeeds
 
-  const netFeedWeight = netFeedBags * 50
+  const netFeedWeight = netFeedBags * FEED_BAG_KG
 
   const totalSaleWeight = sales.reduce(
     (acc, curr) => acc + parseFloat(curr.weight),
@@ -253,7 +253,7 @@ const calculateBatchTotals = (batchOverviews = []) => {
 
   const netFeedBags = totalPurchasedFeeds - totalReturnedFeeds
 
-  const netFeedWeight = netFeedBags * 50
+  const netFeedWeight = netFeedBags * FEED_BAG_KG
 
   // const totalSaleWeight = sales.reduce(
   //   (acc, curr) => acc + parseFloat(curr.weight),
