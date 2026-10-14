@@ -8,6 +8,8 @@ export type PathItem = {
   children?: PathItem[];
   icon?: LucideIcon;
   permission?: string;
+  /** Visible when the user has at least one of these permissions. */
+  anyPermission?: string[];
   audience?: PathAudience;
 };
 

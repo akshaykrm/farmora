@@ -30,10 +30,15 @@ import investorManagementRoutes from './src/investors/management/management.rout
 import investorLedgerRoutes from './src/investors/ledger/ledger.routes.js'
 import brandRouter from '@routes/brand.router'
 import referralRoutes from './src/referrals/referral.routes.js'
+import reportsRouter from '@routes/reports.router'
+import { reportCacheInvalidator } from './src/reports/report-cache.js'
+import { registerSnapshotHooks } from './src/reports/snapshots.js'
 
 import responseHandler from '@middlewares/response.middleware'
 import requestLogger from '@middlewares/request.middleware'
 import globalErrorHandler from '@middlewares/error.middleware'
+
+registerSnapshotHooks()
 
 const app = express()
 
@@ -45,6 +50,8 @@ app.use(cors({ exposedHeaders: ['Content-Disposition'] }))
 app.use(requestLogger)
 
 app.use(responseHandler)
+
+app.use(reportCacheInvalidator)
 
 app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes)
@@ -74,6 +81,7 @@ app.use('/api/investors/ledger', investorLedgerRoutes)
 app.use('/api/investors', investorManagementRoutes)
 app.use('/api/brands', brandRouter)
 app.use('/api/referrals', referralRoutes)
+app.use('/api/reports', reportsRouter)
 
 app.get('/', (_, res) => {
   res.json({ message: 'server is up and running', status: 'ok' })

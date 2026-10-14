@@ -38,7 +38,35 @@ const writeEntries = (sheet, entries, startRow) => {
   return rowIndex
 }
 
+/** Row of the column headers, matching the layout written by writeSection. */
+const headerRowFor = (report, includeSummary) => {
+  let row = report.sections.length > 1 ? 3 : 2
+  row += report.meta.length + 1
+  if (includeSummary && report.summary?.length) row += 2 + report.summary.length
+  return row + 1
+}
+
+const setColumnWidths = (sheet, section) => {
+  section.columns.forEach((column, i) => {
+    const longest = section.rows.reduce(
+      (max, record) =>
+        Math.max(max, formatValue(record[column.key], column.type).length),
+      column.header.length
+    )
+    sheet.getColumn(i + 1).width = Math.min(
+      MAX_WIDTH,
+      Math.max(MIN_WIDTH, longest + 2)
+    )
+  })
+  if (sheet.getColumn(1).width < 18) sheet.getColumn(1).width = 18
+}
+
+/**
+ * Writes rows top to bottom and commits each data row, so the streaming
+ * writer can flush them. Column widths must be set before the first commit.
+ */
 const writeSection = (sheet, report, section, { includeSummary }) => {
+  setColumnWidths(sheet, section)
   sheet.getCell(1, 1).value = report.title
   sheet.getCell(1, 1).font = { bold: true, size: 14 }
 
@@ -79,6 +107,7 @@ const writeSection = (sheet, report, section, { includeSummary }) => {
     }
     cell.border = { bottom: { style: 'thin' } }
   })
+  headerRow.commit()
 
   for (const record of section.rows) {
     const row = sheet.getRow(++rowIndex)
@@ -88,27 +117,29 @@ const writeSection = (sheet, report, section, { includeSummary }) => {
       if (column.type === 'currency') cell.numFmt = CURRENCY_FORMAT
       if (column.type === 'date') cell.numFmt = DATE_FORMAT
     })
+    row.commit()
   }
 
   if (!section.rows.length) {
     sheet.getCell(rowIndex + 1, 1).value = 'No records found'
     sheet.getCell(rowIndex + 1, 1).font = { italic: true }
   }
+}
 
-  sheet.views = [{ state: 'frozen', ySplit: headerRowIndex }]
-
-  section.columns.forEach((column, i) => {
-    const longest = section.rows.reduce(
-      (max, record) =>
-        Math.max(max, formatValue(record[column.key], column.type).length),
-      column.header.length
-    )
-    sheet.getColumn(i + 1).width = Math.min(
-      MAX_WIDTH,
-      Math.max(MIN_WIDTH, longest + 2)
-    )
+const addSheets = (workbook, report) => {
+  workbook.creator = 'Farmora'
+  workbook.created = new Date()
+  const used = new Set()
+  return report.sections.map((section, index) => {
+    const includeSummary = index === 0
+    const sheet = workbook.addWorksheet(sheetName(section.title, used), {
+      views: [
+        { state: 'frozen', ySplit: headerRowFor(report, includeSummary) },
+      ],
+    })
+    writeSection(sheet, report, section, { includeSummary })
+    return sheet
   })
-  if (sheet.getColumn(1).width < 18) sheet.getColumn(1).width = 18
 }
 
 /**
@@ -117,15 +148,22 @@ const writeSection = (sheet, report, section, { includeSummary }) => {
  */
 export const renderXlsx = async (report) => {
   const workbook = new ExcelJS.Workbook()
-  workbook.creator = 'Farmora'
-  workbook.created = new Date()
-
-  const used = new Set()
-  report.sections.forEach((section, index) => {
-    const sheet = workbook.addWorksheet(sheetName(section.title, used))
-    writeSection(sheet, report, section, { includeSummary: index === 0 })
-  })
-
+  addSheets(workbook, report)
   const buffer = await workbook.xlsx.writeBuffer()
   return Buffer.from(buffer)
+}
+
+/**
+ * Streams the workbook to `stream` row by row instead of building the whole
+ * file in memory. Used for large exports.
+ * @param {import('./report.js').Report} report
+ * @param {import('stream').Writable} stream
+ */
+export const renderXlsxStream = async (report, stream) => {
+  const workbook = new ExcelJS.stream.xlsx.WorkbookWriter({
+    stream,
+    useStyles: true,
+  })
+  addSheets(workbook, report).forEach((sheet) => sheet.commit())
+  await workbook.commit()
 }
