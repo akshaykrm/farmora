@@ -8,12 +8,36 @@ export const isoDate = Joi.string()
 
 const id = Joi.number().integer().positive()
 
+const MAX_IDS = 100
+
+/** One id, a comma-separated list ("1,2,3") or an array; always an array. */
+const idList = Joi.alternatives()
+  .try(
+    id.custom((value) => [value]),
+    Joi.string()
+      .pattern(/^\d+(,\d+)*$/)
+      .custom((value) => [...new Set(value.split(',').map(Number))])
+      .messages({
+        'string.pattern.base':
+          '{#label} must be an id or a comma-separated list of ids',
+      }),
+    Joi.array().items(id)
+  )
+  .custom((value, helpers) =>
+    value.length > MAX_IDS ? helpers.error('array.max') : value
+  )
+  .messages({
+    'alternatives.match':
+      '{#label} must be an id or a comma-separated list of ids',
+    'array.max': `{#label} can have at most ${MAX_IDS} ids`,
+  })
+
 export const fields = {
   start_date: isoDate,
   end_date: isoDate,
   season_id: id,
-  batch_id: id,
-  farm_id: id,
+  batch_id: idList,
+  farm_id: idList,
   buyer_id: id,
   vendor_id: id,
   as_of: isoDate,

@@ -507,6 +507,28 @@ describe('Reports', () => {
     })
   })
 
+  describe('multiple farms and batches', () => {
+    it('accepts a comma-separated list of ids', async () => {
+      const res = await view('batch_financial', {
+        batch_id: `${data.batch.id},999999999`,
+        farm_id: `${data.farm.id}`,
+      })
+      expect(res.status).toBe(200)
+      expect(res.body.data.sections[0].rows).toHaveLength(1)
+      const batchMeta = res.body.data.meta.find((m) => m.label === 'Batch')
+      expect(batchMeta.value).toBe('Report Batch, #999999999')
+
+      const sales = await view('sales_register', {
+        batch_id: `${data.batch.id},999999999`,
+      })
+      expect(sales.status).toBe(200)
+      expect(sales.body.data.sections[0].rows).toHaveLength(1)
+
+      const bad = await view('batch_financial', { batch_id: '1,abc' })
+      expect(bad.status).toBe(400)
+    })
+  })
+
   describe('limits', () => {
     it('requires a scope or a bounded date range', async () => {
       const none = await view('batch_financial')

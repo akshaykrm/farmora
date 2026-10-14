@@ -47,13 +47,21 @@ export const dateRangeSql = (column, filter, prefix = 'range') => {
   }
 }
 
-/** Optional `column = :name` fragments for the ids present in the filter. */
+/**
+ * Optional `column = :name` (or `IN (:name)` for id lists) fragments for the
+ * values present in the filter.
+ */
 export const idFiltersSql = (pairs) => {
   const parts = []
   const replacements = {}
   for (const [column, name, value] of pairs) {
     if (value === undefined || value === null || value === '') continue
-    parts.push(`${column} = :${name}`)
+    if (Array.isArray(value)) {
+      if (!value.length) continue
+      parts.push(`${column} IN (:${name})`)
+    } else {
+      parts.push(`${column} = :${name}`)
+    }
     replacements[name] = value
   }
   return {
@@ -62,13 +70,16 @@ export const idFiltersSql = (pairs) => {
   }
 }
 
+/** Name for an id, or comma-joined names for a list of ids. */
 export const nameOf = async (table, id, masterId) => {
-  if (!id) return null
+  const ids = (Array.isArray(id) ? id : [id]).filter(Boolean)
+  if (!ids.length) return null
   const rows = await query(
-    `SELECT name FROM ${table} WHERE id = :id${masterId ? ' AND master_id = :masterId' : ''} LIMIT 1`,
-    { id, masterId }
+    `SELECT id, name FROM ${table} WHERE id IN (:ids)${masterId ? ' AND master_id = :masterId' : ''}`,
+    { ids, masterId }
   )
-  return rows[0]?.name || `#${id}`
+  const names = new Map(rows.map((row) => [Number(row.id), row.name]))
+  return ids.map((value) => names.get(Number(value)) || `#${value}`).join(', ')
 }
 
 export const sumRows = (rows, keys) =>

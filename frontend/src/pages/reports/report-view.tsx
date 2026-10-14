@@ -106,20 +106,19 @@ const ReportViewPage = () => {
         }
       />
 
-      {needsCompany && (
-        <CompanySelect value={companyId} onChange={changeCompany} />
-      )}
-
-      {companyReady && (
-        <ReportFilters
-          key={`${reportKey}-${companyId || ""}`}
-          reportKey={reportKey}
-          fields={config.filters}
-          applied={queryParms}
-          options={options}
-          onApply={applyFilter}
-        />
-      )}
+      <ReportFilters
+        key={`${reportKey}-${companyId || ""}`}
+        reportKey={reportKey}
+        fields={companyReady ? config.filters : []}
+        applied={queryParms}
+        options={options}
+        onApply={applyFilter}
+        leading={
+          needsCompany ? (
+            <CompanySelect value={companyId} onChange={changeCompany} />
+          ) : undefined
+        }
+      />
 
       {!companyReady ? (
         <ApplyFilterMessage
@@ -156,6 +155,13 @@ const ReportViewPage = () => {
             </div>
           )}
           <ReportSummary summary={data.summary} />
+          {data.sections.map((section) => (
+            <ReportTable
+              key={section.key}
+              section={section}
+              onPageChange={(update) => updateQueryParams(update)}
+            />
+          ))}
           {charts.length > 0 && (
             <div
               className={`grid grid-cols-1 gap-6 ${charts.length > 1 ? "xl:grid-cols-2" : ""}`}
@@ -165,13 +171,6 @@ const ReportViewPage = () => {
               ))}
             </div>
           )}
-          {data.sections.map((section) => (
-            <ReportTable
-              key={section.key}
-              section={section}
-              onPageChange={(update) => updateQueryParams(update)}
-            />
-          ))}
         </div>
       ) : null}
     </>

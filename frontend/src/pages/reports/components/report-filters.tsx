@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState, type ReactNode } from "react";
 import {
   Button,
   FormControlLabel,
@@ -12,6 +12,7 @@ import SelectList from "@components/select-list";
 import type { NameResponse } from "@app-types/gen.types";
 import { FILTER_LABELS, missingRequirement, type FilterField } from "../config";
 import type { ReportFilter, ReportOptions } from "../types";
+import MultiSelectList from "./multi-select-list";
 
 const CHOICES: Partial<
   Record<FilterField, { value: string; label: string }[]>
@@ -35,6 +36,10 @@ const CHOICES: Partial<
 };
 
 const DATE_FIELDS: FilterField[] = ["start_date", "end_date", "as_of"];
+const MULTI_FIELDS: FilterField[] = ["farm_id", "batch_id"];
+
+const toIds = (value?: string) =>
+  value ? value.split(",").map(Number).filter(Boolean) : [];
 
 type Props = {
   reportKey: string;
@@ -42,6 +47,8 @@ type Props = {
   applied: ReportFilter;
   options?: ReportOptions;
   onApply: (filter: ReportFilter) => void;
+  /** Rendered as the first cell, e.g. super admin's company picker. */
+  leading?: ReactNode;
 };
 
 const ReportFilters = ({
@@ -50,22 +57,35 @@ const ReportFilters = ({
   applied,
   options,
   onApply,
+  leading,
 }: Props) => {
   const [draft, setDraft] = useState<ReportFilter>(() =>
     Object.fromEntries(fields.map((field) => [field, applied[field] || ""])),
   );
-  const set = (field: FilterField, value: string) =>
-    setDraft((current) => ({ ...current, [field]: value }));
 
-  const batches = useMemo(
-    () =>
-      (options?.batches || []).filter(
-        (batch) =>
-          (!draft.season_id || batch.season_id === Number(draft.season_id)) &&
-          (!draft.farm_id || batch.farm_id === Number(draft.farm_id)),
-      ),
-    [options?.batches, draft.season_id, draft.farm_id],
-  );
+  const batchesFor = (filter: ReportFilter) => {
+    const farms = toIds(filter.farm_id);
+    return (options?.batches || []).filter(
+      (batch) =>
+        (!filter.season_id || batch.season_id === Number(filter.season_id)) &&
+        (!farms.length ||
+          (batch.farm_id !== null && farms.includes(batch.farm_id))),
+    );
+  };
+
+  const set = (field: FilterField, value: string) =>
+    setDraft((current) => {
+      const next = { ...current, [field]: value };
+      if ((field === "season_id" || field === "farm_id") && next.batch_id) {
+        const allowed = new Set(batchesFor(next).map((batch) => batch.id));
+        next.batch_id = toIds(next.batch_id)
+          .filter((id) => allowed.has(id))
+          .join(",");
+      }
+      return next;
+    });
+
+  const batches = batchesFor(draft);
 
   const lists: Partial<Record<FilterField, NameResponse[]>> = {
     season_id: options?.seasons,
@@ -80,11 +100,23 @@ const ReportFilters = ({
 
   const missing = missingRequirement(reportKey, draft);
 
-  if (!fields.length) return null;
+  if (!fields.length && !leading) return null;
 
   const renderField = (field: FilterField) => {
     const label = FILTER_LABELS[field];
-    if (lists[field] !== undefined || field.endsWith("_id")) {
+    if (MULTI_FIELDS.includes(field)) {
+      return (
+        <MultiSelectList
+          key={field}
+          name={field}
+          label={label}
+          options={lists[field]}
+          value={toIds(draft[field])}
+          onChange={(ids) => set(field, ids.join(","))}
+        />
+      );
+    }
+    if (field.endsWith("_id")) {
       return (
         <SelectList
           key={field}
@@ -92,11 +124,7 @@ const ReportFilters = ({
           label={label}
           options={lists[field] || []}
           value={draft[field] ? Number(draft[field]) : null}
-          onChange={(id) => {
-            set(field, id ? String(id) : "");
-            if (field === "season_id" || field === "farm_id")
-              set("batch_id", "");
-          }}
+          onChange={(id) => set(field, id ? String(id) : "")}
         />
       );
     }
@@ -122,8 +150,11 @@ const ReportFilters = ({
         <FormControlLabel
           key={field}
           label={label}
+          className="m-0"
+          slotProps={{ typography: { fontSize: 14 } }}
           control={
             <Switch
+              size="small"
               checked={draft.include_open === "true"}
               onChange={(event) =>
                 set(field, event.target.checked ? "true" : "")
@@ -159,25 +190,29 @@ const ReportFilters = ({
   };
 
   return (
-    <section className="mb-6 rounded-xl border border-brand-border bg-brand-card p-4 shadow-xs">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3 xl:grid-cols-4">
+    <section className="mb-4 rounded-xl border border-brand-border bg-brand-card p-3 shadow-xs">
+      <div className="grid grid-cols-2 items-center gap-3 md:grid-cols-4 xl:grid-cols-6">
+        {leading}
         {fields.map(renderField)}
-      </div>
-      <div className="mt-4 flex flex-wrap items-center justify-end gap-3">
-        {missing && (
-          <p className="mr-auto text-xs text-brand-ink-muted">{missing}</p>
+        {fields.length > 0 && (
+          <div className="col-span-2 flex items-center justify-end gap-2 md:col-span-1 xl:col-start-6">
+            <Button size="small" variant="text" onClick={clear}>
+              Clear
+            </Button>
+            <Button
+              size="small"
+              variant="contained"
+              disabled={Boolean(missing)}
+              onClick={() => onApply(draft)}
+            >
+              Apply
+            </Button>
+          </div>
         )}
-        <Button variant="text" onClick={clear}>
-          Clear
-        </Button>
-        <Button
-          variant="contained"
-          disabled={Boolean(missing)}
-          onClick={() => onApply(draft)}
-        >
-          Apply Filters
-        </Button>
       </div>
+      {fields.length > 0 && missing && (
+        <p className="mt-2 text-xs text-brand-ink-muted">{missing}</p>
+      )}
     </section>
   );
 };
