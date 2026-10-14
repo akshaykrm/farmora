@@ -11,6 +11,8 @@ export const dailyLogSchema = Joi.object({
   mortality: Joi.number().integer().min(0).default(0),
   issued_feed: quantity.default(0),
   consumed_feed: quantity.default(0),
+  sold_birds: Joi.number().integer().min(0).default(0),
+  sold_weight: quantity.default(0),
   avg_body_weight: Joi.number().min(0).precision(3).allow(null).optional(),
   remarks: Joi.string().trim().max(500).allow('', null).optional(),
 })
@@ -20,6 +22,8 @@ export const updateDailyLogSchema = Joi.object({
   mortality: Joi.number().integer().min(0).optional(),
   issued_feed: quantity.optional(),
   consumed_feed: quantity.optional(),
+  sold_birds: Joi.number().integer().min(0).optional(),
+  sold_weight: quantity.optional(),
   avg_body_weight: Joi.number().min(0).precision(3).allow(null).optional(),
   remarks: Joi.string().trim().max(500).allow('', null).optional(),
 })

@@ -17,13 +17,16 @@ type Props = {
 };
 
 const feedHeader = "bg-brand-canvas";
+const saleHeader = "bg-brand-success-soft";
 
 const headers: { label: string; className?: string }[] = [
   { label: "Date" },
   { label: "Age" },
   { label: "Mortality" },
   { label: "Cum. Mortality" },
-  { label: "Birds Alive" },
+  { label: "Birds Sold", className: saleHeader },
+  { label: "Wt Sold (kg)", className: saleHeader },
+  { label: "Birds on Farm" },
   { label: "Feed Issued", className: feedHeader },
   { label: "Feed Consumed", className: feedHeader },
   { label: "Total Consumed", className: feedHeader },
@@ -66,6 +69,14 @@ const LogTable = ({ rows, canEdit, canDelete, onEdit, onDelete }: Props) => {
             className={row.mortality > 0 ? "font-semibold !text-red-600" : ""}
           />
           <TableCell content={row.cum_mortality} />
+          <TableCell
+            content={row.sold_birds ? row.sold_birds.toLocaleString() : "-"}
+            className="bg-brand-success-soft/40"
+          />
+          <TableCell
+            content={row.sold_weight ? num(row.sold_weight) : "-"}
+            className="bg-brand-success-soft/40"
+          />
           <TableCell
             content={row.chicks_placed ? row.birds_alive.toLocaleString() : "-"}
             className="font-semibold !text-brand-ink"

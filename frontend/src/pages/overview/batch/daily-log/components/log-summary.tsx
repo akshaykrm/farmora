@@ -42,7 +42,7 @@ const Stat = ({
 );
 
 const LogSummary = ({ header, summary }: Props) => (
-  <div className="grid grid-cols-2 divide-brand-border border-b border-brand-border sm:grid-cols-3 lg:grid-cols-6 lg:divide-x">
+  <div className="grid grid-cols-2 divide-brand-border border-b border-brand-border sm:grid-cols-4 lg:grid-cols-7 lg:divide-x">
     <Stat
       label="Chicks Placed"
       value={header.total_chicks ? header.total_chicks.toLocaleString() : "0"}
@@ -50,8 +50,20 @@ const LogSummary = ({ header, summary }: Props) => (
       tone={header.total_chicks ? undefined : "warning"}
     />
     <Stat
-      label="Birds Alive"
+      label="Birds on Farm"
       value={header.total_chicks ? summary.birds_alive.toLocaleString() : "-"}
+      tone={summary.birds_alive < 0 ? "danger" : undefined}
+    />
+    <Stat
+      label="Birds Sold"
+      value={summary.total_sold_birds.toLocaleString()}
+      hint={
+        summary.total_sold_birds
+          ? `${formatBags(summary.total_sold_weight)} kg · avg ${summary.avg_sale_weight} kg${
+              header.total_chicks ? ` · ${summary.sold_pct.toFixed(1)}%` : ""
+            }`
+          : "No sales yet"
+      }
     />
     <Stat
       label="Mortality"

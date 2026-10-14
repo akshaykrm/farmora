@@ -253,7 +253,7 @@ describe('Batch daily log', () => {
 
     const { body } = await api('get', '/')
     const rows = body.data.logs
-    expect(rows.map((row) => row.age)).toEqual([0, 1, 2])
+    expect(rows.map((row) => row.age)).toEqual([1, 2, 3])
     expect(rows.map((row) => row.cum_mortality)).toEqual([1, 6, 13])
     expect(rows.map((row) => row.total_consumption)).toEqual([1, 3, 4])
     expect(rows.map((row) => row.feed_stock)).toEqual([9, 7, 6])
@@ -337,7 +337,7 @@ describe('Batch daily log', () => {
     })
     expect(earlier.status).toBe(200)
     const { body } = await api('get', '/')
-    expect(body.data.logs[0].age).toBe(1)
+    expect(body.data.logs[0].age).toBe(2)
 
     const reset = await api('put', '/start-date').send({ log_start_date: null })
     expect(reset.status).toBe(200)
@@ -346,7 +346,7 @@ describe('Batch daily log', () => {
   it('prefills the age and feed purchased for a date', async () => {
     const res = await api('get', '/prefill').query({ date: '2025-09-25' })
     expect(res.status).toBe(200)
-    expect(res.body.data.age).toBe(4)
+    expect(res.body.data.age).toBe(5)
     expect(res.body.data.issued_feed).toBe(5)
 
     const noFeed = await api('get', '/prefill').query({ date: '2025-09-24' })
@@ -418,6 +418,40 @@ describe('Batch daily log', () => {
     expect(otherRes.body.data.some((entry) => entry.id === batch.id)).toBe(
       false
     )
+  })
+
+  it('records sales on the log and reduces birds on farm', async () => {
+    const before = await api('get', '/')
+    const day2 = before.body.data.logs[1]
+    const edited = await api('put', `/${day2.id}`).send({
+      sold_birds: 100,
+      sold_weight: 200,
+    })
+    expect(edited.status).toBe(200)
+    const added = await api('post', '/').send({
+      date: '2025-09-24',
+      sold_birds: 50,
+      sold_weight: 110,
+    })
+    expect(added.status).toBe(201)
+
+    const { body } = await api('get', '/')
+    const rows = body.data.logs
+    expect(rows.map((row) => row.sold_birds)).toEqual([0, 100, 0, 50])
+    expect(rows[1].sold_weight).toBe(200)
+    expect(rows[1].birds_alive).toBe(3000 - 3 - 100)
+    expect(rows[2].birds_alive).toBe(3876 - 10 - 100)
+    expect(rows[3].birds_alive).toBe(3876 - 10 - 150)
+    expect(body.data.summary.total_sold_birds).toBe(150)
+    expect(body.data.summary.total_sold_weight).toBe(310)
+    expect(body.data.summary.avg_sale_weight).toBe(2.067)
+    expect(body.data.summary.birds_alive).toBe(3876 - 10 - 150)
+
+    const invalid = await api('post', '/').send({
+      date: '2025-09-26',
+      sold_birds: -1,
+    })
+    expect(invalid.status).toBe(400)
   })
 
   it('blocks changes once the batch is closed', async () => {

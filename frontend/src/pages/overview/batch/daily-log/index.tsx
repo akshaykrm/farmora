@@ -126,7 +126,7 @@ const DailyLogSection = ({ batchId, onChange }: Props) => {
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
             <p>
               No chick purchase found for this batch, so Chicks Placed and Birds
-              Alive are 0. A purchase is counted as chicks only when its
+              on Farm are 0. A purchase is counted as chicks only when its
               item&apos;s type is <strong>Chick</strong>. Check the item in the
               Items menu
               {startDate ? "." : ", or set the start date manually."}

@@ -62,7 +62,7 @@ const BatchStatusCard = ({ batch, selected, onSelect }: Props) => {
 
       <div className="grid grid-cols-3 gap-2">
         <Stat
-          label="Birds alive"
+          label="On farm"
           value={batch.total_chicks ? batch.birds_alive : "-"}
         />
         <Stat label="Mortality" value={batch.total_mortality} />
