@@ -26,6 +26,7 @@ import InvestorTransactionModel from './investorTransaction.js'
 import BrandModel from './brand.js'
 import ReferralPartnerModel from './referralpartner.js'
 import ReferralLedgerTransactionModel from './referralledgertransaction.js'
+import BatchDailyLogModel from './batchdailylog.js'
 UserModel.hasMany(SubscriptionModel, {
   foreignKey: 'user_id',
   as: 'subscriptions',
@@ -93,6 +94,17 @@ BatchModel.belongsTo(FarmModel, {
 BatchModel.belongsTo(SeasonModel, {
   foreignKey: 'season_id',
   as: 'season',
+  targetKey: 'id',
+})
+
+BatchModel.hasMany(BatchDailyLogModel, {
+  foreignKey: 'batch_id',
+  as: 'daily_logs',
+})
+
+BatchDailyLogModel.belongsTo(BatchModel, {
+  foreignKey: 'batch_id',
+  as: 'batch',
   targetKey: 'id',
 })
 
@@ -383,4 +395,5 @@ export {
   BrandModel,
   ReferralPartnerModel,
   ReferralLedgerTransactionModel,
+  BatchDailyLogModel,
 }

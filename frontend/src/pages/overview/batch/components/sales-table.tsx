@@ -6,16 +6,12 @@ import { roundNumber } from "@utils/number";
 import dayjs from "dayjs";
 import type { BatchOverviewSale, BatchOverviewSummary } from "../types";
 import { formatCurrency } from "@utils/currency";
-import { ClipText } from "@components/narration";
-import Tooltip from "@mui/material/Tooltip";
 
 const salesHeaders = [
   "Date",
   "Vehicle No",
-  "Narration",
   "Weight",
   "Birds",
-  "Avg Weight",
   "Price",
   "Amount",
 ];
@@ -43,21 +39,8 @@ const SalesTable = (props: Props) => {
           <TableRow key={index}>
             <TableCell content={dayjs(item.date).format("DD-MM-YYYY")} />
             <TableCell content={item.vehicle_no} />
-            <TableCell
-              content={
-                <Tooltip
-                  title={item.narration}
-                  placement="top"
-                  arrow
-                  disableHoverListener={!item.narration}
-                >
-                  <ClipText value={item.narration} />
-                </Tooltip>
-              }
-            />
             <TableCell content={item.weight ? item.weight : "-"} />
             <TableCell content={item.bird_no ?? "-"} />
-            <TableCell content={item.avg_weight ? item.avg_weight : "-"} />
             <TableCell content={formatCurrency(item.price)} />
             <TableCell content={formatCurrency(item.amount)} />
           </TableRow>
@@ -72,7 +55,6 @@ const SalesTable = (props: Props) => {
           <TableCell
             content={<strong>{roundNumber(total_sale_birds)}</strong>}
           />
-          <TableCell content="" />
           <TableCell content="" />
           <TableCell
             content={<strong>{formatCurrency(total_sale_amount)}</strong>}

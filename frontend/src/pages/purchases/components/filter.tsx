@@ -83,7 +83,7 @@ const FilterItems = (props: Props) => {
 
           <SelectList
             options={itemCategoryName.data?.map((t) => {
-              return { id: t.id, name: t.type };
+              return { id: t.id, name: `${t.name} (${t.type})` };
             })}
             value={values.category_id}
             onChange={(val) => {

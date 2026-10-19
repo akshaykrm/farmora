@@ -6,13 +6,11 @@ import { roundNumber } from "@utils/number";
 import dayjs from "dayjs";
 import type { BatchOverviewExpense, BatchOverviewSummary } from "../types";
 import { formatCurrency } from "@utils/currency";
-import { ClipText } from "@components/narration";
-import Tooltip from "@mui/material/Tooltip";
 
 const expenseHeaders = [
   "Date",
-  "Purpose",
-  "Narration",
+  "Supplier",
+  "Item",
   "Quantity",
   "Price",
   "Amount",
@@ -41,25 +39,19 @@ const ExpenseTable = (props: Props) => {
           return (
             <TableRow key={index}>
               <TableCell content={dayjs(item.date).format("DD-MM-YYYY")} />
+              <TableCell content={item.vendor?.name || "-"} />
               <TableCell
                 content={
-                  <span
-                    className={`capitalize ${item.return_type === "batch" ? "text-brand-danger" : ""}`}
+                  <div
+                    className={
+                      item.return_type === "batch" ? "text-brand-danger" : ""
+                    }
                   >
-                    {item.category.type}
-                  </span>
-                }
-              />
-              <TableCell
-                content={
-                  <Tooltip
-                    title={item.narration}
-                    placement="top"
-                    arrow
-                    disableHoverListener={!item.narration}
-                  >
-                    <ClipText value={item.narration} />
-                  </Tooltip>
+                    <p>{item.category?.name || "-"}</p>
+                    <p className="text-xs capitalize text-brand-ink-muted">
+                      {item.category?.type}
+                    </p>
+                  </div>
                 }
               />
               <TableCell content={item.quantity} />
@@ -72,8 +64,14 @@ const ExpenseTable = (props: Props) => {
         <TableRow>
           <TableCell content={<strong>Total</strong>} />
           <TableCell content="" />
+          <TableCell content="" />
           <TableCell
-            content={<strong>{roundNumber(total_purchase_feeds)}</strong>}
+            content={
+              <span>
+                <strong>{roundNumber(total_purchase_feeds)}</strong>{" "}
+                <span className="text-xs text-brand-ink-muted">feed bags</span>
+              </span>
+            }
           />
           <TableCell content="" />
           <TableCell

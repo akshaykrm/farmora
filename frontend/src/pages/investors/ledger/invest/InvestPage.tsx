@@ -1,5 +1,6 @@
 import PageTitle from '@components/PageTitle'
 import AddButton from '@components/AddButton'
+import ExportMenu from '@components/ExportMenu'
 import { useState } from 'react'
 import { Box } from '@mui/material'
 import { Dialog, DialogContent } from '@components/dialog'
@@ -25,7 +26,7 @@ const defaultFormValues: InvestorTransactionFormValues = {
 
 const InvestPage = () => {
   const { filter, updateQueryParams } = useLedgerFilter()
-  const { transactions } =
+  const { transactions, refetch } =
     useGetInvestorLedgerTransactions({ ...filter, category: 'CAPITAL' })
   const [isOpen, setOpenAdd] = useState(false)
   const [isReversalOpen, setReversalOpen] = useState(false)
@@ -47,6 +48,7 @@ const InvestPage = () => {
     onSuccess: () => {
       onClose()
       handleClose()
+      refetch({ page: 1 })
       updateQueryParams({ page: 1 })
       refetchBalance()
     },
@@ -71,7 +73,15 @@ const InvestPage = () => {
     <>
       <div className="flex items-center justify-between mb-6">
         <PageTitle title="Investments" />
-        <AddButton label="Investment" onClick={onOpen} />
+        <div className="flex gap-2">
+          <ExportMenu
+            permission="investor_ledger:export"
+            endpoint="investors/ledger/export"
+            filter={{ ...filter, category: 'CAPITAL' }}
+            filename="investments"
+          />
+          <AddButton label="Investment" onClick={onOpen} />
+        </div>
       </div>
       <InvestFilters defaultFilter={filter} onFilter={(f) => updateQueryParams(f)} />
       <div className="mt-4">

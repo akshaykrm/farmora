@@ -15,12 +15,15 @@ const EditItem = ({ selectedId, onClose, refetch }: Props) => {
 
   const { dataLoaded, selectedData } = useGetPurchaseById(selectedId);
 
-  const { clearError, errors, onSubmit } = useEditPurchase(selectedId, {
-    onSuccess: () => {
-      handleClose();
-      refetch();
+  const { clearError, errors, onSubmit, duplicateInvoice } = useEditPurchase(
+    selectedId,
+    {
+      onSuccess: () => {
+        handleClose();
+        refetch();
+      },
     },
-  });
+  );
 
   const handleClose = () => {
     onClose();
@@ -28,7 +31,12 @@ const EditItem = ({ selectedId, onClose, refetch }: Props) => {
   };
 
   return (
-    <Dialog isOpen={isShow} headerTitle="Edit Purchase" onClose={handleClose}>
+    <Dialog
+      isOpen={isShow}
+      headerTitle="Edit Purchase"
+      onClose={handleClose}
+      className="max-w-5xl"
+    >
       <DialogContent>
         <Ternary
           when={dataLoaded}
@@ -38,6 +46,7 @@ const EditItem = ({ selectedId, onClose, refetch }: Props) => {
               defaultValues={selectedData}
               apiError={errors}
               onCancel={handleClose}
+              duplicateInvoice={duplicateInvoice}
             />
           }
         />

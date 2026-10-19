@@ -20,6 +20,10 @@ export type Purchase = {
   quantity: number;
   price_per_unit: number;
   batch_id: number;
+  batch: {
+    id: number;
+    name: string;
+  };
   status: string;
   payment_type: "credit" | "paid";
   narration: string;
@@ -83,10 +87,16 @@ export type PurchaseFormValues = {
   narration: string;
 };
 
+export type DuplicateInvoice = {
+  invoice_number: string;
+  next_invoice_number: string;
+};
+
 type UsePurchaseReturn = {
   onSubmit: (inputData: PurchaseFormValues) => void;
   errors: ValidationError[];
   clearError: () => void;
+  duplicateInvoice: DuplicateInvoice | null;
 };
 
 type Opts = {

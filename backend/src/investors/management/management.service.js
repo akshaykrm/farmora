@@ -1,6 +1,7 @@
 import { Op } from 'sequelize'
 import InvestorManagementModel from '@models/investorManagement'
 import userRoles from '@utils/user-roles'
+import { calculateOffSet } from '@utils/pagination'
 import {
   InvestorNotFoundError,
   InvestorPhoneConflictError,
@@ -22,7 +23,7 @@ async function createInvestor(payload, currentUser) {
 
 async function getAllInvestors(payload, currentUser) {
   const { page, limit, search, start_date, end_date, ...filter } = payload
-  const offset = (page - 1) * limit
+  const offset = calculateOffSet(page, limit)
 
   if (search) {
     filter[Op.or] = [
@@ -44,6 +45,8 @@ async function getAllInvestors(payload, currentUser) {
 
   if (currentUser.user_type === userRoles.manager.type) {
     filter.master_id = currentUser.id
+  } else if (currentUser.user_type === userRoles.staff.type) {
+    filter.master_id = currentUser.master_id
   }
 
   const { count, rows } = await InvestorManagementModel.findAndCountAll({
@@ -65,6 +68,8 @@ async function getInvestorById(investorId, currentUser) {
 
   if (currentUser.user_type === userRoles.manager.type) {
     filter.master_id = currentUser.id
+  } else if (currentUser.user_type === userRoles.staff.type) {
+    filter.master_id = currentUser.master_id
   }
 
   const investorRecord = await InvestorManagementModel.findOne({

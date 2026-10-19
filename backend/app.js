@@ -11,6 +11,8 @@ import perimssionRouter from '@routes/permission.routes'
 import rolesRouter from '@routes/role.router'
 import seasonRouter from '@routes/season.router'
 import batchRouter from '@routes/batch.router'
+import batchDailyLogRouter from '@routes/batch-daily-log.router'
+import dailyLogDashboardRouter from '@routes/daily-log-dashboard.router'
 import vendorRouter from '@routes/vendor.router'
 import itemsRouter from '@routes/items.router'
 import purchaseRouter from '@routes/purchase.router'
@@ -29,21 +31,28 @@ import investorLedgerRoutes from './src/investors/ledger/ledger.routes.js'
 import brandRouter from '@routes/brand.router'
 import referralRoutes from './src/referrals/referral.routes.js'
 import setupRouter from '@routes/setup.router'
+import reportsRouter from '@routes/reports.router'
+import { reportCacheInvalidator } from './src/reports/report-cache.js'
+import { registerSnapshotHooks } from './src/reports/snapshots.js'
 
 import responseHandler from '@middlewares/response.middleware'
 import requestLogger from '@middlewares/request.middleware'
 import globalErrorHandler from '@middlewares/error.middleware'
+
+registerSnapshotHooks()
 
 const app = express()
 
 const { json } = bodyParser
 
 app.use(json())
-app.use(cors())
+app.use(cors({ exposedHeaders: ['Content-Disposition'] }))
 
 app.use(requestLogger)
 
 app.use(responseHandler)
+
+app.use(reportCacheInvalidator)
 
 app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes)
@@ -53,6 +62,8 @@ app.use('/api/subscriptions', subscriptionRouter)
 app.use('/api/permissions', perimssionRouter)
 app.use('/api/roles', rolesRouter)
 app.use('/api/seasons', seasonRouter)
+app.use('/api/batches/:batch_id/daily-logs', batchDailyLogRouter)
+app.use('/api/daily-logs', dailyLogDashboardRouter)
 app.use('/api/batches', batchRouter)
 app.use('/api/vendors', vendorRouter)
 app.use('/api/items', itemsRouter)
@@ -72,6 +83,7 @@ app.use('/api/investors', investorManagementRoutes)
 app.use('/api/brands', brandRouter)
 app.use('/api/referrals', referralRoutes)
 app.use('/api/setup', setupRouter)
+app.use('/api/reports', reportsRouter)
 
 app.get('/', (_, res) => {
   res.json({ message: 'server is up and running', status: 'ok' })

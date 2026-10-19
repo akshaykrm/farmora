@@ -10,6 +10,9 @@ const globalErrorHandler = (err, req, res, next) => {
   if (err.error) {
     error.error = err.error
   }
+  if (err.details) {
+    error.details = err.details
+  }
 
   const logChild = logger.child({ requestId: req.id, method: req.method, path: req.originalUrl, userId: req.user?.id })
 

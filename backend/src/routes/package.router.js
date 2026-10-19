@@ -9,7 +9,9 @@ import {
   newPackageSchema,
   updatePackageSchema,
 } from '@validators/package.validator'
-import validate from '@utils/validate-request'
+import validate, { validateQuery } from '@utils/validate-request'
+import platformExportController from '@controllers/platform-export.controller'
+import { exportQuerySchema } from '@validators/export.validator'
 
 const router = Router()
 
@@ -24,6 +26,14 @@ router.post(
 router.get('/names', packageController.getNames)
 
 router.get('/', packageController.getAll)
+
+router.get(
+  '/export',
+  isAuthenticated,
+  requirePermission(P.package_read, P.package_export),
+  validateQuery(exportQuerySchema),
+  platformExportController.packages
+)
 
 router.get('/:package_id', packageController.getById)
 

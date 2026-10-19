@@ -3,6 +3,7 @@ import PackageModel from '@models/package'
 import RoleModel from '@models/role'
 import { PackageNotFoundError } from '@errors/package.errors'
 import { PermissionDeniedError } from '@errors/auth.errors'
+import { calculateOffSet } from '@utils/pagination'
 
 const roleInclude = {
   model: RoleModel,
@@ -33,7 +34,7 @@ const create = async (insertData) => {
 
 const getAll = async (payload) => {
   const { limit, page, ...filter } = payload
-  const offset = (page - 1) * limit
+  const offset = calculateOffSet(page, limit)
 
   if (filter.name) {
     filter.name = { [Op.iLike]: `%${filter.name}%` }

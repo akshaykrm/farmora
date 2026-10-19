@@ -8,6 +8,7 @@ import FarmModel from '@models/farm'
 import SeasonModel from '@models/season'
 import { calculateOffSet } from '@utils/pagination'
 import logger from '@utils/logger'
+import { applyTenantMasterId } from '@utils/tenant-scope'
 
 const create = async (payload, currentUser) => {
   payload.name = payload.name.trim()
@@ -43,9 +44,7 @@ const getAll = async (payload, currentUser) => {
   if (filter.name) {
     filter.name = { [Op.iLike]: `%${filter.name}%` }
   }
-  if (currentUser.user_type === userRoles.manager.type) {
-    filter.master_id = currentUser.id
-  }
+  applyTenantMasterId(filter, currentUser)
   try {
     const { count, rows } = await BatchModel.findAndCountAll({
       where: filter,
