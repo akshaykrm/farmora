@@ -1,12 +1,11 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { Link } from "react-router";
+import type { Farm, Batch, Season, Transaction } from "../types";
 import type {
-  Farm,
-  Batch,
-  Season,
-  Transaction,
-} from "../types";
-import type { RecentPurchase, RecentSale, OpenBatchDetail } from "@app-types/dashboard.types";
+  RecentPurchase,
+  RecentSale,
+  OpenBatchDetail,
+} from "@app-types/dashboard.types";
 import PaginationWithLimit from "@components/pagination-with-limit";
 import { DEFAULT_FIRST_PAGE, DEFAULT_PAGE_LIMIT } from "@config";
 import dayjs from "dayjs";
@@ -25,10 +24,12 @@ const Badge = ({
   children: ReactNode;
 }) => {
   const styles = {
-    green: "bg-brand-success-soft text-brand-success-strong border-brand-success-soft",
+    green:
+      "bg-brand-success-soft text-brand-success-strong border-brand-success-soft",
     blue: "bg-brand-info-soft text-brand-info-strong border-brand-info-soft",
     slate: "bg-brand-canvas text-brand-ink-soft border-brand-border",
-    amber: "bg-brand-warning-soft text-brand-warning-strong border-brand-warning-soft",
+    amber:
+      "bg-brand-warning-soft text-brand-warning-strong border-brand-warning-soft",
     red: "bg-brand-danger-soft text-brand-danger-strong border-brand-danger-soft",
   };
   return (
@@ -61,7 +62,9 @@ export const FarmsListing = ({ data }: { data: Farm[] }) => (
               <td className="px-4 py-2.5 font-bold text-brand-ink">
                 {farm.name}
               </td>
-              <td className="px-4 py-2.5 text-brand-ink-muted">{farm.place || "-"}</td>
+              <td className="px-4 py-2.5 text-brand-ink-muted">
+                {farm.place || "-"}
+              </td>
               <td className="px-4 py-2.5 text-brand-ink-soft font-medium">
                 {farm.capacity || "-"}
               </td>
@@ -76,7 +79,9 @@ export const FarmsListing = ({ data }: { data: Farm[] }) => (
       </table>
     </div>
     {data.length === 0 && (
-      <div className="p-4 pt-8 text-center text-brand-ink-muted flex items-start justify-center flex-1">No farms found</div>
+      <div className="p-4 pt-8 text-center text-brand-ink-muted flex items-start justify-center flex-1">
+        No farms found
+      </div>
     )}
   </div>
 );
@@ -130,7 +135,9 @@ export const BatchesListing = ({ data }: { data: Batch[] }) => (
       </table>
     </div>
     {data.length === 0 && (
-      <div className="p-4 pt-8 text-center text-brand-ink-muted flex items-start justify-center flex-1">No batches found</div>
+      <div className="p-4 pt-8 text-center text-brand-ink-muted flex items-start justify-center flex-1">
+        No batches found
+      </div>
     )}
   </div>
 );
@@ -185,7 +192,9 @@ export const SeasonsListing = ({ data }: { data: Season[] }) => (
       </table>
     </div>
     {data.length === 0 && (
-      <div className="p-4 pt-8 text-center text-brand-ink-muted flex items-start justify-center flex-1">No seasons found</div>
+      <div className="p-4 pt-8 text-center text-brand-ink-muted flex items-start justify-center flex-1">
+        No seasons found
+      </div>
     )}
   </div>
 );
@@ -227,7 +236,9 @@ export const SalesListing = ({ data }: { data: RecentSale[] }) => (
                 {sale.birds?.toLocaleString() ?? "-"}
               </td>
               <td className="px-4 py-2.5">
-                <Badge variant={sale.payment_type === "paid" ? "green" : "amber"}>
+                <Badge
+                  variant={sale.payment_type === "paid" ? "green" : "amber"}
+                >
                   {sale.payment_type}
                 </Badge>
               </td>
@@ -240,7 +251,9 @@ export const SalesListing = ({ data }: { data: RecentSale[] }) => (
       </table>
     </div>
     {data.length === 0 && (
-      <div className="p-4 pt-8 text-center text-brand-ink-muted flex items-start justify-center flex-1">No sales found</div>
+      <div className="p-4 pt-8 text-center text-brand-ink-muted flex items-start justify-center flex-1">
+        No sales found
+      </div>
     )}
   </div>
 );
@@ -291,12 +304,20 @@ export const PurchasesListing = ({ data }: { data: RecentPurchase[] }) => (
       </table>
     </div>
     {data.length === 0 && (
-      <div className="p-4 pt-8 text-center text-brand-ink-muted flex items-start justify-center flex-1">No purchases found</div>
+      <div className="p-4 pt-8 text-center text-brand-ink-muted flex items-start justify-center flex-1">
+        No purchases found
+      </div>
     )}
   </div>
 );
 
-export const OpenBatchesListing = ({ data }: { data: OpenBatchDetail[] }) => {
+export const OpenBatchesListing = ({
+  data,
+  emptyMessage = "No open batches found",
+}: {
+  data: OpenBatchDetail[];
+  emptyMessage?: string;
+}) => {
   const [page, setPage] = useState(DEFAULT_FIRST_PAGE);
   const [limit, setLimit] = useState(DEFAULT_PAGE_LIMIT);
 
@@ -353,7 +374,9 @@ export const OpenBatchesListing = ({ data }: { data: OpenBatchDetail[] }) => {
                       {batch.number_of_chicks.toLocaleString()}
                     </td>
                     <td className="px-4 py-2.5 text-brand-ink-soft font-medium text-xs">
-                      {batch.number_of_days != null ? batch.number_of_days : "-"}
+                      {batch.number_of_days != null
+                        ? batch.number_of_days
+                        : "-"}
                     </td>
                     <td className="px-4 py-2.5 text-brand-ink-muted text-xs">
                       {batch.season_name}
@@ -366,7 +389,7 @@ export const OpenBatchesListing = ({ data }: { data: OpenBatchDetail[] }) => {
         </div>
         {data.length === 0 && (
           <div className="p-4 pt-8 text-center text-brand-ink-muted flex items-start justify-center flex-1">
-            No open batches found
+            {emptyMessage}
           </div>
         )}
       </div>
@@ -451,7 +474,9 @@ export const TransactionsListing = ({ data }: { data: Transaction[] }) => (
               </td>
               <td
                 className={`px-4 py-2.5 font-bold text-base ${
-                  tx.type === "credit" ? "text-brand-success" : "text-brand-danger"
+                  tx.type === "credit"
+                    ? "text-brand-success"
+                    : "text-brand-danger"
                 }`}
               >
                 {tx.type === "credit" ? "+" : "-"}₹{tx.amount.toLocaleString()}

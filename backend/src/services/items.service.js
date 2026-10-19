@@ -5,6 +5,7 @@ import ItemModel from '@models/items.model'
 import userRoles from '@utils/user-roles'
 import { Op } from 'sequelize'
 import { calculateOffSet } from '@utils/pagination'
+import { tenantMasterId } from '@utils/tenant-scope'
 
 const create = async (payload, currentUser) => {
   payload.status = 'active'
@@ -112,40 +113,69 @@ const deleteById = async (itemCategoryId, currentUser) => {
   itemCategory.destroy()
 }
 
-const getIntegrationItem = async (currentUser) => {
-  const filter = {
-    type: 'integration',
-  }
+export const SYSTEM_ITEMS = [
+  { name: 'Integration Cost', type: 'integration', base_price: 0 },
+  { name: 'Working Cost', type: 'working', base_price: 0 },
+  { name: 'General', type: 'general', base_price: 0 },
+]
 
-  if (currentUser.user_type === userRoles.staff.type) {
-    filter.master_id = currentUser.master_id
-  } else {
-    filter.master_id = currentUser.id
-  }
+export const SYSTEM_ITEM_TYPES = SYSTEM_ITEMS.map((item) => item.type)
 
-  const itemCategoryRecord = await ItemModel.findOne({
-    where: filter,
+export const findOrCreateInternalVendor = async (masterId, transaction) => {
+  const existing = await VendorModel.findOne({
+    where: { master_id: masterId, vendor_type: 'internal' },
+    order: [['id', 'ASC']],
+    transaction,
   })
+  if (existing) return existing
 
-  return itemCategoryRecord.toJSON()
+  return VendorModel.create(
+    {
+      name: 'Internal',
+      vendor_type: 'internal',
+      address: 'nil',
+      opening_balance: 0,
+      status: 'active',
+      master_id: masterId,
+    },
+    { transaction }
+  )
+}
+
+const ensureSystemItem = async (type, currentUser, transaction) => {
+  const definition = SYSTEM_ITEMS.find((item) => item.type === type)
+  if (!definition) {
+    throw new Error(`unknown system item type: ${type}`)
+  }
+
+  const masterId = tenantMasterId(currentUser)
+  const existing = await ItemModel.findOne({
+    where: { master_id: masterId, type },
+    order: [['id', 'ASC']],
+    transaction,
+  })
+  if (existing) return existing
+
+  const vendor = await findOrCreateInternalVendor(masterId, transaction)
+  return ItemModel.create(
+    {
+      ...definition,
+      vendor_id: vendor.id,
+      master_id: masterId,
+      status: 'active',
+    },
+    { transaction }
+  )
+}
+
+const getIntegrationItem = async (currentUser) => {
+  const item = await ensureSystemItem('integration', currentUser)
+  return item.toJSON()
 }
 
 const getWorkingItem = async (currentUser) => {
-  const filter = {
-    type: 'working',
-  }
-
-  if (currentUser.user_type === userRoles.staff.type) {
-    filter.master_id = currentUser.master_id
-  } else {
-    filter.master_id = currentUser.id
-  }
-
-  const itemCategoryRecord = await ItemModel.findOne({
-    where: filter,
-  })
-
-  return itemCategoryRecord.toJSON()
+  const item = await ensureSystemItem('working', currentUser)
+  return item.toJSON()
 }
 
 const itemService = {
@@ -158,6 +188,7 @@ const itemService = {
   getItemsByVendorId,
   getIntegrationItem,
   getWorkingItem,
+  ensureSystemItem,
 }
 
 export default itemService

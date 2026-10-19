@@ -20,7 +20,6 @@ import vendorService from '@services/vendor.service'
 import userRoles from '@utils/user-roles'
 import userService from '@services/user.service'
 import dayjs from 'dayjs'
-import itemService from '@services/items.service'
 import referralBonusService from '@services/referral-bonus.service'
 
 const createManager = async (payload) => {
@@ -82,34 +81,7 @@ const createManager = async (payload) => {
       }
     )
 
-    const newVendor = await vendorService.createInternalVendor(newUser)
-
-    await itemService.create(
-      {
-        name: 'Integration Cost',
-        vendor_id: newVendor.id,
-        type: 'integration',
-      },
-      newUser
-    )
-
-    await itemService.create(
-      {
-        name: 'Working Cost',
-        vendor_id: newVendor.id,
-        type: 'working',
-      },
-      newUser
-    )
-
-    await itemService.create(
-      {
-        name: 'General',
-        vendor_id: newVendor.id,
-        type: 'general',
-      },
-      newUser
-    )
+    await vendorService.createInternalVendor(newUser)
 
     await transaction.commit()
     await InvoiceConfig.create({

@@ -4,7 +4,14 @@ import MetricCard from "./components/MetricCard";
 import SectionHeader from "./components/SectionHeader";
 import SeasonProfitChart from "./components/SeasonProfitChart";
 import SubscriptionStatusCard from "./components/SubscriptionStatusCard";
-import { PurchasesListing, SalesListing, OpenBatchesListing } from "./components/DataListings";
+import SetupChecklistCard from "./components/SetupChecklistCard";
+import setupApi from "@api/setup.api";
+import usePermissions from "@hooks/use-permissions";
+import {
+  PurchasesListing,
+  SalesListing,
+  OpenBatchesListing,
+} from "./components/DataListings";
 import dashboardApi from "@api/dashboard.api";
 import type { ManagerDashboardData } from "@app-types/dashboard.types";
 import { CircularProgress, Box } from "@mui/material";
@@ -16,6 +23,13 @@ const ManagerDashboard = () => {
   const { data, isLoading, error } = useQuery<ManagerDashboardData>({
     queryKey: ["manager-dashboard"],
     queryFn: dashboardApi.fetchManagerDashboard,
+  });
+
+  const { isSubscriber } = usePermissions();
+  const { data: setupStatus } = useQuery({
+    queryKey: ["setup-status"],
+    queryFn: setupApi.fetchStatus,
+    enabled: isSubscriber,
   });
 
   if (isLoading) {
@@ -45,6 +59,8 @@ const ManagerDashboard = () => {
           Welcome back! Here's what's happening with your farm today.
         </p>
       </div>
+
+      <SetupChecklistCard />
 
       <SubscriptionStatusCard subscriptionInfo={data.subscription} />
 
@@ -127,7 +143,14 @@ const ManagerDashboard = () => {
             </svg>
           }
         />
-        <OpenBatchesListing data={data.openBatches ?? []} />
+        <OpenBatchesListing
+          data={data.openBatches ?? []}
+          emptyMessage={
+            setupStatus && !setupStatus.items.batch
+              ? "No batches yet. Use \u201cSet up your farm\u201d above to create your first batch."
+              : undefined
+          }
+        />
       </section>
 
       {/* RECENT PURCHASES & SALES */}
