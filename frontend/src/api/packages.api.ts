@@ -10,6 +10,7 @@ export type PackageFormValues = {
   actual_price: number;
   discount_price: number;
   duration: number;
+  farm_limit: number | null;
   status: string;
   referral_bonus_type: "none" | "fixed" | "percentage";
   referral_bonus_value: number | null;

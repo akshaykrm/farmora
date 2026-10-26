@@ -8,3 +8,6 @@ export const generateToken = (user) => {
     expiresIn: '24h',
   })
 }
+
+export const generateCheckoutToken = (user) =>
+  sign({ id: user.id, purpose: 'checkout' }, CONFIG.jwt_secret, { expiresIn: '1h' })

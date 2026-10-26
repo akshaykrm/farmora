@@ -28,6 +28,7 @@ interface Package {
   discount_price: string;
   price?: string;
   duration: number;
+  farm_limit: number | null;
   status: string;
 }
 
@@ -132,6 +133,11 @@ const PackagesSection = () => {
                         {pkg.description}
                       </p>
                       <div className="space-y-3">
+                        <p className="font-semibold text-brand-ink">
+                          {pkg.farm_limit == null
+                            ? "Unlimited farms"
+                            : `${pkg.farm_limit} ${pkg.farm_limit === 1 ? "farm" : "farms"}`}
+                        </p>
                         {PACKAGE_FEATURES[pkg.name]?.map((feature, i) => (
                           <div key={i} className="flex items-start gap-3">
                             <div className="w-5 h-5 bg-brand-canvas rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -146,7 +152,7 @@ const PackagesSection = () => {
                     </CardContent>
 
                     <CardActions sx={{ p: 4, pt: 0 }}>
-                      {pkg.name === "Basic" && pkg.status === "active" ? (
+                      {pkg.status === "active" ? (
                         <Button
                           variant="contained"
                           fullWidth

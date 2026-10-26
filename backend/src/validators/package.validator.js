@@ -9,6 +9,7 @@ export const newPackageSchema = Joi.object({
     .max(Joi.ref('actual_price'))
     .required(),
   duration: Joi.number().integer().positive().required(),
+  farm_limit: Joi.number().integer().min(0).max(2147483647).allow(null).optional(),
   status: Joi.string()
     .valid('active', 'inactive', 'disabled')
     .optional(),

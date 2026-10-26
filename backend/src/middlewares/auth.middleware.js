@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken'
+import { assertAccountApproved } from '@services/account-approval.service'
 import userRoles from '@utils/user-roles'
 import {
   MissingTokenError,
@@ -19,6 +20,7 @@ export const isAuthenticated = asyncHandler(async function (req, res, next) {
   if (!token) throw new MissingTokenError()
 
   const decoded = verify(token, CONFIG.jwt_secret)
+  if (decoded.purpose) throw new UnauthorizedError()
 
   const authenticatedUser = await userService.getById(decoded.id)
 
@@ -26,9 +28,10 @@ export const isAuthenticated = asyncHandler(async function (req, res, next) {
     throw new MissingTokenError()
   }
 
-  const permissions = await permissionService.resolvePermissionKeys(
-    authenticatedUser
-  )
+  await assertAccountApproved(authenticatedUser)
+
+  const permissions =
+    await permissionService.resolvePermissionKeys(authenticatedUser)
 
   authenticatedUser.master_id = getMasterId(authenticatedUser)
   authenticatedUser.permissions = permissions

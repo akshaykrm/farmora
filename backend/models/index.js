@@ -27,6 +27,10 @@ import BrandModel from './brand.js'
 import ReferralPartnerModel from './referralpartner.js'
 import ReferralLedgerTransactionModel from './referralledgertransaction.js'
 import BatchDailyLogModel from './batchdailylog.js'
+UserModel.belongsTo(PackageModel, {
+  foreignKey: 'requested_package_id',
+  as: 'requested_package',
+})
 UserModel.hasMany(SubscriptionModel, {
   foreignKey: 'user_id',
   as: 'subscriptions',

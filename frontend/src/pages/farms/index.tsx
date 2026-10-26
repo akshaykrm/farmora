@@ -5,7 +5,10 @@ import { useState } from "react";
 import AddFarm from "./components/add-farm";
 import EditFarm from "./components/edit-farm";
 import FarmTable from "./components/table";
-import { Box } from "@mui/material";
+import { Alert, Box, Button } from "@mui/material";
+import { useQuery } from "@tanstack/react-query";
+import farmsApi from "./api";
+import usePermissions from "@hooks/use-permissions";
 import useGetFarms from "./hooks/use-get-farms";
 import useFarmFilter from "./hooks/use-farm-filter";
 import PaginationWithLimit from "@components/pagination-with-limit";
@@ -16,6 +19,11 @@ const FarmsPage = () => {
   const { filter, updateQueryParams } = useFarmFilter();
 
   const { farms, refetch } = useGetFarms(filter);
+  const { can, user } = usePermissions();
+  const allowance = useQuery({
+    queryKey: ["farm-allowance", user?.master_id],
+    queryFn: farmsApi.getAllowance,
+  });
 
   const onOpen = () => setOpenAdd(true);
   const onClose = () => setOpenAdd(false);
@@ -32,10 +40,42 @@ const FarmsPage = () => {
               filter={filter}
               filename="farms"
             />
-            <AddButton label="Farm" onClick={onOpen} />
+            {can("farm:write") && (
+              <AddButton
+                label="Farm"
+                onClick={onOpen}
+                disabled={!allowance.data?.can_create || allowance.isFetching}
+              />
+            )}
           </div>
         }
       />
+      {allowance.data && (
+        <Alert
+          severity={allowance.data.can_create ? "info" : "warning"}
+          className="mb-4"
+        >
+          {allowance.data.package_name || "Current package"}:{" "}
+          {allowance.data.used} / {allowance.data.limit ?? "unlimited"} farms
+          used.
+          {!allowance.data.subscription_active
+            ? " An active subscription is required to add farms."
+            : !allowance.data.can_create
+              ? " Farm limit reached. Upgrade your package to add another farm. Existing farms remain available."
+              : allowance.data.remaining != null
+                ? ` You can add ${allowance.data.remaining} more.`
+                : ""}
+        </Alert>
+      )}
+      {allowance.error && (
+        <Alert
+          severity="error"
+          className="mb-4"
+          action={<Button onClick={() => allowance.refetch()}>Retry</Button>}
+        >
+          Unable to load farm allowance. {allowance.error.message}
+        </Alert>
+      )}
       <div>
         <FarmTable onEdit={(id) => setSelectedId(id)} farms={farms.records} />
       </div>

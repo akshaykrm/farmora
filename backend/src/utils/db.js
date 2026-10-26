@@ -8,6 +8,7 @@ const formatSql = (sql) => sql.trim().replace(/\s+/g, ' ')
 
 export const sequelize = new Sequelize(db_name, db_user, db_password, {
   host: db_host,
+  port: CONFIG.db_port,
   dialect: db_dialect,
   benchmark: true,
   logging: (sql, timing) => {

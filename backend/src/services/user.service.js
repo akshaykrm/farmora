@@ -262,6 +262,13 @@ const update = async (userId, payload, currentUser) => {
   const userFields = { ...rawFields }
   delete userFields.parent_id
   delete userFields.user_type
+  for (const field of [
+    'approval_status',
+    'approved_by',
+    'approved_at',
+    'requested_package_id',
+  ])
+    delete userFields[field]
 
   if (currentUser.user_type !== userRoles.admin.type) {
     delete userFields.status
@@ -386,7 +393,15 @@ const getAll = async (payload = {}, currentUser) => {
   }
 
   const { count, rows } = await UserModel.findAndCountAll({
-    include: [subscriptionListInclude],
+    include: [
+      subscriptionListInclude,
+      {
+        model: PackageModel,
+        as: 'requested_package',
+        attributes: ['id', 'name'],
+        required: false,
+      },
+    ],
     where: filter,
     limit,
     offset,

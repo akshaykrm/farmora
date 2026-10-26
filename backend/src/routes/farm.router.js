@@ -11,6 +11,12 @@ import configExportController from '@controllers/config-export.controller'
 import { exportQuerySchema } from '@validators/export.validator'
 
 const router = Router()
+router.get(
+  '/allowance',
+  isAuthenticated,
+  requirePermission(P.farm_read),
+  farmController.getAllowance
+)
 
 router.post(
   '/',

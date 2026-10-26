@@ -27,6 +27,7 @@ const emptyForm: PackageFormValues = {
   actual_price: 0,
   discount_price: 0,
   duration: 1,
+  farm_limit: null,
   status: "active",
   referral_bonus_type: "none",
   referral_bonus_value: null,
@@ -87,6 +88,7 @@ const PackagesPage = () => {
         actual_price: Number(res.data.actual_price),
         discount_price: Number(res.data.discount_price ?? 0),
         duration: res.data.duration,
+        farm_limit: res.data.farm_limit ?? null,
         status: res.data.status,
         referral_bonus_type: res.data.referral_bonus_type || "none",
         referral_bonus_value:
@@ -147,24 +149,30 @@ const PackagesPage = () => {
             "Name",
             "Price",
             "Duration",
+            "Farm limit",
             "System Role",
             "Referral Bonus",
             "Status",
             "Edit",
-          ].map(
-            (header) => (
-              <TableHeaderCell key={header} content={header} />
-            ),
-          )}
+          ].map((header) => (
+            <TableHeaderCell key={header} content={header} />
+          ))}
         </TableRow>
         {rows.map((row, i) => (
           <TableRow key={row.id}>
             <TableCell content={i + 1} />
             <TableCell content={row.name} />
             <TableCell
-              content={<PackagePriceDisplay pkg={row} duration={row.duration} size="compact" />}
+              content={
+                <PackagePriceDisplay
+                  pkg={row}
+                  duration={row.duration}
+                  size="compact"
+                />
+              }
             />
             <TableCell content={row.duration} />
+            <TableCell content={row.farm_limit ?? "Unlimited"} />
             <TableCell content={row.role?.name || "—"} />
             <TableCell
               content={
@@ -210,7 +218,10 @@ const PackagesPage = () => {
         onClose={() => setIsOpen(false)}
       >
         <DialogContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 gap-4">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="grid grid-cols-1 gap-4"
+          >
             <TextField
               label="Name"
               size="small"
@@ -240,6 +251,25 @@ const PackagesPage = () => {
               size="small"
               type="number"
               {...register("duration", { valueAsNumber: true })}
+            />
+            <TextField
+              label="Farm limit"
+              size="small"
+              type="number"
+              slotProps={{ htmlInput: { min: 0, step: 1 } }}
+              {...register("farm_limit", {
+                setValueAs: (value) =>
+                  value === "" || value == null ? null : Number(value),
+                validate: (value) =>
+                  value == null ||
+                  (Number.isInteger(value) && value >= 0) ||
+                  "Enter a whole number of farms, 0 or more.",
+              })}
+              error={Boolean(formState.errors.farm_limit)}
+              helperText={
+                formState.errors.farm_limit?.message ||
+                "Leave blank for unlimited farms. 0 prevents farm creation. Changes apply to current subscribers."
+              }
             />
             <TextField
               select

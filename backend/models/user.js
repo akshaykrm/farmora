@@ -47,6 +47,15 @@ const UserModel = sequelize.define(
       defaultValue: 0,
       field: 'status',
     },
+    approval_status: {
+      type: Sequelize.STRING(20),
+      allowNull: false,
+      defaultValue: 'approved',
+      validate: { isIn: [['pending', 'approved']] },
+    },
+    requested_package_id: { type: Sequelize.INTEGER, allowNull: true },
+    approved_at: { type: Sequelize.DATE, allowNull: true },
+    approved_by: { type: Sequelize.INTEGER, allowNull: true },
     parent_id: {
       type: Sequelize.INTEGER,
       defaultValue: 0,

@@ -4,6 +4,7 @@ import SeasonModel from '@models/season'
 import BatchModel from '@models/batch'
 import VendorModel from '@models/vendor'
 import UserModel from '@models/user'
+import farmService from '@services/farm.service'
 import ItemModel from '@models/items.model'
 import { sequelize } from '@utils/db'
 import { tenantMasterId } from '@utils/tenant-scope'
@@ -135,10 +136,12 @@ const generateDefaults = async (currentUser) => {
   const created = {}
 
   await sequelize.transaction(async (transaction) => {
+    await UserModel.findByPk(masterId, { transaction, lock: transaction.LOCK.UPDATE })
     let farm = await findFirst(FarmModel, { master_id: masterId }, transaction)
     if (!farm) {
-      farm = await FarmModel.create(
+      farm = await farmService.create(
         { ...defaults.farm, master_id: masterId, own: true, status: 'active' },
+        currentUser,
         { transaction }
       )
       created.farm = farm
