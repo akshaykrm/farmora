@@ -28,6 +28,7 @@ interface Package {
   discount_price: string;
   price?: string;
   duration: number;
+  farm_limit: number | null;
   status: string;
 }
 
@@ -132,6 +133,11 @@ const PackagesSection = () => {
                         {pkg.description}
                       </p>
                       <div className="space-y-3">
+                        <p className="font-semibold text-brand-ink">
+                          {pkg.farm_limit == null
+                            ? "Unlimited farms"
+                            : `${pkg.farm_limit} ${pkg.farm_limit === 1 ? "farm" : "farms"}`}
+                        </p>
                         {PACKAGE_FEATURES[pkg.name]?.map((feature, i) => (
                           <div key={i} className="flex items-start gap-3">
                             <div className="w-5 h-5 bg-brand-canvas rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -146,19 +152,31 @@ const PackagesSection = () => {
                     </CardContent>
 
                     <CardActions sx={{ p: 4, pt: 0 }}>
-                      <Button
-                        variant={
-                          pkg.status === "active" ? "contained" : "outlined"
-                        }
-                        fullWidth
-                        size="large"
-                        disabled={pkg.status !== "active"}
-                        onClick={() => handleGetStarted(pkg)}
-                      >
-                        {pkg.status === "active"
-                          ? "Get Started"
-                          : "Coming Soon"}
-                      </Button>
+                      {pkg.status === "active" ? (
+                        <Button
+                          variant="contained"
+                          fullWidth
+                          size="large"
+                          onClick={() => handleGetStarted(pkg)}
+                        >
+                          Get Started
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="contained"
+                          fullWidth
+                          size="large"
+                          disabled
+                          sx={{
+                            "&.Mui-disabled": {
+                              bgcolor: "#ffffff",
+                              color: "#111111",
+                            },
+                          }}
+                        >
+                          Coming Soon
+                        </Button>
+                      )}
                     </CardActions>
                   </Card>
                 </RevealDiv>

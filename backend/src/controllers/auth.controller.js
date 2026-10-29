@@ -1,16 +1,32 @@
-import { generateToken } from '@utils/jwt'
+import { generateToken, generateCheckoutToken } from '@utils/jwt'
 import asyncHandler from '@utils/async-handler'
 import authService from '@services/auth.service'
 import permissionService, { getMasterId } from '@services/permission.service'
 
 const createManager = async (req, res) => {
   const user = await authService.createManager(req.body)
-  res.success(user, { message: 'user created', statusCode: 201 })
+  const safeUser = user.toJSON()
+  delete safeUser.password
+  res.success(
+    {
+      ...safeUser,
+      checkout_token: user.getDataValue('checkout_required')
+        ? generateCheckoutToken(user)
+        : null,
+    },
+    { message: 'user created', statusCode: 201 }
+  )
 }
 
 const login = async (req, res) => {
   const { username, password } = req.body
   const user = await authService.login(username, password)
+  if (user.getDataValue('checkout_required')) {
+    return res.success(
+      { checkout_required: true, checkout_token: generateCheckoutToken(user) },
+      { message: 'Complete package checkout to continue' }
+    )
+  }
   const permissions = await permissionService.resolvePermissionKeys(user)
 
   const responseObject = {

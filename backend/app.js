@@ -34,6 +34,10 @@ import setupRouter from '@routes/setup.router'
 import reportsRouter from '@routes/reports.router'
 import { reportCacheInvalidator } from './src/reports/report-cache.js'
 import { registerSnapshotHooks } from './src/reports/snapshots.js'
+import settingsRouter from '@routes/settings.router'
+import checkoutRouter from '@routes/checkout.router'
+import checkoutService from '@services/checkout.service'
+import asyncHandler from '@utils/async-handler'
 
 import responseHandler from '@middlewares/response.middleware'
 import requestLogger from '@middlewares/request.middleware'
@@ -45,12 +49,24 @@ const app = express()
 
 const { json } = bodyParser
 
-app.use(json())
 app.use(cors({ exposedHeaders: ['Content-Disposition'] }))
 
 app.use(requestLogger)
 
 app.use(responseHandler)
+
+// Razorpay signs the exact bytes. Mount before any JSON body parser.
+app.post(
+  '/api/payments/razorpay/webhook',
+  express.raw({ type: 'application/json', limit: '256kb' }),
+  asyncHandler(async (req, res) => {
+    await checkoutService.webhook(req.body, req.headers['x-razorpay-signature'])
+    res.success({ received: true })
+  })
+)
+app.use(json())
+app.use('/api/settings', settingsRouter)
+app.use('/api/checkout', checkoutRouter)
 
 app.use(reportCacheInvalidator)
 
@@ -94,7 +110,11 @@ app.use((req, res) => {
     status: 'failed',
     data: null,
     message: `Route ${req.method} ${req.originalUrl} not found`,
-    error: { message: `Route not found`, name: 'NotFoundError', code: 'NOT_FOUND' },
+    error: {
+      message: `Route not found`,
+      name: 'NotFoundError',
+      code: 'NOT_FOUND',
+    },
   })
 })
 

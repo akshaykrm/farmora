@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import {
   isAuthenticated,
+  isSuperAdmin,
   requirePermission,
 } from '@middlewares/auth.middleware'
 import { PERMISSION_KEYS as P } from '../../config/permissions.js'
@@ -16,11 +17,37 @@ import configExportController from '@controllers/config-export.controller'
 import platformExportController from '@controllers/platform-export.controller'
 import { exportQuerySchema } from '@validators/export.validator'
 
+import asyncHandler from '@utils/async-handler'
+import {
+  approveAccount,
+  revokeAccountApproval,
+} from '@services/account-approval.service'
+
 const router = Router()
 
 router.use(isAuthenticated)
 
+router.post(
+  '/:user_id/approve',
+  isSuperAdmin,
+  asyncHandler(async (req, res) => {
+    res.success(await approveAccount(req.params.user_id, req.user), {
+      message: 'Subscriber approved',
+    })
+  })
+)
+
 router.get('/me', userController.getMe)
+
+router.post(
+  '/:user_id/revoke-approval',
+  isSuperAdmin,
+  asyncHandler(async (req, res) => {
+    res.success(await revokeAccountApproval(req.params.user_id, req.user), {
+      message: 'Subscriber approval revoked',
+    })
+  })
+)
 
 router.put('/me', validate(updateProfileSchema), userController.updateMe)
 

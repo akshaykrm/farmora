@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { isAuthenticated } from '@middlewares/auth.middleware'
+import { isAuthenticated, isSuperAdmin } from '@middlewares/auth.middleware'
 import {
   changePasswordSchema,
   newManageSchema,
@@ -16,6 +16,8 @@ router.post('/login', authController.login)
 
 router.post(
   '/reset-password',
+  isAuthenticated,
+  isSuperAdmin,
   validate(resetPasswordSchema),
   authController.resetPassword
 )

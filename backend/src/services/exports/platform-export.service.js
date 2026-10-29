@@ -78,6 +78,7 @@ const packages = async (filter) => {
       discount_price: pkg.discount_price,
       price: getEffectivePackagePrice(pkg),
       duration: pkg.duration,
+      farm_limit: pkg.farm_limit ?? 'Unlimited',
       role: pkg.role?.name,
       referral_bonus: bonusLabel(
         pkg.referral_bonus_type,
@@ -103,6 +104,7 @@ const packages = async (filter) => {
           { key: 'discount_price', header: 'Discount', type: 'currency' },
           { key: 'price', header: 'Price', type: 'currency' },
           { key: 'duration', header: 'Duration (months)', type: 'number' },
+          { key: 'farm_limit', header: 'Farm limit' },
           { key: 'role', header: 'System Role' },
           { key: 'referral_bonus', header: 'Referral Bonus' },
           { key: 'status', header: 'Status', width: 0.8 },

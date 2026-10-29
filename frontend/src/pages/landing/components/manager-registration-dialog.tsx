@@ -5,6 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Check, CircleCheck, X } from "lucide-react";
 import { useNavigate } from "react-router";
 import auth from "@api/auth.api";
+import { CHECKOUT_TOKEN_KEY } from "@api/checkout.api";
 import type { ManagerRegistrationPayload } from "@app-types/auth.types";
 import { BASIC_FEATURES } from "../content/landing-content";
 import {
@@ -84,7 +85,9 @@ const ManagerRegistrationDialog = ({
   const [showPassword, setShowPassword] = useState(false);
   const [showReferral, setShowReferral] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [result, setResult] = useState<"skipped" | "complete" | null>(null);
+  const [result, setResult] = useState<
+    "skipped" | "complete" | "pending" | null
+  >(null);
   const [skipped, setSkipped] = useState(false);
 
   const cardRef = useRef<HTMLDivElement>(null);
@@ -115,8 +118,19 @@ const ManagerRegistrationDialog = ({
       payload: ManagerRegistrationPayload;
       skipped: boolean;
     }) => auth.registerManager(variables.payload),
-    onSuccess: (_data, variables) => {
+    onSuccess: (data, variables) => {
       setSubmitError(null);
+      if (data.approval_required) {
+        sessionStorage.removeItem(CHECKOUT_TOKEN_KEY);
+        setResult("pending");
+        return;
+      }
+      if (data.checkout_required) {
+        sessionStorage.setItem(CHECKOUT_TOKEN_KEY, data.checkout_token);
+        onClose();
+        navigate("/checkout");
+        return;
+      }
       setResult(variables.skipped ? "skipped" : "complete");
     },
     onError: (error: unknown) => {
@@ -312,9 +326,9 @@ const ManagerRegistrationDialog = ({
             manage. Profit and loss, cost per kg and reports update as you go,
             so you always know where each batch stands.
           </p>
-          <section className="rf-package" aria-label="Basic package">
+          <section className="rf-package" aria-label={`${packageName} package`}>
             <div className="rf-package-head">
-              <h3 className="rf-package-title">Basic package</h3>
+              <h3 className="rf-package-title">{packageName} package</h3>
               {packageName && (
                 <span className="rf-package-badge">{packageName}</span>
               )}
@@ -355,9 +369,11 @@ const ManagerRegistrationDialog = ({
                 Account created
               </h2>
               <p>
-                {result === "skipped"
-                  ? "Your account has been created. You can add your farm details later from your profile."
-                  : "Your account and farm details have been saved. You can sign in and start managing your farm."}
+                {result === "pending"
+                  ? "Your account is awaiting admin approval. Once approved, sign in to complete your package checkout and start using the app."
+                  : result === "skipped"
+                    ? "Your account has been created. You can add your farm details later from your profile."
+                    : "Your account and farm details have been saved. You can sign in and start managing your farm."}
               </p>
               <button
                 type="button"

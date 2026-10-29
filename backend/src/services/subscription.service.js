@@ -2,16 +2,12 @@ import SubscriptionModel from '@models/subscription'
 import PackageModel from '@models/package'
 import UserModel from '@models/user'
 import ReferralPartnerModel from '@models/referralpartner'
-import paymentService from '@services/payment.service'
+import checkoutService from '@services/checkout.service'
 import referralBonusService from '@services/referral-bonus.service'
-import {
-  SubsriptionAlreadyActiveError,
-} from '@errors/subscription.errors'
 import { PackageNotFoundError } from '@errors/package.errors'
 import { PermissionDeniedError } from '@errors/auth.errors'
 import { UserNotFoundError } from '@errors/user.errors'
 import dayjs from 'dayjs'
-import logger from '@utils/logger'
 import { getEffectivePackagePrice } from '@utils/package-price'
 import userRoles from '@utils/user-roles'
 import { Op } from 'sequelize'
@@ -22,15 +18,6 @@ class SubscriptionNotFoundError extends Error {
     this.name = 'SubscriptionNotFoundError'
     this.code = 'SUBSCRIPTION_NOT_FOUND'
     this.statusCode = 404
-  }
-}
-
-class NoSubscriptionToRenewError extends Error {
-  constructor(userId) {
-    super(`no subscription found to renew for user ${userId}`)
-    this.name = 'NoSubscriptionToRenewError'
-    this.code = 'NO_SUBSCRIPTION_TO_RENEW'
-    this.statusCode = 400
   }
 }
 
@@ -151,7 +138,10 @@ const subscriptionInclude = [
 const getLatestSubscription = async (userId) => {
   return SubscriptionModel.findOne({
     where: { user_id: userId },
-    order: [['valid_to', 'DESC'], ['id', 'DESC']],
+    order: [
+      ['valid_to', 'DESC'],
+      ['id', 'DESC'],
+    ],
     include: [
       {
         model: PackageModel,
@@ -170,7 +160,10 @@ const getCurrentSubscription = async (userId) => {
       valid_from: { [Op.lte]: now },
       valid_to: { [Op.gte]: now },
     },
-    order: [['valid_to', 'DESC'], ['id', 'DESC']],
+    order: [
+      ['valid_to', 'DESC'],
+      ['id', 'DESC'],
+    ],
     include: [
       {
         model: PackageModel,
@@ -187,7 +180,10 @@ const buildSubscriptionSummary = (subscription) => {
   }
 
   const validTo = dayjs(subscription.valid_to)
-  const daysRemaining = Math.max(0, validTo.startOf('day').diff(dayjs().startOf('day'), 'day'))
+  const daysRemaining = Math.max(
+    0,
+    validTo.startOf('day').diff(dayjs().startOf('day'), 'day')
+  )
   const packageRecord = subscription.package
 
   return {
@@ -210,115 +206,16 @@ const buildSubscriptionSummary = (subscription) => {
   }
 }
 
-const create = async (userID, packageID, options = {}) => {
-  const existing = await SubscriptionModel.findOne({
-    where: { user_id: userID },
-  })
-
-  if (existing) {
-    throw new SubsriptionAlreadyActiveError(userID)
-  }
-
-  const packageRecord = await PackageModel.findByPk(packageID)
-  if (!packageRecord) {
-    throw new PackageNotFoundError(packageID)
-  }
-
-  const validFrom = dayjs().toDate()
-  const validTo = dayjs().add(packageRecord.duration, 'month').toDate()
-
-  logger.info({ userID, packageID }, 'Creating subscription')
-  const newSubscription = await SubscriptionModel.create({
-    user_id: userID,
-    package_id: packageID,
-    valid_from: validFrom,
-    valid_to: validTo,
-    kind: 'initial',
-  })
-  logger.info({ subscription_id: newSubscription.id }, 'Subscription created')
-
-  await paymentService.process(
-    userID,
-    newSubscription.id,
-    'card',
-    getEffectivePackagePrice(packageRecord)
-  )
-
-  const user = await UserModel.findByPk(userID)
-  const partnerId =
-    options.referralPartnerId || user?.referral_partner_id || null
-  if (partnerId && options.creditBonus !== false) {
-    await referralBonusService.creditForSubscription({
-      partnerId,
-      companyUserId: userID,
-      subscription: newSubscription,
-      packageRecord,
-      type: referralBonusService.TYPES.initial_bonus,
-      remarks: 'Initial subscription bonus',
-    })
-  }
-
-  return newSubscription
-}
+const create = async (userId, packageId, options = {}) =>
+  checkoutService.start(userId, packageId, { ...options, kind: 'initial' })
 
 const renew = async (userId, packageId, actor = null, options = {}) => {
-  const latest = await getLatestSubscription(userId)
-  if (!latest) {
-    throw new NoSubscriptionToRenewError(userId)
-  }
-
-  const packageRecord = await PackageModel.findByPk(packageId)
-  if (!packageRecord) {
-    throw new PackageNotFoundError(packageId)
-  }
-
-  const validFromCandidate = dayjs(latest.valid_to)
-  const validFrom = (
-    validFromCandidate.isAfter(dayjs()) ? validFromCandidate : dayjs()
-  ).toDate()
-  const validTo = dayjs(validFrom).add(packageRecord.duration, 'month').toDate()
-
-  logger.info({ userId, packageId, actor_id: actor?.id }, 'Renewing subscription')
-  const renewed = await SubscriptionModel.create({
-    user_id: userId,
-    package_id: packageId,
-    valid_from: validFrom,
-    valid_to: validTo,
+  if (actor && actor.user_type !== 'admin' && actor.id !== userId)
+    throw new PermissionDeniedError()
+  return checkoutService.start(userId, packageId, {
+    ...options,
     kind: 'renewal',
   })
-
-  await paymentService.process(
-    userId,
-    renewed.id,
-    'card',
-    getEffectivePackagePrice(packageRecord)
-  )
-
-  if (options.referral_partner_id) {
-    await assignReferralPartner({
-      userId,
-      referralPartnerId: options.referral_partner_id,
-      subscription: renewed,
-      packageRecord,
-      actorId: actor?.id,
-      creditBonus: false,
-    })
-  }
-
-  const user = await UserModel.findByPk(userId)
-  if (user?.referral_partner_id) {
-    await referralBonusService.creditForSubscription({
-      partnerId: user.referral_partner_id,
-      companyUserId: userId,
-      subscription: renewed,
-      packageRecord,
-      type: referralBonusService.TYPES.renewal_bonus,
-      createdBy: actor?.id || null,
-      remarks: 'Renewal bonus',
-    })
-  }
-
-  return SubscriptionModel.findByPk(renewed.id, { include: subscriptionInclude })
 }
 
 const getAll = async (payload, currentUser) => {
@@ -336,8 +233,6 @@ const getAll = async (payload, currentUser) => {
     throw new PermissionDeniedError()
   }
 
-  logger.debug({ payload, where }, 'Fetching subscriptions')
-
   const { count, rows } = await SubscriptionModel.findAndCountAll({
     where,
     limit,
@@ -350,8 +245,6 @@ const getAll = async (payload, currentUser) => {
     distinct: true,
     col: 'id',
   })
-
-  logger.info({ page, limit, count }, 'Subscriptions fetched')
 
   return {
     page,
@@ -400,9 +293,7 @@ const updateById = async (id, payload, currentUser) => {
     updates.package_id = payload.package_id
     if (!payload.valid_from && !payload.valid_to) {
       updates.valid_from = dayjs().toDate()
-      updates.valid_to = dayjs()
-        .add(packageRecord.duration, 'month')
-        .toDate()
+      updates.valid_to = dayjs().add(packageRecord.duration, 'month').toDate()
     }
   }
 
@@ -471,10 +362,18 @@ const createForUser = async (payload, currentUser) => {
   ) {
     throw new PermissionDeniedError('subscriptions belong to subscribers')
   }
-  return create(userId, payload.package_id)
+  return create(userId, payload.package_id, { request_id: payload.request_id })
 }
 
 const renewForUser = async (payload, currentUser) => {
+  if (
+    payload.referral_partner_id &&
+    currentUser.user_type !== userRoles.admin.type
+  ) {
+    throw new PermissionDeniedError(
+      'Only Super Admin can assign a referral partner'
+    )
+  }
   const userId = resolveSubscribeUserId(payload, currentUser)
   const user = await UserModel.findByPk(userId)
   if (!user) {
@@ -488,6 +387,7 @@ const renewForUser = async (payload, currentUser) => {
   }
   return renew(userId, payload.package_id, currentUser, {
     referral_partner_id: payload.referral_partner_id,
+    request_id: payload.request_id,
   })
 }
 

@@ -6,6 +6,7 @@ import type {
 } from "@app-types/subscription.types";
 import type { ListResponse } from "@app-types/response.types";
 import fetcher from "@utils/fetcher";
+import { purchasePackage } from "@api/checkout.api";
 
 const subscription = {
   fetchAll: (filter?: {
@@ -24,13 +25,9 @@ const subscription = {
     };
   },
   create: async (payload: NewSubscriptionRequest) =>
-    await fetcher("subscriptions/subscribe", JSON.stringify(payload), {
-      method: "POST",
-    }),
+    purchasePackage({ ...payload, kind: "initial" }),
   renew: async (payload: NewSubscriptionRequest) =>
-    await fetcher("subscriptions/renew", JSON.stringify(payload), {
-      method: "POST",
-    }),
+    purchasePackage({ ...payload, kind: "renewal" }),
   updateById: async (id: number, updateData: EditSubscriptionRequest) => {
     const payload: EditSubscriptionPayload = {
       package_id: updateData.package_id,

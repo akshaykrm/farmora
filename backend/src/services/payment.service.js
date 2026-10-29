@@ -1,33 +1,12 @@
-import PaymentModel from '@models/payment'
-import { PackageNotFoundError } from '@errors/package.errors'
-import { v4 as UUIDV4 } from 'uuid'
+import { checkoutError } from '@errors/checkout.errors'
 
-const paymentService = {}
-
-paymentService.process = async (
-  userId,
-  subscriptionId,
-  paymentMethod = 'card',
-  amount
-) => {
-  const uuid = UUIDV4()
-  const newPayment = await PaymentModel.create({
-    user_id: userId,
-    subscription_id: subscriptionId,
-    transaction_id: uuid,
-    status: 'pending',
-    payment_method: paymentMethod,
-    amount: parseFloat(amount),
-  })
-
-  const isPaymentSuccessful = Math.random() > 0.2
-
-  if (!isPaymentSuccessful) {
-    await newPayment.update({ status: 'failed' })
-    throw new PackageNotFoundError(subscriptionId, userId)
-  }
-
-  await newPayment.update({ status: 'completed' })
+// Subscription payments must use verified checkout activation.
+export default {
+  process: async () => {
+    throw checkoutError(
+      'Use package checkout to process payments.',
+      'PAYMENT_CHECKOUT_REQUIRED',
+      409
+    )
+  },
 }
-
-export default paymentService

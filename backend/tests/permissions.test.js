@@ -70,7 +70,9 @@ describe('Roles and permissions', () => {
 
   beforeAll(async () => {
     await connectDB()
-    const basicPackage = await PackageModel.findOne({ where: { name: 'Basic' } })
+    const basicPackage = await PackageModel.findOne({
+      where: { name: 'Basic' },
+    })
     expect(basicPackage).toBeTruthy()
     basicPackageId = basicPackage.id
     await grantAllTenantPermissionsToPackage(basicPackageId)
@@ -313,7 +315,8 @@ describe('Roles and permissions', () => {
     const pkg = await PackageModel.create({
       name: unique('pkg'),
       description: 'Test package',
-      price: 10,
+      actual_price: 0,
+      discount_price: 0,
       duration: 1,
       status: 'active',
       role_id: roleRes.body.data.id,
@@ -335,7 +338,8 @@ describe('Roles and permissions', () => {
     const limitedPackage = await PackageModel.create({
       name: unique('limitedpkg'),
       description: 'Limited',
-      price: 1,
+      actual_price: 0,
+      discount_price: 0,
       duration: 1,
       status: 'active',
       role_id: limitedRole.id,
@@ -396,7 +400,8 @@ describe('Roles and permissions', () => {
     const premiumPackage = await PackageModel.create({
       name: unique('premiumpkg'),
       description: 'Premium ceiling',
-      price: 100,
+      actual_price: 0,
+      discount_price: 0,
       duration: 1,
       status: 'active',
       role_id: premiumRole.id,
@@ -404,7 +409,8 @@ describe('Roles and permissions', () => {
     const basicPackage = await PackageModel.create({
       name: unique('basicpkg'),
       description: 'Basic ceiling',
-      price: 50,
+      actual_price: 0,
+      discount_price: 0,
       duration: 1,
       status: 'active',
       role_id: basicRole.id,
@@ -494,7 +500,8 @@ describe('Roles and permissions', () => {
     const limitedPackage = await PackageModel.create({
       name: unique('assignpkg'),
       description: 'Assign cap',
-      price: 1,
+      actual_price: 0,
+      discount_price: 0,
       duration: 1,
       status: 'active',
       role_id: limitedRole.id,

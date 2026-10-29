@@ -32,6 +32,12 @@ const PackageModel = sequelize.define(
       type: Sequelize.INTEGER,
       allowNull: false,
     },
+    farm_limit: {
+      type: Sequelize.INTEGER,
+      allowNull: true,
+      defaultValue: null,
+      validate: { min: 0, isInt: true },
+    },
     status: {
       type: Sequelize.ENUM('active', 'inactive', 'disabled'),
       defaultValue: 'active',
