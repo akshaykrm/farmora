@@ -50,16 +50,20 @@ const createManager = async (payload) => {
     }
   }
 
-  const packageRecord = payload.package_id
-    ? await PackageModel.findByPk(payload.package_id)
-    : await PackageModel.findOne({ where: { name: 'Basic', status: 'active' } })
-  if (!packageRecord || packageRecord.status !== 'active') {
-    throw Object.assign(new Error('Package is not available.'), {
-      statusCode: 404,
-      code: 'PACKAGE_NOT_FOUND',
-    })
-  }
   return sequelize.transaction(async (transaction) => {
+    const packageOptions = { transaction, lock: transaction.LOCK.SHARE }
+    const packageRecord = payload.package_id
+      ? await PackageModel.findByPk(payload.package_id, packageOptions)
+      : await PackageModel.findOne({
+          where: { name: 'Basic', status: 'active' },
+          ...packageOptions,
+        })
+    if (!packageRecord || packageRecord.status !== 'active') {
+      throw Object.assign(new Error('Package is not available.'), {
+        statusCode: 404,
+        code: 'PACKAGE_NOT_FOUND',
+      })
+    }
     const user = await UserModel.create(
       {
         name: payload.name,

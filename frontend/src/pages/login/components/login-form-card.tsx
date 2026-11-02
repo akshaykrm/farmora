@@ -129,6 +129,7 @@ const LoginFormCard = ({ methods, onLogin, isPending }: LoginFormCardProps) => {
               className="absolute top-1/2 right-3 -translate-y-1/2 p-0.5 text-brand-ink-muted hover:text-brand-ink-soft"
               onClick={() => setShowPassword((v) => !v)}
               aria-label={showPassword ? "Hide password" : "Show password"}
+              aria-pressed={showPassword}
             >
               {showPassword ? (
                 <EyeOff className="h-[18px] w-[18px]" />

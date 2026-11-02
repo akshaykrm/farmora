@@ -38,7 +38,8 @@ const getAllowance = async (currentUser, transaction = null) => {
     include: [{ model: PackageModel, as: 'package', required: true }],
     transaction,
   })
-  const limit = subscription ? subscription.package.farm_limit : 0
+  // Farm quotas are retired. Keep the allowance endpoint compatible with older clients.
+  const limit = subscription ? null : 0
   return {
     used,
     limit,

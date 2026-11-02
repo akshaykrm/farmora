@@ -5,6 +5,7 @@ import validate from '@utils/validate-request'
 import asyncHandler from '@utils/async-handler'
 import paymentSettings from '@services/payment-settings.service'
 import razorpay from '@services/razorpay.service'
+import platformSettings from '@services/platform-settings.service'
 
 const router = Router()
 router.use(isAuthenticated, isSuperAdmin)
@@ -29,6 +30,25 @@ router.put(
   ),
   asyncHandler(async (req, res) =>
     res.success(await paymentSettings.save(req.body))
+  )
+)
+router.get(
+  '/subscriptions',
+  asyncHandler(async (_, res) => res.success(await platformSettings.read()))
+)
+router.put(
+  '/subscriptions',
+  validate(
+    Joi.object({
+      subscription_reminder_days: Joi.number()
+        .integer()
+        .min(0)
+        .max(365)
+        .required(),
+    })
+  ),
+  asyncHandler(async (req, res) =>
+    res.success(await platformSettings.save(req.body))
   )
 )
 export default router

@@ -19,6 +19,7 @@ export type CheckoutOrder = {
 };
 
 export type CheckoutSession = {
+  free_trial_used: boolean;
   active: boolean;
   kind: "initial" | "renewal";
   request_id: string;

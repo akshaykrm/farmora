@@ -174,7 +174,7 @@ const getCurrentSubscription = async (userId) => {
   })
 }
 
-const buildSubscriptionSummary = (subscription) => {
+const buildSubscriptionSummary = (subscription, reminderDays = 10) => {
   if (!subscription) {
     return null
   }
@@ -192,7 +192,8 @@ const buildSubscriptionSummary = (subscription) => {
     valid_from: subscription.valid_from,
     valid_to: subscription.valid_to,
     days_remaining: daysRemaining,
-    expiring_soon: daysRemaining <= 10,
+    expiring_soon: daysRemaining <= reminderDays,
+    reminder_days: reminderDays,
     package: packageRecord
       ? {
           id: packageRecord.id,

@@ -26,6 +26,7 @@ import seasonService from '@services/season.service'
 import integrationBookService from '@services/itegration-book.service'
 import workingCostService from '@services/working-cost.service'
 import subscriptionService from '@services/subscription.service'
+import platformSettings from '@services/platform-settings.service'
 
 function calculateTotalStockValue(purchaseItems, returnedItems) {
   let expenseTotal = 0
@@ -308,6 +309,8 @@ const getManagerDashboard = async (currentUser) => {
       (await subscriptionService.getCurrentSubscription(subscriptionOwnerId)) ||
       (await subscriptionService.getLatestSubscription(subscriptionOwnerId))
 
+    const { subscription_reminder_days } = await platformSettings.read()
+
     return {
       metrics,
       balanceInHand: await getBalanceInHand(currentUser),
@@ -316,8 +319,10 @@ const getManagerDashboard = async (currentUser) => {
       recentPurchases: parsedPurchases,
       recentSales: parsedSales,
       openBatches,
-      subscription:
-        subscriptionService.buildSubscriptionSummary(currentSubscription),
+      subscription: subscriptionService.buildSubscriptionSummary(
+        currentSubscription,
+        subscription_reminder_days
+      ),
     }
   } catch (err) {
     logger.error({ err }, 'Error fetching manager dashboard')
