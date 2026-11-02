@@ -18,10 +18,6 @@ import platformExportController from '@controllers/platform-export.controller'
 import { exportQuerySchema } from '@validators/export.validator'
 
 import asyncHandler from '@utils/async-handler'
-import Joi from 'joi'
-import userAllowance from '@services/user-allowance.service'
-import { getMasterId } from '@services/permission.service'
-import { checkoutError } from '@errors/checkout.errors'
 import {
   approveAccount,
   revokeAccountApproval,
@@ -41,21 +37,6 @@ router.post(
   })
 )
 
-router.get(
-  '/allowance',
-  requirePermission(P.user_read),
-  validateQuery(
-    Joi.object({ parent_id: Joi.number().integer().positive().optional() })
-  ),
-  asyncHandler(async (req, res) => {
-    const ownerId = req.query.parent_id
-      ? Number(req.query.parent_id)
-      : getMasterId(req.user)
-    if (req.user.user_type !== 'admin' && ownerId !== getMasterId(req.user))
-      throw checkoutError('Permission denied.', 'PERMISSION_DENIED', 403)
-    res.success(await userAllowance.read(ownerId))
-  })
-)
 router.get('/me', userController.getMe)
 
 router.post(

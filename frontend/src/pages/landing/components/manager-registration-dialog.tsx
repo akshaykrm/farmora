@@ -2,7 +2,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import type { FormEvent, KeyboardEvent } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
-import { Check, CircleCheck, Eye, EyeOff, X } from "lucide-react";
+import { Check, CircleCheck, X } from "lucide-react";
 import { useNavigate } from "react-router";
 import auth from "@api/auth.api";
 import { CHECKOUT_TOKEN_KEY } from "@api/checkout.api";
@@ -550,11 +550,7 @@ const ManagerRegistrationDialog = ({
                               aria-pressed={showPassword}
                               aria-controls={id("password")}
                             >
-                              {showPassword ? (
-                                <EyeOff size={18} aria-hidden="true" />
-                              ) : (
-                                <Eye size={18} aria-hidden="true" />
-                              )}
+                              {showPassword ? "Hide" : "Show"}
                             </button>
                           </div>
                           <div
