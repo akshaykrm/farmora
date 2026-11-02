@@ -6,7 +6,8 @@ export type Package = {
   discount_price: number;
   price?: number;
   duration: number;
-  farm_limit: number | null;
+  user_limit: number | null;
+  batch_limit: number | null;
   status: string;
   referral_bonus_type?: "none" | "fixed" | "percentage";
   referral_bonus_value?: number | null;

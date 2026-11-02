@@ -4,7 +4,16 @@ import fetcher from "@utils/fetcher";
 import fetcherV2, { type FetcherReturnType } from "@utils/fetcherV2";
 import type { Filter } from "@utils/filters";
 
+export type BatchAllowance = {
+  used: number;
+  limit: number | null;
+  remaining: number | null;
+  can_create: boolean;
+  package_name: string | null;
+  subscription_active: boolean;
+};
 const batches = {
+  getAllowance: (): Promise<BatchAllowance> => fetcher("batches/allowance"),
   fetchAll: (filter?: Filter) => {
     const opts = {
       method: "GET" as const,

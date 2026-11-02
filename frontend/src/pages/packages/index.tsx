@@ -9,7 +9,7 @@ import Table from "@components/Table";
 import TableCell from "@components/TableCell";
 import TableHeaderCell from "@components/TableHeaderCell";
 import TableRow from "@components/TableRow";
-import { EditIcon } from "lucide-react";
+import { EditIcon, Trash2 } from "lucide-react";
 import EmptyContentMessage from "@components/EmptyContentMessage";
 import Ternary from "@components/ternary";
 import { Dialog, DialogContent } from "@components/dialog";
@@ -20,6 +20,8 @@ import PackagePriceDisplay from "@components/PackagePriceDisplay";
 import type { Package } from "@app-types/package.types";
 import type { ValidationError } from "@errors/api.error";
 import { useForm } from "react-hook-form";
+import usePermissions from "@hooks/use-permissions";
+import toast from "react-hot-toast";
 
 const emptyForm: PackageFormValues = {
   name: "",
@@ -27,7 +29,8 @@ const emptyForm: PackageFormValues = {
   actual_price: 0,
   discount_price: 0,
   duration: 1,
-  farm_limit: null,
+  batch_limit: null,
+  user_limit: null,
   status: "active",
   referral_bonus_type: "none",
   referral_bonus_value: null,
@@ -35,6 +38,7 @@ const emptyForm: PackageFormValues = {
 };
 
 const PackagesPage = () => {
+  const { can } = usePermissions();
   const { queryParms, updateQueryParams } = useQueryParameters();
   const page = queryParms.page ? parseInt(queryParms.page) : DEFAULT_FIRST_PAGE;
   const limit = queryParms.limit
@@ -46,6 +50,9 @@ const PackagesPage = () => {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [apiErrors, setApiErrors] = useState<ValidationError[]>([]);
   const [systemRoles, setSystemRoles] = useState<Role[]>([]);
+  const [deleteTarget, setDeleteTarget] = useState<Package | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   const methods = useForm<PackageFormValues>({ defaultValues: emptyForm });
   const { register, handleSubmit, reset, watch, formState } = methods;
@@ -78,6 +85,27 @@ const PackagesPage = () => {
     setIsOpen(true);
   };
 
+  const onDelete = async () => {
+    if (!deleteTarget || isDeleting) return;
+    setIsDeleting(true);
+    setDeleteError("");
+    try {
+      const res = await packages.deleteById(deleteTarget.id);
+      if (res.status !== "success") {
+        setDeleteError(
+          res.error?.message || "Could not delete package. Please try again.",
+        );
+        return;
+      }
+      setDeleteTarget(null);
+      toast.success("Package deleted");
+      if (rows.length === 1 && page > 1) updateQueryParams(page - 1);
+      else await refetch();
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const openEdit = async (id: number) => {
     setSelectedId(id);
     const res = await packages.fetchById(id);
@@ -88,7 +116,8 @@ const PackagesPage = () => {
         actual_price: Number(res.data.actual_price),
         discount_price: Number(res.data.discount_price ?? 0),
         duration: res.data.duration,
-        farm_limit: res.data.farm_limit ?? null,
+        batch_limit: res.data.batch_limit ?? null,
+        user_limit: res.data.user_limit ?? null,
         status: res.data.status,
         referral_bonus_type: res.data.referral_bonus_type || "none",
         referral_bonus_value:
@@ -149,11 +178,13 @@ const PackagesPage = () => {
             "Name",
             "Price",
             "Duration",
-            "Farm limit",
+            "Batch limit",
+            "User limit",
             "System Role",
             "Referral Bonus",
             "Status",
             "Edit",
+            ...(can("package:delete") ? ["Delete"] : []),
           ].map((header) => (
             <TableHeaderCell key={header} content={header} />
           ))}
@@ -172,7 +203,8 @@ const PackagesPage = () => {
               }
             />
             <TableCell content={row.duration} />
-            <TableCell content={row.farm_limit ?? "Unlimited"} />
+            <TableCell content={row.batch_limit ?? "Unlimited"} />
+            <TableCell content={row.user_limit ?? "Unlimited"} />
             <TableCell content={row.role?.name || "—"} />
             <TableCell
               content={
@@ -192,6 +224,23 @@ const PackagesPage = () => {
                 />
               }
             />
+            {can("package:delete") && (
+              <TableCell
+                content={
+                  <button
+                    type="button"
+                    aria-label={`Delete ${row.name}`}
+                    className="cursor-pointer text-brand-danger"
+                    onClick={() => {
+                      setDeleteError("");
+                      setDeleteTarget(row);
+                    }}
+                  >
+                    <Trash2 className="h-5 w-5" />
+                  </button>
+                }
+              />
+            )}
           </TableRow>
         ))}
       </Table>
@@ -212,6 +261,46 @@ const PackagesPage = () => {
           onChange={(p) => updateQueryParams(p)}
         />
       </Box>
+      <Dialog
+        isOpen={deleteTarget !== null}
+        headerTitle="Delete package"
+        onClose={() => {
+          if (!isDeleting) setDeleteTarget(null);
+        }}
+      >
+        <DialogContent>
+          <p>
+            Delete <strong>{deleteTarget?.name}</strong>? It will be removed
+            from the package list and signup choices.
+          </p>
+          <p className="mt-2 text-sm text-brand-ink-muted">
+            Packages linked to subscribers or checkout orders cannot be deleted.
+            You can set them to inactive instead.
+          </p>
+          {deleteError && (
+            <p role="alert" className="mt-3 text-sm text-brand-danger">
+              {deleteError}
+            </p>
+          )}
+          <div className="mt-6 flex justify-end gap-2">
+            <Button
+              variant="outlined"
+              disabled={isDeleting}
+              onClick={() => setDeleteTarget(null)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              color="error"
+              disabled={isDeleting}
+              onClick={onDelete}
+            >
+              {isDeleting ? "Deleting..." : "Delete package"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
       <Dialog
         isOpen={isOpen}
         headerTitle={selectedId ? "Edit Package" : "Add Package"}
@@ -253,22 +342,41 @@ const PackagesPage = () => {
               {...register("duration", { valueAsNumber: true })}
             />
             <TextField
-              label="Farm limit"
+              label="Batch limit"
               size="small"
               type="number"
               slotProps={{ htmlInput: { min: 0, step: 1 } }}
-              {...register("farm_limit", {
+              {...register("batch_limit", {
                 setValueAs: (value) =>
                   value === "" || value == null ? null : Number(value),
                 validate: (value) =>
                   value == null ||
                   (Number.isInteger(value) && value >= 0) ||
-                  "Enter a whole number of farms, 0 or more.",
+                  "Enter a whole number of batches, 0 or more.",
               })}
-              error={Boolean(formState.errors.farm_limit)}
+              error={Boolean(formState.errors.batch_limit)}
               helperText={
-                formState.errors.farm_limit?.message ||
-                "Leave blank for unlimited farms. 0 prevents farm creation. Changes apply to current subscribers."
+                formState.errors.batch_limit?.message ||
+                "Leave blank for unlimited total batches. 0 prevents batch creation. Closed batches also count toward the limit. Changes apply to current subscribers."
+              }
+            />
+            <TextField
+              label="User limit"
+              size="small"
+              type="number"
+              slotProps={{ htmlInput: { min: 0, step: 1 } }}
+              {...register("user_limit", {
+                setValueAs: (value) =>
+                  value === "" || value == null ? null : Number(value),
+                validate: (value) =>
+                  value == null ||
+                  (Number.isInteger(value) && value >= 0) ||
+                  "Enter a whole number of users, 0 or more.",
+              })}
+              error={Boolean(formState.errors.user_limit)}
+              helperText={
+                formState.errors.user_limit?.message ||
+                "Staff users only; the subscriber is not counted. Disabled users count. Blank means unlimited; 0 prevents adding users. Applies to current subscribers."
               }
             />
             <TextField

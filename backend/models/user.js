@@ -47,6 +47,7 @@ const UserModel = sequelize.define(
       defaultValue: 0,
       field: 'status',
     },
+    free_trial_used_at: { type: Sequelize.DATE, allowNull: true },
     approval_status: {
       type: Sequelize.STRING(20),
       allowNull: false,
