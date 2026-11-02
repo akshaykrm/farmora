@@ -1,3 +1,4 @@
+import PasswordField from "@components/PasswordField";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Alert, Button, TextField } from "@mui/material";
@@ -51,6 +52,7 @@ export default function SettingsPage() {
   return (
     <div className="max-w-2xl space-y-6">
       <PageTitle title="Settings" />
+      <SubscriptionReminderSettings />
       <form
         onSubmit={save}
         className="space-y-5 rounded-xl border border-brand-border bg-brand-card p-6"
@@ -97,10 +99,9 @@ export default function SettingsPage() {
           placeholder="rzp_test_…"
           autoComplete="off"
         />
-        <TextField
+        <PasswordField
           fullWidth
           label="Key secret"
-          type="password"
           value={secret}
           onChange={(event) => setSecret(event.target.value)}
           autoComplete="new-password"
@@ -148,5 +149,91 @@ export default function SettingsPage() {
         </Button>
       </form>
     </div>
+  );
+}
+
+function SubscriptionReminderSettings() {
+  const settings = useQuery<{ subscription_reminder_days: number }>({
+    queryKey: ["subscription-settings"],
+    queryFn: () => fetcher("settings/subscriptions"),
+  });
+  const [days, setDays] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [saved, setSaved] = useState(false);
+  const value = days ?? String(settings.data?.subscription_reminder_days ?? 10);
+  const save = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setError("");
+    setSaved(false);
+    const number = Number(value);
+    if (
+      !value.trim() ||
+      !Number.isInteger(number) ||
+      number < 0 ||
+      number > 365
+    ) {
+      setError("Enter a whole number from 0 to 365.");
+      return;
+    }
+    setBusy(true);
+    try {
+      await fetcher(
+        "settings/subscriptions",
+        JSON.stringify({ subscription_reminder_days: number }),
+        { method: "PUT" },
+      );
+      await settings.refetch();
+      setDays(null);
+      setSaved(true);
+    } catch (cause) {
+      setError(
+        cause instanceof Error ? cause.message : "Unable to save settings",
+      );
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <form
+      onSubmit={save}
+      className="space-y-5 rounded-xl border border-brand-border bg-brand-card p-6"
+    >
+      <h2 className="text-xl font-semibold text-brand-ink">
+        Subscription reminders
+      </h2>
+      <p className="text-sm text-brand-ink-muted">
+        Show the current package section on subscriber dashboards only when
+        expiry is this many days away. Applies to all subscribers. Expired
+        packages remain visible for renewal.
+      </p>
+      {settings.error && (
+        <Alert severity="error">{settings.error.message}</Alert>
+      )}
+      {error && <Alert severity="error">{error}</Alert>}
+      {saved && (
+        <Alert severity="success">Subscription reminder settings saved.</Alert>
+      )}
+      <TextField
+        fullWidth
+        required
+        type="number"
+        label="Days before package expiry"
+        value={value}
+        onChange={(event) => {
+          setDays(event.target.value);
+          setSaved(false);
+        }}
+        slotProps={{ htmlInput: { min: 0, max: 365, step: 1 } }}
+        helperText="Default: 10 days. Use 0 to show only on the expiry date or after expiry."
+      />
+      <Button
+        type="submit"
+        variant="contained"
+        disabled={busy || settings.isPending || !!settings.error}
+      >
+        {busy ? "Saving…" : "Save subscription settings"}
+      </Button>
+    </form>
   );
 }

@@ -103,6 +103,12 @@ export default function CheckoutPage() {
           </Alert>
         )}
         {message && <Alert severity="warning">{message}</Alert>}
+        {!completed && data?.free_trial_used && (
+          <Alert severity="info">
+            Your free trial has already been used. Choose a paid package to
+            continue.
+          </Alert>
+        )}
         {!completed && data && (
           <>
             <TextField

@@ -28,7 +28,8 @@ interface Package {
   discount_price: string;
   price?: string;
   duration: number;
-  farm_limit: number | null;
+  user_limit: number | null;
+  batch_limit: number | null;
   status: string;
 }
 
@@ -134,9 +135,14 @@ const PackagesSection = () => {
                       </p>
                       <div className="space-y-3">
                         <p className="font-semibold text-brand-ink">
-                          {pkg.farm_limit == null
-                            ? "Unlimited farms"
-                            : `${pkg.farm_limit} ${pkg.farm_limit === 1 ? "farm" : "farms"}`}
+                          {pkg.batch_limit == null
+                            ? "Unlimited total batches"
+                            : `${pkg.batch_limit} ${pkg.batch_limit === 1 ? "batch" : "total batches"}`}
+                        </p>
+                        <p className="font-semibold text-brand-ink">
+                          {pkg.user_limit == null
+                            ? "Unlimited staff users"
+                            : `${pkg.user_limit} staff ${pkg.user_limit === 1 ? "user" : "users"}`}
                         </p>
                         {PACKAGE_FEATURES[pkg.name]?.map((feature, i) => (
                           <div key={i} className="flex items-start gap-3">

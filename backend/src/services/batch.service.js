@@ -8,13 +8,101 @@ import FarmModel from '@models/farm'
 import SeasonModel from '@models/season'
 import { calculateOffSet } from '@utils/pagination'
 import logger from '@utils/logger'
-import { applyTenantMasterId } from '@utils/tenant-scope'
+import { applyTenantMasterId, tenantMasterId } from '@utils/tenant-scope'
+import { sequelize } from '@utils/db'
+import SubscriptionModel from '@models/subscription'
+import PackageModel from '@models/package'
 
-const create = async (payload, currentUser) => {
-  payload.name = payload.name.trim()
-  payload.master_id = currentUser.id
-  const newBatch = await BatchModel.create(payload)
-  return newBatch
+const getAllowance = async (currentUser, transaction = null) => {
+  const masterId = tenantMasterId(currentUser)
+  const used = await BatchModel.count({
+    where: { master_id: masterId },
+    transaction,
+  })
+  if (currentUser.user_type === 'admin') {
+    return {
+      used,
+      limit: null,
+      remaining: null,
+      can_create: true,
+      package_name: null,
+      subscription_active: true,
+    }
+  }
+  const now = new Date()
+  const subscription = await SubscriptionModel.findOne({
+    where: {
+      user_id: masterId,
+      valid_from: { [Op.lte]: now },
+      valid_to: { [Op.gt]: now },
+    },
+    order: [
+      ['valid_to', 'DESC'],
+      ['id', 'DESC'],
+    ],
+    include: [{ model: PackageModel, as: 'package', required: true }],
+    transaction,
+  })
+  const limit = subscription ? subscription.package.batch_limit : 0
+  return {
+    used,
+    limit,
+    remaining: limit == null ? null : Math.max(0, limit - used),
+    can_create: Boolean(subscription && (limit == null || used < limit)),
+    package_name: subscription?.package?.name || null,
+    subscription_active: Boolean(subscription),
+  }
+}
+
+const create = async (payload, currentUser, options = {}) => {
+  const insert = async (transaction) => {
+    const masterId = tenantMasterId(currentUser)
+    const owner = await UserModel.findByPk(masterId, {
+      transaction,
+      lock: transaction.LOCK.UPDATE,
+    })
+    if (!owner)
+      throw Object.assign(new Error('Batch owner not found.'), {
+        statusCode: 404,
+        code: 'USER_NOT_FOUND',
+      })
+    const allowance = await getAllowance(currentUser, transaction)
+    if (!allowance.can_create)
+      throw Object.assign(
+        new Error(
+          allowance.subscription_active
+            ? `Your package allows ${allowance.limit} total batches. Upgrade your package to add another.`
+            : 'An active subscription is required to create a batch.'
+        ),
+        {
+          statusCode: 403,
+          code: allowance.subscription_active
+            ? 'BATCH_LIMIT_REACHED'
+            : 'SUBSCRIPTION_REQUIRED',
+          details: allowance,
+        }
+      )
+    const farm = await FarmModel.findOne({
+      where: { id: payload.farm_id, master_id: masterId },
+      transaction,
+    })
+    const season = await SeasonModel.findOne({
+      where: { id: payload.season_id, master_id: masterId },
+      transaction,
+    })
+    if (!farm || !season)
+      throw Object.assign(
+        new Error('Farm or season not found in this account.'),
+        { statusCode: 404, code: 'BATCH_PARENT_NOT_FOUND' }
+      )
+    return BatchModel.create(
+      { ...payload, name: payload.name.trim(), master_id: masterId },
+      { transaction }
+    )
+  }
+  return options.transaction
+    ? insert(options.transaction)
+    : sequelize.transaction(insert)
 }
 
 const getNames = async (currentUser, filter) => {
@@ -89,9 +177,7 @@ export async function getAllActiveBatches(filter) {
         [Op.is]: null,
       },
     },
-    include: [
-      { model: SeasonModel, as: 'season', attributes: ['id', 'name'] },
-    ],
+    include: [{ model: SeasonModel, as: 'season', attributes: ['id', 'name'] }],
   })
   return batchRecords
 }
@@ -222,6 +308,7 @@ const deleteById = async (batchId, currentUser) => {
 
 const batchService = {
   create,
+  getAllowance,
   getAll,
   getById,
   getBySeasonId,

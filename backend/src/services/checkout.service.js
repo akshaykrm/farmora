@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto'
+import freeTrial from '@services/free-trial.service'
 import dayjs from 'dayjs'
 import { Op } from 'sequelize'
 import { sequelize } from '@utils/db'
@@ -22,6 +23,7 @@ const assertOwner = (order, actor) => {
 
 const activate = async (order, user, transaction, payment = null) => {
   if (order.status === 'completed') return order
+  if (order.amount === 0) await freeTrial.assertEligible(user, transaction)
   const options = { transaction }
   const latest = await SubscriptionModel.findOne({
     where: { user_id: user.id },
@@ -50,6 +52,8 @@ const activate = async (order, user, transaction, payment = null) => {
     },
     options
   )
+  if (order.amount === 0)
+    await user.update({ free_trial_used_at: new Date() }, options)
   await PaymentModel.create(
     {
       user_id: user.id,
@@ -153,6 +157,7 @@ const prepare = async (
   const plan = await PackageModel.findOne({
     where: { id: packageId, status: 'active' },
     ...options,
+    lock: transaction.LOCK.SHARE,
   })
   if (
     !plan ||
@@ -178,6 +183,7 @@ const prepare = async (
     )
   }
   const amount = Math.round(getEffectivePackagePrice(plan) * 100)
+  if (amount === 0) await freeTrial.assertEligible(user, transaction)
   if (!Number.isSafeInteger(amount) || amount < 0 || amount > 2147483647) {
     throw checkoutError('Package price is outside supported limits.')
   }
@@ -381,10 +387,7 @@ const session = async (actor) => {
     order: [['created_at', 'DESC']],
   })
   const orderData = order ? await status(order.id, actor) : null
-  const plans = await PackageModel.findAll({
-    where: { status: 'active' },
-    attributes: ['id', 'name', 'actual_price', 'discount_price', 'duration'],
-  })
+  const eligible = await freeTrial.availablePackages(actor)
   const subscription = await SubscriptionModel.findOne({
     where: { user_id: actor.id },
     order: [['valid_to', 'DESC']],
@@ -400,7 +403,8 @@ const session = async (actor) => {
     order: orderData,
     active: active > 0,
     kind: subscription ? 'renewal' : 'initial',
-    packages: plans,
+    packages: eligible.packages,
+    free_trial_used: eligible.free_trial_used,
     request_id:
       orderData?.status === 'pending' ? order.request_id : randomUUID(),
   }
