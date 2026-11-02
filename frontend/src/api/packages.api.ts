@@ -10,8 +10,7 @@ export type PackageFormValues = {
   actual_price: number;
   discount_price: number;
   duration: number;
-  user_limit: number | null;
-  batch_limit: number | null;
+  farm_limit: number | null;
   status: string;
   referral_bonus_type: "none" | "fixed" | "percentage";
   referral_bonus_value: number | null;
@@ -19,11 +18,6 @@ export type PackageFormValues = {
 };
 
 const packages = {
-  getEligibleNames: (userId?: number): Promise<NameResponse[]> =>
-    fetcher("subscriptions/package-options", null, {
-      method: "GET",
-      filter: { user_id: userId },
-    }),
   getNames: async (): Promise<NameResponse[]> => {
     const data = await fetcher("packages/names");
     return data;

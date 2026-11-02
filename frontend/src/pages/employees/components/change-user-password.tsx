@@ -1,5 +1,4 @@
-import PasswordField from "@components/PasswordField";
-import { Button } from "@mui/material";
+import { Button, TextField } from "@mui/material";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -60,8 +59,9 @@ const SetPasswordForm = ({
         </div>
       )}
       <div className="grid grid-cols-1 gap-4">
-        <PasswordField
+        <TextField
           label="New Password"
+          type="password"
           size="small"
           autoComplete="new-password"
           error={Boolean(errors.new_password)}
@@ -74,8 +74,9 @@ const SetPasswordForm = ({
             },
           })}
         />
-        <PasswordField
+        <TextField
           label="Confirm Password"
+          type="password"
           size="small"
           autoComplete="new-password"
           error={Boolean(errors.confirm_password)}

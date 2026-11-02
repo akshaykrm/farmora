@@ -29,19 +29,9 @@ const SubscriptionStatusCard = ({ subscriptionInfo }: Props) => {
   }, [subscriptionInfo?.valid_to]);
 
   const openRenew = async () => {
-    const names = await packages.getEligibleNames();
-    if (!names.length) {
-      toast.error(
-        "No eligible packages are available. Contact the administrator.",
-      );
-      return;
-    }
+    const names = await packages.getNames();
     setPackageOptions(names);
-    setPackageId(
-      names.some((plan) => plan.id === subscriptionInfo?.package?.id)
-        ? subscriptionInfo!.package!.id
-        : names[0]?.id || "",
-    );
+    setPackageId(subscriptionInfo?.package?.id || names[0]?.id || "");
     setOpen(true);
   };
 
@@ -65,7 +55,16 @@ const SubscriptionStatusCard = ({ subscriptionInfo }: Props) => {
     }
   };
 
-  if (!subscriptionInfo?.expiring_soon) return null;
+  if (!subscriptionInfo) {
+    return (
+      <div className="rounded-xl border border-brand-border bg-brand-card p-5">
+        <p className="text-sm font-medium text-brand-ink">Current package</p>
+        <p className="mt-1 text-sm text-brand-ink-muted">
+          No active subscription found.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -96,9 +95,7 @@ const SubscriptionStatusCard = ({ subscriptionInfo }: Props) => {
             </p>
             {warning && (
               <p className="mt-2 text-sm font-medium text-amber-800">
-                {subscriptionInfo.days_remaining === 0
-                  ? "Your package expires today or has expired. Renew to avoid interruption."
-                  : `Your package expires within ${subscriptionInfo.reminder_days} ${subscriptionInfo.reminder_days === 1 ? "day" : "days"}. Renew to avoid interruption.`}
+                Your package expires within 10 days. Renew to avoid interruption.
               </p>
             )}
           </div>

@@ -51,19 +51,13 @@ const RenewSubscription = ({
   };
 
   return (
-    <Dialog
-      isOpen={isShow}
-      headerTitle="Renew Subscription"
-      onClose={handleClose}
-    >
+    <Dialog isOpen={isShow} headerTitle="Renew Subscription" onClose={handleClose}>
       <DialogContent>
         <SubscriptionForm
           methods={methods}
           onSubmit={onSubmit}
           onCancel={handleClose}
           showUserSelect={false}
-          eligiblePackagesOnly
-          eligibleUserId={userId || undefined}
           showReferralSelect
           referralLocked={Boolean(referralPartnerId)}
         />

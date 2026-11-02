@@ -24,12 +24,6 @@ const subscription = {
       referral_partner_id: data.user?.referral_partner_id ?? null,
     };
   },
-  updateDays: (id: number, days: number, expectedValidTo: string) =>
-    fetcher(
-      `subscriptions/${id}/days`,
-      JSON.stringify({ days, expected_valid_to: expectedValidTo }),
-      { method: "PUT" },
-    ),
   create: async (payload: NewSubscriptionRequest) =>
     purchasePackage({ ...payload, kind: "initial" }),
   renew: async (payload: NewSubscriptionRequest) =>

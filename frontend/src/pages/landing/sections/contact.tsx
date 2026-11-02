@@ -5,7 +5,6 @@ import SectionHeader from "../components/section-header"
 import RevealDiv from "../components/reveal"
 
 const CONTACT_EMAIL = "support@farmora.com"
-const CONTACT_PHONE = "+919539092205"
 
 const ContactSection = () => {
   const [formData, setFormData] = useState({
@@ -135,19 +134,9 @@ const ContactSection = () => {
                   const Icon = item.icon
                   return (
                     <div key={i} className="flex items-start gap-4">
-                      {item.icon === Phone ? (
-                        <a
-                          href={`tel:${CONTACT_PHONE}`}
-                          aria-label="Call Farmora at +91 95390 92205"
-                          className="w-12 h-12 bg-brand-canvas rounded-xl flex items-center justify-center flex-shrink-0 hover:bg-brand-card-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent"
-                        >
-                          <Icon className="w-5 h-5 text-brand-accent" />
-                        </a>
-                      ) : (
-                        <div className="w-12 h-12 bg-brand-canvas rounded-xl flex items-center justify-center flex-shrink-0">
-                          <Icon className="w-5 h-5 text-brand-accent" />
-                        </div>
-                      )}
+                      <div className="w-12 h-12 bg-brand-canvas rounded-xl flex items-center justify-center flex-shrink-0">
+                        <Icon className="w-5 h-5 text-brand-accent" />
+                      </div>
                       <div>
                         <h4 className="font-semibold text-brand-ink mb-1">
                           {item.label}

@@ -1,4 +1,3 @@
-import PasswordField from "@components/PasswordField";
 import PageHeader from "@components/PageHeader";
 import AddButton from "@components/AddButton";
 import ExportMenu from "@components/ExportMenu";
@@ -25,8 +24,6 @@ import employee from "@pages/employees/api";
 import type { Employee } from "@pages/employees/types";
 import toast from "react-hot-toast";
 import SubscriptionHistoryDialog from "./components/subscription-history-dialog";
-
-import UpdateSubscriptionDaysDialog from "./components/update-subscription-days-dialog";
 
 type SubscriberSubscription = {
   id: number;
@@ -119,10 +116,6 @@ const SubscribersPage = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [usersFor, setUsersFor] = useState<Subscriber | null>(null);
-  const [daysFor, setDaysFor] = useState<{
-    subscriber: Subscriber;
-    subscription: SubscriberSubscription;
-  } | null>(null);
   const [historyFor, setHistoryFor] = useState<Subscriber | null>(null);
   const [staff, setStaff] = useState<Employee[]>([]);
   const packageNames = useGetPackageNames();
@@ -270,7 +263,6 @@ const SubscribersPage = () => {
             "Current package",
             "Valid From",
             "Valid To",
-            "Subscription days",
             "Status",
             "Approval",
             "History",
@@ -303,21 +295,6 @@ const SubscribersPage = () => {
               <TableCell
                 content={
                   sub?.valid_to ? dayjs(sub.valid_to).format("DD-MM-YYYY") : "-"
-                }
-              />
-              <TableCell
-                content={
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    disabled={!sub}
-                    onClick={() => {
-                      if (sub)
-                        setDaysFor({ subscriber: row, subscription: sub });
-                    }}
-                  >
-                    Update days
-                  </Button>
                 }
               />
               <TableCell content={row.status === 1 ? "Active" : "Disabled"} />
@@ -442,9 +419,10 @@ const SubscribersPage = () => {
               value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })}
             />
-            <PasswordField
+            <TextField
               label="Password"
               size="small"
+              type="password"
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
             />
@@ -590,16 +568,18 @@ const SubscribersPage = () => {
       >
         <DialogContent>
           <div className="grid grid-cols-1 gap-4">
-            <PasswordField
+            <TextField
               label="New password"
               size="small"
+              type="password"
               autoComplete="new-password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
             />
-            <PasswordField
+            <TextField
               label="Confirm password"
               size="small"
+              type="password"
               autoComplete="new-password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
@@ -646,17 +626,6 @@ const SubscribersPage = () => {
         </DialogContent>
       </Dialog>
 
-      {daysFor && (
-        <UpdateSubscriptionDaysDialog
-          subscription={daysFor.subscription}
-          subscriberName={daysFor.subscriber.name}
-          onClose={() => setDaysFor(null)}
-          onSaved={() => {
-            setDaysFor(null);
-            refetch();
-          }}
-        />
-      )}
       <SubscriptionHistoryDialog
         subscriber={historyFor}
         onClose={() => setHistoryFor(null)}

@@ -56,7 +56,6 @@ export interface ManagerDashboardData {
     valid_to: string;
     days_remaining: number;
     expiring_soon: boolean;
-    reminder_days: number;
     package: {
       id: number;
       name: string;
