@@ -4,7 +4,7 @@ import useGetVendorNames from "@hooks/use-get-vendor-name-list";
 import { TextField, Button, MenuItem } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useForm, type DefaultValues } from "react-hook-form";
 import type { DuplicateInvoice, PurchaseFormValues } from "../types";
 import { Dialog, DialogActions, DialogContent } from "@components/dialog";
@@ -103,11 +103,7 @@ const PurchaseForm = ({
 
   const selectedType = useMemo(() => {
     if (selectedItem) {
-      const { type, base_price } = selectedItem;
-      if (base_price) {
-        setValue("price_per_unit", base_price.toString());
-      }
-      return type;
+      return selectedItem.type;
     }
 
     return itemTypes.find((item) => item.value === "regular")?.value;
@@ -117,15 +113,22 @@ const PurchaseForm = ({
     return values.quantity ? parseFloat(values.quantity) : 0;
   }, [values.quantity]);
 
+  // Which amount field the user edited last: the other one is derived from it.
+  const driver = useRef<"rate" | "total">("rate");
+  const round = (n: number) => (Math.round(n * 100) / 100).toString();
+
+  // Recalculate when quantity changes (rate x qty, or total / qty).
   useEffect(() => {
-    if (parsedQty === 0) {
-      setValue("total_price", "");
+    const rate = parseFloat(values.price_per_unit as string);
+    const total = parseFloat(values.total_price as string);
+    if (driver.current === "total") {
+      if (parsedQty > 0 && !isNaN(total)) {
+        setValue("price_per_unit", round(total / parsedQty));
+      }
+    } else if (!isNaN(rate)) {
+      setValue("total_price", parsedQty > 0 ? round(parsedQty * rate) : "");
     }
-    if (values.price_per_unit && !values.total_price) {
-      const totalPrice = parsedQty * parseFloat(values.price_per_unit);
-      setValue("total_price", totalPrice.toString());
-    }
-  }, [parsedQty, values.price_per_unit]);
+  }, [parsedQty]);
 
   useEffect(() => {
     if (selectedType === "working") {
@@ -254,6 +257,12 @@ const PurchaseForm = ({
               onChange={(val) => {
                 clearErrors("category_id");
                 setValue("category_id", val);
+                const item = itemList.find((i) => i.id === val);
+                if (item?.base_price) {
+                  driver.current = "rate";
+                  setValue("price_per_unit", item.base_price.toString());
+                  setValue("total_price", round(parsedQty * item.base_price));
+                }
               }}
               label="Item"
               name="category_id"
@@ -320,9 +329,13 @@ const PurchaseForm = ({
               size="small"
               onChange={(e) => {
                 const { value } = e.target;
+                driver.current = "rate";
                 setValue("price_per_unit", value);
-                const totalPrice = parsedQty * parseFloat(value || 0);
-                setValue("total_price", totalPrice.toString());
+                const rate = parseFloat(value);
+                setValue(
+                  "total_price",
+                  isNaN(rate) ? "" : round(parsedQty * rate)
+                );
               }}
             />
 
@@ -335,11 +348,13 @@ const PurchaseForm = ({
               size="small"
               onChange={(e) => {
                 const { value } = e.target;
+                driver.current = "total";
                 setValue("total_price", value);
-                const pricePerUnit = parsedQty
-                  ? parseFloat(value || 0) / parsedQty
-                  : 0;
-                setValue("price_per_unit", pricePerUnit.toString());
+                const total = parseFloat(value);
+                setValue(
+                  "price_per_unit",
+                  isNaN(total) || !parsedQty ? "" : round(total / parsedQty)
+                );
               }}
             />
 
