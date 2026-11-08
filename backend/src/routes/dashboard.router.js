@@ -17,6 +17,13 @@ router.get(
 )
 
 router.get(
+  '/pending-invoices',
+  isAuthenticated,
+  requirePermission(P.dashboard_read),
+  dashboardController.getPendingInvoices
+)
+
+router.get(
   '/manager',
   isAuthenticated,
   requirePermission(P.dashboard_read),

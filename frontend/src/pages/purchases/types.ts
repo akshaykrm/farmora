@@ -27,6 +27,7 @@ export type Purchase = {
   status: string;
   payment_type: "credit" | "paid";
   narration: string;
+  is_incomplete: boolean;
   type: "integration" | "working" | null;
 };
 
@@ -52,6 +53,7 @@ export type PurchaseFilterRequest = {
   vendor_id?: number | "";
   category_id?: number | "";
   batch_id?: number | "";
+  is_incomplete?: string;
   start_date?: string;
   end_date?: string;
 };
@@ -85,6 +87,7 @@ export type PurchaseFormValues = {
   assign_quantity: number | "";
   payment_type: "credit" | "paid" | null;
   narration: string;
+  is_incomplete: boolean;
 };
 
 export type DuplicateInvoice = {

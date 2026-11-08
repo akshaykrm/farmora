@@ -19,6 +19,7 @@ const defaultValues: PurchaseFormValues = {
   assign_quantity: "",
   payment_type: "credit",
   narration: "",
+  is_incomplete: false,
 };
 
 type Props = {

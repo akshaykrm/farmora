@@ -1,6 +1,7 @@
 import { SeasonNotFoundError } from '@errors/season.errors'
 import SeasonModel from '@models/season'
 import dayjs from 'dayjs'
+import pendingInvoiceService from '@services/pending-invoice.service'
 import { Op } from 'sequelize'
 import { applyTenantMasterId, tenantMasterId } from '@utils/tenant-scope'
 import { calculateOffSet } from '@utils/pagination'
@@ -75,6 +76,12 @@ const updateById = async (seasonId, payload, currentUser) => {
 }
 
 const close = async (seasonId, currentUser) => {
+  const seasonRecord = await getById(seasonId, currentUser)
+  await pendingInvoiceService.assertNoneForClose(
+    'season',
+    { season_id: seasonRecord.id },
+    currentUser
+  )
   await updateById(seasonId, { closed_on: dayjs().toDate() }, currentUser)
 }
 

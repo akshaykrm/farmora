@@ -9,6 +9,7 @@ import Ternary from "@components/ternary";
 import dayjs from "dayjs";
 import type { Purchase } from "../types";
 import { formatCurrency } from "@utils/currency";
+import Badge from "@components/Badge";
 
 const headers = [
   "Invoice Number",
@@ -43,7 +44,16 @@ const ItemTable = ({ onEdit, data }: Props) => {
         {data.map((item) => {
           return (
             <TableRow key={item.id}>
-              <TableCell content={item.invoice_number} />
+              <TableCell
+                content={
+                  <div className="flex flex-col items-start gap-1">
+                    <span>{item.invoice_number}</span>
+                    {item.is_incomplete && (
+                      <Badge variant="warning">Incomplete</Badge>
+                    )}
+                  </div>
+                }
+              />
               <TableCell
                 content={dayjs(item.invoice_date).format("DD-MM-YYYY")}
               />

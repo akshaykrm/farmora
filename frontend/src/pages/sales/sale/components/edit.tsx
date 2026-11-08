@@ -25,6 +25,7 @@ const defaultValues: EditSaleRequest = {
   payment_type: null,
   price: 0,
   narration: "",
+  is_incomplete: false,
 };
 
 const EditSale = ({ selectedId, onClose, refetch }: Props) => {
@@ -89,7 +90,12 @@ const EditSale = ({ selectedId, onClose, refetch }: Props) => {
   };
 
   return (
-    <Dialog isOpen={isShow} headerTitle="Edit Sale" onClose={handleClose}>
+    <Dialog
+      isOpen={isShow}
+      headerTitle="Edit Sale"
+      onClose={handleClose}
+      className="max-w-3xl"
+    >
       <DialogContent>
         <SaleForm
           methods={methods}

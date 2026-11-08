@@ -14,6 +14,7 @@ import purchase from "../api";
 import { itemTypes } from "@pages/items";
 import { RHFTextField } from "@components/form/input";
 import useGetBatchNameList from "@hooks/use-get-batch-names";
+import IncompleteInvoiceToggle from "@components/incomplete-invoice-toggle";
 
 type Props = {
   defaultValues: DefaultValues<PurchaseFormValues>;
@@ -399,6 +400,10 @@ const PurchaseForm = ({
                 size="small"
               />
             </div>
+            <IncompleteInvoiceToggle
+              checked={Boolean(values.is_incomplete)}
+              onChange={(checked) => setValue("is_incomplete", checked)}
+            />
           </FormSection>
         </div>
 

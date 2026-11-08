@@ -9,8 +9,16 @@ function useGetSales(filter: Filter) {
     totalPages: number;
   }>({ records: [], totalPages: 0 });
 
-  const { season_id, start_date, end_date, buyer_name, page, limit, batch_id } =
-    filter;
+  const {
+    season_id,
+    start_date,
+    end_date,
+    buyer_name,
+    page,
+    limit,
+    batch_id,
+    is_incomplete,
+  } = filter;
 
   const handlefetchAllSales = useCallback(
     async (override?: Filter) => {
@@ -27,7 +35,16 @@ function useGetSales(filter: Filter) {
         }
       }
     },
-    [season_id, start_date, end_date, buyer_name, page, limit, batch_id],
+    [
+      season_id,
+      start_date,
+      end_date,
+      buyer_name,
+      page,
+      limit,
+      batch_id,
+      is_incomplete,
+    ],
   );
 
   useEffect(() => {

@@ -17,6 +17,7 @@ export type Sale = {
   amount: number;
   narration: string;
   status: string;
+  is_incomplete: boolean;
 };
 
 export type NewSaleRequest = {
@@ -30,6 +31,7 @@ export type NewSaleRequest = {
   payment_type: "credit" | "cash" | null;
   price: number;
   narration: string;
+  is_incomplete: boolean;
 };
 
 export type SaleFilterRequest = {

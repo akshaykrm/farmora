@@ -10,3 +10,15 @@ export class InvoiceNumberExistsError extends Error {
     }
   }
 }
+
+export class IncompleteInvoicesError extends Error {
+  constructor(scope, summary) {
+    super(
+      `Cannot close ${scope}: ${summary.total} incomplete invoice(s) must be completed first`
+    )
+    this.name = 'IncompleteInvoicesError'
+    this.code = 'INCOMPLETE_INVOICES'
+    this.statusCode = 409
+    this.details = summary
+  }
+}

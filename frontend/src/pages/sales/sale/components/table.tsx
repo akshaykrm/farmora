@@ -8,13 +8,14 @@ import EmptyContentMessage from "@components/EmptyContentMessage";
 import Ternary from "@components/ternary";
 import dayjs from "dayjs";
 import type { Sale } from "@app-types/sales.types";
+import Badge from "@components/Badge";
 
 const headers = [
   "ID",
   "Date",
   "Season",
   "Batch",
-  "Buyer",
+  "Customer",
   "Vehicle No",
   "Weight (kg)",
   "Birds",
@@ -44,7 +45,16 @@ const SalesTable = ({ onEdit, data }: Props) => {
         </TableRow>
         {data.map((sale, i) => (
           <TableRow key={sale.id}>
-            <TableCell content={i + 1} />
+            <TableCell
+              content={
+                <div className="flex flex-col items-start gap-1">
+                  <span>{i + 1}</span>
+                  {sale.is_incomplete && (
+                    <Badge variant="warning">Incomplete</Badge>
+                  )}
+                </div>
+              }
+            />
             <TableCell content={dayjs(sale.date).format("DD-MM-YYYY")} />
             <TableCell content={sale.season?.name} />
             <TableCell content={sale.batch?.name} />

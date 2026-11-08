@@ -39,7 +39,27 @@ export interface OpenBatchDetail {
   season_name: string;
 }
 
+export interface PendingInvoiceItem {
+  type: "purchase" | "sale";
+  id: number;
+  reference: string;
+  date: string;
+  amount: string;
+  party: string;
+  batch_id: number | null;
+  batch: string;
+  season: string;
+}
+
+export interface PendingInvoicesSummary {
+  total: number;
+  purchases: number;
+  sales: number;
+  items: PendingInvoiceItem[];
+}
+
 export interface ManagerDashboardData {
+  pendingInvoices?: PendingInvoicesSummary;
   metrics: MetricData[];
   balanceInHand: number;
   customerBalance: number;

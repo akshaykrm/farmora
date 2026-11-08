@@ -1,17 +1,50 @@
 import SelectList from "@components/select-list";
 import useGetBatchNameList from "@hooks/use-get-batch-names";
 import useGetSeasonNames from "@hooks/use-get-season-names";
-import { TextField, Button, MenuItem } from "@mui/material";
+import { TextField, Button, InputAdornment } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
-import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
 import useGetVendorNames from "@hooks/use-get-vendor-name-list";
+import IncompleteInvoiceToggle from "@components/incomplete-invoice-toggle";
+import { formatCurrency } from "@utils/currency";
 
 type Props = {
   methods: any;
   onSubmit: (payload: any) => void;
   onCancel?: () => void;
 };
+
+const Section = ({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description?: string;
+  children: ReactNode;
+}) => (
+  <section className="rounded-lg border border-brand-border p-4">
+    <div className="mb-4">
+      <h3 className="text-sm font-semibold text-brand-ink">{title}</h3>
+      {description && (
+        <p className="text-xs text-brand-ink-muted">{description}</p>
+      )}
+    </div>
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 [&>*]:min-w-0">
+      {children}
+    </div>
+  </section>
+);
+
+const SummaryItem = ({ label, value }: { label: string; value: string }) => (
+  <div className="flex flex-col">
+    <span className="text-[11px] uppercase tracking-wider text-brand-ink-muted">
+      {label}
+    </span>
+    <span className="text-lg font-semibold text-brand-ink">{value}</span>
+  </div>
+);
 
 const SaleForm = ({ methods, onSubmit, onCancel }: Props) => {
   const {
@@ -20,49 +53,80 @@ const SaleForm = ({ methods, onSubmit, onCancel }: Props) => {
     formState: { errors },
     clearErrors,
   } = methods;
+  const err = errors as Record<string, { message?: string } | undefined>;
 
   const values = methods.watch();
 
   const seasonNames = useGetSeasonNames({ status: "active" });
   const batchNames = useGetBatchNameList({
     status: "active",
+    season_id: values.season_id,
   });
-
   const buyersList = useGetVendorNames({ type: "customer" });
 
-  const [averageWeight, setAverageWeight] = useState<number>(0.0);
-  useEffect(() => {
-    const iWeight = parseFloat(values.weight);
-    const iBirdNo = parseFloat(values.bird_no);
+  const weight = parseFloat(values.weight) || 0;
+  const birds = parseFloat(values.bird_no) || 0;
+  const price = parseFloat(values.price) || 0;
+  const averageWeight = birds > 0 ? weight / birds : 0;
+  const amount = price * weight;
 
-    if (iBirdNo > 0) {
-      const averageWeight = iWeight / iBirdNo;
-      setAverageWeight(averageWeight);
-    }
-  }, [values.weight, values.bird_no]);
+  const textProps = (name: string) => ({
+    name,
+    fullWidth: true,
+    size: "small" as const,
+    error: Boolean(err[name]),
+    helperText: err[name]?.message,
+  });
 
-  const [amount, setAmount] = useState<number>(0);
-  useEffect(() => {
-    setAmount(values.price * values.weight);
-  }, [values.price, values.weight]);
+  const numberField = (
+    name: string,
+    label: string,
+    unit: string,
+    opts: { integer?: boolean; required?: boolean } = {},
+  ) => (
+    <TextField
+      {...textProps(name)}
+      label={label}
+      required={opts.required}
+      type="number"
+      placeholder="0"
+      value={values[name] === 0 ? "" : (values[name] ?? "")}
+      onFocus={(e) => e.target.select()}
+      onWheel={(e) => (e.target as HTMLInputElement).blur()}
+      slotProps={{
+        input: {
+          endAdornment: <InputAdornment position="end">{unit}</InputAdornment>,
+        },
+        htmlInput: { min: 0, step: opts.integer ? 1 : "any" },
+      }}
+      onChange={(e) => {
+        const { value } = e.target;
+        setValue(name, value === "" ? "" : parseFloat(value));
+        clearErrors(name);
+      }}
+    />
+  );
 
   return (
-    <>
-      <form {...methods} onSubmit={handleSubmit(onSubmit)}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <div className="flex flex-col gap-4">
+        <Section
+          title="Sale Details"
+          description="Who bought, and for which batch"
+        >
           <SelectList
             options={seasonNames.data || []}
             value={values.season_id}
             onChange={(val) => {
               setValue("season_id", val);
+              setValue("batch_id", null);
               clearErrors("season_id");
             }}
-            label="Season"
+            label="Season *"
             name="season_id"
-            error={Boolean((errors as any).season_id)}
-            helperText={(errors as any).season_id?.message}
+            error={Boolean(err.season_id)}
+            helperText={err.season_id?.message}
           />
-
           <SelectList
             options={batchNames.data || []}
             value={values.batch_id}
@@ -70,31 +134,29 @@ const SaleForm = ({ methods, onSubmit, onCancel }: Props) => {
               setValue("batch_id", val);
               clearErrors("batch_id");
             }}
-            label="Batch"
+            label="Batch *"
             name="batch_id"
-            error={Boolean((errors as any).batch_id)}
-            helperText={(errors as any).batch_id?.message}
+            error={Boolean(err.batch_id)}
+            helperText={err.batch_id?.message}
           />
-
           <DatePicker
-            label="Sale Date"
+            label="Sale Date *"
             name="date"
             value={values.date ? dayjs(values.date) : null}
             format="DD-MM-YYYY"
             onChange={(v) => {
-              setValue("date", dayjs(v).toISOString());
+              setValue("date", v ? dayjs(v).toISOString() : "");
               clearErrors("date");
             }}
             slotProps={{
               textField: {
                 fullWidth: true,
-                error: Boolean(errors.date),
-                helperText: errors.date?.message,
+                error: Boolean(err.date),
+                helperText: err.date?.message,
                 size: "small",
               },
             }}
           />
-
           <SelectList
             options={buyersList.data}
             value={values.buyer_id}
@@ -102,142 +164,76 @@ const SaleForm = ({ methods, onSubmit, onCancel }: Props) => {
               setValue("buyer_id", val);
               clearErrors("buyer_id");
             }}
-            label="Buyer"
+            label="Customer *"
             name="buyer_id"
-            error={Boolean((errors as any).buyer_id)}
-            helperText={(errors as any).buyer_id?.message}
+            error={Boolean(err.buyer_id)}
+            helperText={err.buyer_id?.message}
           />
-
           <TextField
-            label="Vehicle Number"
-            value={values.vehicle_no}
-            name="vehicle_no"
+            {...textProps("vehicle_no")}
+            label="Vehicle Number (optional)"
+            value={values.vehicle_no ?? ""}
             onChange={(e) => {
-              const { name, value } = e.target;
-              setValue(name, value);
-              clearErrors(name);
+              setValue("vehicle_no", e.target.value.toUpperCase());
+              clearErrors("vehicle_no");
             }}
-            fullWidth
-            error={Boolean(errors.vehicle_no)}
-            helperText={errors.vehicle_no?.message}
-            size="small"
           />
+        </Section>
 
-          <TextField
-            label="Weight (kg)"
-            type="number"
-            value={values.weight}
-            name="weight"
-            fullWidth
-            onChange={(e) => {
-              const { name, value } = e.target;
-              setValue(name, value ? parseFloat(value) : "");
-              clearErrors(name);
-            }}
-            error={Boolean(errors.weight)}
-            helperText={errors.weight?.message}
-            size="small"
-          />
+        <Section title="Load & Pricing" description="Totals update as you type">
+          {numberField("weight", "Total Weight", "kg", { required: true })}
+          {numberField("bird_no", "Number of Birds", "birds", {
+            integer: true,
+            required: true,
+          })}
+          {numberField("price", "Price per kg", "₹")}
+          <div className="rounded-md bg-brand-canvas border border-brand-border px-4 py-2 grid grid-cols-2 gap-4 items-center">
+            <SummaryItem
+              label="Avg weight"
+              value={`${averageWeight.toFixed(2)} kg`}
+            />
+            <SummaryItem label="Net amount" value={formatCurrency(amount)} />
+          </div>
+        </Section>
 
-          <TextField
-            label="Number of Birds"
-            type="number"
-            value={values.bird_no}
-            name="bird_no"
-            onChange={(e) => {
-              const { name, value } = e.target;
-              setValue(name, value ? value : "");
-              clearErrors(name);
-            }}
-            fullWidth
-            error={Boolean(errors.bird_no)}
-            helperText={errors.bird_no?.message}
-            size="small"
-          />
-
-          <TextField
-            label="AVG Weight"
-            value={averageWeight}
-            fullWidth
-            disabled
-            size="small"
-          />
-
-          <TextField
-            label="Price per Unit"
-            type="number"
-            name="price"
-            value={values.price}
-            fullWidth
-            onChange={(e) => {
-              const { name, value } = e.target;
-              setValue(name, value ? parseFloat(value) : "");
-              clearErrors(name);
-            }}
-            error={Boolean(errors.price)}
-            helperText={errors.price?.message}
-            size="small"
-          />
-
-          <TextField
-            label="Net Amount"
-            type="number"
-            name="amount"
-            value={amount}
-            fullWidth
-            disabled
-            size="small"
-          />
-
+        <Section title="Notes">
           <TextField
             label="Payment Type"
-            select
-            value={values.payment_type}
-            name="payment_type"
-            fullWidth
-            onChange={(e) => {
-              const { name, value } = e.target;
-              setValue(name, value ? value : "");
-              clearErrors(name);
-            }}
-            error={Boolean(errors.payment_type)}
-            helperText={errors.payment_type?.message}
             size="small"
-          >
-            <MenuItem value="cash">Cash</MenuItem>
-            <MenuItem value="credit">Credit</MenuItem>
-          </TextField>
-
+            fullWidth
+            disabled
+            value={values.payment_type === "cash" ? "Cash" : "Credit"}
+          />
           <TextField
-            label="Narration"
-            value={values.narration}
-            fullWidth
-            name="narration"
-            onChange={(e) => {
-              const { name, value } = e.target;
-              setValue(name, value ? value : "");
-              clearErrors(name);
-            }}
-            error={Boolean(errors.narration)}
-            helperText={errors.narration?.message}
-            size="small"
+            {...textProps("narration")}
+            label="Narration (optional)"
+            value={values.narration ?? ""}
             multiline
             rows={2}
             className="md:col-span-2"
+            onChange={(e) => {
+              setValue("narration", e.target.value);
+              clearErrors("narration");
+            }}
           />
-        </div>
-        <div className="flex justify-end mt-6 gap-2">
-          {onCancel && (
-            <Button variant="outlined" type="button" onClick={onCancel}>
-              Cancel
-            </Button>
-          )}
-          <Button variant="contained" type="submit">
-            Submit
+          <IncompleteInvoiceToggle
+            checked={Boolean(values.is_incomplete)}
+            onChange={(checked) => setValue("is_incomplete", checked)}
+          />
+        </Section>
+      </div>
+
+      <div className="sticky bottom-0 -mx-1 mt-4 flex justify-end gap-2 bg-brand-card px-1 pt-3">
+        {onCancel && (
+          <Button variant="outlined" type="button" onClick={onCancel}>
+            Cancel
           </Button>
-        </div>
-      </form>
-    </>
+        )}
+        <Button variant="contained" type="submit">
+          Save Sale
+        </Button>
+      </div>
+    </form>
   );
 };
 

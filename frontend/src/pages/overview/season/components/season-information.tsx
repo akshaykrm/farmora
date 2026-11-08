@@ -6,6 +6,8 @@ import { Button } from "@mui/material";
 import dayjs from "dayjs";
 import { useCallback, useState } from "react";
 import seasonOverview from "../api";
+import PendingInvoicesList from "@components/pending-invoices/pending-invoices-list";
+import usePendingInvoices from "@components/pending-invoices/use-pending-invoices";
 
 type SeasonInformationProps = {
   name: string;
@@ -17,6 +19,12 @@ type SeasonInformationProps = {
 const SeasonInformation = (props: SeasonInformationProps) => {
   const { batchLength, name, closedOn, season_id } = props;
   const [showConfirm, setShowConfirm] = useState(false);
+
+  const pending = usePendingInvoices(
+    { season_id: season_id ?? 0 },
+    showConfirm && Boolean(season_id),
+  );
+  const pendingTotal = pending.data?.total ?? 0;
 
   const handleConfirmClose = useCallback(async () => {
     if (!season_id) {
@@ -86,6 +94,18 @@ const SeasonInformation = (props: SeasonInformationProps) => {
             able to add new batches, expenses, sales, or returns. You can
             still view the season information. This action cannot be undone.
           </p>
+          {pendingTotal > 0 && pending.data && (
+            <div className="mt-4 flex flex-col gap-2">
+              <p className="text-sm font-semibold text-brand-danger">
+                {pendingTotal} incomplete invoice(s) must be completed before
+                this season can be closed.
+              </p>
+              <PendingInvoicesList
+                items={pending.data.items}
+                total={pending.data.total}
+              />
+            </div>
+          )}
           <div className="flex justify-end mt-6 gap-2">
             <Button variant="outlined" onClick={() => setShowConfirm(false)}>
               Cancel
@@ -93,6 +113,7 @@ const SeasonInformation = (props: SeasonInformationProps) => {
             <Button
               variant="contained"
               color="error"
+              disabled={pending.isLoading || pendingTotal > 0}
               onClick={handleConfirmClose}
             >
               Proceed

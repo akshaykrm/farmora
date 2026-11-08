@@ -31,6 +31,7 @@ const salesApi = {
       payment_type: data?.payment_type,
       price: data?.price,
       narration: data?.narration,
+      is_incomplete: Boolean(data?.is_incomplete),
     };
     return {
       status,
@@ -54,6 +55,7 @@ const salesApi = {
       payment_type: updateData.payment_type,
       price: updateData.price,
       narration: updateData.narration,
+      is_incomplete: updateData.is_incomplete,
     };
     return await fetcherV2(`sales/${id}`, JSON.stringify(payload), {
       method: "PUT",
