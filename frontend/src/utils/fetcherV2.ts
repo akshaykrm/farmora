@@ -1,5 +1,6 @@
 import { type ErrorTest } from "@errors/api.error";
 import { getSession } from "./session";
+import { handleUnauthorized } from "./auth-events";
 import { BACKEND_URL } from "@config";
 
 const genURI = (path: string) => {
@@ -59,6 +60,9 @@ const fetcherV2 = async <T>(
       options.body = payload;
     }
     const res = await fetch(URI.toString(), options);
+    if (res.status === 401 && session?.token) {
+      handleUnauthorized();
+    }
     const json = await res.json();
 
     if (res.ok) {

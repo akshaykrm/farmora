@@ -3,6 +3,7 @@ import { authDataContext, authDispatchContext } from "./context";
 import type { AuthActions, AuthContextData, AuthUser } from "@app-types/auth.types";
 import { createSession, getSession } from "@utils/session";
 import profile from "@pages/profile/api";
+import { setUnauthorizedListener } from "@utils/auth-events";
 
 const sessionToUser = (): AuthUser | null => {
   const userSession = getSession();
@@ -63,6 +64,13 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       user: sessionToUser(),
     };
   });
+
+  useEffect(() => {
+    setUnauthorizedListener(() =>
+      dispatch({ type: "LOGOUT", payload: { token: null, user: null } }),
+    );
+    return () => setUnauthorizedListener(null);
+  }, []);
 
   useEffect(() => {
     if (!value.token) return;
