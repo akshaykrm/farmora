@@ -68,6 +68,7 @@ const platform = (key, description, group, submenu = null) => ({
 export const TENANT_REPORTS = {
   batch_financial: 'Batch Performance (Financial)',
   batch_daily_log: 'Batch Performance (Daily Log)',
+  bird_shortage: 'Shortage Comparison',
   farm_comparison: 'Farm Comparison',
   daily_production: 'Daily Production',
   sales_register: 'Sales Register',

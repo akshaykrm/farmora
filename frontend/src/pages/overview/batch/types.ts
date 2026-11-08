@@ -80,6 +80,10 @@ export type BatchOverviewSummary = {
   total_expense: number;
   fcr: number;
   cfcr: number;
+  total_birds_purchased: number;
+  total_mortality: number;
+  bird_shortage: number;
+  shortage_percentage: number;
 };
 
 export type BatchOverviewSlot<T> = {

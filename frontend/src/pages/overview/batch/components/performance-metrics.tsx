@@ -1,5 +1,6 @@
 import {
   ArrowUpDown,
+  Bird,
   Coins,
   Gauge,
   Percent,
@@ -17,10 +18,12 @@ type Props = {
   avgCost: number;
   avgRate: number;
   costRateDifference: number;
+  birdShortage: number;
+  shortagePercentage: number;
 };
 
 const PerformanceMetrics = (props: Props) => {
-  const { averageWeight, cfcr, fcr, avgCost, avgRate, costRateDifference } =
+  const { averageWeight, cfcr, fcr, avgCost, avgRate, costRateDifference, birdShortage, shortagePercentage } =
     props;
 
   return (
@@ -68,6 +71,20 @@ const PerformanceMetrics = (props: Props) => {
           value={`₹${roundNumber(costRateDifference)}`}
           valueClassName={
             costRateDifference >= 0 ? "text-brand-success" : "text-brand-danger"
+          }
+        />
+        <MetricTile
+          icon={<Bird className="w-4 h-4" />}
+          label="Bird Shortage"
+          value={`${birdShortage}`}
+          valueClassName={birdShortage > 0 ? "text-brand-danger" : ""}
+        />
+        <MetricTile
+          icon={<Percent className="w-4 h-4" />}
+          label="Shortage %"
+          value={`${roundNumber(shortagePercentage)}%`}
+          valueClassName={
+            shortagePercentage > 0 ? "text-brand-danger" : ""
           }
         />
       </div>

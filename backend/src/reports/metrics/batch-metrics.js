@@ -225,3 +225,58 @@ export const computeDailyLogMetrics = async (batches, masterId) => {
     })
   )
 }
+
+/**
+ * Bird shortage = birds purchased - birds sold - birds dead. Birds sold come
+ * from the sales table (same as the Batch Overview), deaths from the daily log.
+ */
+export const calculateBirdShortage = (purchased, sold, dead) => {
+  const shortage = purchased - sold - dead
+  return {
+    total_birds_purchased: purchased,
+    total_mortality: dead,
+    bird_shortage: shortage,
+    shortage_percentage: purchased ? (shortage / purchased) * 100 : 0,
+  }
+}
+
+export const computeShortageMetrics = async (batches, masterId) => {
+  const ids = batches.map((batch) => batch.id)
+  if (!ids.length) return new Map()
+  const [sales, logs, chicks] = await Promise.all([
+    query(
+      `SELECT batch_id, SUM(bird_no) AS birds
+       FROM sales
+       WHERE master_id = :masterId AND batch_id IN (:ids)
+         AND season_id IS NOT NULL AND deleted_at IS NULL
+       GROUP BY batch_id`,
+      { ids, masterId }
+    ),
+    query(
+      `SELECT batch_id, SUM(mortality) AS mortality
+       FROM batch_daily_logs
+       WHERE master_id = :masterId AND batch_id IN (:ids)
+       GROUP BY batch_id`,
+      { ids, masterId }
+    ),
+    chickTotals(ids, masterId),
+  ])
+  const s = byBatch(sales)
+  const l = byBatch(logs)
+  return new Map(
+    ids.map((id) => {
+      const sold = num(s.get(id)?.birds)
+      return [
+        id,
+        {
+          ...calculateBirdShortage(
+            chicks.get(id)?.chicks || 0,
+            sold,
+            num(l.get(id)?.mortality)
+          ),
+          sale_birds: sold,
+        },
+      ]
+    })
+  )
+}

@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import {
   Activity,
+  Bird,
   CalendarClock,
   ChartColumn,
   ChartPie,
@@ -52,6 +53,18 @@ const DEFAULT_SCOPE: Scope = {
 export const REPORT_CONFIG: Record<string, ReportConfig> = {
   batch_financial: {
     icon: ChartColumn,
+    filters: [
+      "season_id",
+      "farm_id",
+      "batch_id",
+      "batch_status",
+      "start_date",
+      "end_date",
+    ],
+    scope: DEFAULT_SCOPE,
+  },
+  bird_shortage: {
+    icon: Bird,
     filters: [
       "season_id",
       "farm_id",
