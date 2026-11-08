@@ -17,7 +17,7 @@ import {
   DailyLogNotFoundError,
   DailyLogStartDateMissingError,
 } from '@errors/batch-daily-log.errors'
-import { CHICK_TYPE, isFeedType } from '@utils/feed'
+import { CHICK_TYPE } from '@utils/feed'
 import logger from '@utils/logger'
 
 const DATE_FORMAT = 'YYYY-MM-DD'
@@ -398,50 +398,13 @@ const remove = async (batchId, logId, currentUser) => {
   await record.destroy()
 }
 
-const sumFeedQuantity = (records) =>
-  records
-    .filter((record) => isFeedType(record.category?.type))
-    .reduce((sum, record) => sum + toNumber(record.quantity), 0)
-
 const prefill = async (batchId, date, currentUser) => {
   const batch = await loadBatch(batchId, currentUser)
-  const start = dayjs(date).startOf('day').toDate()
-  const end = dayjs(date).add(1, 'day').startOf('day').toDate()
-  const categoryInclude = {
-    model: ItemModel,
-    as: 'category',
-    required: false,
-    attributes: ['id', 'type'],
-  }
-
-  const [purchases, reassigned, startDate] = await Promise.all([
-    PurchaseModel.findAll({
-      where: {
-        batch_id: batch.id,
-        master_id: batch.master_id,
-        invoice_date: { [Op.gte]: start, [Op.lt]: end },
-      },
-      attributes: ['id', 'quantity'],
-      include: [categoryInclude],
-    }),
-    PurchaseReturnModel.findAll({
-      where: {
-        to_batch: batch.id,
-        master_id: batch.master_id,
-        date: { [Op.gte]: start, [Op.lt]: end },
-      },
-      attributes: ['id', 'quantity'],
-      include: [categoryInclude],
-    }),
-    resolveStartDate(batch),
-  ])
+  const startDate = await resolveStartDate(batch)
 
   return {
     date,
     age: startDate.date ? ageOn(startDate.date, date) : null,
-    issued_feed: round(
-      sumFeedQuantity(purchases) + sumFeedQuantity(reassigned)
-    ),
   }
 }
 
