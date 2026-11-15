@@ -26,12 +26,17 @@ const create = async (payload, currentUser) => {
 }
 
 const getAll = async (filter, currentUser) => {
-  const { limit, page, season_id, start_date, end_date, purpose } = filter
+  const { limit, page, season_id, category_id, start_date, end_date, purpose } =
+    filter
   const whereClause = {}
   const offset = calculateOffSet(page, limit)
 
   if (season_id) {
     whereClause.season_id = season_id
+  }
+
+  if (category_id) {
+    whereClause.category_id = category_id
   }
 
   if (purpose) {
