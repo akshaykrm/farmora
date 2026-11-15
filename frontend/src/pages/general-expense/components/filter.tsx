@@ -5,7 +5,7 @@ import FilterCard from "@components/FilterCard";
 import { useForm } from "react-hook-form";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
-import { RHFTextField } from "@components/form/input";
+import CategoryFilterSelect from "@components/general-category/category-filter-select";
 import type { Filter } from "@utils/filters";
 
 type Props = {
@@ -21,7 +21,6 @@ const FilterGeneralExpense = ({ onFilter, defaultFilter }: Props) => {
     formState: { errors },
     watch,
     setValue,
-    control,
   } = methods;
 
   const seasonNames = useGetSeasonNames({ status: "active" });
@@ -34,11 +33,11 @@ const FilterGeneralExpense = ({ onFilter, defaultFilter }: Props) => {
   const handleClearAll = () => {
     methods.reset({
       season_id: null,
-      purpose: "",
+      category_id: null,
       start_date: "",
       end_date: "",
     });
-    onFilter({ season_id: null, purpose: "", start_date: "", end_date: "" });
+    onFilter({ season_id: null, category_id: null, start_date: "", end_date: "" });
   };
 
   return (
@@ -56,12 +55,12 @@ const FilterGeneralExpense = ({ onFilter, defaultFilter }: Props) => {
           helperText={errors.season_id?.message}
         />
 
-        <RHFTextField
-          label="Purpose"
-          name="purpose"
-          control={control}
-          fullWidth
-          size="small"
+        <CategoryFilterSelect
+          kind="expense"
+          value={values.category_id as number | null}
+          onChange={(val) => {
+            setValue("category_id", val);
+          }}
         />
         <DatePicker
           label="Start Date"

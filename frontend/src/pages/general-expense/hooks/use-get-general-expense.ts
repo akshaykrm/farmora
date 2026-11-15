@@ -10,7 +10,7 @@ function useGetGeneralExpense(filter: Filter) {
     totalAmount: number;
   }>({ records: [], totalPages: 0, totalAmount: 0 });
 
-  const { season_id, start_date, end_date, purpose, page, limit } = filter;
+  const { season_id, start_date, end_date, category_id, page, limit } = filter;
 
   const handlefetchAllGeneralExpense = useCallback(
     async (override?: Filter) => {
@@ -28,7 +28,7 @@ function useGetGeneralExpense(filter: Filter) {
         }
       }
     },
-    [season_id, start_date, end_date, purpose, page, limit],
+    [season_id, start_date, end_date, category_id, page, limit],
   );
 
   useEffect(() => {
