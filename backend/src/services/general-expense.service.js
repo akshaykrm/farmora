@@ -1,5 +1,7 @@
 import GeneralExpenseModel from '@models/generalexpense'
+import GeneralCategoryModel from '@models/generalcategory'
 import SeasonModel from '@models/season'
+import generalCategoryService from '@services/general-category.service'
 import userRoles from '@utils/user-roles'
 import dayjs from 'dayjs'
 import { Op } from 'sequelize'
@@ -11,6 +13,12 @@ const create = async (payload, currentUser) => {
   } else {
     payload.master_id = currentUser.id
   }
+
+  payload = await generalCategoryService.applyCategory(
+    'expense',
+    payload,
+    payload.master_id
+  )
 
   const record = await GeneralExpenseModel.create(payload)
   return record
@@ -53,6 +61,12 @@ const getAll = async (filter, currentUser) => {
       offset,
       order: [['date', 'DESC']],
       include: [
+        {
+          model: GeneralCategoryModel,
+          as: 'category',
+          required: false,
+          attributes: ['id', 'name'],
+        },
         {
           model: SeasonModel,
           as: 'season',
@@ -116,6 +130,11 @@ const getById = async (id, currentUser) => {
 
 const updateById = async (id, payload, currentUser) => {
   const record = await getById(id, currentUser)
+  payload = await generalCategoryService.applyCategory(
+    'expense',
+    payload,
+    record.master_id
+  )
   await record.update(payload)
 }
 

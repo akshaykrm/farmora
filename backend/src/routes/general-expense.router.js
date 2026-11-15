@@ -5,9 +5,20 @@ import validate, { validateQuery } from '@utils/validate-request'
 import salesExportController from '@controllers/sales-export.controller'
 import { exportQuerySchema } from '@validators/export.validator'
 import { newGeneralExpenseSchema } from '@validators/general-expense.validator'
+import createGeneralCategoryRouter from '@routes/general-category.router'
 import { Router } from 'express'
 
 const router = Router()
+
+router.use(
+  '/categories',
+  createGeneralCategoryRouter('expense', {
+    read: P.general_expense_read,
+    write: P.general_expense_write,
+    edit: P.general_expense_edit,
+    delete: P.general_expense_delete,
+  })
+)
 
 router.get(
   '/',

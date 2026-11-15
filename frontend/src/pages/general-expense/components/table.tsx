@@ -8,7 +8,7 @@ import { formatCurrency } from "@utils/currency";
 import dayjs from "dayjs";
 import { EditIcon } from "lucide-react";
 
-const headers = ["Date", "Season", "Purpose", "Amount", "Action"];
+const headers = ["Date", "Season", "Category", "Amount", "Action"];
 
 type Props = {
   onEdit: (selectedId: number) => void;
@@ -32,7 +32,7 @@ const GeneralExpenseTable = ({ onEdit, data }: Props) => {
             <TableCell
               content={item.season?.name || `Season ${item.season_id}`}
             />
-            <TableCell content={item.purpose} />
+            <TableCell content={item.category?.name ?? item.purpose} />
             <TableCell content={formatCurrency(item.amount || 0)} />
             <TableCell
               content={
