@@ -1,22 +1,18 @@
 import seasons from "@pages/seasons/api";
 import type { SeasonName, SeasonNameFilter } from "@pages/seasons/types";
-import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+
+const EMPTY: SeasonName[] = [];
 
 const useGetSeasonNames = (filter?: SeasonNameFilter) => {
-  const [state, setState] = useState<SeasonName[]>([]);
-
   const { status } = filter || {};
-  useEffect(() => {
-    seasons
-      .getNames({ status })
-      .then((data) => setState(data))
-      .catch((err) => {
-        console.log(err);
-        setState([]);
-      });
-  }, [status]);
+  const query = useQuery<SeasonName[]>({
+    queryKey: ["season:names", { status }],
+    queryFn: () => seasons.getNames({ status }),
+    staleTime: 30_000,
+  });
 
-  return { data: state };
+  return { data: query.data ?? EMPTY };
 };
 
 export default useGetSeasonNames;

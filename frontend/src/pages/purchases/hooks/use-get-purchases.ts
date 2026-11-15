@@ -18,6 +18,7 @@ function useGetPurchases(filter?: Filter) {
     vendor_id,
     category_id,
     batch_id,
+    is_incomplete,
     start_date,
     end_date,
   } = filter || {};
@@ -37,7 +38,16 @@ function useGetPurchases(filter?: Filter) {
         }
       }
     },
-    [page, limit, vendor_id, category_id, batch_id, start_date, end_date],
+    [
+      page,
+      limit,
+      vendor_id,
+      category_id,
+      batch_id,
+      is_incomplete,
+      start_date,
+      end_date,
+    ],
   );
 
   useEffect(() => {

@@ -19,6 +19,7 @@ export const parseSaleFilter = (query) =>
     'batch_id',
     'buyer_name',
     'payment_type',
+    'is_incomplete',
     'start_date',
     'end_date',
   ])

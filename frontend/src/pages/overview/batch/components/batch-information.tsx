@@ -7,6 +7,8 @@ import { Button } from "@mui/material";
 import dayjs from "dayjs";
 import { useState } from "react";
 import type { BatchOverviewBatch, BatchLog } from "../types";
+import PendingInvoicesList from "@components/pending-invoices/pending-invoices-list";
+import usePendingInvoices from "@components/pending-invoices/use-pending-invoices";
 
 type Props = {
   batch?: BatchOverviewBatch;
@@ -44,7 +46,13 @@ function BatchInformation({ batch, refetch }: Props) {
   const [logError, setLogError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
+  const pending = usePendingInvoices(
+    { batch_id: batch?.id ?? 0 },
+    showConfirm && Boolean(batch),
+  );
+
   if (!batch) return null;
+  const pendingTotal = pending.data?.total ?? 0;
 
   const isClosed = Boolean(batch.closed_on);
   const logs = parseBatchLogs(batch.closing_statement);
@@ -242,6 +250,18 @@ function BatchInformation({ batch, refetch }: Props) {
             to add new expenses, sales, or returns. You can still view the batch
             information. This action cannot be undone.
           </p>
+          {pendingTotal > 0 && pending.data && (
+            <div className="mt-4 flex flex-col gap-2">
+              <p className="text-sm font-semibold text-brand-danger">
+                {pendingTotal} incomplete invoice(s) must be completed before
+                this batch can be closed.
+              </p>
+              <PendingInvoicesList
+                items={pending.data.items}
+                total={pending.data.total}
+              />
+            </div>
+          )}
           <div className="flex justify-end mt-4 gap-2">
             <Button variant="outlined" onClick={() => setShowConfirm(false)}>
               Cancel
@@ -249,6 +269,7 @@ function BatchInformation({ batch, refetch }: Props) {
             <Button
               variant="contained"
               color="error"
+              disabled={pending.isLoading || pendingTotal > 0}
               onClick={handleConfirmClose}
             >
               Proceed

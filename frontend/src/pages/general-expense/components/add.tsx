@@ -7,7 +7,7 @@ import { useState } from "react";
 
 const defaultValues: GeneralExpanceFormValues = {
   season_id: "",
-  purpose: "",
+  category_id: "",
   amount: "",
   date: "",
   narration: "",

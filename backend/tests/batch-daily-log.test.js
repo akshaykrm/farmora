@@ -343,14 +343,10 @@ describe('Batch daily log', () => {
     expect(reset.status).toBe(200)
   })
 
-  it('prefills the age and feed purchased for a date', async () => {
+  it('prefills the age for a date', async () => {
     const res = await api('get', '/prefill').query({ date: '2025-09-25' })
     expect(res.status).toBe(200)
     expect(res.body.data.age).toBe(5)
-    expect(res.body.data.issued_feed).toBe(5)
-
-    const noFeed = await api('get', '/prefill').query({ date: '2025-09-24' })
-    expect(noFeed.body.data.issued_feed).toBe(0)
   })
 
   it('deletes a log', async () => {

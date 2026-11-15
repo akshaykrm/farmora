@@ -26,6 +26,7 @@ import seasonService from '@services/season.service'
 import integrationBookService from '@services/itegration-book.service'
 import workingCostService from '@services/working-cost.service'
 import subscriptionService from '@services/subscription.service'
+import pendingInvoiceService from '@services/pending-invoice.service'
 
 function calculateTotalStockValue(purchaseItems, returnedItems) {
   let expenseTotal = 0
@@ -308,8 +309,15 @@ const getManagerDashboard = async (currentUser) => {
       (await subscriptionService.getCurrentSubscription(subscriptionOwnerId)) ||
       (await subscriptionService.getLatestSubscription(subscriptionOwnerId))
 
+    const pendingInvoices = await pendingInvoiceService.getPending(
+      {},
+      currentUser,
+      { limit: 10 }
+    )
+
     return {
       metrics,
+      pendingInvoices,
       balanceInHand: await getBalanceInHand(currentUser),
       customerBalance: customerBalance,
       supplierBalance: supplierBalance,

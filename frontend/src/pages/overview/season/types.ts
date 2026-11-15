@@ -26,6 +26,8 @@ export type Totals = {
   total_avg_weight: number;
   fcr: number;
   cfcr: number;
+  bird_shortage: number;
+  shortage_percentage: number;
   avg_cost: number;
   avg_rate: number;
   profit_loss_percentage: number;

@@ -5,6 +5,8 @@ export type GeneralExpenseRecord = {
   season_id: number;
   master_id: number;
   purpose: string;
+  category_id: number | null;
+  category?: { id: number; name: string } | null;
   date: string;
   amount: number;
   narration: string | null;
@@ -30,7 +32,7 @@ export type GeneralExpenseListResponse = {
 
 export type GeneralExpanceFormValues = {
   season_id: number | "";
-  purpose: string;
+  category_id: number | "";
   amount: string;
   date: string;
   narration?: string;

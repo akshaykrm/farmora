@@ -28,7 +28,7 @@ const generalExpense = {
   updateById: async (id: number, updateData: GeneralExpanceFormValues) => {
     const payload: GeneralExpanceFormValues = {
       season_id: updateData.season_id,
-      purpose: updateData.purpose,
+      category_id: updateData.category_id,
       amount: updateData.amount,
       date: updateData.date,
       narration: updateData.narration,

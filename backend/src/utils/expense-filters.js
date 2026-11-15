@@ -8,6 +8,7 @@ export const parsePurchaseFilter = (query) =>
     'category_id',
     'vendor_id',
     'batch_id',
+    'is_incomplete',
     'start_date',
     'end_date',
   ])

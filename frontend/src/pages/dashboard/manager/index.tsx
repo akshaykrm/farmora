@@ -14,6 +14,7 @@ import type { ManagerDashboardData } from "@app-types/dashboard.types";
 import { CircularProgress, Box } from "@mui/material";
 import { formatCurrency } from "@utils/currency";
 import DashboardDailyLog from "./components/daily-log";
+import PendingInvoicesCard from "./components/PendingInvoicesCard";
 
 const ManagerDashboard = () => {
   const { user } = useAuth();
@@ -61,6 +62,8 @@ const ManagerDashboard = () => {
       <SetupChecklistCard />
 
       <SubscriptionStatusCard subscriptionInfo={data.subscription} />
+
+      <PendingInvoicesCard data={data.pendingInvoices} />
 
       {/* KEY PERFORMANCE INDICATORS */}
       <section className="animate-in fade-in duration-700 shrink-0">

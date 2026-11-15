@@ -40,6 +40,8 @@ function useGetSeasonOverview(filter: Filter) {
       total_avg_weight: 0,
       fcr: 0,
       cfcr: 0,
+      bird_shortage: 0,
+      shortage_percentage: 0,
       avg_cost: 0,
       avg_rate: 0,
       profit_loss_percentage: 0,

@@ -13,6 +13,11 @@ import VendorModel from '@models/vendor'
 import BatchModel from '@models/batch'
 import { calculateOffSet } from '@utils/pagination'
 import { FEED_BAG_KG, isFeedType } from '@utils/feed'
+import BatchDailyLogModel from '@models/batchdailylog'
+import {
+  calculateBirdShortage,
+  chickTotals,
+} from '../reports/metrics/batch-metrics.js'
 
 function calculateTotalFeeds(records = []) {
   return records
@@ -151,6 +156,23 @@ async function getBatchOverview(filter, currentUser) {
 
   const CFCR = FCR - (avgWeight - 2.0) * 0.25
 
+  const chickMap = await chickTotals(
+    [Number(batch_id)],
+    selectedBatch.master_id
+  )
+  const totalBirdsPurchased = chickMap.get(Number(batch_id))?.chicks || 0
+  const totalMortality =
+    Number(
+      await BatchDailyLogModel.sum('mortality', {
+        where: { batch_id: Number(batch_id) },
+      })
+    ) || 0
+  const birdShortage = calculateBirdShortage(
+    totalBirdsPurchased,
+    totalSaleBirds,
+    totalMortality
+  )
+
   const expenses = [
     ...purchases.map((p) => ({
       ...p.get({ plain: true }),
@@ -183,6 +205,7 @@ async function getBatchOverview(filter, currentUser) {
     total_expense: totalPurchaseAmount - totalReturnAmount,
     fcr: FCR,
     cfcr: CFCR,
+    ...birdShortage,
   }
 
   // Expense
@@ -238,6 +261,8 @@ const calculateBatchTotals = (batchOverviews = []) => {
   let totalSaleWeight = 0
   let totalSaleBirds = 0
   let totalSaleAmount = 0
+  let totalBirdsPurchased = 0
+  let totalMortality = 0
 
   for (const overview of batchOverviews) {
     const data = overview.overviewCalculations
@@ -249,6 +274,8 @@ const calculateBatchTotals = (batchOverviews = []) => {
     totalSaleWeight += data.total_sale_weight || 0
     totalSaleBirds += data.total_sale_birds || 0
     totalSaleAmount += data.total_sale_amount || 0
+    totalBirdsPurchased += data.total_birds_purchased || 0
+    totalMortality += data.total_mortality || 0
   }
 
   const netFeedBags = totalPurchasedFeeds - totalReturnedFeeds
@@ -286,6 +313,11 @@ const calculateBatchTotals = (batchOverviews = []) => {
     totalSaleAmount,
     FCR,
     CFCR,
+    ...calculateBirdShortage(
+      totalBirdsPurchased,
+      totalSaleBirds,
+      totalMortality
+    ),
   }
 }
 
@@ -436,6 +468,8 @@ const getSeasonOverview = async (filter, currentUser) => {
       total_avg_weight: totalAvgWeight,
       fcr: totals.FCR,
       cfcr: totals.CFCR,
+      bird_shortage: totals.bird_shortage,
+      shortage_percentage: totals.shortage_percentage,
       avg_cost: avgCost,
       avg_rate: avgRate,
       profit_loss_percentage: avgRate - avgCost,

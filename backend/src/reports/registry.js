@@ -1,5 +1,6 @@
 import batchFinancial from './builders/batch-financial.js'
 import batchDailyLog from './builders/batch-daily-log.js'
+import birdShortage from './builders/bird-shortage.js'
 import farmComparison from './builders/farm-comparison.js'
 import dailyProduction from './builders/daily-production.js'
 import salesRegister from './builders/sales-register.js'
@@ -24,6 +25,7 @@ const withPermissions = (definition) => ({
 const REPORTS = [
   batchFinancial,
   batchDailyLog,
+  birdShortage,
   farmComparison,
   dailyProduction,
   salesRegister,

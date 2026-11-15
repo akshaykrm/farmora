@@ -12,6 +12,7 @@ export const newSaleSchema = Joi.object({
   price: Joi.number().greater(-1).optional(),
   narration: Joi.string().max(500).optional().allow('', null),
   status: Joi.string().valid('active', 'inactive').optional(),
+  is_incomplete: Joi.boolean().optional(),
 })
 
 export const updateSaleSchema = newSaleSchema.fork(

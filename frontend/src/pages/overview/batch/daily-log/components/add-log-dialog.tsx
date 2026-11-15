@@ -133,19 +133,6 @@ const AddLogDialog = ({
     );
   }, [isOpen, log, rows, startDate]);
 
-  useEffect(() => {
-    if (!isOpen || isEdit || !form.date) return;
-    let cancelled = false;
-    dailyLogApi.prefill(batchId, form.date).then((res) => {
-      if (cancelled || res.status !== "success" || !res.data) return;
-      const issued = res.data.issued_feed;
-      setForm((prev) => ({ ...prev, issued_feed: String(issued) }));
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [batchId, form.date, isOpen, isEdit]);
-
   const update = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((prev) => ({ ...prev, [key]: value }));
 
@@ -277,9 +264,6 @@ const AddLogDialog = ({
             <FormSection
               title="Feed (bags)"
               icon={<Wheat className="h-4 w-4" />}
-              hint={
-                isEdit ? undefined : "Issued is pre-filled from feed purchases"
-              }
               results={[
                 { label: "Total Consumed", value: preview.totalConsumption },
                 {

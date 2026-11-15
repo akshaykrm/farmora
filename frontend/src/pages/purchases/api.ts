@@ -48,6 +48,7 @@ const purchase = {
       net_amount: updateData.net_amount,
       payment_type: updateData.payment_type,
       narration: updateData.narration,
+      is_incomplete: updateData.is_incomplete,
     };
     return await fetcherV2(`items/${id}`, JSON.stringify(payload), {
       method: "PUT",

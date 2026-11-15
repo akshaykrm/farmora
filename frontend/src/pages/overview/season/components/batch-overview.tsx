@@ -13,6 +13,8 @@ const batchHeaders = [
   "Avg Weight",
   "FCR",
   "CFCR",
+  "Bird Shortage",
+  "Shortage %",
   "Avg Cost",
   "Avg Rate",
   "Profit - Loss Diff",
@@ -41,6 +43,8 @@ const BatchOverviewTable = (props: BatchOverviewTableProps) => {
             avg_weight,
             fcr,
             cfcr,
+            bird_shortage,
+            shortage_percentage,
             total_expense,
             total_sale_amount,
             total_sale_weight,
@@ -62,6 +66,8 @@ const BatchOverviewTable = (props: BatchOverviewTableProps) => {
               <TableCell content={roundNumber(avg_weight)} />
               <TableCell content={roundNumber(fcr)} />
               <TableCell content={roundNumber(cfcr)} />
+              <TableCell content={bird_shortage} />
+              <TableCell content={`${roundNumber(shortage_percentage)}%`} />
               <TableCell content={formatCurrency(avgCost)} />
               <TableCell content={formatCurrency(avgRate)} />
               <TableCell content={formatCurrency(avgRate - avgCost)} />

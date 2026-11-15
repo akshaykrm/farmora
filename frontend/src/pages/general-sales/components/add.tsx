@@ -5,7 +5,7 @@ import useAddGeneralSales from "../hooks/use-add-general-sales";
 
 const defaultValues: GeneralSalesFormValues = {
   season_id: null,
-  purpose: "",
+  category_id: null,
   amount: "",
   narration: "",
   date: "",
