@@ -66,6 +66,13 @@ export default {
           AND LOWER(c.name) = LOWER(TRIM(t.purpose))
           AND c.deleted_at IS NULL
       `)
+      // one spelling per category, so reports group legacy variants together
+      await queryInterface.sequelize.query(`
+        UPDATE ${table} t
+        SET purpose = c.name
+        FROM general_categories c
+        WHERE t.category_id = c.id AND t.purpose <> c.name
+      `)
     }
   },
   async down(queryInterface) {
