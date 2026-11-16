@@ -5,6 +5,7 @@ import useGetSeasonOverview from "./hooks/use-get-season-overview";
 import FilterSeasonOverview from "./components/filter";
 import Ternary from "@components/ternary";
 import SeasonInformation from "./components/season-information";
+import BatchFilter from "./components/batch-filter";
 import BatchOverviewTable from "./components/batch-overview";
 import GeneralCostTable from "./components/general-cost";
 import GeneralSalesTable from "./components/general-sales";
@@ -73,7 +74,26 @@ const SeasonOverviewPage = () => {
                       totalGeneralSale={summary?.total_general_sales || 0}
                     />
                     <div className="mb-6">
-                      <BatchOverviewTable data={batches.data} totals={totals} />
+                      <h2 className="text-xl font-semibold mb-3">
+                        Batch Overview
+                      </h2>
+                      <BatchFilter
+                        values={filter}
+                        onApply={(f) => updateQueryParams(f)}
+                      />
+                      <BatchOverviewTable
+                        data={batches.data}
+                        totals={totals}
+                        sortBy={filter.b_sort_by}
+                        sortOrder={filter.b_sort_order as "asc" | "desc"}
+                        onSort={(key, order) =>
+                          updateQueryParams({
+                            b_sort_by: key,
+                            b_sort_order: order,
+                            b_page: 1,
+                          })
+                        }
+                      />
                       <PaginationWithLimit
                         onChange={(f) => {
                           const opts: Record<string, number> = {};
