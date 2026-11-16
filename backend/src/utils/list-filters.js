@@ -28,7 +28,7 @@ export const parseSalesBookFilter = (query) =>
   pick(query, ['buyer_id', 'from_date', 'end_date'])
 
 export const parseGeneralEntryFilter = (query) =>
-  pick(query, ['season_id', 'purpose', 'start_date', 'end_date'])
+  pick(query, ['season_id', 'category_id', 'purpose', 'start_date', 'end_date'])
 
 export const parseCashFlowFilter = (query) =>
   pick(query, ['from_date', 'to_date', 'purpose'])

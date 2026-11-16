@@ -5,6 +5,8 @@ export type GeneralSalesRecord = {
   season_id: number | null;
   master_id: number | null;
   purpose: string;
+  category_id: number | null;
+  category?: { id: number; name: string } | null;
   date: string;
   amount: number;
   narration: string | null;
@@ -38,7 +40,7 @@ export type NewGeneralSalesRequest = {
 export type GeneralSalesFormValues = {
   season_id: number | null;
   date: string | null;
-  purpose: string;
+  category_id: number | null;
   amount: number | string;
   narration?: string | null;
 };

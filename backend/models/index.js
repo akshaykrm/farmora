@@ -19,6 +19,7 @@ import WorkingCostModel from './workingcost.js'
 import SalesModel from './sales.js'
 import GeneralExpenseModel from './generalexpense.js'
 import ExpenseSalesModel from './expensesales.js'
+import GeneralCategoryModel from './generalcategory.js'
 import PurchaseBookModel from './purchasebook.js'
 import InvestorManagementModel from './investorManagement.js'
 import InvestorTransactionTypeModel from './investorTransactionType.js'
@@ -141,6 +142,18 @@ GeneralExpenseModel.belongsTo(SeasonModel, {
 GeneralExpenseModel.belongsTo(UserModel, {
   foreignKey: 'master_id',
   as: 'master',
+  targetKey: 'id',
+})
+
+GeneralExpenseModel.belongsTo(GeneralCategoryModel, {
+  foreignKey: 'category_id',
+  as: 'category',
+  targetKey: 'id',
+})
+
+ExpenseSalesModel.belongsTo(GeneralCategoryModel, {
+  foreignKey: 'category_id',
+  as: 'category',
   targetKey: 'id',
 })
 
@@ -389,6 +402,7 @@ export {
   SalesModel,
   GeneralExpenseModel,
   ExpenseSalesModel,
+  GeneralCategoryModel,
   InvestorManagementModel,
   InvestorTransactionTypeModel,
   InvestorTransactionModel,

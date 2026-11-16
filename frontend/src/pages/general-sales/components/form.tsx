@@ -1,4 +1,5 @@
 import type { GeneralSalesFormValues } from "@app-types/general-sales.types";
+import CategoryField from "@components/general-category/category-field";
 import SelectList from "@components/select-list";
 import useGetSeasonNames from "@hooks/use-get-season-names";
 import { TextField, Button } from "@mui/material";
@@ -75,13 +76,17 @@ const GeneralSalesForm = (props: Props) => {
             helperText={errors.season_id?.message}
           />
 
-          <TextField
-            label="Purpose"
-            {...(register as any)("purpose")}
-            fullWidth
-            error={Boolean(errors.purpose)}
-            helperText={errors.purpose?.message}
-            size="small"
+          <CategoryField
+            kind="sale"
+            value={values.category_id ?? null}
+            onChange={(val) => {
+              (setValue as any)("category_id", val);
+              if (val) {
+                clearErrors("category_id" as any);
+              }
+            }}
+            error={Boolean((errors as any).category_id)}
+            helperText={(errors as any).category_id?.message}
           />
 
           <TextField

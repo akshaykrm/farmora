@@ -103,11 +103,11 @@ const build = async (filter, { masterId }) => {
         value: round(purposeTotals.amount + itemTotals.amount),
         type: 'currency',
       },
-      { label: 'Expense Purposes', value: purposeRows.length, type: 'number' },
+      { label: 'Expense Categories', value: purposeRows.length, type: 'number' },
     ],
     chart: {
       type: 'pie',
-      title: 'General expenses by purpose',
+      title: 'General expenses by category',
       x: 'purpose',
       series: [{ key: 'amount', label: 'Amount' }],
       data: purposeRows.slice(0, 8),
@@ -133,7 +133,7 @@ const build = async (filter, { masterId }) => {
         key: 'purposes',
         title: 'General Expenses by Purpose',
         columns: [
-          { key: 'purpose', header: 'Purpose', width: 2 },
+          { key: 'purpose', header: 'Category', width: 2 },
           { key: 'entries', header: 'Entries', type: 'number' },
           { key: 'amount', header: 'Amount', type: 'currency' },
         ],
@@ -170,7 +170,7 @@ export default {
   key: 'expense_breakdown',
   title: 'Expense Breakdown',
   description:
-    'General expenses by purpose and month, and purchases by item type.',
+    'General expenses by category and month, and purchases by item type.',
   group: 'Finance',
   audience: 'tenant',
   schema: schemaOf('season_id', 'start_date', 'end_date'),

@@ -9,7 +9,7 @@ import { useState, useEffect, useRef } from "react";
 import { TextField } from "@mui/material";
 import useDebounce from "@hooks/use-debounce";
 
-const generalHeaders = ["Date", "Purpose", "Amount"];
+const generalHeaders = ["Date", "Category", "Amount"];
 
 type GeneralCostTableProps = {
   data: GeneralCostItem[];
@@ -41,7 +41,7 @@ const GeneralCostTable = (props: GeneralCostTableProps) => {
         <h2 className="text-xl font-semibold">General Cost</h2>
         <TextField
           size="small"
-          placeholder="Search purpose..."
+          placeholder="Search category..."
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
         />

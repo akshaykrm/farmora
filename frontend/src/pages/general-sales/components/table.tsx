@@ -10,7 +10,7 @@ import { EditIcon, EyeIcon } from "lucide-react";
 import { useState } from "react";
 import ViewDetailsDialog from "@components/view-details-dialog";
 
-const headers = ["Date", "Season", "Purpose", "Amount", "Action"];
+const headers = ["Date", "Season", "Category", "Amount", "Action"];
 
 type Props = {
   onEdit: (selectedId: number) => void;
@@ -35,7 +35,7 @@ const GeneralSalesTable = ({ onEdit, data }: Props) => {
             <TableCell
               content={item.season?.name || `Season ${item.season_id}`}
             />
-            <TableCell content={item.purpose} />
+            <TableCell content={item.category?.name ?? item.purpose} />
             <TableCell content={formatCurrency(item.amount || 0)} />
             <TableCell
               content={
