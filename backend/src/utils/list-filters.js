@@ -33,9 +33,30 @@ export const parseGeneralEntryFilter = (query) =>
 export const parseCashFlowFilter = (query) =>
   pick(query, ['from_date', 'to_date', 'purpose'])
 
+const BATCH_METRIC_KEYS = [
+  'avg_weight',
+  'fcr',
+  'cfcr',
+  'bird_shortage',
+  'shortage_percentage',
+  'avg_cost',
+  'avg_rate',
+  'diff',
+  'profit',
+]
+
 export const parseSeasonOverviewFilter = (query) => ({
   season_id: parseInt(query.season_id),
-  ...pick(query, ['gc_purpose', 'gs_purpose']),
+  ...pick(query, [
+    'gc_purpose',
+    'gs_purpose',
+    'b_search',
+    'b_close_from',
+    'b_close_to',
+    ...BATCH_METRIC_KEYS.flatMap((k) => [`b_${k}_min`, `b_${k}_max`]),
+    'b_sort_by',
+    'b_sort_order',
+  ]),
 })
 
 export const parseBatchOverviewFilter = (query) => ({
