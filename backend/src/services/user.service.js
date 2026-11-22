@@ -15,6 +15,7 @@ import dayjs from 'dayjs'
 import userRoles from '@utils/user-roles'
 import logger from '@utils/logger'
 import { calculateOffSet } from '@utils/pagination'
+import { getEffectivePackagePrice } from '@utils/package-price'
 import permissionService, { getMasterId } from '@services/permission.service'
 
 const getAccountOwnerId = (currentUser, payload = {}) => {
@@ -366,7 +367,17 @@ const pickCurrentSubscription = (subscriptions = []) => {
 
 const toSubscriberPayload = (userRecord) => {
   const json = userRecord.toJSON()
-  const subscriptions = json.subscriptions || []
+  const subscriptions = (json.subscriptions || []).map((subscription) =>
+    subscription.package
+      ? {
+          ...subscription,
+          package: {
+            ...subscription.package,
+            price: getEffectivePackagePrice(subscription.package),
+          },
+        }
+      : subscription
+  )
   return {
     ...json,
     subscriptions,
@@ -387,7 +398,7 @@ const subscriptionListInclude = {
       model: PackageModel,
       as: 'package',
       required: false,
-      attributes: ['id', 'name', 'price', 'duration'],
+      attributes: ['id', 'name', 'actual_price', 'discount_price', 'duration'],
     },
   ],
 }
