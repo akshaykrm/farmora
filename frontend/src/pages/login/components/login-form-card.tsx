@@ -51,10 +51,6 @@ const LoginFormCard = ({ methods, onLogin, isPending }: LoginFormCardProps) => {
     formState: { errors },
   } = methods;
 
-  const handleReset = (username: string) => {
-    methods.setValue("username", username);
-  };
-
   return (
     <div className="w-full max-w-[420px] rounded-3xl border border-brand-border bg-brand-card p-7 shadow-brand-xl md:p-9">
       <div className="mb-7">
@@ -245,7 +241,6 @@ const LoginFormCard = ({ methods, onLogin, isPending }: LoginFormCardProps) => {
         isOpen={forgotOpen}
         onClose={() => setForgotOpen(false)}
         defaultUsername={methods.getValues("username")}
-        onReset={handleReset}
       />
     </div>
   );

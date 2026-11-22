@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Alert, Button, TextField } from "@mui/material";
 import PageTitle from "@components/PageTitle";
 import fetcher from "@utils/fetcher";
+import EmailSettingsCard from "./components/email-settings";
 
 type Settings = {
   key_id: string;
@@ -148,6 +149,7 @@ export default function SettingsPage() {
           Test saved connection
         </Button>
       </form>
+      <EmailSettingsCard />
     </div>
   );
 }

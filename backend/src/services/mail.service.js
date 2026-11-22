@@ -3,19 +3,42 @@ import { readFileSync } from 'fs'
 import { join } from 'path'
 import bar from 'handlebars'
 import logger from '@utils/logger'
+import emailSettings from '@services/email-settings.service'
 
 const { compile } = bar
 
-// Configure transporter
-const transporter = createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-})
+let cached = { signature: null, transporter: null }
 
-// Function to compile Handlebars template
+const transportOptions = (config) =>
+  config.host
+    ? {
+        host: config.host,
+        port: config.port,
+        secure: config.secure,
+        auth: { user: config.user, pass: config.pass },
+      }
+    : { service: 'gmail', auth: { user: config.user, pass: config.pass } }
+
+// Rebuilt whenever the saved settings change, so updates in Settings apply
+// without restarting the server.
+const getTransporter = (config) => {
+  const signature = JSON.stringify([
+    config.source,
+    config.version,
+    config.user,
+    config.host,
+    config.port,
+    config.secure,
+  ])
+  if (cached.signature !== signature) {
+    cached = {
+      signature,
+      transporter: createTransport(transportOptions(config)),
+    }
+  }
+  return cached.transporter
+}
+
 const compileTemplate = (templateName, data) => {
   const filePath = join(__dirname, `templates/${templateName}.hbs`)
   const source = readFileSync(filePath, 'utf8')
@@ -23,19 +46,24 @@ const compileTemplate = (templateName, data) => {
   return template(data)
 }
 
-// Send Email Function
+export const getMailConfig = () => emailSettings.resolve()
+
 export async function sendMail(to, subject, templateName, templateData) {
   try {
+    const config = await emailSettings.resolve()
+    if (config.source === 'none') {
+      logger.error({ to }, 'Email is not configured; message not sent')
+      return { success: false, error: 'Email is not configured.' }
+    }
     const htmlContent = compileTemplate(templateName, templateData)
-
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
+    await getTransporter(config).sendMail({
+      from: config.senderName
+        ? { name: config.senderName, address: config.user }
+        : config.user,
       to,
       subject,
-      html: htmlContent, // Use HTML instead of plain text
-    }
-
-    await transporter.sendMail(mailOptions)
+      html: htmlContent,
+    })
     return { success: true, message: 'Email sent successfully' }
   } catch (error) {
     logger.error({ err: error, to }, 'Error sending email')
