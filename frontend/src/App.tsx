@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Navigate, Route, Routes } from "react-router";
 import LoginPage from "./pages/login";
+import ResetPasswordPage from "./pages/reset-password";
 import CheckoutPage from "./pages/checkout";
 import SettingsPage from "./pages/settings";
 import LandingPage from "./pages/landing";
@@ -142,6 +143,7 @@ function App() {
                   </LoginRouteGuard>
                 }
               />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route
                 path="/*"
                 element={

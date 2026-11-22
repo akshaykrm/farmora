@@ -1,6 +1,9 @@
 import { generateToken, generateCheckoutToken } from '@utils/jwt'
 import asyncHandler from '@utils/async-handler'
 import authService from '@services/auth.service'
+import passwordResetService, {
+  GENERIC_RESET_MESSAGE,
+} from '@services/password-reset.service'
 import permissionService, { getMasterId } from '@services/permission.service'
 
 const createManager = async (req, res) => {
@@ -55,11 +58,32 @@ const changePassword = async (req, res) => {
   res.success(null, { message: 'Password updated successfully' })
 }
 
+const clientIp = (req) => {
+  const forwarded = req.headers['x-forwarded-for']
+  if (typeof forwarded === 'string' && forwarded) {
+    return forwarded.split(',')[0].trim()
+  }
+  return req.ip || req.socket?.remoteAddress || null
+}
+
+const forgotPassword = async (req, res) => {
+  await passwordResetService.requestReset(req.body.identifier, clientIp(req))
+  res.success(null, { message: GENERIC_RESET_MESSAGE })
+}
+
+const confirmPasswordReset = async (req, res) => {
+  const { token, new_password } = req.body
+  await passwordResetService.confirmReset(token, new_password)
+  res.success(null, { message: 'Password updated. You can now sign in.' })
+}
+
 const authController = {
   createManager: asyncHandler(createManager),
   login: asyncHandler(login),
   resetPassword: asyncHandler(resetPassword),
   changePassword: asyncHandler(changePassword),
+  forgotPassword: asyncHandler(forgotPassword),
+  confirmPasswordReset: asyncHandler(confirmPasswordReset),
 }
 
 export default authController
