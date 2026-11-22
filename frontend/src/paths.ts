@@ -285,4 +285,10 @@ export const paths: Paths = [
       },
     ],
   },
+  {
+    pathname: "Settings",
+    link: "/settings",
+    icon: Settings,
+    audience: "platform",
+  },
 ];

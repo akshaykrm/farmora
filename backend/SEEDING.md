@@ -1,5 +1,9 @@
 # 🌱 Database Seeding Guide
 
+> Historical reference: the demo seeders and accounts listed below are no longer
+> present. Use [the current local setup guide](../LOCAL_SETUP.md) and
+> `bun run seed:demo` for the current schema and dummy data.
+
 ## Overview
 
 This document describes the database seeding strategy for the Farmora application. All seeders are designed to work seamlessly together with proper dependency management.

@@ -7,8 +7,11 @@ import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import { useAuthDispatch } from "@store/authentication/context";
 import { createSession } from "@utils/session";
+import { useNavigate } from "react-router";
+import { CHECKOUT_TOKEN_KEY } from "@api/checkout.api";
 
 const useLogin = () => {
+  const navigate = useNavigate();
   const dispatch = useAuthDispatch();
   const methods = useForm<LoginPayload>({
     defaultValues: {
@@ -20,6 +23,12 @@ const useLogin = () => {
   const mutation = useMutation({
     mutationFn: async (payload: LoginPayload) => auth.login(payload),
     onSuccess: (data) => {
+      if (data.checkout_required) {
+        sessionStorage.setItem(CHECKOUT_TOKEN_KEY, data.checkout_token);
+        navigate("/checkout");
+        return;
+      }
+      sessionStorage.removeItem(CHECKOUT_TOKEN_KEY);
       const userSession: UserSession = {
         username: data.username,
         name: data.name,
@@ -54,15 +63,26 @@ const useLogin = () => {
     },
     onError: (error) => {
       if (error instanceof NetworkError) {
+        if (error.code === "ACCOUNT_APPROVAL_REQUIRED") {
+          sessionStorage.removeItem(CHECKOUT_TOKEN_KEY);
+          methods.setError("root", { type: "server", message: error.message });
+          return;
+        }
         if (
           error.code === "USER_NOT_FOUND" ||
           error.code === "INVALID_USERNAME"
         ) {
-          methods.setError("username", { type: "server", message: error.message });
+          methods.setError("username", {
+            type: "server",
+            message: error.message,
+          });
           return;
         }
         if (error.code === "UNAUTHORIZED") {
-          methods.setError("password", { type: "server", message: error.message });
+          methods.setError("password", {
+            type: "server",
+            message: error.message,
+          });
           return;
         }
       }
@@ -73,6 +93,7 @@ const useLogin = () => {
 
   const onLogin = useCallback(
     (payload: LoginPayload) => {
+      methods.clearErrors("root");
       methods.clearErrors("username");
       methods.clearErrors("password");
       mutation.mutate(payload);

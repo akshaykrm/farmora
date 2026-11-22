@@ -14,7 +14,18 @@ import {
   addBatchLogSchema,
 } from '@validators/batch.validator'
 
+import batchService from '@services/batch.service'
+import asyncHandler from '@utils/async-handler'
+
 const router = Router()
+router.get(
+  '/allowance',
+  isAuthenticated,
+  requirePermission(P.batch_read),
+  asyncHandler(async (req, res) =>
+    res.success(await batchService.getAllowance(req.user))
+  )
+)
 
 router.post(
   '/',

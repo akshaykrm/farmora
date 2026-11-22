@@ -1,6 +1,8 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Navigate, Route, Routes } from "react-router";
 import LoginPage from "./pages/login";
+import CheckoutPage from "./pages/checkout";
+import SettingsPage from "./pages/settings";
 import LandingPage from "./pages/landing";
 import { useAuth } from "@store/authentication/context";
 import { useMemo, type ReactNode } from "react";
@@ -53,6 +55,7 @@ import type { PathItem } from "./types/paths.types";
 const queryClient = new QueryClient();
 
 const pageComponents: Record<string, React.ComponentType> = {
+  "/settings": SettingsPage,
   "/configuration/batches": BatchesPage,
   "/configuration/users": EmployeesPage,
   "/configuration/roles": RolesPage,
@@ -122,6 +125,7 @@ function App() {
         <MuiThemeBridge>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <Routes>
+              <Route path="/checkout" element={<CheckoutPage />} />
               <Route
                 path="/"
                 element={

@@ -3,6 +3,7 @@ import { PermissionDeniedError } from '@errors/auth.errors'
 import SubscriptionModel from '@models/subscription'
 import PackageModel from '@models/package'
 import UserModel from '@models/user'
+import userAllowance from '@services/user-allowance.service'
 import RoleModel from '@models/role'
 import UserRoleAssignment from '@models/userroleassignment'
 import UserPermissionModel from '@models/userpermission'
@@ -137,6 +138,28 @@ const createStaff = async (payload, currentUser) => {
 
   const transaction = await sequelize.transaction()
   try {
+    const owner = await UserModel.findByPk(parentId, {
+      transaction,
+      lock: transaction.LOCK.UPDATE,
+    })
+    if (!owner || owner.user_type !== userRoles.manager.type)
+      throw new PermissionDeniedError('parent must be a subscriber')
+    const allowance = await userAllowance.read(parentId, transaction)
+    if (!allowance.can_create)
+      throw Object.assign(
+        new Error(
+          allowance.subscription_active
+            ? `Your package allows ${allowance.limit} staff users. Upgrade your package to add another user.`
+            : 'An active subscription is required to add users.'
+        ),
+        {
+          statusCode: 403,
+          code: allowance.subscription_active
+            ? 'USER_LIMIT_REACHED'
+            : 'SUBSCRIPTION_REQUIRED',
+          details: allowance,
+        }
+      )
     const newUser = await UserModel.create(
       {
         name: payload.name,
@@ -149,12 +172,7 @@ const createStaff = async (payload, currentUser) => {
       { transaction }
     )
 
-    await replaceUserAccess(
-      newUser.id,
-      payload,
-      parentId,
-      transaction
-    )
+    await replaceUserAccess(newUser.id, payload, parentId, transaction)
 
     logger.debug({ user_id: newUser.id }, 'Staff user created')
     await transaction.commit()
@@ -262,6 +280,14 @@ const update = async (userId, payload, currentUser) => {
   const userFields = { ...rawFields }
   delete userFields.parent_id
   delete userFields.user_type
+  for (const field of [
+    'free_trial_used_at',
+    'approval_status',
+    'approved_by',
+    'approved_at',
+    'requested_package_id',
+  ])
+    delete userFields[field]
 
   if (currentUser.user_type !== userRoles.admin.type) {
     delete userFields.status
@@ -386,7 +412,15 @@ const getAll = async (payload = {}, currentUser) => {
   }
 
   const { count, rows } = await UserModel.findAndCountAll({
-    include: [subscriptionListInclude],
+    include: [
+      subscriptionListInclude,
+      {
+        model: PackageModel,
+        as: 'requested_package',
+        attributes: ['id', 'name'],
+        required: false,
+      },
+    ],
     where: filter,
     limit,
     offset,

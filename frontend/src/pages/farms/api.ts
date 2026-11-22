@@ -1,9 +1,10 @@
 import fetcherV2 from "@utils/fetcherV2.ts";
-import type { FarmFormValues, FarmsListResponse } from "./types.ts";
+import type { FarmAllowance, FarmFormValues, FarmsListResponse } from "./types.ts";
 import fetcher from "@utils/fetcher";
 import type { Filter } from "@utils/filters.ts";
 
 const farms = {
+  getAllowance: (): Promise<FarmAllowance> => fetcher("farms/allowance"),
   fetchAll: (filter?: Filter) => {
     const opts = {
       method: "GET" as const,

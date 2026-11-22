@@ -6,6 +6,7 @@ import type {
 } from "@app-types/subscription.types";
 import type { ListResponse } from "@app-types/response.types";
 import fetcher from "@utils/fetcher";
+import { purchasePackage } from "@api/checkout.api";
 
 const subscription = {
   fetchAll: (filter?: {
@@ -23,14 +24,16 @@ const subscription = {
       referral_partner_id: data.user?.referral_partner_id ?? null,
     };
   },
+  updateDays: (id: number, days: number, expectedValidTo: string) =>
+    fetcher(
+      `subscriptions/${id}/days`,
+      JSON.stringify({ days, expected_valid_to: expectedValidTo }),
+      { method: "PUT" },
+    ),
   create: async (payload: NewSubscriptionRequest) =>
-    await fetcher("subscriptions/subscribe", JSON.stringify(payload), {
-      method: "POST",
-    }),
+    purchasePackage({ ...payload, kind: "initial" }),
   renew: async (payload: NewSubscriptionRequest) =>
-    await fetcher("subscriptions/renew", JSON.stringify(payload), {
-      method: "POST",
-    }),
+    purchasePackage({ ...payload, kind: "renewal" }),
   updateById: async (id: number, updateData: EditSubscriptionRequest) => {
     const payload: EditSubscriptionPayload = {
       package_id: updateData.package_id,

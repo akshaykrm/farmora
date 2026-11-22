@@ -1,6 +1,7 @@
 {
   "private": true,
   "scripts": {
+    "dev:local": "bash scripts/dev-local.sh",
     "dev": "bun --workspaces --parallel dev"
   },  
   "workspaces": [

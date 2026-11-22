@@ -6,6 +6,7 @@ const CONFIG = {
   db_user: process.env.DB_USER,
   db_password: process.env.DB_PASS,
   db_host: process.env.DB_HOST,
+  db_port: Number(process.env.DB_PORT) || 5432,
   db_dialect: 'postgres',
   port: process.env.PORT || 3000,
   nodeEnv: process.env.NODE_ENV || 'development',

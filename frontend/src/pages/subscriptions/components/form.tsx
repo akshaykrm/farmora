@@ -4,13 +4,20 @@ import type {
 } from "@app-types/subscription.types";
 import SelectList from "@components/select-list";
 import useGetPackageNames from "@hooks/package/use-get-package-names";
-import type { FieldValues, UseFormReturn } from "react-hook-form";
-import { Button } from "@mui/material";
+import type {
+  FieldValues,
+  UseFormReturn,
+  UseFormSetValue,
+} from "react-hook-form";
+import { Alert, Button } from "@mui/material";
 import { useEffect, useState } from "react";
 import fetcherV2 from "@utils/fetcherV2";
 import type { ListResponse } from "@app-types/response.types";
 import type { NameResponse } from "@app-types/gen.types";
 import referralsApi from "@api/referrals.api";
+
+import packagesApi from "@api/packages.api";
+import { useQuery } from "@tanstack/react-query";
 
 type EditMethod = UseFormReturn<EditSubscriptionRequest, any, FieldValues>;
 type AddMethod = UseFormReturn<NewSubscriptionRequest, any, FieldValues>;
@@ -22,6 +29,8 @@ type Props = {
   showUserSelect?: boolean;
   showReferralSelect?: boolean;
   referralLocked?: boolean;
+  eligiblePackagesOnly?: boolean;
+  eligibleUserId?: number;
 };
 
 const SubscriptionForm = ({
@@ -31,6 +40,8 @@ const SubscriptionForm = ({
   showUserSelect,
   showReferralSelect,
   referralLocked,
+  eligiblePackagesOnly,
+  eligibleUserId,
 }: Props) => {
   const {
     handleSubmit,
@@ -38,8 +49,26 @@ const SubscriptionForm = ({
     formState: { errors },
   } = methods;
 
+  const setField = setValue as UseFormSetValue<EditSubscriptionRequest>;
   const packageNames = useGetPackageNames();
   const values = methods.watch();
+  const targetId = eligibleUserId || values.user_id;
+  const eligible = useQuery({
+    queryKey: ["eligible-packages", targetId],
+    queryFn: () => packagesApi.getEligibleNames(targetId),
+    enabled: !!eligiblePackagesOnly && (!showUserSelect || !!targetId),
+  });
+  const options = eligiblePackagesOnly
+    ? eligible.data || []
+    : packageNames.data;
+  useEffect(() => {
+    if (
+      eligiblePackagesOnly &&
+      eligible.data &&
+      !eligible.data.some((plan) => plan.id === values.package_id)
+    )
+      setField("package_id", eligible.data[0]?.id || 0);
+  }, [eligiblePackagesOnly, eligible.data, values.package_id, setField]);
   const [subscribers, setSubscribers] = useState<NameResponse[]>([]);
   const [partners, setPartners] = useState<NameResponse[]>([]);
 
@@ -49,7 +78,10 @@ const SubscriptionForm = ({
       const res = await fetcherV2<ListResponse<{ id: number; name: string }>>(
         "users",
         null,
-        { method: "GET", filter: { user_type: "manager", limit: 100, page: 1 } },
+        {
+          method: "GET",
+          filter: { user_type: "manager", limit: 100, page: 1 },
+        },
       );
       if (res.status === "success" && res.data) {
         setSubscribers(
@@ -82,12 +114,15 @@ const SubscriptionForm = ({
     <>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="grid grid-cols-1 gap-4">
+          {eligiblePackagesOnly && eligible.error && (
+            <Alert severity="error">{eligible.error.message}</Alert>
+          )}
           {showUserSelect && (
             <SelectList
               options={subscribers}
               value={(values as NewSubscriptionRequest).user_id}
               onChange={(val) => {
-                (setValue as any)("user_id", val);
+                setField("user_id", val || undefined);
               }}
               label="Subscriber"
               name="user_id"
@@ -96,10 +131,10 @@ const SubscriptionForm = ({
             />
           )}
           <SelectList
-            options={packageNames.data}
+            options={options}
             value={values.package_id}
             onChange={(val) => {
-              (setValue as any)("package_id", val);
+              setField("package_id", val || 0);
             }}
             label="Package"
             name="package_id"
@@ -111,7 +146,7 @@ const SubscriptionForm = ({
               options={partners}
               value={(values as NewSubscriptionRequest).referral_partner_id}
               onChange={(val) => {
-                (setValue as any)("referral_partner_id", val || null);
+                setField("referral_partner_id", val || null);
               }}
               label="Referral partner"
               name="referral_partner_id"
@@ -132,7 +167,14 @@ const SubscriptionForm = ({
               Cancel
             </Button>
           )}
-          <Button variant="contained" type="submit">
+          <Button
+            variant="contained"
+            type="submit"
+            disabled={
+              eligiblePackagesOnly &&
+              (eligible.isPending || !!eligible.error || !values.package_id)
+            }
+          >
             Submit
           </Button>
         </div>

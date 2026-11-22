@@ -39,6 +39,7 @@ const AddSubscription = ({ isShow, onClose }: Props) => {
           onSubmit={onSubmit}
           onCancel={handleClose}
           showUserSelect
+          eligiblePackagesOnly
         />
       </DialogContent>
     </Dialog>

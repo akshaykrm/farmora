@@ -47,7 +47,7 @@ const getById = async (req, res) => {
 const updateById = async (req, res) => {
   const { farm_id } = req.params
 
-  await farmService.updateById(farm_id, req.body, req.body)
+  await farmService.updateById(farm_id, req.body, req.user)
   res.success(null, { message: 'Farm updated successfully' })
 }
 
@@ -65,6 +65,9 @@ const farmController = {
   updateById: asyncHandler(updateById),
   deletById: asyncHandler(deletById),
   getNames: asyncHandler(getNames),
+  getAllowance: asyncHandler(async (req, res) =>
+    res.success(await farmService.getAllowance(req.user))
+  ),
 }
 
 export default farmController

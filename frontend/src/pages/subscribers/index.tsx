@@ -1,3 +1,4 @@
+import PasswordField from "@components/PasswordField";
 import PageHeader from "@components/PageHeader";
 import AddButton from "@components/AddButton";
 import ExportMenu from "@components/ExportMenu";
@@ -25,6 +26,8 @@ import type { Employee } from "@pages/employees/types";
 import toast from "react-hot-toast";
 import SubscriptionHistoryDialog from "./components/subscription-history-dialog";
 
+import UpdateSubscriptionDaysDialog from "./components/update-subscription-days-dialog";
+
 type SubscriberSubscription = {
   id: number;
   valid_from: string;
@@ -46,6 +49,8 @@ type Subscriber = {
   pincode?: string | null;
   bird_capacity?: string | null;
   subscriptions?: SubscriberSubscription[];
+  approval_status: "pending" | "approved";
+  requested_package?: { id: number; name: string } | null;
   current_subscription?: SubscriberSubscription | null;
 };
 
@@ -104,6 +109,7 @@ const SubscribersPage = () => {
   const limit = queryParms.limit
     ? parseInt(queryParms.limit)
     : DEFAULT_PAGE_LIMIT;
+  const [approvingId, setApprovingId] = useState<number | null>(null);
   const [rows, setRows] = useState<Subscriber[]>([]);
   const [totalPages, setTotalPages] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
@@ -113,6 +119,10 @@ const SubscribersPage = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [usersFor, setUsersFor] = useState<Subscriber | null>(null);
+  const [daysFor, setDaysFor] = useState<{
+    subscriber: Subscriber;
+    subscription: SubscriberSubscription;
+  } | null>(null);
   const [historyFor, setHistoryFor] = useState<Subscriber | null>(null);
   const [staff, setStaff] = useState<Employee[]>([]);
   const packageNames = useGetPackageNames();
@@ -139,6 +149,29 @@ const SubscribersPage = () => {
     setIsOpen(false);
     setForm(emptySubscriber);
     refetch();
+  };
+
+  const onApprovalChange = async (subscriber: Subscriber, approve: boolean) => {
+    setApprovingId(subscriber.id);
+    try {
+      const res = await fetcherV2(
+        `users/${subscriber.id}/${approve ? "approve" : "revoke-approval"}`,
+        null,
+        { method: "POST" },
+      );
+      if (res.status !== "success") {
+        toast.error(res.error?.message || "Failed to update approval");
+        return;
+      }
+      toast.success(
+        approve
+          ? "Subscriber approved. They can now sign in and complete checkout if required."
+          : "Approval revoked. Subscriber and staff access is blocked.",
+      );
+      await refetch();
+    } finally {
+      setApprovingId(null);
+    }
   };
 
   const openEdit = (subscriber: Subscriber) => {
@@ -237,7 +270,9 @@ const SubscribersPage = () => {
             "Current package",
             "Valid From",
             "Valid To",
+            "Subscription days",
             "Status",
+            "Approval",
             "History",
             "Users",
             "Password",
@@ -253,7 +288,11 @@ const SubscribersPage = () => {
               <TableCell content={i + 1} />
               <TableCell content={row.name} />
               <TableCell content={row.username} />
-              <TableCell content={sub?.package?.name || "-"} />
+              <TableCell
+                content={
+                  sub?.package?.name || row.requested_package?.name || "-"
+                }
+              />
               <TableCell
                 content={
                   sub?.valid_from
@@ -266,7 +305,54 @@ const SubscribersPage = () => {
                   sub?.valid_to ? dayjs(sub.valid_to).format("DD-MM-YYYY") : "-"
                 }
               />
+              <TableCell
+                content={
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    disabled={!sub}
+                    onClick={() => {
+                      if (sub)
+                        setDaysFor({ subscriber: row, subscription: sub });
+                    }}
+                  >
+                    Update days
+                  </Button>
+                }
+              />
               <TableCell content={row.status === 1 ? "Active" : "Disabled"} />
+              <TableCell
+                content={
+                  row.approval_status === "pending" ? (
+                    <div className="flex flex-col items-start gap-1">
+                      <span>Awaiting approval</span>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        disabled={approvingId !== null}
+                        onClick={() => onApprovalChange(row, true)}
+                      >
+                        {approvingId === row.id ? "Approving..." : "Approve"}
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-start gap-1">
+                      <span>Approved</span>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        color="error"
+                        disabled={approvingId !== null}
+                        onClick={() => onApprovalChange(row, false)}
+                      >
+                        {approvingId === row.id
+                          ? "Revoking..."
+                          : "Revoke approval"}
+                      </Button>
+                    </div>
+                  )
+                }
+              />
               <TableCell
                 content={
                   <History
@@ -356,10 +442,9 @@ const SubscribersPage = () => {
               value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })}
             />
-            <TextField
+            <PasswordField
               label="Password"
               size="small"
-              type="password"
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
             />
@@ -505,18 +590,16 @@ const SubscribersPage = () => {
       >
         <DialogContent>
           <div className="grid grid-cols-1 gap-4">
-            <TextField
+            <PasswordField
               label="New password"
               size="small"
-              type="password"
               autoComplete="new-password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
             />
-            <TextField
+            <PasswordField
               label="Confirm password"
               size="small"
-              type="password"
               autoComplete="new-password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
@@ -563,6 +646,17 @@ const SubscribersPage = () => {
         </DialogContent>
       </Dialog>
 
+      {daysFor && (
+        <UpdateSubscriptionDaysDialog
+          subscription={daysFor.subscription}
+          subscriberName={daysFor.subscriber.name}
+          onClose={() => setDaysFor(null)}
+          onSaved={() => {
+            setDaysFor(null);
+            refetch();
+          }}
+        />
+      )}
       <SubscriptionHistoryDialog
         subscriber={historyFor}
         onClose={() => setHistoryFor(null)}

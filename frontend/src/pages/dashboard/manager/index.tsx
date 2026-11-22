@@ -6,13 +6,13 @@ import SeasonProfitChart from "./components/SeasonProfitChart";
 import SubscriptionStatusCard from "./components/SubscriptionStatusCard";
 import SetupChecklistCard from "./components/SetupChecklistCard";
 import setupApi from "@api/setup.api";
+import usePermissions from "@hooks/use-permissions";
 // import { PurchasesListing, SalesListing } from "./components/DataListings";
 import { OpenBatchesListing } from "./components/DataListings";
 import dashboardApi from "@api/dashboard.api";
 import type { ManagerDashboardData } from "@app-types/dashboard.types";
 import { CircularProgress, Box } from "@mui/material";
 import { formatCurrency } from "@utils/currency";
-import usePermissions from "@hooks/use-permissions";
 import DashboardDailyLog from "./components/daily-log";
 import PendingInvoicesCard from "./components/PendingInvoicesCard";
 

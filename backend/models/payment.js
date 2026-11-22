@@ -17,7 +17,7 @@ const PaymentModel = sequelize.define(
       allowNull: false,
     },
     payment_method: {
-      type: Sequelize.ENUM('card', 'paypal', 'bank_transfer'),
+      type: Sequelize.STRING(50),
       allowNull: false,
     },
     status: {
