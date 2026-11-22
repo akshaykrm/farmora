@@ -51,6 +51,7 @@ type Subscriber = {
   subscriptions?: SubscriberSubscription[];
   approval_status: "pending" | "approved";
   requested_package?: { id: number; name: string } | null;
+  referral_partner?: { id: number; name: string; code: string } | null;
   current_subscription?: SubscriberSubscription | null;
 };
 
@@ -65,6 +66,7 @@ type EditSubscriberForm = {
   place: string;
   pincode: string;
   bird_capacity: string;
+  referral_code: string;
 };
 
 const emptySubscriber: ManagerRegistrationPayload = {
@@ -88,6 +90,7 @@ const emptyEditForm: EditSubscriberForm = {
   place: "",
   pincode: "",
   bird_capacity: "",
+  referral_code: "",
 };
 
 const toEditForm = (subscriber: Subscriber): EditSubscriberForm => ({
@@ -101,6 +104,7 @@ const toEditForm = (subscriber: Subscriber): EditSubscriberForm => ({
   place: subscriber.place || "",
   pincode: subscriber.pincode || "",
   bird_capacity: subscriber.bird_capacity || "",
+  referral_code: subscriber.referral_partner?.code || "",
 });
 
 const SubscribersPage = () => {
@@ -181,6 +185,7 @@ const SubscribersPage = () => {
 
   const onSaveEdit = async () => {
     if (!selected) return;
+    const referralCode = editForm.referral_code.trim().toUpperCase();
     const res = await fetcherV2(
       `users/${selected.id}`,
       JSON.stringify({
@@ -194,6 +199,9 @@ const SubscribersPage = () => {
         place: editForm.place,
         pincode: editForm.pincode,
         bird_capacity: editForm.bird_capacity,
+        ...(referralCode !== (selected.referral_partner?.code || "")
+          ? { referral_code: referralCode }
+          : {}),
       }),
       { method: "PUT" },
     );
@@ -204,7 +212,7 @@ const SubscribersPage = () => {
     } else if (res.status === "validation_error") {
       toast.error(res.error?.[0]?.message || "Validation failed");
     } else {
-      toast.error("Failed to update subscriber");
+      toast.error(res.error?.message || "Failed to update subscriber");
     }
   };
 
@@ -565,6 +573,23 @@ const SubscribersPage = () => {
               value={editForm.pincode}
               onChange={(e) =>
                 setEditForm({ ...editForm, pincode: e.target.value })
+              }
+            />
+            <TextField
+              label="Referral code"
+              size="small"
+              className="sm:col-span-2"
+              value={editForm.referral_code}
+              onChange={(e) =>
+                setEditForm({
+                  ...editForm,
+                  referral_code: e.target.value.toUpperCase(),
+                })
+              }
+              helperText={
+                selected?.referral_partner
+                  ? `Currently: ${selected.referral_partner.name}. Leave empty to remove. Past bonuses are not moved.`
+                  : "Leave empty to remove. Past bonuses are not moved."
               }
             />
           </div>

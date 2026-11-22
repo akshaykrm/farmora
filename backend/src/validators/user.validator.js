@@ -49,6 +49,7 @@ export const updateNewStaffSchema = newStaffMemberSchema
     place: optionalProfileField,
     pincode: optionalProfileField,
     bird_capacity: optionalProfileField,
+    referral_code: Joi.string().trim().max(50).allow('', null).optional(),
   })
   .fork(['name', 'username'], (schema) => schema.optional())
 
