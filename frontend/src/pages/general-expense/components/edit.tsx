@@ -13,7 +13,7 @@ type Props = {
 
 const defaultValues: GeneralExpanceFormValues = {
   season_id: "",
-  purpose: "",
+  category_id: "",
   amount: "",
   date: "",
   narration: "",
@@ -39,11 +39,11 @@ const EditGeneralExpense = ({ selectedId, onClose, refetch }: Props) => {
       const res = await generalExpense.fetchById(selectedId);
       if (res.status === "success") {
         if (res.data) {
-          const { amount, season_id, purpose, narration, date } = res.data;
+          const { amount, season_id, category_id, narration, date } = res.data;
           setSelectedData({
             season_id,
             amount: amount.toString(),
-            purpose,
+            category_id: category_id ?? "",
             date,
             narration: narration || "",
           });

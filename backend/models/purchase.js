@@ -76,6 +76,11 @@ const PurchaseModel = sequelize.define(
       type: Sequelize.TEXT,
       allowNull: true,
     },
+    is_incomplete: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
   },
   {
     underscored: true,

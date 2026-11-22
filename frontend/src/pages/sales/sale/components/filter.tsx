@@ -84,7 +84,7 @@ const SaleFilter = ({ handleFetch, defaultValues }: Props) => {
           }}
         />
         <TextField
-          label="Buyer Name"
+          label="Customer Name"
           size="small"
           {...register("buyer_name")}
         />

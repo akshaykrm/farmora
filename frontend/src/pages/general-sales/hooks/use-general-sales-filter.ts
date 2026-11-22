@@ -12,14 +12,16 @@ function useGeneralSalesFilter() {
     ? parseInt(queryParms.season_id)
     : null;
 
-  const purpose = queryParms.purpose || "";
+  const category_id = queryParms.category_id
+    ? parseInt(queryParms.category_id)
+    : null;
 
   return {
     filter: {
       ...queryParms,
       page,
       limit,
-      purpose,
+      category_id,
       season_id,
     },
     updateQueryParams,

@@ -2,6 +2,7 @@ import salesService from '@services/sales.service'
 import generalExpenseService from '@services/general-expense.service'
 import expenseSalesService from '@services/expense-sales.service'
 import balanceSheetService from '@services/balance-sheet.service'
+import generalCategoryService from '@services/general-category.service'
 import seasonService from '@services/season.service'
 import batchService from '@services/batch.service'
 import { compactMeta } from '@utils/export/report'
@@ -126,7 +127,7 @@ const salesBook = async (filter, currentUser) => {
 }
 
 const generalEntries =
-  ({ service, title, filename }) =>
+  ({ service, title, filename, categoryType }) =>
   async (filter, currentUser) => {
     const { data, totalAmount } = await service.getAll(filter, currentUser)
 
@@ -146,13 +147,18 @@ const generalEntries =
       filter.season_id,
       currentUser
     )
+    const category = filter.category_id
+      ? await generalCategoryService
+          .getById(categoryType, filter.category_id, currentUser)
+          .catch(() => null)
+      : null
 
     return {
       title,
       filename,
       meta: compactMeta([
         { label: 'Season', value: season },
-        { label: 'Purpose', value: filter.purpose },
+        { label: 'Category', value: category?.name || filter.purpose },
         dateMeta(filter.start_date, filter.end_date),
       ]),
       sections: [
@@ -161,7 +167,7 @@ const generalEntries =
           columns: [
             { key: 'date', header: 'Date', type: 'date' },
             { key: 'season', header: 'Season' },
-            { key: 'purpose', header: 'Purpose', width: 2 },
+            { key: 'purpose', header: 'Category', width: 2 },
             { key: 'amount', header: 'Amount', type: 'currency' },
             { key: 'narration', header: 'Narration', width: 2 },
           ],
@@ -179,12 +185,14 @@ const generalExpenses = generalEntries({
   service: generalExpenseService,
   title: 'General Expense',
   filename: 'general-expenses',
+  categoryType: 'expense',
 })
 
 const generalSales = generalEntries({
   service: expenseSalesService,
   title: 'General Sales',
   filename: 'general-sales',
+  categoryType: 'sale',
 })
 
 const cashFlow = async (filter, currentUser) => {

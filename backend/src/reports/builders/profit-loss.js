@@ -15,13 +15,13 @@ const BATCH_COLUMNS = [
 ]
 
 const PURPOSE_COLUMNS = [
-  { key: 'purpose', header: 'Purpose', width: 2 },
+  { key: 'purpose', header: 'Category', width: 2 },
   { key: 'entries', header: 'Entries', type: 'number' },
   { key: 'amount', header: 'Amount', type: 'currency' },
 ]
 
 /**
- * General costs or general income (expense_sales) grouped by purpose. A season
+ * General costs or general income (expense_sales) grouped by category. A season
  * filter matches the season overview; otherwise the date range applies.
  */
 const byPurpose = async (table, masterId, filter) => {

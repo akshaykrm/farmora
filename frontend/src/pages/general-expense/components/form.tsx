@@ -1,5 +1,6 @@
 import type { GeneralExpanceFormValues } from "@app-types/general-expense.types";
 import { RHFTextField } from "@components/form/input";
+import CategoryField from "@components/general-category/category-field";
 import SelectList from "@components/select-list";
 import type { ValidationError } from "@errors/api.error";
 import useGetSeasonNames from "@hooks/use-get-season-names";
@@ -86,12 +87,17 @@ const GeneralExpenseForm = (props: Props) => {
             helperText={errors.season_id?.message}
           />
 
-          <RHFTextField
-            label="Purpose"
-            name="purpose"
-            control={control}
-            fullWidth
-            size="small"
+          <CategoryField
+            kind="expense"
+            value={values.category_id}
+            onChange={(val) => {
+              setValue("category_id", val ? val : "");
+              if (val) {
+                clearErrors("category_id");
+              }
+            }}
+            error={Boolean(errors.category_id)}
+            helperText={errors.category_id?.message}
           />
 
           <RHFTextField

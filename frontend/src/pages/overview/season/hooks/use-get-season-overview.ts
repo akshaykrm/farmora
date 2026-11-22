@@ -3,6 +3,18 @@ import seasonOverviewApi from "../api";
 import type { SeasonOverviewResponse } from "../types";
 import { useCallback, useEffect, useState } from "react";
 
+const BATCH_FILTER_EXCLUDED = new Set(["b_page", "b_limit"]);
+
+function pickBatchFilters(filter: Filter) {
+  const picked: Filter = {};
+  for (const key in filter) {
+    if (key.startsWith("b_") && !BATCH_FILTER_EXCLUDED.has(key)) {
+      picked[key] = filter[key];
+    }
+  }
+  return picked;
+}
+
 function searializeFilter(filter: Filter, override?: Filter) {
   const {
     season_id,
@@ -27,6 +39,7 @@ function searializeFilter(filter: Filter, override?: Filter) {
       gs_limit,
       gc_purpose,
       gs_purpose,
+      ...pickBatchFilters(filter),
     },
     override,
   );
@@ -40,6 +53,8 @@ function useGetSeasonOverview(filter: Filter) {
       total_avg_weight: 0,
       fcr: 0,
       cfcr: 0,
+      bird_shortage: 0,
+      shortage_percentage: 0,
       avg_cost: 0,
       avg_rate: 0,
       profit_loss_percentage: 0,
@@ -74,6 +89,7 @@ function useGetSeasonOverview(filter: Filter) {
     gc_purpose,
     gs_purpose,
   } = filter;
+  const batchFilterKey = JSON.stringify(pickBatchFilters(filter));
 
   const handleGetSeasonOverview = useCallback(
     async (override?: Filter) => {
@@ -101,6 +117,7 @@ function useGetSeasonOverview(filter: Filter) {
       gs_limit,
       gc_purpose,
       gs_purpose,
+      batchFilterKey,
     ],
   );
 

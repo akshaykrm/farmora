@@ -13,6 +13,11 @@ import VendorModel from '@models/vendor'
 import BatchModel from '@models/batch'
 import { calculateOffSet } from '@utils/pagination'
 import { FEED_BAG_KG, isFeedType } from '@utils/feed'
+import BatchDailyLogModel from '@models/batchdailylog'
+import {
+  calculateBirdShortage,
+  chickTotals,
+} from '../reports/metrics/batch-metrics.js'
 
 function calculateTotalFeeds(records = []) {
   return records
@@ -151,6 +156,23 @@ async function getBatchOverview(filter, currentUser) {
 
   const CFCR = FCR - (avgWeight - 2.0) * 0.25
 
+  const chickMap = await chickTotals(
+    [Number(batch_id)],
+    selectedBatch.master_id
+  )
+  const totalBirdsPurchased = chickMap.get(Number(batch_id))?.chicks || 0
+  const totalMortality =
+    Number(
+      await BatchDailyLogModel.sum('mortality', {
+        where: { batch_id: Number(batch_id) },
+      })
+    ) || 0
+  const birdShortage = calculateBirdShortage(
+    totalBirdsPurchased,
+    totalSaleBirds,
+    totalMortality
+  )
+
   const expenses = [
     ...purchases.map((p) => ({
       ...p.get({ plain: true }),
@@ -183,6 +205,7 @@ async function getBatchOverview(filter, currentUser) {
     total_expense: totalPurchaseAmount - totalReturnAmount,
     fcr: FCR,
     cfcr: CFCR,
+    ...birdShortage,
   }
 
   // Expense
@@ -238,6 +261,8 @@ const calculateBatchTotals = (batchOverviews = []) => {
   let totalSaleWeight = 0
   let totalSaleBirds = 0
   let totalSaleAmount = 0
+  let totalBirdsPurchased = 0
+  let totalMortality = 0
 
   for (const overview of batchOverviews) {
     const data = overview.overviewCalculations
@@ -249,6 +274,8 @@ const calculateBatchTotals = (batchOverviews = []) => {
     totalSaleWeight += data.total_sale_weight || 0
     totalSaleBirds += data.total_sale_birds || 0
     totalSaleAmount += data.total_sale_amount || 0
+    totalBirdsPurchased += data.total_birds_purchased || 0
+    totalMortality += data.total_mortality || 0
   }
 
   const netFeedBags = totalPurchasedFeeds - totalReturnedFeeds
@@ -286,7 +313,106 @@ const calculateBatchTotals = (batchOverviews = []) => {
     totalSaleAmount,
     FCR,
     CFCR,
+    ...calculateBirdShortage(
+      totalBirdsPurchased,
+      totalSaleBirds,
+      totalMortality
+    ),
   }
+}
+
+const BATCH_SORT_GETTERS = {
+  name: (b) => (b.batch.name || '').toLowerCase(),
+  closed_on: (b) =>
+    b.batch.closed_on ? new Date(b.batch.closed_on).getTime() : null,
+  avg_weight: (b) => b.overviewCalculations.avg_weight,
+  fcr: (b) => b.overviewCalculations.fcr,
+  cfcr: (b) => b.overviewCalculations.cfcr,
+  bird_shortage: (b) => b.overviewCalculations.bird_shortage,
+  shortage_percentage: (b) => b.overviewCalculations.shortage_percentage,
+  avg_cost: (b) => batchAvgCost(b),
+  avg_rate: (b) => batchAvgRate(b),
+  diff: (b) => batchAvgRate(b) - batchAvgCost(b),
+  profit: (b) => batchProfit(b),
+}
+
+const batchAvgCost = (b) =>
+  b.overviewCalculations.total_expense /
+  b.overviewCalculations.total_sale_weight
+
+const batchAvgRate = (b) =>
+  b.overviewCalculations.total_sale_amount /
+  b.overviewCalculations.total_sale_weight
+
+const batchProfit = (b) =>
+  b.overviewCalculations.total_sale_amount -
+  b.overviewCalculations.total_expense
+
+const parseRangeBound = (v) => {
+  if (v === undefined || v === null || v === '') return null
+  const n = Number(v)
+  return Number.isFinite(n) ? n : null
+}
+
+const filterAndSortBatches = (batchOverviews, filter) => {
+  const { b_search, b_close_from, b_close_to, b_sort_by } = filter
+  const sortOrder = filter.b_sort_order === 'desc' ? 'desc' : 'asc'
+
+  let result = batchOverviews
+
+  if (b_search) {
+    const term = String(b_search).toLowerCase()
+    result = result.filter((b) =>
+      (b.batch.name || '').toLowerCase().includes(term)
+    )
+  }
+
+  if (b_close_from || b_close_to) {
+    const from = b_close_from ? new Date(b_close_from) : null
+    const to = b_close_to ? new Date(b_close_to) : null
+    if (to) to.setHours(23, 59, 59, 999)
+    result = result.filter((b) => {
+      if (!b.batch.closed_on) return false
+      const closed = new Date(b.batch.closed_on)
+      if (from && closed < from) return false
+      if (to && closed > to) return false
+      return true
+    })
+  }
+
+  for (const key of Object.keys(BATCH_SORT_GETTERS)) {
+    if (key === 'name' || key === 'closed_on') continue
+    const min = parseRangeBound(filter[`b_${key}_min`])
+    const max = parseRangeBound(filter[`b_${key}_max`])
+    if (min === null && max === null) continue
+    const getter = BATCH_SORT_GETTERS[key]
+    result = result.filter((b) => {
+      const v = getter(b)
+      if (!Number.isFinite(v)) return false
+      if (min !== null && v < min) return false
+      if (max !== null && v > max) return false
+      return true
+    })
+  }
+
+  const getter = BATCH_SORT_GETTERS[b_sort_by]
+  if (getter) {
+    const dir = sortOrder === 'desc' ? -1 : 1
+    result = [...result].sort((a, b) => {
+      const av = getter(a)
+      const bv = getter(b)
+      const aNull = av === null || av === undefined || Number.isNaN(av)
+      const bNull = bv === null || bv === undefined || Number.isNaN(bv)
+      if (aNull && bNull) return 0
+      if (aNull) return 1
+      if (bNull) return -1
+      if (av < bv) return -1 * dir
+      if (av > bv) return 1 * dir
+      return 0
+    })
+  }
+
+  return result
 }
 
 const getSeasonOverview = async (filter, currentUser) => {
@@ -387,8 +513,10 @@ const getSeasonOverview = async (filter, currentUser) => {
   const { b_page, b_limit } = filter
   const b_offset = calculateOffSet(b_page, b_limit)
 
-  const b_count = batchOverviews.length
-  const paginatedBatches = batchOverviews.slice(b_offset, b_offset + b_limit)
+  const visibleBatches = filterAndSortBatches(batchOverviews, filter)
+
+  const b_count = visibleBatches.length
+  const paginatedBatches = visibleBatches.slice(b_offset, b_offset + b_limit)
   const b_totalPages = Math.ceil(b_count / b_limit)
 
   const { gc_page, gc_limit } = filter
@@ -436,6 +564,8 @@ const getSeasonOverview = async (filter, currentUser) => {
       total_avg_weight: totalAvgWeight,
       fcr: totals.FCR,
       cfcr: totals.CFCR,
+      bird_shortage: totals.bird_shortage,
+      shortage_percentage: totals.shortage_percentage,
       avg_cost: avgCost,
       avg_rate: avgRate,
       profit_loss_percentage: avgRate - avgCost,

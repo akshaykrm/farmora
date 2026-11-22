@@ -61,6 +61,11 @@ const SalesModel = sequelize.define(
       type: Sequelize.ENUM('active', 'inactive'),
       defaultValue: 'active',
     },
+    is_incomplete: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
   },
   {
     underscored: true,

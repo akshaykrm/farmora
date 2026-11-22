@@ -35,6 +35,12 @@ function useSeasonOverviewFilter() {
   const gc_purpose = queryParms.gc_purpose ? queryParms.gc_purpose : "";
   const gs_purpose = queryParms.gs_purpose ? queryParms.gs_purpose : "";
 
+  const b_search = queryParms.b_search || "";
+  const b_close_from = queryParms.b_close_from || "";
+  const b_close_to = queryParms.b_close_to || "";
+  const b_sort_by = queryParms.b_sort_by || "";
+  const b_sort_order = queryParms.b_sort_order === "desc" ? "desc" : "asc";
+
   return {
     filter: {
       ...queryParms,
@@ -47,6 +53,11 @@ function useSeasonOverviewFilter() {
       season_id,
       gc_purpose,
       gs_purpose,
+      b_search,
+      b_close_from,
+      b_close_to,
+      b_sort_by,
+      b_sort_order,
     },
     updateQueryParams,
   };

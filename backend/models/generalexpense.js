@@ -12,6 +12,10 @@ const GeneralExpenseModel = sequelize.define(
       type: Sequelize.INTEGER,
       allowNull: false,
     },
+    category_id: {
+      type: Sequelize.INTEGER,
+      allowNull: true,
+    },
     purpose: {
       type: Sequelize.STRING,
       allowNull: false,

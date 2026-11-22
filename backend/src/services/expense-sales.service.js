@@ -1,5 +1,7 @@
 import ExpenseSalesModel from '@models/expensesales'
+import GeneralCategoryModel from '@models/generalcategory'
 import SeasonModel from '@models/season'
+import generalCategoryService from '@services/general-category.service'
 import userRoles from '@utils/user-roles'
 import dayjs from 'dayjs'
 import { Op } from 'sequelize'
@@ -13,17 +15,28 @@ const create = async (payload, currentUser) => {
     payload.master_id = currentUser.id
   }
 
+  payload = await generalCategoryService.applyCategory(
+    'sale',
+    payload,
+    payload.master_id
+  )
+
   const record = await ExpenseSalesModel.create(payload)
   return record
 }
 
 const getAll = async (filter, currentUser) => {
-  const { limit, page, season_id, start_date, end_date, purpose } = filter
+  const { limit, page, season_id, category_id, start_date, end_date, purpose } =
+    filter
   const whereClause = {}
   const offset = calculateOffSet(page, limit)
 
   if (season_id) {
     whereClause.season_id = season_id
+  }
+
+  if (category_id) {
+    whereClause.category_id = category_id
   }
 
   if (purpose) {
@@ -55,6 +68,12 @@ const getAll = async (filter, currentUser) => {
       offset,
       order: [['date', 'DESC']],
       include: [
+        {
+          model: GeneralCategoryModel,
+          as: 'category',
+          required: false,
+          attributes: ['id', 'name'],
+        },
         {
           model: SeasonModel,
           as: 'season',
@@ -119,6 +138,11 @@ const getById = async (id, currentUser) => {
 
 const updateById = async (id, payload, currentUser) => {
   const record = await getById(id, currentUser)
+  payload = await generalCategoryService.applyCategory(
+    'sale',
+    payload,
+    record.master_id
+  )
   await record.update(payload)
 }
 

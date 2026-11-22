@@ -6,7 +6,7 @@ function useGetGeneralSalesById(selectedId: number | null) {
   const [dataLoaded, setdataLoaded] = useState(false);
   const [selectedData, setSelectedData] = useState<GeneralSalesFormValues>({
     amount: 0,
-    purpose: "",
+    category_id: null,
     date: null,
     season_id: null,
     narration: "",
@@ -17,10 +17,10 @@ function useGetGeneralSalesById(selectedId: number | null) {
       const res = await generalSales.fetchById(id);
       if (res.status === "success") {
         if (res.data) {
-          const { amount, purpose, season_id, narration, date } = res.data;
+          const { amount, category_id, season_id, narration, date } = res.data;
           setSelectedData({
             amount,
-            purpose,
+            category_id,
             date,
             season_id,
             narration,

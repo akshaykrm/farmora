@@ -2,7 +2,9 @@ import jwt from 'jsonwebtoken'
 import { assertAccountApproved } from '@services/account-approval.service'
 import userRoles from '@utils/user-roles'
 import {
+  InvalidTokenError,
   MissingTokenError,
+  TokenExpiredError,
   PermissionDeniedError,
   UnauthorizedError,
 } from '@errors/auth.errors'
@@ -19,7 +21,13 @@ export const isAuthenticated = asyncHandler(async function (req, res, next) {
 
   if (!token) throw new MissingTokenError()
 
-  const decoded = verify(token, CONFIG.jwt_secret)
+  let decoded
+  try {
+    decoded = verify(token, CONFIG.jwt_secret)
+  } catch (err) {
+    if (err instanceof jwt.TokenExpiredError) throw new TokenExpiredError()
+    throw new InvalidTokenError()
+  }
   if (decoded.purpose) throw new UnauthorizedError()
 
   const authenticatedUser = await userService.getById(decoded.id)

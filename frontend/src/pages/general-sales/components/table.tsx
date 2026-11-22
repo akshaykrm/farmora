@@ -6,9 +6,11 @@ import TableRow from "@components/TableRow";
 import EmptyContentMessage from "@components/EmptyContentMessage";
 import { formatCurrency } from "@utils/currency";
 import dayjs from "dayjs";
-import { EditIcon } from "lucide-react";
+import { EditIcon, EyeIcon } from "lucide-react";
+import { useState } from "react";
+import ViewDetailsDialog from "@components/view-details-dialog";
 
-const headers = ["Date", "Season", "Purpose", "Amount", "Action"];
+const headers = ["Date", "Season", "Category", "Amount", "Action"];
 
 type Props = {
   onEdit: (selectedId: number) => void;
@@ -17,6 +19,7 @@ type Props = {
 
 const GeneralSalesTable = ({ onEdit, data }: Props) => {
   const isEmpty = data.length === 0;
+  const [viewing, setViewing] = useState<GeneralSalesRecord | null>(null);
 
   return (
     <div className="w-full">
@@ -32,16 +35,22 @@ const GeneralSalesTable = ({ onEdit, data }: Props) => {
             <TableCell
               content={item.season?.name || `Season ${item.season_id}`}
             />
-            <TableCell content={item.purpose} />
+            <TableCell content={item.category?.name ?? item.purpose} />
             <TableCell content={formatCurrency(item.amount || 0)} />
             <TableCell
               content={
-                <EditIcon
-                  className="w-6 h-6 text-brand-ink-muted hover:text-brand-ink-soft cursor-pointer"
-                  onClick={() => {
-                    onEdit(item.id);
-                  }}
-                />
+                <div className="flex items-center gap-3">
+                  <EyeIcon
+                    className="w-6 h-6 text-brand-ink-muted hover:text-brand-ink-soft cursor-pointer"
+                    onClick={() => setViewing(item)}
+                  />
+                  <EditIcon
+                    className="w-6 h-6 text-brand-ink-muted hover:text-brand-ink-soft cursor-pointer"
+                    onClick={() => {
+                      onEdit(item.id);
+                    }}
+                  />
+                </div>
               }
             />
           </TableRow>
@@ -53,6 +62,26 @@ const GeneralSalesTable = ({ onEdit, data }: Props) => {
           description="No general sales items found for the selected season and date range"
         />
       )}
+      <ViewDetailsDialog
+        title="General Sales Details"
+        isOpen={viewing !== null}
+        onClose={() => setViewing(null)}
+        rows={[
+          {
+            label: "Date",
+            value: viewing ? dayjs(viewing.date).format("DD-MM-YYYY") : "-",
+          },
+          {
+            label: "Season",
+            value:
+              viewing?.season?.name ||
+              (viewing ? `Season ${viewing.season_id}` : "-"),
+          },
+          { label: "Purpose", value: viewing?.purpose },
+          { label: "Amount", value: formatCurrency(viewing?.amount || 0) },
+          { label: "Narration", value: viewing?.narration || "-" },
+        ]}
+      />
     </div>
   );
 };

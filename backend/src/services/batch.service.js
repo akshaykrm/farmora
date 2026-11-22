@@ -12,6 +12,7 @@ import { applyTenantMasterId, tenantMasterId } from '@utils/tenant-scope'
 import { sequelize } from '@utils/db'
 import SubscriptionModel from '@models/subscription'
 import PackageModel from '@models/package'
+import pendingInvoiceService from '@services/pending-invoice.service'
 
 const getAllowance = async (currentUser, transaction = null) => {
   const masterId = tenantMasterId(currentUser)
@@ -272,6 +273,11 @@ const updateById = async (batchId, payload, currentUser) => {
 
 const close = async (batchId, currentUser, closingStatement = null) => {
   const batchRecord = await getById(batchId, currentUser)
+  await pendingInvoiceService.assertNoneForClose(
+    'batch',
+    { batch_id: batchRecord.id },
+    currentUser
+  )
   const payload = { closed_on: dayjs().toDate() }
   if (closingStatement !== null) {
     payload.closing_statement = closingStatement

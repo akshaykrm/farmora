@@ -203,7 +203,7 @@ const seasonOverview = async (filter, currentUser) => {
 
   const entryColumns = [
     { key: 'date', header: 'Date', type: 'date' },
-    { key: 'purpose', header: 'Purpose', width: 3 },
+    { key: 'purpose', header: 'Category', width: 3 },
     { key: 'amount', header: 'Amount', type: 'currency' },
   ]
 
@@ -215,8 +215,8 @@ const seasonOverview = async (filter, currentUser) => {
     meta: compactMeta([
       { label: 'Season', value: data.season?.name },
       { label: 'Closed On', value: data.season?.closed_on, type: 'date' },
-      { label: 'General Cost Purpose', value: filter.gc_purpose },
-      { label: 'General Sales Purpose', value: filter.gs_purpose },
+      { label: 'General Cost Category', value: filter.gc_purpose },
+      { label: 'General Sales Category', value: filter.gs_purpose },
     ]),
     sections: [
       {

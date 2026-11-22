@@ -1,24 +1,18 @@
 import vendors from "@api/vendor.api";
 import type { VendorName } from "@app-types/vendor.types";
 import type { VendorNamesFilter } from "@pages/vendors/types";
-import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+
+const EMPTY: VendorName[] = [];
 
 const useGetVendorNames = (filter?: VendorNamesFilter) => {
-  const [state, setState] = useState<VendorName[]>([]);
+  const query = useQuery<VendorName[]>({
+    queryKey: ["vendor:name-list", filter ?? null],
+    queryFn: () => vendors.getNames(filter),
+    staleTime: 30_000,
+  });
 
-  useEffect(() => {
-    vendors
-      .getNames(filter)
-      .then((data: VendorName[]) => {
-        setState(data);
-      })
-      .catch((err) => {
-        console.log(err);
-        setState([]);
-      });
-  }, []);
-
-  return { data: state };
+  return { data: query.data ?? EMPTY };
 };
 
 export default useGetVendorNames;

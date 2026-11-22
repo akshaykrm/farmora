@@ -178,6 +178,10 @@ const BatchOverviewPage = () => {
                             averageWeight={overviewCalculations.avg_weight}
                             cfcr={overviewCalculations.cfcr}
                             fcr={overviewCalculations.fcr}
+                            birdShortage={overviewCalculations.bird_shortage}
+                            shortagePercentage={
+                              overviewCalculations.shortage_percentage
+                            }
                           />
                         </div>
                       </div>

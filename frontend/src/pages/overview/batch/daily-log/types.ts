@@ -94,5 +94,4 @@ export type OpenBatchLogStatus = {
 export type DailyLogPrefill = {
   date: string;
   age: number | null;
-  issued_feed: number;
 };
