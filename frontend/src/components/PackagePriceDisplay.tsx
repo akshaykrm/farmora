@@ -12,11 +12,19 @@ type Props = {
   duration: number;
 };
 
-//TODO: This needs to calculate duration and automatically calculate the valid
-// time span. Currently we only have duration but we don't have identifier for
-// months or anything this need to be thought out and implemented
-function PackageExpiry(props: { duration: number }) {
-  return <span className="text-sm text-brand-ink-muted"> / 1yr</span>;
+// Package duration is stored in months (the backend adds `duration` months to
+// the subscription start date).
+function formatPackageDuration(months: number): string {
+  const value = Number(months);
+  if (!Number.isFinite(value) || value <= 0) return "";
+  if (value % 12 === 0) return `${value / 12}yr`;
+  return `${value}mo`;
+}
+
+function PackageExpiry({ duration }: { duration: number }) {
+  const label = formatPackageDuration(duration);
+  if (!label) return null;
+  return <span className="text-sm text-brand-ink-muted"> / {label}</span>;
 }
 
 const PackagePriceDisplay = ({ pkg, duration, size = "landing" }: Props) => {
