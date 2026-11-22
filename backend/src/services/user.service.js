@@ -17,6 +17,8 @@ import logger from '@utils/logger'
 import { calculateOffSet } from '@utils/pagination'
 import { getEffectivePackagePrice } from '@utils/package-price'
 import permissionService, { getMasterId } from '@services/permission.service'
+import referralBonusService from '@services/referral-bonus.service'
+import ReferralPartnerModel from '@models/referralpartner'
 
 const getAccountOwnerId = (currentUser, payload = {}) => {
   if (currentUser.user_type === userRoles.admin.type) {
@@ -275,13 +277,29 @@ const updateMe = async (userId, payload) => {
   return attachAccessFields(userRecord)
 }
 
+const resolveReferralPartnerId = async (referralCode) => {
+  const code = typeof referralCode === 'string' ? referralCode.trim() : ''
+  if (!code) return null
+  const partner = await referralBonusService.findActivePartnerByCode(code)
+  if (!partner) {
+    const error = new Error('invalid referral code')
+    error.statusCode = 400
+    error.code = 'INVALID_REFERRAL_CODE'
+    error.name = 'ValidationError'
+    throw error
+  }
+  return partner.id
+}
+
 const update = async (userId, payload, currentUser) => {
   const userRecord = await userService.getById(userId, currentUser)
   const { role_ids, permission_ids, ...rawFields } = payload
   const userFields = { ...rawFields }
   delete userFields.parent_id
   delete userFields.user_type
+  delete userFields.referral_code
   for (const field of [
+    'referral_partner_id',
     'free_trial_used_at',
     'approval_status',
     'approved_by',
@@ -292,6 +310,18 @@ const update = async (userId, payload, currentUser) => {
 
   if (currentUser.user_type !== userRoles.admin.type) {
     delete userFields.status
+  }
+
+  // Only Super Admin can relink a manager to a referral partner. Existing
+  // ledger rows stay with the old partner; future checkouts use the new one.
+  if (
+    currentUser.user_type === userRoles.admin.type &&
+    userRecord.user_type === userRoles.manager.type &&
+    Object.prototype.hasOwnProperty.call(payload, 'referral_code')
+  ) {
+    userFields.referral_partner_id = await resolveReferralPartnerId(
+      payload.referral_code
+    )
   }
 
   const transaction = await sequelize.transaction()
@@ -429,6 +459,12 @@ const getAll = async (payload = {}, currentUser) => {
         model: PackageModel,
         as: 'requested_package',
         attributes: ['id', 'name'],
+        required: false,
+      },
+      {
+        model: ReferralPartnerModel,
+        as: 'referral_partner',
+        attributes: ['id', 'name', 'code'],
         required: false,
       },
     ],
