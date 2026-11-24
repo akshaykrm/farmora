@@ -6,6 +6,7 @@ import AddFarm from "./components/add-farm";
 import EditFarm from "./components/edit-farm";
 import FarmTable from "./components/table";
 import { Box } from "@mui/material";
+import usePermissions from "@hooks/use-permissions";
 import useGetFarms from "./hooks/use-get-farms";
 import useFarmFilter from "./hooks/use-farm-filter";
 import PaginationWithLimit from "@components/pagination-with-limit";
@@ -16,6 +17,7 @@ const FarmsPage = () => {
   const { filter, updateQueryParams } = useFarmFilter();
 
   const { farms, refetch } = useGetFarms(filter);
+  const { can } = usePermissions();
 
   const onOpen = () => setOpenAdd(true);
   const onClose = () => setOpenAdd(false);
@@ -32,7 +34,7 @@ const FarmsPage = () => {
               filter={filter}
               filename="farms"
             />
-            <AddButton label="Farm" onClick={onOpen} />
+            {can("farm:write") && <AddButton label="Farm" onClick={onOpen} />}
           </div>
         }
       />

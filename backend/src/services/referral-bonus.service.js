@@ -7,9 +7,15 @@ import logger from '@utils/logger'
 import { getEffectivePackagePrice } from '@utils/package-price'
 import { UniqueConstraintError } from 'sequelize'
 
-export const computeBonus = (packageRecord) => {
-  const bonusType = packageRecord.referral_bonus_type || 'none'
-  const bonusValue = Number(packageRecord.referral_bonus_value || 0)
+export const computeBonus = (packageRecord, partnerRecord = null) => {
+  const source =
+    partnerRecord?.referral_bonus_type &&
+    partnerRecord.referral_bonus_type !== 'none'
+      ? partnerRecord
+      : packageRecord
+  const sourceName = source === partnerRecord ? 'partner' : 'package'
+  const bonusType = source.referral_bonus_type || 'none'
+  const bonusValue = Number(source.referral_bonus_value || 0)
   const packagePrice = getEffectivePackagePrice(packageRecord)
 
   if (bonusType === 'none' || bonusValue <= 0) {
@@ -18,7 +24,7 @@ export const computeBonus = (packageRecord) => {
       bonusValue,
       bonusAmount: 0,
       packagePrice,
-      source: source.source,
+      source: sourceName,
     }
   }
 
@@ -28,7 +34,7 @@ export const computeBonus = (packageRecord) => {
       bonusValue,
       bonusAmount: Number(bonusValue.toFixed(2)),
       packagePrice,
-      source: source.source,
+      source: sourceName,
     }
   }
 
@@ -38,7 +44,7 @@ export const computeBonus = (packageRecord) => {
       bonusValue,
       bonusAmount: Number(((packagePrice * bonusValue) / 100).toFixed(2)),
       packagePrice,
-      source: source.source,
+      source: sourceName,
     }
   }
 
@@ -47,7 +53,7 @@ export const computeBonus = (packageRecord) => {
     bonusValue: 0,
     bonusAmount: 0,
     packagePrice,
-    source: source.source,
+    source: sourceName,
   }
 }
 
@@ -60,6 +66,7 @@ const creditForSubscription = async ({
   createdBy = null,
   remarks = null,
   partnerRecord = null,
+  transaction = null,
 }) => {
   if (!partnerId || !subscription?.id || !packageRecord) {
     return null
@@ -70,7 +77,8 @@ const creditForSubscription = async ({
   }
 
   const partner =
-    partnerRecord || (await ReferralPartnerModel.findByPk(partnerId))
+    partnerRecord ||
+    (await ReferralPartnerModel.findByPk(partnerId, { transaction }))
 
   const { bonusType, bonusValue, bonusAmount, packagePrice } = computeBonus(
     packageRecord,
@@ -86,21 +94,24 @@ const creditForSubscription = async ({
   }
 
   try {
-    const txn = await ReferralLedgerTransactionModel.create({
-      referral_partner_id: partnerId,
-      type,
-      amount: bonusAmount,
-      company_user_id: companyUserId,
-      subscription_id: subscription.id,
-      package_id: packageRecord.id,
-      package_name: packageRecord.name,
-      package_price: packagePrice,
-      bonus_type: bonusType,
-      bonus_value: bonusValue,
-      bonus_amount: bonusAmount,
-      remarks,
-      created_by: createdBy,
-    })
+    const txn = await ReferralLedgerTransactionModel.create(
+      {
+        referral_partner_id: partnerId,
+        type,
+        amount: bonusAmount,
+        company_user_id: companyUserId,
+        subscription_id: subscription.id,
+        package_id: packageRecord.id,
+        package_name: packageRecord.name,
+        package_price: packagePrice,
+        bonus_type: bonusType,
+        bonus_value: bonusValue,
+        bonus_amount: bonusAmount,
+        remarks,
+        created_by: createdBy,
+      },
+      { transaction }
+    )
     logger.info(
       {
         partner_id: partnerId,

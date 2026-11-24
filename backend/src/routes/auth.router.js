@@ -1,7 +1,9 @@
 import { Router } from 'express'
-import { isAuthenticated } from '@middlewares/auth.middleware'
+import { isAuthenticated, isSuperAdmin } from '@middlewares/auth.middleware'
 import {
   changePasswordSchema,
+  confirmPasswordResetSchema,
+  forgotPasswordSchema,
   newManageSchema,
   resetPasswordSchema,
 } from '@validators/user.validator'
@@ -15,7 +17,21 @@ router.post('/signup', validate(newManageSchema), authController.createManager)
 router.post('/login', authController.login)
 
 router.post(
+  '/forgot-password',
+  validate(forgotPasswordSchema),
+  authController.forgotPassword
+)
+
+router.post(
+  '/forgot-password/reset',
+  validate(confirmPasswordResetSchema),
+  authController.confirmPasswordReset
+)
+
+router.post(
   '/reset-password',
+  isAuthenticated,
+  isSuperAdmin,
   validate(resetPasswordSchema),
   authController.resetPassword
 )

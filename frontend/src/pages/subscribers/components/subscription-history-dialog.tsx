@@ -13,6 +13,8 @@ import { EditIcon } from "lucide-react";
 import RenewSubscription from "@pages/subscriptions/components/renew";
 import EditSubscription from "@pages/subscriptions/components/edit";
 
+import UpdateSubscriptionDaysDialog from "./update-subscription-days-dialog";
+
 type Props = {
   subscriber: { id: number; name: string } | null;
   onClose: () => void;
@@ -25,6 +27,7 @@ const SubscriptionHistoryDialog = ({
   onChanged,
 }: Props) => {
   const [rows, setRows] = useState<Subscription[]>([]);
+  const [daysTarget, setDaysTarget] = useState<Subscription | null>(null);
   const [editId, setEditId] = useState<number | null>(null);
   const [renewTarget, setRenewTarget] = useState<Subscription | null>(null);
 
@@ -57,7 +60,9 @@ const SubscriptionHistoryDialog = ({
     if (fromRows) return fromRows;
     const partnerId = rows.find((row) => row.user?.referral_partner_id)?.user
       ?.referral_partner_id;
-    return partnerId ? { id: partnerId, name: `Partner #${partnerId}`, code: "" } : null;
+    return partnerId
+      ? { id: partnerId, name: `Partner #${partnerId}`, code: "" }
+      : null;
   }, [rows]);
 
   return (
@@ -112,11 +117,16 @@ const SubscriptionHistoryDialog = ({
           ) : (
             <Table>
               <TableRow>
-                {["Package", "Kind", "Valid From", "Valid To", "Edit"].map(
-                  (header) => (
-                    <TableHeaderCell key={header} content={header} />
-                  ),
-                )}
+                {[
+                  "Package",
+                  "Kind",
+                  "Valid From",
+                  "Valid To",
+                  "Days",
+                  "Edit",
+                ].map((header) => (
+                  <TableHeaderCell key={header} content={header} />
+                ))}
               </TableRow>
               {rows.map((row) => (
                 <TableRow key={row.id}>
@@ -138,6 +148,13 @@ const SubscriptionHistoryDialog = ({
                   />
                   <TableCell
                     content={
+                      <Button size="small" onClick={() => setDaysTarget(row)}>
+                        Update days
+                      </Button>
+                    }
+                  />
+                  <TableCell
+                    content={
                       <EditIcon
                         className="h-5 w-5 cursor-pointer text-brand-ink-muted hover:text-brand-ink-soft"
                         onClick={() => setEditId(row.id)}
@@ -151,6 +168,17 @@ const SubscriptionHistoryDialog = ({
         </DialogContent>
       </Dialog>
 
+      {daysTarget && subscriber && (
+        <UpdateSubscriptionDaysDialog
+          subscription={daysTarget}
+          subscriberName={subscriber.name}
+          onClose={() => setDaysTarget(null)}
+          onSaved={() => {
+            setDaysTarget(null);
+            handleChanged();
+          }}
+        />
+      )}
       <EditSubscription
         selectedId={editId}
         onClose={() => {
@@ -161,13 +189,9 @@ const SubscriptionHistoryDialog = ({
       <RenewSubscription
         isShow={renewTarget !== null}
         userId={renewTarget?.user_id ?? null}
-        packageId={
-          renewTarget?.package_id ?? renewTarget?.package?.id ?? null
-        }
+        packageId={renewTarget?.package_id ?? renewTarget?.package?.id ?? null}
         referralPartnerId={
-          renewTarget?.user?.referral_partner_id ??
-          referralPartner?.id ??
-          null
+          renewTarget?.user?.referral_partner_id ?? referralPartner?.id ?? null
         }
         onClose={() => {
           setRenewTarget(null);

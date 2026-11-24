@@ -3,6 +3,7 @@ import { PermissionDeniedError } from '@errors/auth.errors'
 import SubscriptionModel from '@models/subscription'
 import PackageModel from '@models/package'
 import UserModel from '@models/user'
+import userAllowance from '@services/user-allowance.service'
 import RoleModel from '@models/role'
 import UserRoleAssignment from '@models/userroleassignment'
 import UserPermissionModel from '@models/userpermission'
@@ -14,7 +15,10 @@ import dayjs from 'dayjs'
 import userRoles from '@utils/user-roles'
 import logger from '@utils/logger'
 import { calculateOffSet } from '@utils/pagination'
+import { getEffectivePackagePrice } from '@utils/package-price'
 import permissionService, { getMasterId } from '@services/permission.service'
+import referralBonusService from '@services/referral-bonus.service'
+import ReferralPartnerModel from '@models/referralpartner'
 
 const getAccountOwnerId = (currentUser, payload = {}) => {
   if (currentUser.user_type === userRoles.admin.type) {
@@ -137,6 +141,28 @@ const createStaff = async (payload, currentUser) => {
 
   const transaction = await sequelize.transaction()
   try {
+    const owner = await UserModel.findByPk(parentId, {
+      transaction,
+      lock: transaction.LOCK.UPDATE,
+    })
+    if (!owner || owner.user_type !== userRoles.manager.type)
+      throw new PermissionDeniedError('parent must be a subscriber')
+    const allowance = await userAllowance.read(parentId, transaction)
+    if (!allowance.can_create)
+      throw Object.assign(
+        new Error(
+          allowance.subscription_active
+            ? `Your package allows ${allowance.limit} staff users. Upgrade your package to add another user.`
+            : 'An active subscription is required to add users.'
+        ),
+        {
+          statusCode: 403,
+          code: allowance.subscription_active
+            ? 'USER_LIMIT_REACHED'
+            : 'SUBSCRIPTION_REQUIRED',
+          details: allowance,
+        }
+      )
     const newUser = await UserModel.create(
       {
         name: payload.name,
@@ -149,12 +175,7 @@ const createStaff = async (payload, currentUser) => {
       { transaction }
     )
 
-    await replaceUserAccess(
-      newUser.id,
-      payload,
-      parentId,
-      transaction
-    )
+    await replaceUserAccess(newUser.id, payload, parentId, transaction)
 
     logger.debug({ user_id: newUser.id }, 'Staff user created')
     await transaction.commit()
@@ -256,15 +277,51 @@ const updateMe = async (userId, payload) => {
   return attachAccessFields(userRecord)
 }
 
+const resolveReferralPartnerId = async (referralCode) => {
+  const code = typeof referralCode === 'string' ? referralCode.trim() : ''
+  if (!code) return null
+  const partner = await referralBonusService.findActivePartnerByCode(code)
+  if (!partner) {
+    const error = new Error('invalid referral code')
+    error.statusCode = 400
+    error.code = 'INVALID_REFERRAL_CODE'
+    error.name = 'ValidationError'
+    throw error
+  }
+  return partner.id
+}
+
 const update = async (userId, payload, currentUser) => {
   const userRecord = await userService.getById(userId, currentUser)
   const { role_ids, permission_ids, ...rawFields } = payload
   const userFields = { ...rawFields }
   delete userFields.parent_id
   delete userFields.user_type
+  delete userFields.referral_code
+  for (const field of [
+    'referral_partner_id',
+    'free_trial_used_at',
+    'approval_status',
+    'approved_by',
+    'approved_at',
+    'requested_package_id',
+  ])
+    delete userFields[field]
 
   if (currentUser.user_type !== userRoles.admin.type) {
     delete userFields.status
+  }
+
+  // Only Super Admin can relink a manager to a referral partner. Existing
+  // ledger rows stay with the old partner; future checkouts use the new one.
+  if (
+    currentUser.user_type === userRoles.admin.type &&
+    userRecord.user_type === userRoles.manager.type &&
+    Object.prototype.hasOwnProperty.call(payload, 'referral_code')
+  ) {
+    userFields.referral_partner_id = await resolveReferralPartnerId(
+      payload.referral_code
+    )
   }
 
   const transaction = await sequelize.transaction()
@@ -340,7 +397,17 @@ const pickCurrentSubscription = (subscriptions = []) => {
 
 const toSubscriberPayload = (userRecord) => {
   const json = userRecord.toJSON()
-  const subscriptions = json.subscriptions || []
+  const subscriptions = (json.subscriptions || []).map((subscription) =>
+    subscription.package
+      ? {
+          ...subscription,
+          package: {
+            ...subscription.package,
+            price: getEffectivePackagePrice(subscription.package),
+          },
+        }
+      : subscription
+  )
   return {
     ...json,
     subscriptions,
@@ -361,7 +428,7 @@ const subscriptionListInclude = {
       model: PackageModel,
       as: 'package',
       required: false,
-      attributes: ['id', 'name', 'price', 'duration'],
+      attributes: ['id', 'name', 'actual_price', 'discount_price', 'duration'],
     },
   ],
 }
@@ -386,7 +453,21 @@ const getAll = async (payload = {}, currentUser) => {
   }
 
   const { count, rows } = await UserModel.findAndCountAll({
-    include: [subscriptionListInclude],
+    include: [
+      subscriptionListInclude,
+      {
+        model: PackageModel,
+        as: 'requested_package',
+        attributes: ['id', 'name'],
+        required: false,
+      },
+      {
+        model: ReferralPartnerModel,
+        as: 'referral_partner',
+        attributes: ['id', 'name', 'code'],
+        required: false,
+      },
+    ],
     where: filter,
     limit,
     offset,

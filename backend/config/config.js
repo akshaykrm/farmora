@@ -7,6 +7,7 @@ export default {
     password: process.env.DB_PASS,
     database: process.env.DB_NAME,
     host: process.env.DB_HOST,
+    port: Number(process.env.DB_PORT) || 5432,
     dialect: 'postgres',
   },
   test: {
@@ -14,6 +15,7 @@ export default {
     password: process.env.DB_PASS,
     database: process.env.DB_NAME,
     host: process.env.DB_HOST,
+    port: Number(process.env.DB_PORT) || 5432,
     dialect: 'postgres',
   },
   production: {
@@ -21,6 +23,7 @@ export default {
     password: process.env.DB_PASS,
     database: process.env.DB_NAME,
     host: process.env.DB_HOST,
+    port: Number(process.env.DB_PORT) || 5432,
     dialect: 'postgres',
   },
 }

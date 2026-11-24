@@ -49,6 +49,7 @@ export const updateNewStaffSchema = newStaffMemberSchema
     place: optionalProfileField,
     pincode: optionalProfileField,
     bird_capacity: optionalProfileField,
+    referral_code: Joi.string().trim().max(50).allow('', null).optional(),
   })
   .fork(['name', 'username'], (schema) => schema.optional())
 
@@ -64,4 +65,17 @@ export const changePasswordSchema = Joi.object({
 
 export const setUserPasswordSchema = Joi.object({
   new_password: Joi.string().min(3).max(100).required(),
+})
+
+export const forgotPasswordSchema = Joi.object({
+  identifier: Joi.string().trim().min(3).max(255).required(),
+})
+
+export const confirmPasswordResetSchema = Joi.object({
+  token: Joi.string()
+    .trim()
+    .pattern(/^[a-f0-9]{64}$/i)
+    .required()
+    .messages({ 'string.pattern.base': 'Reset link is invalid or expired.' }),
+  new_password: Joi.string().min(8).max(100).required(),
 })

@@ -1,230 +1,131 @@
-import { useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
-import { Dialog, DialogContent } from "@components/dialog"
-import { Button, CircularProgress } from "@mui/material"
-import toast from "react-hot-toast"
-import fetcherV2 from "@utils/fetcherV2"
-import type { ValidationError } from "@errors/api.error"
-
-type FormValues = {
-  username: string
-  new_password: string
-  confirm_password: string
-}
+import { useEffect, useState, type FormEvent } from "react";
+import { Mail, MailCheck } from "lucide-react";
+import { Button } from "@mui/material";
+import { Dialog, DialogContent } from "@components/dialog";
+import fetcherV2 from "@utils/fetcherV2";
 
 type Props = {
-  isOpen: boolean
-  onClose: () => void
-  defaultUsername?: string
-  onReset: (username: string) => void
-}
+  isOpen: boolean;
+  onClose: () => void;
+  defaultUsername?: string;
+};
 
 const fieldClass =
-  "w-full rounded-xl border border-brand-border bg-brand-card px-4 py-3 text-sm text-brand-ink outline-none transition-shadow placeholder:text-brand-ink-muted focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/30"
+  "w-full rounded-xl border border-brand-border bg-brand-card py-3 pr-4 pl-11 text-sm text-brand-ink outline-none transition-shadow placeholder:text-brand-ink-muted focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/30";
 
-const ForgotPasswordDialog = ({
-  isOpen,
-  onClose,
-  defaultUsername,
-  onReset,
-}: Props) => {
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-    setError,
-    watch,
-  } = useForm<FormValues>({
-    defaultValues: {
-      username: "",
-      new_password: "",
-      confirm_password: "",
-    },
-  })
+const ForgotPasswordDialog = ({ isOpen, onClose, defaultUsername }: Props) => {
+  const [identifier, setIdentifier] = useState("");
+  const [error, setError] = useState("");
+  const [sentMessage, setSentMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
-      reset({
-        username: defaultUsername || "",
-        new_password: "",
-        confirm_password: "",
-      })
-      setErrorMessage(null)
+      setIdentifier(defaultUsername || "");
+      setError("");
+      setSentMessage("");
     }
-  }, [isOpen, defaultUsername, reset])
+  }, [isOpen, defaultUsername]);
 
-  const handleClose = () => {
-    if (!isSubmitting) {
-      reset()
-      setErrorMessage(null)
-      onClose()
+  const onSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+    const value = identifier.trim();
+    if (value.length < 3) {
+      setError("Enter your username or email address.");
+      return;
     }
-  }
-
-  const onSubmit = async (data: FormValues) => {
-    setIsSubmitting(true)
-    setErrorMessage(null)
-
-    const res = await fetcherV2<unknown>(
-      "auth/reset-password",
-      JSON.stringify({
-        username: data.username,
-        new_password: data.new_password,
-      }),
+    setIsSubmitting(true);
+    setError("");
+    const res = await fetcherV2<null>(
+      "auth/forgot-password",
+      JSON.stringify({ identifier: value }),
       { method: "POST" },
-    )
-
-    setIsSubmitting(false)
-
+    );
+    setIsSubmitting(false);
     if (res.status === "success") {
-      toast.success("Password reset successfully. Please sign in.")
-      onReset(data.username)
-      handleClose()
+      setSentMessage(
+        "If an account matches, we've sent a password reset link to its email address. The link expires in 30 minutes.",
+      );
     } else if (res.status === "validation_error") {
-      res.error.forEach(({ name, message }: ValidationError) => {
-        setError(name as keyof FormValues, { message })
-      })
-    } else if (res.status === "failed") {
-      setErrorMessage(
-        typeof res.data === "string"
-          ? res.data
-          : "Password reset failed. Please try again.",
-      )
+      setError(res.error?.[0]?.message || "Check what you entered.");
+    } else if (res.status === "network_error") {
+      setError("Could not reach the server. Check your connection.");
     } else {
-      setErrorMessage("Network error. Please try again.")
+      setError(res.error?.message || "Something went wrong. Try again.");
     }
-  }
+  };
 
   return (
-    <Dialog
-      isOpen={isOpen}
-      headerTitle="Reset Password"
-      onClose={handleClose}
-    >
+    <Dialog isOpen={isOpen} headerTitle="Reset password" onClose={onClose}>
       <DialogContent>
-        <p className="mb-4 text-sm text-brand-ink-soft">
-          Enter your username and a new password to reset your account.
-        </p>
-
-        {errorMessage && (
-          <div className="mb-4 p-3 rounded-lg bg-brand-danger-soft border border-brand-danger-soft">
-            <p className="text-sm text-brand-danger-strong">{errorMessage}</p>
+        {sentMessage ? (
+          <div>
+            <div className="mb-4 flex items-start gap-3 rounded-xl border border-brand-border bg-brand-card-soft p-4">
+              <MailCheck
+                className="mt-0.5 h-5 w-5 shrink-0 text-brand-accent"
+                aria-hidden
+              />
+              <p className="text-sm text-brand-ink-soft" role="status">
+                {sentMessage}
+              </p>
+            </div>
+            <p className="mb-5 text-xs text-brand-ink-muted">
+              No email? Staff accounts without an email address need their
+              account owner or Super Admin to reset the password.
+            </p>
+            <Button onClick={onClose} variant="contained">
+              Back to sign in
+            </Button>
           </div>
+        ) : (
+          <form onSubmit={onSubmit} noValidate>
+            <p className="mb-4 text-sm text-brand-ink-soft">
+              Enter your username or email address and we&apos;ll email you a
+              link to choose a new password.
+            </p>
+            <label
+              htmlFor="forgot-identifier"
+              className="mb-2 block text-sm font-medium text-brand-ink-soft"
+            >
+              Username or email
+            </label>
+            <div className="relative">
+              <Mail
+                className="pointer-events-none absolute top-1/2 left-3.5 h-[18px] w-[18px] -translate-y-1/2 text-brand-ink-muted"
+                aria-hidden
+              />
+              <input
+                id="forgot-identifier"
+                className={fieldClass}
+                placeholder="Enter your username or email"
+                autoComplete="username"
+                autoFocus
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                aria-invalid={Boolean(error)}
+              />
+            </div>
+            {error && (
+              <p
+                className="mt-1.5 text-xs font-medium text-brand-danger"
+                role="alert"
+              >
+                {error}
+              </p>
+            )}
+            <div className="mt-6 flex justify-end gap-2">
+              <Button variant="outlined" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button type="submit" variant="contained" disabled={isSubmitting}>
+                {isSubmitting ? "Sending…" : "Send reset link"}
+              </Button>
+            </div>
+          </form>
         )}
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <label
-              htmlFor="fp-username"
-              className="mb-2 block text-sm font-medium text-brand-ink-soft"
-            >
-              Username
-            </label>
-            <input
-              id="fp-username"
-              className={fieldClass}
-              placeholder="Enter your username"
-              autoComplete="username"
-              {...register("username", {
-                required: "Username is required",
-                minLength: {
-                  value: 3,
-                  message: "Username must be at least 3 characters",
-                },
-              })}
-            />
-            {errors.username && (
-              <p className="mt-1 text-xs text-brand-danger">
-                {errors.username.message}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="fp-new-password"
-              className="mb-2 block text-sm font-medium text-brand-ink-soft"
-            >
-              New Password
-            </label>
-            <input
-              id="fp-new-password"
-              type="password"
-              className={fieldClass}
-              placeholder="Enter a new password"
-              autoComplete="new-password"
-              {...register("new_password", {
-                required: "New password is required",
-                minLength: {
-                  value: 3,
-                  message: "Password must be at least 3 characters",
-                },
-              })}
-            />
-            {errors.new_password && (
-              <p className="mt-1 text-xs text-brand-danger">
-                {errors.new_password.message}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="fp-confirm-password"
-              className="mb-2 block text-sm font-medium text-brand-ink-soft"
-            >
-              Confirm New Password
-            </label>
-            <input
-              id="fp-confirm-password"
-              type="password"
-              className={fieldClass}
-              placeholder="Re-enter the new password"
-              autoComplete="new-password"
-              {...register("confirm_password", {
-                required: "Please confirm your new password",
-                validate: (value) =>
-                  value === watch("new_password") || "Passwords do not match",
-              })}
-            />
-            {errors.confirm_password && (
-              <p className="mt-1 text-xs text-brand-danger">
-                {errors.confirm_password.message}
-              </p>
-            )}
-          </div>
-
-          <div className="flex gap-3 pt-2">
-            <Button
-              type="button"
-              variant="outlined"
-              onClick={handleClose}
-              disabled={isSubmitting}
-              className="flex-1"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={isSubmitting}
-              className="flex-1"
-            >
-              {isSubmitting ? (
-                <CircularProgress size={16} color="inherit" />
-              ) : (
-                "Reset Password"
-              )}
-            </Button>
-          </div>
-        </form>
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};
 
-export default ForgotPasswordDialog
+export default ForgotPasswordDialog;

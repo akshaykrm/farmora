@@ -1,3 +1,4 @@
+import PasswordField from "@components/PasswordField";
 import { Button, TextField, Autocomplete } from "@mui/material";
 import { useForm, type DefaultValues } from "react-hook-form";
 import type { EmployeeFormValues } from "../types";
@@ -5,7 +6,12 @@ import type { ValidationError } from "@errors/api.error";
 import { useEffect, useState } from "react";
 import Ternary from "@components/ternary";
 import PermissionChecklist from "@components/permission-checklist";
-import { permissionsApi, rolesApi, type Permission, type Role } from "@api/roles.api";
+import {
+  permissionsApi,
+  rolesApi,
+  type Permission,
+  type Role,
+} from "@api/roles.api";
 
 type Props = {
   defaultValues: DefaultValues<EmployeeFormValues>;
@@ -100,9 +106,8 @@ const EmployeeForm = (props: Props) => {
           <Ternary
             when={!hidePassword}
             then={
-              <TextField
+              <PasswordField
                 label="Password"
-                type="password"
                 size="small"
                 {...register("password")}
                 error={Boolean(errors.password)}

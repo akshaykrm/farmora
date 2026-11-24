@@ -1,6 +1,10 @@
 import { Op } from 'sequelize'
 import PackageModel from '@models/package'
 import RoleModel from '@models/role'
+import SubscriptionModel from '@models/subscription'
+import CheckoutOrder from '@models/checkoutorder'
+import UserModel from '@models/user'
+import { sequelize } from '@utils/db'
 import { PackageNotFoundError } from '@errors/package.errors'
 import { PermissionDeniedError } from '@errors/auth.errors'
 import { calculateOffSet } from '@utils/pagination'
@@ -78,8 +82,42 @@ const updateById = async (id, data) => {
 }
 
 const deleteById = async (id) => {
-  const packageRecord = await packageService.getById(id)
-  await packageRecord.destroy()
+  await sequelize.transaction(async (transaction) => {
+    const packageRecord = await PackageModel.findByPk(id, {
+      transaction,
+      lock: transaction.LOCK.UPDATE,
+    })
+    if (!packageRecord) throw new PackageNotFoundError(id)
+    const conflict = (message) =>
+      Object.assign(new Error(message), {
+        code: 'PACKAGE_IN_USE',
+        statusCode: 409,
+      })
+    if (packageRecord.name.trim().toLowerCase() === 'basic') {
+      throw conflict(
+        'The Basic package is required for default signup and cannot be deleted. You can edit it instead.'
+      )
+    }
+    const subscriptions = await SubscriptionModel.count({
+      where: { package_id: id },
+      paranoid: false,
+      transaction,
+    })
+    const checkouts = await CheckoutOrder.count({
+      where: { package_id: id },
+      transaction,
+    })
+    const requests = await UserModel.count({
+      where: { requested_package_id: id },
+      transaction,
+    })
+    if (subscriptions || checkouts || requests) {
+      throw conflict(
+        'This package is linked to subscribers or checkout orders. Set its status to inactive to stop new purchases.'
+      )
+    }
+    await packageRecord.destroy({ transaction })
+  })
 }
 
 const getNames = async () => {

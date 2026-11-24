@@ -1,4 +1,5 @@
-import { Button, TextField } from "@mui/material";
+import PasswordField from "@components/PasswordField";
+import { Button } from "@mui/material";
 import { useEffect } from "react";
 import { useForm, type DefaultValues } from "react-hook-form";
 import type { ValidationError } from "@errors/api.error";
@@ -57,9 +58,8 @@ const ChangePasswordForm = ({
       )}
 
       <div className="grid grid-cols-1 gap-4">
-        <TextField
+        <PasswordField
           label="Current Password"
-          type="password"
           fullWidth
           size="small"
           autoComplete="current-password"
@@ -70,9 +70,8 @@ const ChangePasswordForm = ({
           })}
         />
 
-        <TextField
+        <PasswordField
           label="New Password"
-          type="password"
           fullWidth
           size="small"
           autoComplete="new-password"
@@ -87,9 +86,8 @@ const ChangePasswordForm = ({
           })}
         />
 
-        <TextField
+        <PasswordField
           label="Confirm New Password"
-          type="password"
           fullWidth
           size="small"
           autoComplete="new-password"

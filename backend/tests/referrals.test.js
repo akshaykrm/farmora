@@ -1,5 +1,8 @@
-import { beforeAll, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
+import { randomUUID } from 'node:crypto'
+import { installMockGateway, paySignup, payOrder } from './helpers/checkout.js'
 import request from 'supertest'
+import { approveSignup } from './helpers/approval.js'
 import dayjs from 'dayjs'
 import app from '../app.js'
 import '../models/index.js'
@@ -42,7 +45,16 @@ const signupManager = async (overrides = {}) => {
     }
     const res = await request(app).post('/api/auth/signup').send(payload)
     last = { res, username, payload }
-    if (res.status === 201) return last
+    if (res.status === 201) {
+      res.body.data = await approveSignup(
+        res.body.data,
+        username,
+        payload.password
+      )
+      if (res.body.data.checkout_required)
+        await paySignup(res.body.data.checkout_token, payload.package_id)
+      return last
+    }
     if (res.body?.error?.code !== 'PACKAGE_NOT_FOUND') return last
   }
   return last
@@ -53,7 +65,10 @@ describe('Referral bonus and renewals', () => {
   let packageRecord
   let partner
 
+  afterAll(() => vi.restoreAllMocks())
+
   beforeAll(async () => {
+    installMockGateway()
     await connectDB()
     admin = await loginAs('superadmin', 'admin123')
     packageRecord =
@@ -64,6 +79,15 @@ describe('Referral bonus and renewals', () => {
         where: { status: 'active', role_id: { [Op.ne]: null } },
       }))
     expect(packageRecord).toBeTruthy()
+    packageRecord = await PackageModel.create({
+      name: unique('referralPaid'),
+      description: 'Paid referral test',
+      actual_price: 5000,
+      discount_price: 0,
+      duration: 1,
+      role_id: packageRecord.role_id,
+      status: 'active',
+    })
     await grantAllTenantPermissionsToPackage(packageRecord.id)
 
     await packageRecord.update({
@@ -118,8 +142,9 @@ describe('Referral bonus and renewals', () => {
     const renew = await request(app)
       .post('/api/subscriptions/renew')
       .set(authHeader(session.token))
-      .send({ package_id: packageRecord.id })
+      .send({ package_id: packageRecord.id, request_id: randomUUID() })
     expect(renew.status).toBe(201)
+    await payOrder(renew.body.data, session.token)
     expect(renew.body.data.kind).toBe('renewal')
 
     const manager = await UserModel.findOne({ where: { username } })
@@ -333,8 +358,10 @@ describe('Referral bonus and renewals', () => {
         user_id: manager.id,
         package_id: packageRecord.id,
         referral_partner_id: assignPartner.id,
+        request_id: randomUUID(),
       })
     expect(renew.status).toBe(201)
+    await payOrder(renew.body.data, admin.token)
 
     await manager.reload()
     expect(manager.referral_partner_id).toBe(assignPartner.id)

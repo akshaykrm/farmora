@@ -52,6 +52,7 @@ const cleanupUsers = async (ids) => {
   if (!ids.length) return
   const replacements = { ids }
   const statements = [
+    'DELETE FROM checkout_orders WHERE user_id IN (:ids)',
     'DELETE FROM batches WHERE master_id IN (:ids)',
     'DELETE FROM seasons WHERE master_id IN (:ids)',
     'DELETE FROM farms WHERE master_id IN (:ids)',

@@ -1,11 +1,13 @@
 import Joi from 'joi'
 
 export const createSubscriptionSchema = Joi.object({
+  request_id: Joi.string().uuid().required(),
   package_id: Joi.number().integer().required(),
   user_id: Joi.number().integer().optional(),
 })
 
 export const renewSubscriptionSchema = Joi.object({
+  request_id: Joi.string().uuid().required(),
   package_id: Joi.number().integer().required(),
   user_id: Joi.number().integer().optional(),
   referral_partner_id: Joi.number().integer().allow(null).optional(),
