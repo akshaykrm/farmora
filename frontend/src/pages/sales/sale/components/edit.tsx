@@ -63,7 +63,8 @@ const EditSale = ({ selectedId, onClose, refetch }: Props) => {
       const res = await sales.fetchById(selectedId);
       const { data, error, status } = res;
       if (status === "success") {
-        reset(data);
+        // Saving an edited invoice completes it; tick again to keep it pending.
+        reset({ ...data, is_incomplete: false });
       }
       if (res.status === "validation_error") {
         error.forEach((error) => {
