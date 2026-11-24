@@ -26,12 +26,25 @@ const ItemReturnForm = ({ methods, onSubmit, onCancel }: Props) => {
     formState: { errors },
   } = methods;
 
-  const batchNames = useGetBatchNameList({ status: "active" });
+  const activeBatchNames = useGetBatchNameList({ status: "active" });
+  const allBatchNames = useGetBatchNameList();
   const itemCategoryName = useGetItemCategoryName();
   const itemVendorName = useGetVendorNames({ type: "supplier" });
   const values = watch();
 
   const returnType = values.return_type;
+
+  // Keep already-selected batches (e.g. closed ones) visible in the options
+  const batchNames = {
+    data: [
+      ...activeBatchNames.data,
+      ...allBatchNames.data.filter(
+        (b) =>
+          (b.id === values.from_batch || b.id === values.to_batch) &&
+          !activeBatchNames.data.some((a) => a.id === b.id),
+      ),
+    ],
+  };
 
   const [qty, ratePerBag] = watch(["quantity", "rate_per_bag"]);
   const paymentType = watch("payment_type");

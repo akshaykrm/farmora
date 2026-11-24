@@ -21,7 +21,7 @@ type Props = {
 const FilterItemReturns = (props: Props) => {
   const vendorNames = useGetVendorNames({ type: "supplier" });
   const itemCategoryName = useGetItemCategoryNames();
-  const batchNames = useGetBatchNameList({ status: "active" });
+  const batchNames = useGetBatchNameList();
 
   const methods = useForm<ItemReturnFilterRequest>({
     defaultValues: props.defaultFilter,
